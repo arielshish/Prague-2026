@@ -1039,6 +1039,8 @@
         .moveAttraction(poiId, targetDay);
     }
 
+    document.getElementById('debug_overlay').textContent = '✅ A1 (safeStorage→buildPoiCard) OK';
+    </script><script>
     function renderDay() {
       const d = DAYS[currentDayIndex];
       const tl = id('timelineList');
@@ -1170,7 +1172,7 @@
     // ============================================================
     // CHECKLIST
     // ============================================================
-    document.getElementById('debug_overlay').textContent = '✅ first half functions OK';
+    document.getElementById('debug_overlay').textContent = '✅ A2 (safeStorage→renderDay) OK';
     </script><script>
     function setChecklistStatus(msg) {
       const el = id('checklistSyncStatus');
