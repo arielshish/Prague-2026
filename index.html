@@ -1481,7 +1481,7 @@
         if(id('dayTitle')) id('dayTitle').textContent = '🔄 נטען מהענן...';
         setChecklistStatus('🔄 טוען...');
 
-        // STEP 1: Load budget + checklist from AppData sheet
+        // Load AppData + Itinerary in parallel (independent)
         google.script.run
           .withSuccessHandler((resData) => {
             if(resData && resData.ok && resData.data) {
@@ -1490,41 +1490,49 @@
                 ? resData.data.packing_list : [...DEFAULT_PACKING];
               setChecklistStatus('✅ נטען מהענן');
             } else {
-              // Cloud has no data yet – use defaults and push them up
               PACKING_LIST = [...DEFAULT_PACKING];
               setChecklistStatus('☁️ ברירת מחדל');
-              syncAppData(); // first-time write
+              syncAppData();
             }
             if(id('budgetDisplay')) id('budgetDisplay').textContent = '₪' + TARGET_BUDGET.toLocaleString('he-IL');
             renderChecklist();
             setTimeout(() => setChecklistStatus('☁️ מסנכרן'), 2500);
-
-            // STEP 2: Load itinerary
-            google.script.run
-              .withSuccessHandler((resItin) => {
-                if(resItin && resItin.ok && resItin.data) {
-                  DAYS = resItin.data;
-                  BANK = resItin.bank || [];
-                  buildPoisFromDays();
-                  setupExpenseDropdown();
-                  selectDay(0);
-                } else {
-                  if(id('dayTitle')) id('dayTitle').textContent = '⚠️ שגיאה בטעינת מסלול';
-                }
-              })
-              .withFailureHandler(() => {
-                if(id('dayTitle')) id('dayTitle').textContent = '⚠️ שגיאת תקשורת (מסלול)';
-              })
-              .loadItinerary();
           })
           .withFailureHandler(() => {
-            // Fallback: load from local cache
             PACKING_LIST = [...DEFAULT_PACKING];
             renderChecklist();
             setChecklistStatus('❌ שגיאת חיבור');
-            if(id('dayTitle')) id('dayTitle').textContent = '⚠️ שגיאת תקשורת (הגדרות)';
           })
           .loadAppData();
+
+        // Load itinerary independently - not chained to AppData
+        google.script.run
+          .withSuccessHandler((resItin) => {
+            if(resItin && resItin.ok && resItin.data) {
+              DAYS = resItin.data;
+              BANK = resItin.bank || [];
+              buildPoisFromDays();
+              setupExpenseDropdown();
+              selectDay(0);
+            } else {
+              // Fallback to local data
+              DAYS = LOCAL_ITINERARY.data;
+              BANK = LOCAL_ITINERARY.bank;
+              buildPoisFromDays();
+              setupExpenseDropdown();
+              selectDay(0);
+              if(id('dayTitle')) id('dayTitle').textContent = '⚠️ שגיאה בטעינת מסלול';
+            }
+          })
+          .withFailureHandler(() => {
+            DAYS = LOCAL_ITINERARY.data;
+            BANK = LOCAL_ITINERARY.bank;
+            buildPoisFromDays();
+            setupExpenseDropdown();
+            selectDay(0);
+            if(id('dayTitle')) id('dayTitle').textContent = '⚠️ שגיאת תקשורת';
+          })
+          .loadItinerary();
 
       } else {
         // Running locally (dev mode) – use defaults
