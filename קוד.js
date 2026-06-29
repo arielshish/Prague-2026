@@ -18,8 +18,22 @@ var STOP_CATALOG = {
   'Palladium / מרכז העיר': { mapUrl: 'https://www.google.com/maps/place/Palladium+shopping+centre,+Prague', type: 'shopping' }
 };
 
-function doGet() {
-  getOrCreateChecklistSheet(); // Ensure the sheet is created immediately
+function doGet(e) {
+  // ?test=1 → minimal JS diagnostic page
+  if (e && e.parameter && e.parameter.test === '1') {
+    var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>GAS JS Test</title></head><body>' +
+      '<h2 id="s" style="color:red">JS NOT running</h2>' +
+      '<button id="btn" onclick="clicked()">לחץ עלי</button>' +
+      '<p id="r"></p>' +
+      '<script>' +
+      'document.getElementById("s").style.color="green";' +
+      'document.getElementById("s").textContent="JS IS RUNNING ✅";' +
+      'function clicked(){document.getElementById("r").textContent="כפתור עובד! ✅ "+new Date().toLocaleTimeString();}' +
+      '<\/script>' +
+      '</body></html>';
+    return HtmlService.createHtmlOutput(html).setTitle('GAS JS Test');
+  }
+  getOrCreateChecklistSheet();
   return HtmlService.createHtmlOutputFromFile('index')
     .setTitle('פראג 2026 - משפחת שיש')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
