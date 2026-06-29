@@ -349,7 +349,7 @@
             <div class="dash-content">
               <span class="dash-icon">💳</span>
               <h3 class="dash-title">הוצאות</h3>
-              <p class="dash-sub"><span id="dashSpent">₪0</span> / ₪15000</p>
+              <p class="dash-sub"><span id="dashSpent">₪0</span> / <span id="dashBudget">₪15,000</span></p>
             </div>
           </div>
 
@@ -551,6 +551,37 @@
         
         <div style="text-align:center; margin-top:8px;">
           <button onclick="pullChecklistFromCloud()" style="background:none; border:none; color:var(--text-light); font-size:13px; cursor:pointer;">🔄 רענן מהענן</button>
+        </div>
+
+        <!-- Emergency Info Card -->
+        <div style="margin-top:32px; background:linear-gradient(135deg,rgba(244,63,94,0.08),rgba(245,158,11,0.06)); border:1px solid rgba(244,63,94,0.2); border-radius:20px; padding:20px;">
+          <h3 style="margin:0 0 16px; font-size:16px; color:var(--accent);">🆘 מידע חירום – פראג</h3>
+          <div style="display:flex; flex-direction:column; gap:10px; font-size:13px;">
+            <div style="display:flex; gap:10px; align-items:flex-start;">
+              <span style="font-size:16px; flex-shrink:0;">📞</span>
+              <div><strong>חירום כללי:</strong> 112 &nbsp;|&nbsp; <strong>אמבולנס:</strong> 155 &nbsp;|&nbsp; <strong>משטרה:</strong> 158 &nbsp;|&nbsp; <strong>כיבוי:</strong> 150</div>
+            </div>
+            <div style="display:flex; gap:10px; align-items:flex-start;">
+              <span style="font-size:16px; flex-shrink:0;">🏛️</span>
+              <div><strong>שגרירות ישראל בפראג:</strong> <a href="tel:+420233097500" style="color:var(--accent); text-decoration:none;">+420 233 097 500</a></div>
+            </div>
+            <div style="display:flex; gap:10px; align-items:flex-start;">
+              <span style="font-size:16px; flex-shrink:0;">🏥</span>
+              <div><strong>בית חולים קרוב (עיר עתיקה):</strong> Nemocnice Na Františku – <a href="tel:+420222801111" style="color:var(--accent); text-decoration:none;">+420 222 801 111</a></div>
+            </div>
+            <div style="display:flex; gap:10px; align-items:flex-start;">
+              <span style="font-size:16px; flex-shrink:0;">💳</span>
+              <div><strong>חסימת כרטיס Leumi:</strong> 1-700-507-050 &nbsp;|&nbsp; <strong>Max:</strong> 1-700-700-570 &nbsp;|&nbsp; <strong>Cal:</strong> 03-953-5555</div>
+            </div>
+            <div style="display:flex; gap:10px; align-items:flex-start;">
+              <span style="font-size:16px; flex-shrink:0;">🏨</span>
+              <div><strong>המלון שלנו:</strong> Comfort Hotel Prague City East &nbsp;|&nbsp; <a href="tel:+420271000600" style="color:var(--accent); text-decoration:none;">+420 271 000 600</a></div>
+            </div>
+            <div style="display:flex; gap:10px; align-items:flex-start;">
+              <span style="font-size:16px; flex-shrink:0;">💊</span>
+              <div><strong>בית מרקחת 24/7:</strong> Palackeho 5 (מרכז) &nbsp;|&nbsp; <a href="tel:+420224946982" style="color:var(--accent); text-decoration:none;">+420 224 946 982</a></div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -807,64 +838,92 @@
     var sortableBank = null;
 
     var DEFAULT_PACKING = [
+      // מסמכים
       {id:'dp1', text:'דרכונים (לוודא תוקף 6 חודשים!)', category:'מסמכים', done:false},
-      {id:'dp2', text:'ביטוח נסיעות לחו"ל', category:'מסמכים', done:false},
-      {id:'dp3', text:'כסף זר (קורונות + קצת יורו)', category:'כספים', done:false},
-      {id:'dp4', text:'תרופות קבועות + משככי כאבים', category:'בריאות', done:false},
-      {id:'dp5', text:'בגדים נוחים + לבוש ערב קל', category:'ביגוד', done:false},
-      {id:'dp6', text:'נעלי הליכה נוחות', category:'ביגוד', done:false},
-      {id:'dp7', text:'מטענים, כבלים וסוללת גיבוי', category:'אלקטרוניקה', done:false}
+      {id:'dp2', text:'ביטוח נסיעות לחו"ל (צלמו את הפוליסה)', category:'מסמכים', done:false},
+      {id:'dp3', text:'צילום דרכונים שמור ב-WhatsApp / Drive', category:'מסמכים', done:false},
+      // כספים
+      {id:'dp4', text:'קורונות צ׳כיות (CZK) – להמיר בשדה או בבנק', category:'כספים', done:false},
+      {id:'dp5', text:'200 EUR מזומן – לחירום בלבד', category:'כספים', done:false},
+      {id:'dp6', text:'כרטיסי אשראי (2 לפחות) + פרטי חסימה שמורים', category:'כספים', done:false},
+      // ביגוד
+      {id:'dp7', text:'בגדים נוחים + לבוש ערב קל', category:'ביגוד', done:false},
+      {id:'dp8', text:'נעלי הליכה נוחות (הרבה הליכה!)', category:'ביגוד', done:false},
+      {id:'dp9', text:'מעיל דק / ז׳קט (אוגוסט יכול להיות קריר)', category:'ביגוד', done:false},
+      // בריאות
+      {id:'dp10', text:'תרופות קבועות לכל ימי הטיול', category:'בריאות', done:false},
+      {id:'dp11', text:'משככי כאבים + תרופות בטן + חום', category:'בריאות', done:false},
+      {id:'dp12', text:'פלסטרים + חיטוי + חבישות בסיסיות', category:'בריאות', done:false},
+      {id:'dp13', text:'קרם שמש 50+ (חובה ל-Aquapalace!)', category:'בריאות', done:false},
+      // אלקטרוניקה
+      {id:'dp14', text:'מטענים + כבלים לכל המכשירים', category:'אלקטרוניקה', done:false},
+      {id:'dp15', text:'סוללת גיבוי (PowerBank)', category:'אלקטרוניקה', done:false},
+      {id:'dp16', text:'אוזניות', category:'אלקטרוניקה', done:false},
+      // מקרי חירום
+      {id:'de1', text:'📞 חירום אירופאי: 112 | אמבולנס: 155 | משטרה: 158', category:'מקרי חירום', done:false},
+      {id:'de2', text:'🏛️ שגרירות ישראל בפראג: +420 233 097 500', category:'מקרי חירום', done:false},
+      {id:'de3', text:'🏥 בית חולים קרוב: Nemocnice Na Františku (עיר עתיקה)', category:'מקרי חירום', done:false},
+      {id:'de4', text:'💳 חסימת כרטיס Leumi: 1-700-507-050 | Max: 1-700-700-570', category:'מקרי חירום', done:false},
+      {id:'de5', text:'🔒 טלפון ביטוח נסיעות (מספר פוליסה: ______)', category:'מקרי חירום', done:false},
+      {id:'de6', text:'🚖 Bolt מוכן – כרטיס אשראי רשום, אפליקציה מותקנת', category:'מקרי חירום', done:false},
+      {id:'de7', text:'📍 כתובת המלון שמורה אופליין (Comfort Hotel Prague City East)', category:'מקרי חירום', done:false}
     ];
 
     // ============================================================
     // LOCAL FALLBACK ITINERARY (mirrors initItineraryDB in Code.gs)
     // ============================================================
     var LOCAL_ITINERARY = {ok:true,data:[
-      {index:0,e:'🛬',t:'נחיתה והגעה',s:'נחיתה 08:45, Check-In במלון, ארוחת ערב ראשונה!',hero:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Leti%C5%A1t%C4%9B_V%C3%A1clava_Havla_Praha_-_Termin%C3%A1l_1_%282019%29.jpg/800px-Leti%C5%A1t%C4%9B_V%C3%A1clava_Havla_Praha_-_Termin%C3%A1l_1_%282019%29.jpg',attractions:[
-        {id:'d0_a',type:'travel',title:'✈️ Václav Havel Airport',desc:'טיסה נוחתת 08:45 בטרמינל 1.',link:'https://maps.app.goo.gl/xHBo6VkQV7fhsYR36',priority:'High',hours:'24/7',price:'חינם',duration:'45 דק',tip:'Bolt למלון – הרבה יותר זול!'},
-        {id:'d0_b',type:'hotel',title:'🏨 Comfort Hotel Prague City East',desc:'Check-In, בקשו חדר בקומה גבוהה.',link:'',priority:'High',hours:'15:00',price:'שולם',duration:'20 דק',tip:'אם הגעתם מוקדם – שמרו מזוודות'},
-        {id:'d0_c',type:'restaurant',title:'🥩 Kantýna – ארוחה ראשונה',desc:'מסעדת בשרים ספקטקולרית.',link:'',priority:'High',hours:'11:00-23:00',price:'~150 CZK',duration:'90 דק',tip:'הזמינו מקום מראש!'}
+      {index:0,e:'🛬',t:'נחיתה והגעה',s:'נחיתה 08:45, Check-In במלון, ארוחת ערב ראשונה בפראג!',hero:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Leti%C5%A1t%C4%9B_V%C3%A1clava_Havla_Praha_-_Termin%C3%A1l_1_%282019%29.jpg/800px-Leti%C5%A1t%C4%9B_V%C3%A1clava_Havla_Praha_-_Termin%C3%A1l_1_%282019%29.jpg',attractions:[
+        {id:'d0_a',type:'travel',title:'✈️ Václav Havel Airport',desc:'טיסה נוחתת 08:45 בטרמינל 1. החזיקו דרכונים ביד, עברו בקרת דרכונים ואספו מזוודות. Bolt למלון עולה כ-200 CZK ולוקח ~30 דקות.',link:'https://maps.app.goo.gl/xHBo6VkQV7fhsYR36',priority:'High',hours:'24/7',price:'חינם',duration:'45 דקות',tip:'הורידו Bolt לפני הנחיתה – הרבה יותר זול ממונית!'},
+        {id:'d0_b',type:'hotel',title:'🏨 Comfort Hotel Prague City East',desc:'Check-In מ-15:00. המלון כולל ארוחות בוקר. בקשו חדר בקומה גבוהה לנוף. יש חניה ושירות מזוודות.',link:'',priority:'High',hours:'Check-in 15:00',price:'שולם',duration:'20 דקות',tip:'אם הגעתם מוקדם – שמרו מזוודות ולכו לסיור!'},
+        {id:'d0_c',type:'restaurant',title:'🥩 Kantýna – ארוחה ראשונה',desc:'מסעדת בשרים ספקטקולרית עם קונספט קצביה. סטייקים, נקניקיות ובירה Pilsner Urquell טרייה. אווירת ביסטרו מודרני ומקומי אמיתי.',link:'https://kantyna.ambi.cz/',priority:'High',hours:'א-ו 11:00-23:00',price:'~150 CZK',duration:'90 דקות',tip:'⚠️ הזמינו מקום מראש! kantyna.ambi.cz'}
       ]},
-      {index:1,e:'🏰',t:'העיר העתיקה',s:'גשר קארל, כיכר העיר, השעון האסטרונומי.',hero:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Prague_Old_Town_Square.jpg/800px-Prague_Old_Town_Square.jpg',attractions:[
-        {id:'d1_a',type:'attraction',title:'🌉 גשר קארל',desc:'30 פסלי קדושים מ-1357.',link:'',priority:'High',hours:'תמיד פתוח',price:'חינם',duration:'45 דק',tip:'הגיעו לפני 8:00!'},
-        {id:'d1_b',type:'attraction',title:'🏛️ כיכר העיר העתיקה',desc:'לב ההיסטוריה של פראג.',link:'',priority:'High',hours:'תמיד פתוח',price:'חינם',duration:'1 ש',tip:'עצרו בשעה עגולה לשעון'},
-        {id:'d1_c',type:'attraction',title:'⏰ השעון האסטרונומי',desc:'שעון ממוכן מ-1410.',link:'https://www.prague.eu/en/object/places/3129/astronomical-clock',priority:'High',hours:'9:00-21:00',price:'250 CZK',duration:'30 דק',tip:'עלו למגדל לנוף!'},
-        {id:'d1_d',type:'restaurant',title:'🍺 Lokál – אוכל צ׳כי',desc:'Pilsner Urquell טרי + svíčková.',link:'',priority:'High',hours:'11:00-01:00',price:'~200 CZK',duration:'90 דק',tip:'הזמינו svíčková!'}
+      {index:1,e:'🏰',t:'העיר העתיקה',s:'גשר קארל, כיכר העיר העתיקה, השעון האסטרונומי וחומת לנון.',hero:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Prague_Old_Town_Square.jpg/800px-Prague_Old_Town_Square.jpg',attractions:[
+        {id:'d1_a',type:'attraction',title:'🌉 גשר קארל – Charles Bridge',desc:'גשר אבן מ-1357, 516 מטר, עם 30 פסלי קדושים בארוקיים. אחד הגשרים היפים בעולם. בזריחה ריק לגמרי, בצהריים צפוף מאוד.',link:'',priority:'High',hours:'תמיד פתוח',price:'חינם',duration:'45 דקות',tip:'הגיעו לפני 8:00 לתמונות ללא המון!'},
+        {id:'d1_b',type:'attraction',title:'🏛️ כיכר העיר העתיקה',desc:'הלב ההיסטורי של פראג. מוקפת בכנסיות גותיות ובניינים בארוקיים. כנסיית טין עם שני מגדלים דרמטיים, ארמון קינסקי וחנויות עתיקות.',link:'',priority:'High',hours:'תמיד פתוח',price:'חינם',duration:'1 שעה',tip:'עצרו בשעה עגולה לתצוגת השעון האסטרונומי!'},
+        {id:'d1_c',type:'attraction',title:'⏰ השעון האסטרונומי',desc:'שעון מכני מ-1410 – אחד מהעתיקים בעולם שעדיין עובד. בכל שעה עגולה מציג תצוגת שלוש דקות עם שנים עשר שליחים. עלו למגדל לנוף 360 מעלות על פראג.',link:'https://www.prague.eu/en/object/places/3129/astronomical-clock',priority:'High',hours:'9:00-21:00',price:'250 CZK למגדל',duration:'30 דקות',tip:'עלו למגדל – שווה כל שקל!'},
+        {id:'d1_d',type:'attraction',title:'🎸 חומת לנון – Lennon Wall',desc:'קיר גרפיטי ססגוני בהשראת ג׳ון לנון. נוצר בשנות ה-80 כמחאה סמלית. כל יום גרפיטי חדש. אחד המקומות הפוטוגניים ביותר בפראג.',link:'',priority:'Medium',hours:'תמיד פתוח',price:'חינם',duration:'15 דקות',tip:'הביאו טוש – מסורת לחתום על הקיר!'},
+        {id:'d1_e',type:'restaurant',title:'🍺 Lokál Dlouhááá – אוכל צ׳כי',desc:'אחת המסעדות הטובות ביותר לאוכל צ׳כי מסורתי. Pilsner Urquell הטרייה בפראג עם svíčková (סינטה ברוטב שמנת). אווירת פאב שובב ואמיתי.',link:'',priority:'High',hours:'א-ו 11:00-01:00',price:'~200 CZK',duration:'90 דקות',tip:'הזמינו svíčková – הדיש הצ׳כי הלאומי!'}
       ]},
-      {index:2,e:'👑',t:'טירת פראג',s:'קתדרלת ויטוס, סמטת הזהב, פטרין.',hero:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Prague_Castle_from_Charles_Bridge.jpg/800px-Prague_Castle_from_Charles_Bridge.jpg',attractions:[
-        {id:'d2_a',type:'attraction',title:'🏰 טירת פראג',desc:'הטירה הגדולה בעולם!',link:'https://www.hrad.cz/en/prague-castle-for-visitors/tickets',priority:'High',hours:'9:00-17:00',price:'350 CZK',duration:'3-4 ש',tip:'הזמינו כרטיסים מראש!'},
-        {id:'d2_b',type:'attraction',title:'⛪ קתדרלת ויטוס',desc:'ויטראז׳ים מדהימים.',link:'',priority:'High',hours:'9:00-17:00',price:'כלול',duration:'1 ש',tip:'הסתכלו על הויטראז׳'},
-        {id:'d2_c',type:'attraction',title:'🏠 סמטת הזהב',desc:'בית 22 – שם גר קפקא!',link:'',priority:'High',hours:'9:00-17:00',price:'כלול',duration:'30 דק',tip:'ביקור בית קפקא'},
-        {id:'d2_d',type:'attraction',title:'🌿 מגדל פטרין',desc:'כמו מגדל אייפל קטן.',link:'',priority:'High',hours:'10:00-20:00',price:'150 CZK',duration:'1.5 ש',tip:'ברכבל לגבעה!'}
+      {index:2,e:'👑',t:'טירת פראג',s:'קתדרלת ויטוס, סמטת הזהב, פטרין ובית הריקוד.',hero:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Prague_Castle_from_Charles_Bridge.jpg/800px-Prague_Castle_from_Charles_Bridge.jpg',attractions:[
+        {id:'d2_a',type:'attraction',title:'🏰 טירת פראג – Prague Castle',desc:'הטירה הגדולה בעולם לפי שטח! 70,000 מ"ר עם ארמונות, כנסיות, גנים וסמטאות. כרטיס כולל: קתדרלת ויטוס, ארמון מלכותי, כנסיית ג׳ורג׳ וסמטת הזהב.',link:'https://www.hrad.cz/en/prague-castle-for-visitors/tickets',priority:'High',hours:'9:00-17:00',price:'350/175 CZK',duration:'3-4 שעות',tip:'הזמינו כרטיסים מראש! hrad.cz – תורים ארוכים!'},
+        {id:'d2_b',type:'attraction',title:'⛪ קתדרלת סנט ויטוס',desc:'קתדרלה גותית עצומה שבנייתה ארכה 600 שנה. כוללת ויטראז׳ים מרהיבים של אלפונס מוכהה, ארון הקודש של ונציאנוס וקריפטה עם קברות המלכים.',link:'',priority:'High',hours:'9:00-17:00',price:'כלול בכרטיס הטירה',duration:'1 שעה',tip:'הסתכלו על הויטראז׳ בשמש – צבעים מדהימים!'},
+        {id:'d2_c',type:'attraction',title:'🏠 סמטת הזהב – Golden Lane',desc:'סמטה מימי הביניים צבעונית ומקסימה. בתים קטנים מהמאה ה-16 של מגיני הטירה. בית מספר 22 – שם גר פרנץ קפקא בשנים 1916-17.',link:'',priority:'High',hours:'9:00-17:00',price:'כלול בכרטיס הטירה',duration:'30 דקות',tip:'ביקור בית קפקא – חוויה תרבותית מיוחדת!'},
+        {id:'d2_d',type:'attraction',title:'🌿 מגדל פטרין – Petřín',desc:'מגדל מתכת מ-1891 על גבעה ירוקה, בהשראת מגדל אייפל. גובה 63 מטר + 318 מדרגות. מרפסת תצפית פנורמית על כל פראג. לידו: מבוך מראות וכנסיית המאה.',link:'https://www.petrin-rozhledna.cz/en/',priority:'High',hours:'10:00-20:00',price:'150 CZK',duration:'1.5 שעות',tip:'ברכבל (lanovka) לגבעה – 32 CZK, כמו אוטובוס!'},
+        {id:'d2_e',type:'attraction',title:'💃 בית הריקוד – Dancing House',desc:'בניין דקונסטרוקטיביסט מ-1996 של פרנק גרי. נראה כאילו שתי דמויות רוקדות. מרפסת גג עם בר ונוף מדהים על הנהר. אחת הצילומים הכי מצולמות בפראג.',link:'',priority:'Medium',hours:'8:00-22:00',price:'חינם מבחוץ / 150 CZK לגג',duration:'15 דקות',tip:'תמונה מבחוץ מספיקה!'}
       ]},
-      {index:3,e:'🎡',t:'ילדים וכייף',s:'ממלכת הרכבות, Hamleys, קמפה.',hero:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Kr%C3%A1lovstv%C3%AD_%C5%BEeleznic_%281%29.jpg/800px-Kr%C3%A1lovstv%C3%AD_%C5%BEeleznic_%281%29.jpg',attractions:[
-        {id:'d3_a',type:'attraction',title:'🚂 ממלכת הרכבות',desc:'רכבות מיניאטוריות ענקיות.',link:'https://www.kralovstvi-zeleznic.cz/en/',priority:'High',hours:'9:00-19:00',price:'300 CZK',duration:'2-3 ש',tip:'יש סימולטור נהיגה!'},
-        {id:'d3_b',type:'shopping',title:'🧸 Hamleys',desc:'שלוש קומות של צעצועים.',link:'',priority:'Medium',hours:'10:00-20:00',price:'חינם',duration:'1 ש',tip:'קבעו תקציב מראש!'},
-        {id:'d3_c',type:'restaurant',title:'🍔 Maso a Kobliha',desc:'ההמבורגר הכי טוב בפראג.',link:'',priority:'High',hours:'12:00-22:00',price:'~200 CZK',duration:'1 ש',tip:'Truffle Burger!'}
+      {index:3,e:'🎡',t:'ילדים וכייף',s:'ממלכת הרכבות, Hamleys, אי קמפה ומאלה סטרנה.',hero:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Kr%C3%A1lovstv%C3%AD_%C5%BEeleznic_%281%29.jpg/800px-Kr%C3%A1lovstv%C3%AD_%C5%BEeleznic_%281%29.jpg',attractions:[
+        {id:'d3_a',type:'attraction',title:'🚂 ממלכת הרכבות',desc:'מוזיאון רכבות מיניאטוריות ענקי – הגדול בצ׳כיה! 2,000 מ"ר עם ערים מיניאטוריות, 100+ רכבות, סימולטור נהיגה ותצוגות אינטראקטיביות. חוויה לכל הגילאים.',link:'https://www.kralovstvi-zeleznic.cz/en/',priority:'High',hours:'9:00-19:00',price:'300/200 CZK',duration:'2-3 שעות',tip:'סימולטור נהיגת רכבת – הילדים ישתגעו!'},
+        {id:'d3_b',type:'shopping',title:'🧸 Hamleys – חנות הצעצועים',desc:'שלוש קומות מלאות צעצועים, הדגמות חי ובידוריסטים. ענקית הצעצועים הבריטית בלב פראג. מוצרים אינטראקטיביים שלא תמצאו בארץ.',link:'',priority:'Medium',hours:'10:00-20:00',price:'חינם (הארנק לא)',duration:'60 דקות',tip:'קבעו תקציב לכל ילד לפני הכניסה!'},
+        {id:'d3_c',type:'attraction',title:'🏝️ אי קמפה – Kampa',desc:'אי קסום בנהר Čertovka (מאלה ונציה). פסלי David Černý מפורסמים: תינוקות ענקיים ובסוסי נדנדה. גנים ירוקים לפיקניק.',link:'',priority:'Medium',hours:'תמיד פתוח',price:'חינם',duration:'45 דקות',tip:'חפשו "Babies" – פסלי תינוקות ללא פנים, מוזר ומדהים!'},
+        {id:'d3_d',type:'restaurant',title:'🍔 Maso a Kobliha – המבורגר',desc:'מסעדה קטנה ואהובה עם ההמבורגרים הטובים ביותר בפראג. בשר טחון טרי, לחמניות ביתיות ורטבים מיוחדים. פשוט אבל מדהים.',link:'',priority:'High',hours:'א-ו 12:00-22:00',price:'~200 CZK',duration:'60 דקות',tip:'Truffle Burger – חובה מוחלטת!'}
       ]},
-      {index:4,e:'💦',t:'Aquapalace',s:'הפארק המקורה הגדול במרכז אירופה. 14 מגלשות!',hero:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Aquapalace_Praha_-_tobog%C3%A1ny.jpg/800px-Aquapalace_Praha_-_tobog%C3%A1ny.jpg',attractions:[
-        {id:'d4_a',type:'attraction',title:'🌊 Aquapalace Prague',desc:'14 מגלשות, ספא, בריכת גלים.',link:'https://www.aquapalace.cz/en/',priority:'High',hours:'10:00-21:00',price:'650 CZK',duration:'כל היום',tip:'מגבות + שמש 50+!'}
+      {index:4,e:'💦',t:'Aquapalace – פארק מים',s:'הפארק המקורה הגדול במרכז אירופה! 14 מגלשות וספא.',hero:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Aquapalace_Praha_-_tobog%C3%A1ny.jpg/800px-Aquapalace_Praha_-_tobog%C3%A1ny.jpg',attractions:[
+        {id:'d4_a',type:'attraction',title:'🌊 Aquapalace Prague',desc:'הפארק המקורה הגדול ביותר במרכז אירופה! 14 מגלשות, בריכת גלים, נהר עצלנים, אזור ספא וסאונות. מחולק לאזור ילדים ומבוגרים. אפשרות לוקרים ומסעדה בפנים.',link:'https://www.aquapalace.cz/en/',priority:'High',hours:'10:00-21:00',price:'650/530 CZK',duration:'כל היום!',tip:'הביאו: מגבות, שמש 50+, ו-100 CZK פיקדון ללוקר!'}
       ]},
-      {index:5,e:'🐘',t:'גן חיות פראג',s:'Top 5 בעולם – 5000+ חיות.',hero:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Zoo_Praha_-_hlavn%C3%AD_vchod.jpg/800px-Zoo_Praha_-_hlavn%C3%AD_vchod.jpg',attractions:[
-        {id:'d5_a',type:'attraction',title:'🐘 Prague Zoo',desc:'גורילות, פנדות אדומות ועוד.',link:'https://www.zoopraha.cz/en',priority:'High',hours:'9:00-19:00',price:'300 CZK',duration:'4-5 ש',tip:'רכבל פנימי חינם!'},
-        {id:'d5_b',type:'attraction',title:'🌲 פארק Stromovka',desc:'פארק מלכותי מנוחה.',link:'',priority:'Low',hours:'תמיד פתוח',price:'חינם',duration:'1 ש',tip:'פיקניק מ-Tesco!'}
+      {index:5,e:'🐘',t:'גן חיות פראג',s:'Top 5 בעולם – 5000+ חיות. פיקניק בפארק Stromovka.',hero:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Zoo_Praha_-_hlavn%C3%AD_vchod.jpg/800px-Zoo_Praha_-_hlavn%C3%AD_vchod.jpg',attractions:[
+        {id:'d5_a',type:'attraction',title:'🐘 גן חיות פראג – Prague Zoo',desc:'Top 5 בדירוג עולמי של CNN! 700+ מינים, 5,000+ חיות. גורילות, פנדות אדומות, גמלים ונמרים. אולם הג׳ונגל האינדונזי מרהיב. יש רכבל פנימי חינמי לתצפית על הגן.',link:'https://www.zoopraha.cz/en',priority:'High',hours:'9:00-19:00',price:'300/200 CZK',duration:'4-5 שעות',tip:'רכבל פנימי = חינם ותצפית מדהימה!'},
+        {id:'d5_b',type:'attraction',title:'🌲 פארק Stromovka',desc:'פארק מלכותי לשעבר (שמורת הציד של המלכים) שהפך לפארק ציבורי. אגמים, שבילים ועצים עתיקים. מושלם לפיקניק ומנוחה אחה"צ.',link:'',priority:'Low',hours:'תמיד פתוח',price:'חינם',duration:'1 שעה',tip:'קחו אוכל מ-Tesco ופיקניק על הדשא!'}
       ]},
-      {index:6,e:'🛍️',t:'יום קניות',s:'Primark, Palladium, Fashion Arena, U Fleků.',hero:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Palladium_Prague.jpg/800px-Palladium_Prague.jpg',attractions:[
-        {id:'d6_a',type:'shopping',title:'👗 Primark – ונצלס',desc:'שלוש קומות אופנה זולה.',link:'',priority:'High',hours:'9:00-21:00',price:'חינם',duration:'2 ש',tip:'הגיעו ב-09:00!'},
-        {id:'d6_b',type:'shopping',title:'🏬 Palladium',desc:'200+ חנויות במרכז פראג.',link:'',priority:'High',hours:'9:00-21:00',price:'חינם',duration:'2 ש',tip:'Tax Free!'},
-        {id:'d6_c',type:'shopping',title:'🛍️ Fashion Arena Outlet',desc:'מותגים ב-50-70% הנחה.',link:'',priority:'Medium',hours:'10:00-21:00',price:'חינם',duration:'2 ש',tip:'Bolt 30 דקות מהמרכז'},
-        {id:'d6_d',type:'restaurant',title:'🍷 U Fleků',desc:'הפאב ההיסטורי ביותר מ-1499.',link:'',priority:'High',hours:'10:00-23:00',price:'~250 CZK',duration:'2 ש',tip:'המרתף ההיסטורי!'}
+      {index:6,e:'🛍️',t:'יום קניות',s:'הרובע היהודי, Primark, Palladium, Fashion Arena ו-U Fleků.',hero:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Palladium_Prague.jpg/800px-Palladium_Prague.jpg',attractions:[
+        {id:'d6_a',type:'attraction',title:'✡️ הרובע היהודי – Josefov',desc:'אחד הרבעים היהודיים השמורים ביותר באירופה. 6 בתי כנסת מרהיבים, בית עלמין ישן עם 12,000 מצבות, ומוזיאון היהודים בפראג. ביה"כ הספרדי – יפהפה ומרגש.',link:'https://www.jewishmuseum.cz/en/',priority:'High',hours:'9:00-18:00',price:'500 CZK',duration:'2 שעות',tip:'ביה"כ הספרדי – יפהפה ומרגש ביותר!'},
+        {id:'d6_b',type:'shopping',title:'👗 Primark – ונצלס',desc:'ענקית האופנה הזולה! שלוש קומות עמוסות בגדים, אביזרים ומוצרי בית. מחירי ישראל ב-40-50% פחות. דגשים: בגדים לילדים, בגדי ים ואביזרים.',link:'',priority:'High',hours:'9:00-21:00',price:'חינם (קניות)',duration:'2 שעות',tip:'מחירים ב-CZK – פחות ממחצית מישראל! אל תחמיצו'},
+        {id:'d6_c',type:'shopping',title:'🏬 Palladium – קניון מרכזי',desc:'200+ חנויות, 30+ מסעדות, בפיסגה 5 קומות ממלכת הקניות של פראג. Zara, H&M, Air Jordan, Marks & Spencer ועוד. סופרמרקט בקומת המרתף.',link:'',priority:'High',hours:'9:00-21:00',price:'חינם',duration:'2 שעות',tip:'Tax Free במרכז מידע – חסכו 15-20%!'},
+        {id:'d6_d',type:'shopping',title:'🛍️ Fashion Arena Outlet',desc:'מרכז Outlet הגדול בצ׳כיה! Nike, Adidas, Tommy Hilfiger, Calvin Klein ועוד 200 מותגים ב-50-70% הנחה. 20 דקות מהמרכז ב-Bolt.',link:'',priority:'Medium',hours:'10:00-21:00',price:'חינם',duration:'2 שעות',tip:'Bolt מהמרכז ~100 CZK – כדאי מאוד!'},
+        {id:'d6_e',type:'restaurant',title:'🍷 U Fleků – ארוחת פרידה',desc:'הפאב ההיסטורי ביותר בפראג, מוסד מ-1499! 1,200 מ"ר של אולמות אכילה היסטוריים. בירה שחורה ייחודית שמיוצרת במקום. מנות צ׳כיות מסורתיות.',link:'https://www.ufleku.cz/en/',priority:'High',hours:'10:00-23:00',price:'~250 CZK',duration:'2 שעות',tip:'מרתף ההיסטוריה – ארוחה אחרונה שלא תשכחו!'}
       ]},
-      {index:7,e:'🛫',t:'חוזרים הביתה',s:'Vysehrad, Café Louvre, טיסה 23:45.',hero:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Leti%C5%A1t%C4%9B_V%C3%A1clava_Havla_Praha_-_leti%C5%A1tn%C3%AD_v%C4%9B%C5%BE_%282019%29.jpg/800px-Leti%C5%A1t%C4%9B_V%C3%A1clava_Havla_Praha_-_leti%C5%A1tn%C3%AD_v%C4%9B%C5%BE_%282019%29.jpg',attractions:[
-        {id:'d7_a',type:'attraction',title:'🏯 Vyšehrad',desc:'מבצר עתיק עם נוף על הנהר.',link:'',priority:'High',hours:'9:30-18:00',price:'100 CZK',duration:'1.5 ש',tip:'קברי Dvorak ו-Smetana!'},
-        {id:'d7_b',type:'restaurant',title:'☕ Café Louvre',desc:'בית קפה מ-1902 של קפקא.',link:'',priority:'High',hours:'8:00-23:30',price:'~200 CZK',duration:'90 דק',tip:'פנקייקים + קפה!'},
-        {id:'d7_c',type:'travel',title:'✈️ טיסה QS1286 הביתה',desc:'יציאה לשדה 20:45, המראה 23:45.',link:'',priority:'High',hours:'23:45',price:'קיים',duration:'-',tip:'⚠️ הגיעו 3 שעות לפני!'}
+      {index:7,e:'🛫',t:'חוזרים הביתה',s:'Vyšehrad בבוקר, Café Louvre, ואז לשדה לטיסה 23:45.',hero:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Leti%C5%A1t%C4%9B_V%C3%A1clava_Havla_Praha_-_leti%C5%A1tn%C3%AD_v%C4%9B%C5%BE_%282019%29.jpg/800px-Leti%C5%A1t%C4%9B_V%C3%A1clava_Havla_Praha_-_leti%C5%A1tn%C3%AD_v%C4%9B%C5%BE_%282019%29.jpg',attractions:[
+        {id:'d7_a',type:'attraction',title:'🏯 Vyšehrad – מצודת האגדות',desc:'מבצר עתיק מהמאה ה-10 על צוק מעל הנהר. בית הקברות הלאומי עם קברי הגדולים: Dvořák, Smetana, Mucha. כנסיית פטרוס ופאולוס גותית. נוף מדהים על הנהר.',link:'',priority:'High',hours:'9:30-18:00',price:'100 CZK',duration:'1.5 שעות',tip:'קברי Dvořák ו-Smetana – מרגש ומיוחד!'},
+        {id:'d7_b',type:'restaurant',title:'☕ Café Louvre – קפה אחרון',desc:'בית קפה וינאי מ-1902 – Einstein וקפקא ישבו כאן! קירות גבוהים, מראות ישנות ואווירה פריזאית. ארוחות בוקר מפנקות, פנקייקים ודברים מתוקים.',link:'',priority:'High',hours:'8:00-23:30',price:'~200 CZK',duration:'60-90 דקות',tip:'פנקייקים + קפה = זיכרון לחיים!'},
+        {id:'d7_c',type:'travel',title:'✈️ טיסה QS1286 – הביתה',desc:'יציאה מהמלון לשדה בשעה 20:45. טיסה המראה 23:45 מטרמינל 2 → נחיתה ת"א 04:35+1. בדקו-אין אונליין 24 שעות לפני.',link:'',priority:'High',hours:'המראה 23:45',price:'כרטיס קיים',duration:'-',tip:'⚠️ הגיעו לשדה 3 שעות לפני = 20:45!'}
       ]}
     ],bank:[
-      {id:'bank_a',type:'attraction',title:'📚 Clementinum',desc:'הספרייה היפה בעולם!',link:'https://www.klementinum.com/en/',priority:'Medium',hours:'10:00-17:30',price:'300 CZK',duration:'1 ש',tip:'תמונות מ-Level אחר!'},
-      {id:'bank_b',type:'attraction',title:'⛵ שייט בנהר Vltava',desc:'שייט 1 שעה עם נוף הגשרים.',link:'https://www.prague-venice.cz/',priority:'Medium',hours:'10:00-22:00',price:'350 CZK',duration:'1 ש',tip:'שקיעה = הכי יפה!'},
-      {id:'bank_c',type:'tip',title:'🚖 Bolt – נסיעות',desc:'הרבה יותר זול מ-Uber.',link:'https://bolt.eu/',priority:'High',hours:'24/7',price:'~50-100 CZK',duration:'-',tip:'הגדירו כרטיס לפני!'},
-      {id:'bank_d',type:'attraction',title:'💃 Dancing House',desc:'בניין מטורף של פרנק גרי.',link:'',priority:'Medium',hours:'8:00-22:00',price:'חינם/150 CZK גג',duration:'15 דק',tip:'תמונה מבחוץ מספיקה!'}
+      {id:'bank_a',type:'attraction',title:'📚 Clementinum – ספרייה בארוקית',desc:'הספרייה הבארוקית הרייזנטטיבית בעולם! ספרייה ממארפכת מ-1722 עם קמרונות מצוירים, גלוב עתיק ומגדל אסטרונומי. תמונות אינסטגרם מ-Level אחר.',link:'https://www.klementinum.com/en/',priority:'Medium',hours:'10:00-17:30',price:'300 CZK',duration:'1 שעה',tip:'הזמינו סיור מודרך – עדיף!'},
+      {id:'bank_b',type:'attraction',title:'⛵ שייט בנהר Vltava',desc:'שייט 1-2 שעות בנהר Vltava עם נוף על כל הגשרים, הטירה וגשר קארל מלמטה. מפעיל מומלץ: Prague Venice Boats.',link:'https://www.prague-venice.cz/',priority:'Medium',hours:'10:00-22:00',price:'350 CZK',duration:'1 שעה',tip:'שקיעה = הכי יפה – כוונו לשעה 19:00!'},
+      {id:'bank_c',type:'tip',title:'🚖 Bolt – אפליקציית נסיעות',desc:'שירות הסעות המומלץ לפראג. הרבה יותר זול ממוניות ואמין יותר. נסיעה ממוצעת במרכז: 50-100 CZK. ב-Bolt Pool עוד יותר זול.',link:'https://bolt.eu/',priority:'High',hours:'24/7',price:'~50-100 CZK',duration:'-',tip:'הגדירו כרטיס אשראי לפני הטיסה!'},
+      {id:'bank_d',type:'attraction',title:'💃 בית הריקוד – Dancing House',desc:'בניין דקונסטרוקטיביסט מ-1996 של פרנק גרי ו-Vlado Milunić. נראה כאילו שתי דמויות רוקדות. מרפסת גג "Glass Bar" עם בר ונוף מדהים.',link:'',priority:'Medium',hours:'8:00-22:00',price:'חינם מבחוץ / 150 CZK לגג',duration:'15 דקות',tip:'תמונה מבחוץ מספיקה!'},
+      {id:'bank_e',type:'attraction',title:'🎭 Municipal House – בית העירייה',desc:'ארמון Art Nouveau מרהיב מ-1912. אולם Smetana המפורסם עם קישוטי Alfons Mucha. קפה וינאי מפואר וחנויות עיצוב.',link:'https://www.obecnidum.cz/en/',priority:'Medium',hours:'10:00-18:00',price:'250 CZK',duration:'1 שעה',tip:'בדקו קונצרטים בתאריכים שלכם – שווה!'},
+      {id:'bank_f',type:'tip',title:'💱 טיפ: המרת מטבע',desc:'תמיד שלמו ב-CZK! אל תסכימו ל-DCC (המרה ישירה לשקלים). שע"ח רשמי: ~6.4 CZK לשקל. הכי טוב להמיר בבנק או בכספומט עם כרטיס.',link:'https://www.xe.com/',priority:'High',hours:'תמיד',price:'חינם',duration:'-',tip:'⚠️ שלמו ב-CZK תמיד, לא בשקלים!'}
     ]};
 
     </script><script>
@@ -1136,7 +1195,11 @@
       }
       var ticketBtn = id('poiTicketBtn');
       if(ticketBtn) {
-        var hasTickets = poi.link && (poi.link.indexOf('hrad') !== -1 || poi.link.indexOf('aqua') !== -1 || poi.link.indexOf('zoo') !== -1 || poi.link.indexOf('klementinum') !== -1 || poi.link.indexOf('jewishmuseum') !== -1);
+        var hasTickets = poi.link && poi.link.indexOf('http') === 0 &&
+          poi.link.indexOf('maps.app.goo.gl') === -1 &&
+          poi.link.indexOf('maps.google.com') === -1 &&
+          poi.link.indexOf('bolt.eu') === -1 &&
+          poi.link.indexOf('xe.com') === -1;
         if(hasTickets) {
           ticketBtn.href = poi.link;
           ticketBtn.style.display = 'flex';
@@ -1216,7 +1279,7 @@
             if (res.data.packing_list && res.data.packing_list.length) {
               PACKING_LIST = res.data.packing_list;
             }
-            if(id('budgetDisplay')) id('budgetDisplay').textContent = '₪' + TARGET_BUDGET.toLocaleString('he-IL');
+            updateBudgetDisplays();
             renderChecklist();
             setChecklistStatus('✅ מעודכן');
             setTimeout(() => setChecklistStatus('☁️ מסנכרן'), 2000);
@@ -1276,11 +1339,17 @@
         .saveAppData(TARGET_BUDGET, PACKING_LIST);
     }
 
+    function updateBudgetDisplays() {
+      var fmt = '₪' + TARGET_BUDGET.toLocaleString('he-IL');
+      if(id('budgetDisplay')) id('budgetDisplay').textContent = fmt;
+      if(id('dashBudget')) id('dashBudget').textContent = fmt;
+    }
+
     function editBudget() {
       const newBudget = prompt('הכנס תקציב יעד חדש (בשקלים):', TARGET_BUDGET);
       if(newBudget !== null && !isNaN(newBudget) && newBudget > 0) {
         TARGET_BUDGET = Number(newBudget);
-        if(id('budgetDisplay')) id('budgetDisplay').textContent = '₪' + TARGET_BUDGET.toLocaleString('he-IL');
+        updateBudgetDisplays();
         syncAppData();
         renderExpenses();
       }
@@ -1520,7 +1589,7 @@
               setChecklistStatus('☁️ ברירת מחדל');
               syncAppData();
             }
-            if(id('budgetDisplay')) id('budgetDisplay').textContent = '₪' + TARGET_BUDGET.toLocaleString('he-IL');
+            updateBudgetDisplays();
             renderChecklist();
             setTimeout(() => setChecklistStatus('☁️ מסנכרן'), 2500);
           })
@@ -1568,7 +1637,7 @@
         PACKING_LIST = [...DEFAULT_PACKING];
         renderChecklist();
         setChecklistStatus('📱 מצב מקומי');
-        if(id('budgetDisplay')) id('budgetDisplay').textContent = '₪' + TARGET_BUDGET.toLocaleString('he-IL');
+        updateBudgetDisplays();
         // FIX: load local fallback itinerary so Days tab works offline too
         DAYS = LOCAL_ITINERARY.data;
         BANK = LOCAL_ITINERARY.bank;
