@@ -19,6 +19,15 @@ var STOP_CATALOG = {
 };
 
 function doGet(e) {
+  // ?reset=1 → reset & re-seed itinerary DB with latest data
+  if (e && e.parameter && e.parameter.reset === '1') {
+    try {
+      resetAndInitItineraryDB();
+      return HtmlService.createHtmlOutput('<h2 style="color:green;font-family:sans-serif">✅ איפוס הצליח! הנתונים עודכנו ב-Sheets.</h2><p>סגור חלון זה וחזור לאפליקציה.</p>');
+    } catch(err) {
+      return HtmlService.createHtmlOutput('<h2 style="color:red;font-family:sans-serif">❌ שגיאה: ' + err.message + '</h2>');
+    }
+  }
   // ?test=1 → minimal JS diagnostic page
   if (e && e.parameter && e.parameter.test === '1') {
     var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>GAS JS Test</title></head><body>' +
