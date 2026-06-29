@@ -877,7 +877,7 @@
     // ============================================================
     var LOCAL_ITINERARY = {ok:true,data:[
       {index:0,e:'🛬',t:'נחיתה והגעה',s:'נחיתה 08:45, Check-In במלון, ארוחת ערב ראשונה בפראג!',hero:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Leti%C5%A1t%C4%9B_V%C3%A1clava_Havla_Praha_-_Termin%C3%A1l_1_%282019%29.jpg/800px-Leti%C5%A1t%C4%9B_V%C3%A1clava_Havla_Praha_-_Termin%C3%A1l_1_%282019%29.jpg',attractions:[
-        {id:'d0_a',type:'travel',title:'✈️ Václav Havel Airport',desc:'טיסה LY2521 נוחתת 08:45 בטרמינל 1. לאחר נחיתה: קרת דרכונים, איסוף מזוודות, יציאה לאולם. Bolt למרכז פראג: 30-40 דק׳, ~400-500 CZK. אוטובוס 119 + מטרו (80 CZK) – עם מזוודות לא מומלץ.',link:'https://maps.app.goo.gl/xHBo6VkQV7fhsYR36',priority:'High',hours:'24/7',price:'חינם',duration:'45 דקות',tip:'Bolt לפני הנחיתה + כרטיס מוגדר. החליפו ~2,000 CZK בשדה. SIM: Vodafone/T-Mobile בשדה ~300 CZK'},
+        {id:'d0_a',type:'travel',title:'✈️ Václav Havel Airport',desc:'טיסה LY2521 נוחתת 08:45 בטרמינל 1. לאחר נחיתה: קרת דרכונים, איסוף מזוודות, יציאה לאולם. Bolt למרכז פראג: 30-40 דק׳, ~400-500 CZK. אוטובוס 119 + מטרו (80 CZK) – עם מזוודות לא מומלץ.',link:'https://maps.app.goo.gl/xHBo6VkQV7fhsYR36',priority:'High',hours:'סביב השעון',price:'חינם',duration:'45 דקות',tip:'Bolt לפני הנחיתה + כרטיס מוגדר. החליפו ~2,000 CZK בשדה. SIM: Vodafone/T-Mobile בשדה ~300 CZK'},
         {id:'d0_b',type:'hotel',title:'🏨 Comfort Hotel Prague City East',desc:'מלון 4 כוכבים, Bolt 10 דקות ממרכז פראג. Check-in מ-15:00. ארוחת בוקר בופה כלולה – מנצלים! WiFi מהיר. חניה בתשלום בחצר.',link:'',priority:'High',hours:'Check-in 15:00 | Check-out 12:00',price:'שולם',duration:'20 דקות',tip:'בקשו חדר בקומה גבוהה. הגעתם לפני 15:00? השאירו מזוודות ב-Front Desk וצאו לסיור!'},
         {id:'d0_c',type:'restaurant',title:'🥩 Kantýna – ארוחה ראשונה',desc:'מסעדת בשרים פרמיום בסגנון קצביה-ביסטרו. בוחרים נתח מהמדף הקירור וצולים על גריל פחם פתוח. Tomahawk, Rib-eye, knedlíky, נקניקיות. בירה Pilsner Urquell טרייה מהחבית.',link:'https://kantyna.ambi.cz/',priority:'High',hours:'א-ש 11:00-23:00 | א׳ 11:00-22:00',price:'~400-600 CZK לזוג',duration:'90 דקות',tip:'⚠️ הזמינו מקום מראש! kantyna.ambi.cz. מנות ענקיות. שלמו ב-CZK.'}
       ]},
@@ -927,7 +927,7 @@
     ],bank:[
       {id:'bank_a',type:'attraction',title:'📚 Clementinum – הספרייה הבארוקית',desc:'הספרייה הבארוקית הכי יפה בעולם (לפי National Geographic!) שנבנתה ב-1722 ע"י הישועים. תקרות מצוירות עם מלאכים ואלגוריות, גלוב עתיק, ספרים מ-1600+. מגדל אסטרונומי עם תצפית על פראג. גם: קונצרטים קלאסיים קטנים בספרייה עצמה!',link:'https://www.klementinum.com/en/',priority:'Medium',hours:'10:00-17:30 (כניסה אחרונה 17:00)',price:'300 CZK / 200 CZK ילד',duration:'60 דקות',tip:'הזמינו כרטיסים מראש! klementinum.com – מתמלא. סיור מודרך כל 30 דק׳. תמונות מהספרייה = אינסטגרם explosion!'},
       {id:'bank_b',type:'attraction',title:'⛵ שייט Vltava – Prague Venice Boats',desc:'שייט 1-2 שעות בנהר Vltava. עוברים מתחת לגשר קארל (תמונות מרהיבות!), Čechův most, מגדל Vyšehrad ממרחק ו-8 גשרים. ניתן להזמין שייט מוזיקלי בשקיעה. סירות קטנות עם פיינו + ספינות גדולות.',link:'https://www.prague-venice.cz/',priority:'Medium',hours:'10:00-22:00 (קיץ)',price:'350-550 CZK לאדם',duration:'60-90 דקות',tip:'שקיעה 20:00-21:00 = הכי יפה! הזמינו מראש – prague-venice.cz. שייט מוזיקלי +100 CZK – שווה.'},
-      {id:'bank_c',type:'tip',title:'🚖 Bolt – אפליקציית הנסיעות של פראג',desc:'שירות הסעות הנוח ביותר לפראג. הרבה יותר זול ממוניות צהובות (Taxi Prague עלול לרמות!). נסיעה ממוצעת: מרכז→מרכז ~60-100 CZK, לשדה ~400-550 CZK. Bolt Pool: שיתוף נסיעה = ~30-50% זול יותר. הורידו לפני הטיסה + הגדירו כרטיס.',link:'https://bolt.eu/',priority:'High',hours:'24/7',price:'~60-100 CZK/נסיעה',duration:'-',tip:'הגדירו כרטיס אשראי לפני! שלמו תמיד ב-CZK. Scheduled ride = לשדה בלילה. אל תיקחו מונית מהרחוב!'},
+      {id:'bank_c',type:'tip',title:'🚖 Bolt – אפליקציית הנסיעות של פראג',desc:'שירות הסעות הנוח ביותר לפראג. הרבה יותר זול ממוניות צהובות (Taxi Prague עלול לרמות!). נסיעה ממוצעת: מרכז→מרכז ~60-100 CZK, לשדה ~400-550 CZK. Bolt Pool: שיתוף נסיעה = ~30-50% זול יותר. הורידו לפני הטיסה + הגדירו כרטיס.',link:'https://bolt.eu/',priority:'High',hours:'סביב השעון',price:'~60-100 CZK/נסיעה',duration:'-',tip:'הגדירו כרטיס אשראי לפני! שלמו תמיד ב-CZK. Scheduled ride = לשדה בלילה. אל תיקחו מונית מהרחוב!'},
       {id:'bank_d',type:'attraction',title:'🏛️ המוזיאון הלאומי – Národní muzeum',desc:'מוזיאון ההיסטוריה הלאומי של צ׳כיה בקצה כיכר ונצלס. חזיתו המפורסמת שיוצגה בהפגנות 1968 ו-1989. ממצאים: פלאונטולוגיה, היסטוריה טבעית, מינרלוגיה, מוזיאון כוכבי הלכת. נפתח לאחר שיפוץ ב-2018 ונראה מרשים.',link:'',priority:'Low',hours:'10:00-18:00 (ג׳ עד 20:00)',price:'250 CZK / 160 CZK ילד',duration:'1.5-2 שעות',tip:'נוף מהמדרגות לכיכר ונצלס = יפה ומיוחד. מצוין ליום גשם! Hall of Minerals = ילדים אוהבים.'},
       {id:'bank_e',type:'attraction',title:'🎭 Municipal House – בית העירייה',desc:'ארמון Art Nouveau מרהיב מ-1912 על שרידי ארמון מלכותי מימי הביניים. אולם Smetana – אולם הקונצרטים הגדול של פראג עם קישוטי Alfons Mucha מדהימים. Kavárna Obecní dům – בית קפה וינאי פאר. תערוכות קבועות. קונצרטים קלאסיים כמעט מדי ערב.',link:'https://www.obecnidum.cz/en/',priority:'Medium',hours:'10:00-18:00',price:'250 CZK סיור / חינם ללובי',duration:'60 דקות',tip:'בדקו קונצרטים בתאריכים שלכם! obecnidum.cz. Kavárna מתחת = קפה מפואר. ללובי – כניסה חינם.'},
       {id:'bank_f',type:'tip',title:'💱 טיפ: המרת מטבע',desc:'תמיד שלמו ב-CZK! אל תסכימו ל-DCC (המרה ישירה לשקלים). שע"ח רשמי: ~6.4 CZK לשקל. הכי טוב להמיר בבנק או בכספומט עם כרטיס. Exchange bureaus בעיר ישנות – בדקו את השע"ח לפני המרה. Revolut / Wise = ללא עמלה!',link:'https://www.xe.com/',priority:'High',hours:'תמיד',price:'חינם',duration:'-',tip:'⚠️ שלמו ב-CZK תמיד, לא בשקלים! Revolut / Wise = אפס עמלה בחו"ל.'},
@@ -951,6 +951,24 @@
     // ============================================================
     function id(x) { return document.getElementById(x); }
     function isGas() { return typeof google !== 'undefined' && google.script && google.script.run; }
+    function formatHours(h) {
+      if (!h) return '';
+      if (h instanceof Date) {
+        var hh = h.getHours(), mm = h.getMinutes();
+        return (hh < 10 ? '0' : '') + hh + ':' + (mm < 10 ? '0' : '') + mm;
+      }
+      var s = String(h);
+      if (s.indexOf('GMT') !== -1 || s.indexOf('00:00:00') !== -1) {
+        try {
+          var d = new Date(s);
+          if (!isNaN(d.getTime())) {
+            var hh2 = d.getHours(), mm2 = d.getMinutes();
+            return (hh2 < 10 ? '0' : '') + hh2 + ':' + (mm2 < 10 ? '0' : '') + mm2;
+          }
+        } catch(e) {}
+      }
+      return s;
+    }
 
     /* FIX: toggleTheme was called in HTML but never defined */
     function toggleTheme() {
@@ -1169,7 +1187,7 @@
       var metaEl = id('poiMeta');
       if(metaEl) {
         var pills = [];
-        if(poi.hours)    pills.push({ icon:'⏰', label: poi.hours });
+        if(poi.hours)    pills.push({ icon:'⏰', label: formatHours(poi.hours) });
         if(poi.price)    pills.push({ icon:'💰', label: poi.price });
         if(poi.duration) pills.push({ icon:'⏱', label: poi.duration });
         var pillsHtml = '';

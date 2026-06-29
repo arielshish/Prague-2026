@@ -18,6 +18,16 @@ var STOP_CATALOG = {
   'Palladium / מרכז העיר': { mapUrl: 'https://www.google.com/maps/place/Palladium+shopping+centre,+Prague', type: 'shopping' }
 };
 
+function cellStr_(v) {
+  if (!v && v !== 0) return '';
+  if (v instanceof Date) {
+    var hh = v.getHours(), mm = v.getMinutes();
+    if (hh === 0 && mm === 0) return '';
+    return (hh < 10 ? '0' : '') + hh + ':' + (mm < 10 ? '0' : '') + mm;
+  }
+  return String(v);
+}
+
 function doGet(e) {
   // ?reset=1 → reset & re-seed itinerary DB with latest data
   if (e && e.parameter && e.parameter.reset === '1') {
@@ -523,7 +533,7 @@ function initItineraryDB() {
       // DAY 0 – נחיתה
       ['d0_airport',0,'travel','✈️ Václav Havel Airport – הגעה',
         'טיסה LY2521 נוחתת 08:45 בטרמינל 1 (טיסות בינ"ל). לאחר נחיתה: קרת דרכונים (EU/non-EU), איסוף מזוודות, יציאה לאולם. Bolt למרכז פראג לוקח 30-40 דקות ועולה כ-400-500 CZK. אוטובוס 119 + מטרו זול יותר (80 CZK) אך עם מזוודות – Bolt עדיף.',
-        'https://maps.app.goo.gl/xHBo6VkQV7fhsYR36','High','24/7','חינם','45 דקות',
+        'https://maps.app.goo.gl/xHBo6VkQV7fhsYR36','High','סביב השעון','חינם','45 דקות',
         'הורידו Bolt לפני הנחיתה + הגדירו כרטיס. החליפו ~2,000 CZK בשדה לצורך ראשוני. SIM צ׳כי: Vodafone/T-Mobile בשדה ~300 CZK'],
 
       ['d0_hotel',0,'hotel','🏨 Comfort Hotel Prague City East',
@@ -736,7 +746,7 @@ function initItineraryDB() {
 
       ['bank_bolt',-1,'tip','🚖 Bolt – אפליקציית הנסיעות של פראג',
         'שירות הסעות הנוח ביותר לפראג. הרבה יותר זול ממוניות צהובות (Taxi Prague עלול לרמות!). נסיעה ממוצעת: מרכז→מרכז ~60-100 CZK, לשדה ~400-550 CZK. Bolt Pool: שיתוף נסיעה = ~30-50% זול יותר. הורידו לפני הטיסה + הגדירו כרטיס.',
-        'https://bolt.eu/','High','24/7','~60-100 CZK/נסיעה','-',
+        'https://bolt.eu/','High','סביב השעון','~60-100 CZK/נסיעה','-',
         'הגדירו כרטיס אשראי לפני! שלמו תמיד ב-CZK. Scheduled ride = לשדה בלילה. אל תיקחו מונית מהרחוב!'],
 
       ['bank_imperial',-1,'restaurant','🎩 Café Imperial – ארוחת בוקר מלכותית',
@@ -798,10 +808,10 @@ function loadItinerary() {
         desc:     String(a[4]),
         link:     String(a[5]),
         priority: String(a[6]),
-        hours:    String(a[7] || ''),
-        price:    String(a[8] || ''),
-        duration: String(a[9] || ''),
-        tip:      String(a[10] || '')
+        hours:    cellStr_(a[7]),
+        price:    cellStr_(a[8]),
+        duration: cellStr_(a[9]),
+        tip:      cellStr_(a[10])
       };
       
       if (dayIdx >= 0) {
