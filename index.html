@@ -280,8 +280,7 @@
   </style>
 </head>
 <body>
-  <div id="debug_overlay" style="display:block; position:fixed; bottom:0; left:0; right:0; max-height:40%; overflow:auto; background:rgba(0,0,0,0.85); color:white; z-index:99999; padding:10px; font-family:monospace; font-size:11px;">⏳ script1 לא רץ...</div>
-  <script>document.getElementById('debug_overlay').textContent='✅ script1 רץ | init טרם הופעל';</script>
+  <div id="debug_overlay" style="display:none; position:fixed; bottom:0; left:0; right:0; max-height:30%; overflow:auto; background:rgba(0,0,0,0.85); color:white; z-index:99999; padding:10px; font-family:monospace; font-size:11px;"></div>
   <div class="magic-sparkles"></div>
   <div class="app-container">
     <canvas id="confetti"></canvas>
@@ -791,9 +790,7 @@
     </div>
   </div>
 
-  <script>document.getElementById('debug_overlay').textContent='✅ script2 (לפני הגדול) רץ';</script>
   <script>
-    document.getElementById('debug_overlay').textContent = '📍 main script started';
     // ============================================================
     // APP STATE
     // ============================================================
@@ -809,7 +806,6 @@
     var sortableTimeline = null;
     var sortableBank = null;
 
-    document.getElementById('debug_overlay').textContent = '📍 after state vars';
     var DEFAULT_PACKING = [
       {id:'dp1', text:'דרכונים (לוודא תוקף 6 חודשים!)', category:'מסמכים', done:false},
       {id:'dp2', text:'ביטוח נסיעות לחו"ל', category:'מסמכים', done:false},
@@ -823,7 +819,6 @@
     // ============================================================
     // LOCAL FALLBACK ITINERARY (mirrors initItineraryDB in Code.gs)
     // ============================================================
-    document.getElementById('debug_overlay').textContent = '📍 after DEFAULT_PACKING';
     var LOCAL_ITINERARY = {ok:true,data:[
       {index:0,e:'🛬',t:'נחיתה והגעה',s:'נחיתה 08:45, Check-In במלון, ארוחת ערב ראשונה!',hero:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Leti%C5%A1t%C4%9B_V%C3%A1clava_Havla_Praha_-_Termin%C3%A1l_1_%282019%29.jpg/800px-Leti%C5%A1t%C4%9B_V%C3%A1clava_Havla_Praha_-_Termin%C3%A1l_1_%282019%29.jpg',attractions:[
         {id:'d0_a',type:'travel',title:'✈️ Václav Havel Airport',desc:'טיסה נוחתת 08:45 בטרמינל 1.',link:'https://maps.app.goo.gl/xHBo6VkQV7fhsYR36',priority:'High',hours:'24/7',price:'חינם',duration:'45 דק',tip:'Bolt למלון – הרבה יותר זול!'},
@@ -872,7 +867,6 @@
       {id:'bank_d',type:'attraction',title:'💃 Dancing House',desc:'בניין מטורף של פרנק גרי.',link:'',priority:'Medium',hours:'8:00-22:00',price:'חינם/150 CZK גג',duration:'15 דק',tip:'תמונה מבחוץ מספיקה!'}
     ]};
 
-    document.getElementById('debug_overlay').textContent = '✅ data part OK - functions loading...';
     </script><script>
     var safeStorage = (function() {
       try { localStorage.setItem('_t','1'); localStorage.removeItem('_t'); return localStorage; }
@@ -887,7 +881,6 @@
     // ============================================================
     // HELPERS
     // ============================================================
-    document.getElementById('debug_overlay').textContent = '📍 after safeStorage — before functions';
     function id(x) { return document.getElementById(x); }
     function isGas() { return typeof google !== 'undefined' && google.script && google.script.run; }
 
@@ -1039,7 +1032,6 @@
         .moveAttraction(poiId, targetDay);
     }
 
-    document.getElementById('debug_overlay').textContent = '✅ A1 (safeStorage→buildPoiCard) OK';
     </script><script>
     function renderDay() {
       const d = DAYS[currentDayIndex];
@@ -1172,7 +1164,6 @@
     // ============================================================
     // CHECKLIST
     // ============================================================
-    document.getElementById('debug_overlay').textContent = '✅ A2 (safeStorage→renderDay) OK';
     </script><script>
     function setChecklistStatus(msg) {
       const el = id('checklistSyncStatus');
@@ -1595,7 +1586,6 @@
       }
     }
 
-    document.getElementById('debug_overlay').textContent = '📍 before init()';
     // Direct call — script is at bottom of body so DOM is fully parsed
     try { init(); } catch(e) {
       var _dbg = document.getElementById('debug_overlay');
