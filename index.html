@@ -280,7 +280,7 @@
   </style>
 </head>
 <body ontouchstart="">
-  <div id="debug_overlay" style="display:none; position:fixed; bottom:0; left:0; right:0; max-height:30%; overflow:auto; background:rgba(0,0,0,0.85); color:white; z-index:99999; padding:10px; font-family:monospace; font-size:11px;"></div>
+  <div id="debug_overlay" style="display:block; position:fixed; bottom:0; left:0; right:0; max-height:40%; overflow:auto; background:rgba(0,0,0,0.9); color:lime; z-index:99999; padding:10px; font-family:monospace; font-size:11px;">⏳ JS loading...</div>
   <div class="magic-sparkles"></div>
   <div class="app-container">
     <canvas id="confetti"></canvas>
@@ -868,6 +868,7 @@
     ]};
 
     </script><script>
+    (function(){ var d=document.getElementById('debug_overlay'); if(d) d.innerHTML='✅ B1(data) OK'; })();
     var safeStorage = (function() {
       try { localStorage.setItem('_t','1'); localStorage.removeItem('_t'); return localStorage; }
       catch(e) {
@@ -1033,6 +1034,7 @@
     }
 
     </script><script>
+    (function(){ var d=document.getElementById('debug_overlay'); if(d) d.innerHTML+=' | ✅ B2(fns) OK'; })();
     function renderDay() {
       const d = DAYS[currentDayIndex];
       const tl = id('timelineList');
@@ -1087,6 +1089,7 @@
     }
 
     </script><script>
+    (function(){ var d=document.getElementById('debug_overlay'); if(d) d.innerHTML+=' | ✅ B3a(render) OK'; })();
     // Open POI modal (attraction detail / move)
     function openMoveModal(poiId) {
       currentPoiId = poiId;
@@ -1148,6 +1151,7 @@
     }
 
     </script><script>
+    (function(){ var d=document.getElementById('debug_overlay'); if(d) d.innerHTML+=' | ✅ B3b(modal) OK'; })();
     function handleMoveDay() {
       const newIdx = id('moveDaySelect').value;
       if(newIdx === '' || !currentPoiId || !isGas()) return;
@@ -1169,6 +1173,7 @@
     // CHECKLIST
     // ============================================================
     </script><script>
+    (function(){ var d=document.getElementById('debug_overlay'); if(d) d.innerHTML+=' | ✅ B3c(move) OK'; })();
     function setChecklistStatus(msg) {
       const el = id('checklistSyncStatus');
       if(el) el.textContent = msg;
@@ -1493,6 +1498,7 @@
     }
 
     function init() {
+      (function(){ var d=document.getElementById('debug_overlay'); if(d) d.innerHTML+=' | 🚀 INIT'; })();
       setupDateAndCountdown();
       renderStories();
 
