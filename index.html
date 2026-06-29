@@ -258,7 +258,7 @@
   </script>
 </head>
 <body>
-  <div id="debug_overlay" style="display:none; position:fixed; bottom:0; left:0; right:0; max-height:30%; overflow:auto; background:rgba(0,0,0,0.8); color:white; z-index:99999; padding:10px; font-family:monospace;"></div>
+  <div id="debug_overlay" style="display:none; position:fixed; bottom:0; left:0; right:0; max-height:30%; overflow:auto; background:rgba(0,0,0,0.85); color:white; z-index:99999; padding:10px; font-family:monospace; font-size:11px;"></div>
   <div class="magic-sparkles"></div>
   <div class="app-container">
     <canvas id="confetti"></canvas>
@@ -1588,7 +1588,26 @@
       }
     }
 
-    document.addEventListener('DOMContentLoaded', init);
+    // GAS-safe initialization: don't rely solely on DOMContentLoaded
+    // because in GAS iframes the timing can differ.
+    var _initCalled = false;
+    function safeInit() {
+      if (_initCalled) return;
+      _initCalled = true;
+      try { init(); } catch(e) {
+        var dbg = document.getElementById('debug_overlay');
+        if (dbg) {
+          dbg.style.display = 'block';
+          dbg.innerHTML += '<p style="color:orange;margin:0 0 4px;font-size:11px;">INIT ERR: ' + e.message + '</p>';
+        }
+      }
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', safeInit);
+    } else {
+      safeInit();
+    }
+    setTimeout(safeInit, 800);
   </script>
 </body>
 </html>
