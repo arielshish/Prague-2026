@@ -280,7 +280,8 @@
   </style>
 </head>
 <body>
-  <div id="debug_overlay" style="display:none; position:fixed; bottom:0; left:0; right:0; max-height:30%; overflow:auto; background:rgba(0,0,0,0.85); color:white; z-index:99999; padding:10px; font-family:monospace; font-size:11px;"></div>
+  <div id="debug_overlay" style="display:block; position:fixed; bottom:0; left:0; right:0; max-height:40%; overflow:auto; background:rgba(0,0,0,0.85); color:white; z-index:99999; padding:10px; font-family:monospace; font-size:11px;">⏳ script1 לא רץ...</div>
+  <script>document.getElementById('debug_overlay').textContent='✅ script1 רץ | init טרם הופעל';</script>
   <div class="magic-sparkles"></div>
   <div class="app-container">
     <canvas id="confetti"></canvas>
