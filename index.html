@@ -250,12 +250,34 @@
       to { background-position: 200px 600px; }
     }
     /* End Fairy Tale Enhancements */
-  </style>
 
-  <script>
-  /* Sortable stub - drag and drop disabled in GAS environment */
-  window.Sortable = undefined;
-  </script>
+    /* ---- Tab Food styles (moved from body to avoid GAS parser issues) ---- */
+    #tab-food .hero{background:linear-gradient(135deg,var(--navy),#244b70);color:white;padding:24px;border-radius:24px;margin-bottom:20px;box-shadow:var(--shadow-sm);}
+    #tab-food .hero h1{margin:0;font-size:24px;color:white;}
+    #tab-food .hero p{margin:10px 0 0;color:#dbeafe;font-size:14px;}
+    #tab-food .panel{background:var(--surface);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow-sm);padding:20px;margin-bottom:20px;}
+    #tab-food h2{color:var(--navy);margin:0 0 16px;font-size:20px;border-bottom:2px solid var(--line);padding-bottom:8px;}
+    #tab-food h3{color:var(--navy);margin:0 0 8px;font-size:18px;}
+    #tab-food .grid{display:grid;grid-template-columns:1fr;gap:16px;}
+    #tab-food .card{background:var(--bg);border:1px solid var(--line);border-radius:20px;padding:16px;}
+    #tab-food .card h3{display:flex;align-items:center;gap:8px;font-size:17px;color:var(--accent);}
+    #tab-food .meta{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;}
+    #tab-food .pill{display:inline-flex;border-radius:12px;background:var(--line);color:var(--text);padding:4px 10px;font-size:12px;font-weight:600;}
+    #tab-food .priority{background:rgba(244,63,94,0.1);color:var(--accent);}
+    #tab-food .route{border-right:4px solid var(--accent);background:rgba(245,158,11,0.1);border-radius:12px;padding:12px;margin:12px 0;color:var(--text);font-size:14px;line-height:1.5;}
+    #tab-food ul{margin:8px 0 0;padding:0 20px;color:var(--text-light);font-size:14px;line-height:1.6;}
+    #tab-food li{margin:6px 0;}
+    #tab-food p{color:var(--text);font-size:14px;line-height:1.6;margin:8px 0;}
+    #tab-food .day{display:grid;grid-template-columns:1fr;gap:12px;border-bottom:1px solid var(--line);padding:16px 0;}
+    #tab-food .day:last-child{border-bottom:0;}
+    #tab-food .day strong{color:var(--accent);font-size:18px;}
+    #tab-food .summary{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+    #tab-food .summary .card{text-align:center;}
+    #tab-food .big{font-size:28px;color:var(--accent);font-weight:900;}
+    #tab-food .note{background:rgba(245,158,11,0.1);border:1px solid var(--gold);border-radius:16px;padding:16px;color:#B45309;font-size:13px;line-height:1.5;}
+    #tab-food .toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+    #tab-food .toc a{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:8px 16px;color:var(--navy);text-decoration:none;font-weight:700;font-size:13px;}
+  </style>
 </head>
 <body>
   <div id="debug_overlay" style="display:none; position:fixed; bottom:0; left:0; right:0; max-height:30%; overflow:auto; background:rgba(0,0,0,0.85); color:white; z-index:99999; padding:10px; font-family:monospace; font-size:11px;"></div>
@@ -535,33 +557,6 @@
       <!-- FOOD & RECOMMENDATIONS TAB (Separated) -->
       
 <div id="tab-food" class="tab">
-<style>
-#tab-food .hero{background:linear-gradient(135deg,var(--navy),#244b70);color:white;padding:24px;border-radius:24px;margin-bottom:20px;box-shadow:var(--shadow-sm);}
-#tab-food .hero h1{margin:0;font-size:24px;color:white;}
-#tab-food .hero p{margin:10px 0 0;color:#dbeafe;font-size:14px;}
-#tab-food .panel{background:var(--surface);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow-sm);padding:20px;margin-bottom:20px;}
-#tab-food h2{color:var(--navy);margin:0 0 16px;font-size:20px;border-bottom:2px solid var(--line);padding-bottom:8px;} 
-#tab-food h3{color:var(--navy);margin:0 0 8px;font-size:18px;}
-#tab-food .grid{display:grid;grid-template-columns:1fr;gap:16px;}
-#tab-food .card{background:var(--bg);border:1px solid var(--line);border-radius:20px;padding:16px;}
-#tab-food .card h3{display:flex;align-items:center;gap:8px;font-size:17px;color:var(--accent);}
-#tab-food .meta{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;}
-#tab-food .pill{display:inline-flex;border-radius:12px;background:var(--line);color:var(--text);padding:4px 10px;font-size:12px;font-weight:600;}
-#tab-food .priority{background:rgba(244,63,94,0.1);color:var(--accent);}
-#tab-food .route{border-right:4px solid var(--accent);background:rgba(245,158,11,0.1);border-radius:12px;padding:12px;margin:12px 0;color:var(--text);font-size:14px;line-height:1.5;}
-#tab-food ul{margin:8px 0 0;padding:0 20px;color:var(--text-light);font-size:14px;line-height:1.6;} 
-#tab-food li{margin:6px 0;}
-#tab-food p{color:var(--text);font-size:14px;line-height:1.6;margin:8px 0;}
-#tab-food .day{display:grid;grid-template-columns:1fr;gap:12px;border-bottom:1px solid var(--line);padding:16px 0;}
-#tab-food .day:last-child{border-bottom:0;} 
-#tab-food .day strong{color:var(--accent);font-size:18px;}
-#tab-food .summary{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
-#tab-food .summary .card{text-align:center;}
-#tab-food .big{font-size:28px;color:var(--accent);font-weight:900;}
-#tab-food .note{background:rgba(245,158,11,0.1);border:1px solid var(--gold);border-radius:16px;padding:16px;color:#B45309;font-size:13px;line-height:1.5;}
-#tab-food .toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
-#tab-food .toc a{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:8px 16px;color:var(--navy);text-decoration:none;font-weight:700;font-size:13px;}
-</style>
 
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
   <button class="btn btn-outline" style="width:auto; padding:8px 16px; border-radius:20px; font-size:14px;" onclick="switchTab('home')">🏠 חזור לדאשבורד</button>
@@ -1588,26 +1583,11 @@
       }
     }
 
-    // GAS-safe initialization: don't rely solely on DOMContentLoaded
-    // because in GAS iframes the timing can differ.
-    var _initCalled = false;
-    function safeInit() {
-      if (_initCalled) return;
-      _initCalled = true;
-      try { init(); } catch(e) {
-        var dbg = document.getElementById('debug_overlay');
-        if (dbg) {
-          dbg.style.display = 'block';
-          dbg.innerHTML += '<p style="color:orange;margin:0 0 4px;font-size:11px;">INIT ERR: ' + e.message + '</p>';
-        }
-      }
+    // Direct call — script is at bottom of body so DOM is fully parsed
+    try { init(); } catch(e) {
+      var _dbg = document.getElementById('debug_overlay');
+      if (_dbg) { _dbg.style.display='block'; _dbg.textContent='INIT ERROR: '+e.message; }
     }
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', safeInit);
-    } else {
-      safeInit();
-    }
-    setTimeout(safeInit, 800);
   </script>
 </body>
 </html>
