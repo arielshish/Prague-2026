@@ -1090,29 +1090,30 @@
     // Open POI modal (attraction detail / move)
     function openMoveModal(poiId) {
       currentPoiId = poiId;
-      const poi = POIS[poiId];
+      var poi = POIS[poiId];
       if (!poi) return;
 
       if(id('poiTitle')) id('poiTitle').textContent = poi.title;
       if(id('poiDesc')) id('poiDesc').textContent = poi.desc || '';
-      if(id('poiImage')) id('poiImage').style.backgroundImage = poi.img ? `url('${poi.img}')` : 'none';
+      if(id('poiImage')) id('poiImage').style.backgroundImage = poi.img ? 'url(' + JSON.stringify(poi.img) + ')' : 'none';
 
       // Rich metadata pills
-      const metaEl = id('poiMeta');
+      var metaEl = id('poiMeta');
       if(metaEl) {
-        const pills = [
-          poi.hours    ? { icon:'⏰', label: poi.hours }    : null,
-          poi.price    ? { icon:'💰', label: poi.price }    : null,
-          poi.duration ? { icon:'⏱️', label: poi.duration } : null,
-        ].filter(Boolean);
-        metaEl.innerHTML = pills.map(p =>
-          `<span style="background:var(--line); border-radius:12px; padding:5px 12px; font-size:12px; font-weight:600; color:var(--text);">${p.icon} ${p.label}</span>`
-        ).join('');
+        var pills = [];
+        if(poi.hours)    pills.push({ icon:'⏰', label: poi.hours });
+        if(poi.price)    pills.push({ icon:'💰', label: poi.price });
+        if(poi.duration) pills.push({ icon:'⏱', label: poi.duration });
+        var pillsHtml = '';
+        for(var pi=0; pi<pills.length; pi++) {
+          pillsHtml += '<span style="background:var(--line); border-radius:12px; padding:5px 12px; font-size:12px; font-weight:600; color:var(--text);">' + pills[pi].icon + ' ' + pills[pi].label + '</span>';
+        }
+        metaEl.innerHTML = pillsHtml;
       }
 
       // Tip box
-      const tipBox = id('poiTipBox');
-      const tipEl  = id('poiTip');
+      var tipBox = id('poiTipBox');
+      var tipEl  = id('poiTip');
       if(tipBox && tipEl) {
         if(poi.tip && poi.tip.trim() && poi.tip !== 'undefined') {
           tipEl.textContent = poi.tip;
@@ -1125,14 +1126,15 @@
       }
 
       // Navigate / Ticket buttons
-      const mapBtn = id('poiMapBtn');
+      var mapBtn = id('poiMapBtn');
       if(mapBtn) {
-        const mapQuery = encodeURIComponent(poi.title + ' Prague');
-        mapBtn.href = poi.link || `https://maps.google.com/?q=${mapQuery}`;
+        var mapQuery = encodeURIComponent(poi.title + ' Prague');
+        mapBtn.href = poi.link || ('https://maps.google.com/?q=' + mapQuery);
       }
-      const ticketBtn = id('poiTicketBtn');
+      var ticketBtn = id('poiTicketBtn');
       if(ticketBtn) {
-        if(poi.link && (poi.link.includes('hrad') || poi.link.includes('aqua') || poi.link.includes('zoo') || poi.link.includes('klementinum') || poi.link.includes('jewishmuseum'))) {
+        var hasTickets = poi.link && (poi.link.indexOf('hrad') !== -1 || poi.link.indexOf('aqua') !== -1 || poi.link.indexOf('zoo') !== -1 || poi.link.indexOf('klementinum') !== -1 || poi.link.indexOf('jewishmuseum') !== -1);
+        if(hasTickets) {
           ticketBtn.href = poi.link;
           ticketBtn.style.display = 'flex';
         } else {
@@ -1140,8 +1142,8 @@
         }
       }
 
-      buildPoisFromDays(); // refresh day dropdown
-      const modal = id('poiModal');
+      buildPoisFromDays();
+      var modal = id('poiModal');
       if(modal) modal.classList.add('show');
     }
 
