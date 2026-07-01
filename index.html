@@ -1741,13 +1741,33 @@ document.addEventListener('DOMContentLoaded', function() {
     window._photoPendingGps = null;
     window._photoPendingOrigFile = file;
 
-    // קרא GPS מ-EXIF לפני כל עיבוד
-    var gpsReader = new FileReader();
-    gpsReader.onload = function(ev) {
-      window._photoPendingGps = extractExifGps(ev.target.result);
-      updateGpsDisplay(window._photoPendingGps);
-    };
-    gpsReader.readAsArrayBuffer(file);
+    // GPS דרך Geolocation API (iOS מוחק EXIF בדפדפן)
+    var gpsEl = qs('photoGpsDisplay');
+    if (gpsEl) { gpsEl.style.display = 'block'; gpsEl.style.color = '#93C5FD'; gpsEl.textContent = '📍 מאתר מיקום...'; }
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        var gps = { lat: pos.coords.latitude, lng: pos.coords.longitude, alt: pos.coords.altitude };
+        window._photoPendingGps = gps;
+        updateGpsDisplay(gps);
+      }, function() {
+        // נסיון גיבוי: EXIF
+        var gpsReader = new FileReader();
+        gpsReader.onload = function(ev) {
+          var gps = extractExifGps(ev.target.result);
+          window._photoPendingGps = gps;
+          updateGpsDisplay(gps);
+        };
+        gpsReader.readAsArrayBuffer(file);
+      }, { timeout: 8000, enableHighAccuracy: true });
+    } else {
+      var gpsReader = new FileReader();
+      gpsReader.onload = function(ev) {
+        var gps = extractExifGps(ev.target.result);
+        window._photoPendingGps = gps;
+        updateGpsDisplay(gps);
+      };
+      gpsReader.readAsArrayBuffer(file);
+    }
 
     // כווץ + הוסף מסגרת
     var reader = new FileReader();
@@ -2129,6 +2149,17 @@ function openPhotoModal(placeName) {
   }
 
   var m = qs('photoTagModal'); if (m) m.style.display = 'flex';
+
+  // בקש מיקום מיד כדי שיהיה מוכן כשהתמונה נלקחת
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(pos) {
+      if (!window._photoPendingGps) {
+        window._photoPendingGps = { lat: pos.coords.latitude, lng: pos.coords.longitude, alt: pos.coords.altitude };
+        updateGpsDisplay(window._photoPendingGps);
+      }
+    }, function() {}, { timeout: 10000, enableHighAccuracy: true });
+  }
+
   // פתח מצלמה אוטומטית
   setTimeout(function() { var fi = qs('photoFileInput'); if (fi) fi.click(); }, 200);
 }
