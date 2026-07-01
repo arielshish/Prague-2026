@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>מתרגם קולי — פראג 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #040D18;
+    font-family: 'Rubik', Arial, sans-serif;
+    color: #F1F5F9;
+    direction: rtl;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  #app {
+    width: min(430px, 100%);
+    min-height: 100vh;
+    background: linear-gradient(180deg, #040D18 0%, #071525 60%, #0A1A2E 100%);
+    padding: 0 0 40px;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    background: linear-gradient(135deg, #0C1F38, #071525);
+    padding: 52px 20px 24px;
+    text-align: center;
+    border-bottom: 1px solid rgba(168,85,247,0.2);
+  }
+  header h1 { font-size: 22px; font-weight: 900; color: #F1F5F9; margin-bottom: 4px; }
+  header p  { font-size: 12px; color: rgba(241,245,249,0.45); }
+  .content  { padding: 20px 16px; display: flex; flex-direction: column; gap: 14px; flex: 1; }
+
+  .card {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.13);
+    border-radius: 20px;
+    padding: 16px;
+  }
+  .card-purple {
+    background: linear-gradient(135deg, rgba(168,85,247,0.15), rgba(99,102,241,0.1));
+    border: 1px solid rgba(168,85,247,0.3);
+  }
+
+  .lang-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .lang-btn {
+    padding: 11px; border-radius: 13px; font-size: 13px; font-weight: 800;
+    cursor: pointer; font-family: 'Rubik', Arial, sans-serif; border: none; transition: all 0.2s;
+  }
+  .lang-btn.active {
+    background: rgba(168,85,247,0.3); border: 2px solid rgba(168,85,247,0.7); color: #C084FC;
+  }
+  .lang-btn.idle {
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: rgba(241,245,249,0.45);
+  }
+
+  textarea {
+    width: 100%; background: rgba(255,255,255,0.07); border: 1px solid rgba(168,85,247,0.35);
+    border-radius: 14px; padding: 14px; font-size: 15px; color: #F1F5F9;
+    font-family: 'Rubik', Arial, sans-serif; resize: none; height: 90px;
+    box-sizing: border-box; outline: none; margin-bottom: 12px;
+  }
+  textarea:focus { border-color: rgba(168,85,247,0.7); }
+
+  .action-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 0; }
+  .btn-mic {
+    background: linear-gradient(135deg, rgba(168,85,247,0.35), rgba(99,102,241,0.3));
+    border: 1px solid rgba(168,85,247,0.5); border-radius: 14px;
+    padding: 14px 8px; font-size: 24px; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-mic.listening {
+    background: linear-gradient(135deg, rgba(239,68,68,0.4), rgba(220,38,38,0.3));
+    border-color: rgba(239,68,68,0.6); animation: pulse 1s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.06);opacity:0.85} }
+  .btn-translate {
+    background: rgba(99,102,241,0.2); border: 1px solid rgba(99,102,241,0.4);
+    border-radius: 14px; padding: 14px 8px; font-size: 12px; font-weight: 800;
+    color: #A5B4FC; cursor: pointer; font-family: 'Rubik', Arial, sans-serif;
+  }
+  .btn-clear {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px; padding: 14px 8px; font-size: 12px; font-weight: 800;
+    color: rgba(241,245,249,0.4); cursor: pointer; font-family: 'Rubik', Arial, sans-serif;
+  }
+
+  #status {
+    font-size: 11px; color: rgba(241,245,249,0.4); text-align: center;
+    margin-top: 10px; min-height: 16px; transition: color 0.2s;
+  }
+
+  #resultBox {
+    display: none; background: rgba(0,0,0,0.3); border: 1px solid rgba(168,85,247,0.3);
+    border-radius: 16px; padding: 16px;
+  }
+  #resultBox .label { font-size: 10px; color: rgba(241,245,249,0.35); letter-spacing: 1px; margin-bottom: 8px; }
+  #resultText { font-size: 20px; font-weight: 700; color: #E9D5FF; line-height: 1.5; margin-bottom: 14px; }
+  .btn-speak {
+    width: 100%; background: rgba(168,85,247,0.25); border: 1px solid rgba(168,85,247,0.45);
+    border-radius: 12px; padding: 12px; font-size: 14px; font-weight: 800; color: #C084FC;
+    cursor: pointer; font-family: 'Rubik', Arial, sans-serif;
+  }
+
+  /* ביטויים מהירים */
+  .phrases-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+  .phrase-item {
+    padding: 8px 10px; background: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.15);
+    border-radius: 10px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+    transition: background 0.15s;
+  }
+  .phrase-item:active { background: rgba(168,85,247,0.2); }
+  .phrase-cs { font-size: 12px; font-weight: 700; color: #F1F5F9; }
+  .phrase-he { font-size: 10px; color: rgba(241,245,249,0.45); }
+  .phrase-speak { font-size: 15px; }
+
+  .back-link {
+    display: block; text-align: center; padding: 16px;
+    font-size: 12px; color: rgba(241,245,249,0.35); text-decoration: none;
+  }
+  .back-link:hover { color: #C084FC; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>🌐 מתרגם קולי</h1>
+    <p>עברית ↔ צ'כית · פראג 2026 · משפחת שיש</p>
+  </header>
+
+  <div class="content">
+
+    <!-- כרטיס מתרגם -->
+    <div class="card card-purple">
+      <div class="lang-btns">
+        <button id="btnHe" class="lang-btn active" onclick="setLang('he','cs')">🇮🇱 עברית → צ'כית</button>
+        <button id="btnCs" class="lang-btn idle"   onclick="setLang('cs','he')">🇨🇿 צ'כית → עברית</button>
+      </div>
+
+      <textarea id="inputText" placeholder="הקלידו או לחצו 🎤 לדיבור..."></textarea>
+
+      <div class="action-btns">
+        <button id="btnMic" class="btn-mic" onclick="toggleMic()">🎤</button>
+        <button class="btn-translate" onclick="doTranslate()">🌐 תרגם</button>
+        <button class="btn-clear" onclick="doClear()">🗑️ נקה</button>
+      </div>
+
+      <div id="status"></div>
+    </div>
+
+    <!-- תוצאה -->
+    <div id="resultBox">
+      <div class="label">תרגום</div>
+      <div id="resultText"></div>
+      <button class="btn-speak" onclick="speakResult()">🔊 השמע בקול</button>
+    </div>
+
+    <!-- ביטויים מהירים -->
+    <div class="card">
+      <div style="font-size:13px;font-weight:700;color:#C084FC;margin-bottom:12px;">⚡ ביטויים מהירים — לחץ להשמעה</div>
+      <div class="phrases-grid" id="phrasesGrid"></div>
+    </div>
+
+  </div>
+
+  <a href="javascript:history.back()" class="back-link">← חזרה לאפליקציה</a>
+</div>
+
+<script>
+var srcLang = 'he', tgtLang = 'cs';
+var lastTranslation = '';
+var recognition = null, listening = false;
+var liveTimer = null;
+
+var PHRASES = [
+  { cs: 'Děkuji',        he: 'תודה' },
+  { cs: 'Prosím',        he: 'בבקשה' },
+  { cs: 'Ahoj',          he: 'שלום' },
+  { cs: 'Na shledanou',  he: 'להתראות' },
+  { cs: 'Kolik?',        he: 'כמה עולה?' },
+  { cs: 'Kde je?',       he: 'איפה?' },
+  { cs: 'Záchod',        he: 'שירותים' },
+  { cs: 'Pomoc!',        he: 'עזרה!' },
+  { cs: 'Bez vepřového', he: 'ללא חזיר' },
+  { cs: 'Účet prosím',   he: 'חשבון בבקשה' },
+  { cs: 'Nemocnice',     he: 'בית חולים' },
+  { cs: 'Nádraží',       he: 'תחנת רכבת' },
+];
+
+function init() {
+  // בניית ביטויים
+  var grid = document.getElementById('phrasesGrid');
+  PHRASES.forEach(function(p) {
+    var div = document.createElement('div');
+    div.className = 'phrase-item';
+    div.innerHTML = '<span><div class="phrase-cs">' + p.cs + '</div><div class="phrase-he">' + p.he + '</div></span><span class="phrase-speak">🔊</span>';
+    div.onclick = function() { speak(p.cs, 'cs'); };
+    grid.appendChild(div);
+  });
+
+  // תרגום חי
+  var inp = document.getElementById('inputText');
+  inp.addEventListener('input', function() {
+    clearTimeout(liveTimer);
+    var v = inp.value.trim();
+    if (!v) { document.getElementById('resultBox').style.display = 'none'; lastTranslation = ''; setStatus(''); return; }
+    setStatus('⌨️ מתרגם...');
+    liveTimer = setTimeout(doTranslate, 600);
+  });
+
+  // טעינת קולות
+  window.speechSynthesis && window.speechSynthesis.getVoices();
+}
+
+function setLang(src, tgt) {
+  srcLang = src; tgtLang = tgt;
+  document.getElementById('btnHe').className = 'lang-btn ' + (src === 'he' ? 'active' : 'idle');
+  document.getElementById('btnCs').className = 'lang-btn ' + (src === 'cs' ? 'active' : 'idle');
+  var inp = document.getElementById('inputText');
+  inp.style.direction = src === 'he' ? 'rtl' : 'ltr';
+  inp.placeholder = src === 'he' ? 'הקלידו עברית או לחצו 🎤...' : 'Napište česky nebo stiskněte 🎤...';
+  doClear();
+}
+
+function doTranslate() {
+  var text = document.getElementById('inputText').value.trim();
+  if (!text) { setStatus('הקלד טקסט לתרגום'); return; }
+  setStatus('🌐 מתרגם...');
+  var url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=' + srcLang + '&tl=' + tgtLang + '&dt=t&q=' + encodeURIComponent(text);
+  fetch(url)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var result = '';
+      if (data && data[0]) data[0].forEach(function(s) { if (s && s[0]) result += s[0]; });
+      if (!result) { setStatus('⚠️ לא הצלחתי לתרגם'); return; }
+      lastTranslation = result;
+      document.getElementById('resultText').textContent = result;
+      document.getElementById('resultBox').style.display = 'block';
+      setStatus('✅ תרגום מוכן');
+      speak(result, tgtLang);
+    })
+    .catch(function() { setStatus('⚠️ שגיאת חיבור'); });
+}
+
+function speakResult() { if (lastTranslation) speak(lastTranslation, tgtLang); }
+
+function speak(text, lang) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var utt = new SpeechSynthesisUtterance(text);
+  utt.lang = lang === 'cs' ? 'cs-CZ' : 'he-IL';
+  utt.rate = 0.88;
+  var voices = window.speechSynthesis.getVoices();
+  var match = voices.find(function(v) { return v.lang.startsWith(lang === 'cs' ? 'cs' : 'he'); });
+  if (match) utt.voice = match;
+  window.speechSynthesis.speak(utt);
+}
+
+function toggleMic() {
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { setStatus('⚠️ הדפדפן לא תומך בזיהוי קול'); return; }
+  if (listening) { recognition && recognition.stop(); return; }
+
+  var btn = document.getElementById('btnMic');
+  setStatus('🔐 מבקש הרשאת מיקרופון...');
+
+  navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(function(stream) {
+      stream.getTracks().forEach(function(t) { t.stop(); });
+      recognition = new SR();
+      recognition.lang = srcLang === 'he' ? 'he-IL' : 'cs-CZ';
+      recognition.interimResults = true;
+      recognition.continuous = false;
+      listening = true;
+      btn.textContent = '⏹️';
+      btn.classList.add('listening');
+      setStatus('🎤 מאזין... דברו עכשיו');
+
+      recognition.onresult = function(e) {
+        var interim = '', final = '';
+        for (var i = e.resultIndex; i < e.results.length; i++) {
+          if (e.results[i].isFinal) final += e.results[i][0].transcript;
+          else interim += e.results[i][0].transcript;
+        }
+        document.getElementById('inputText').value = final || interim;
+        if (final) { setStatus('✅ זוהה — מתרגם...'); doTranslate(); }
+      };
+      recognition.onerror = function(ev) {
+        setStatus('⚠️ ' + (ev.error === 'not-allowed' ? 'הרשאה נדחתה' : ev.error));
+        resetMic();
+      };
+      recognition.onend = function() { resetMic(); };
+      recognition.start();
+    })
+    .catch(function() {
+      setStatus('⚠️ הרשאת מיקרופון נדחתה — אשרו בהגדרות Safari');
+    });
+}
+
+function resetMic() {
+  listening = false;
+  var btn = document.getElementById('btnMic');
+  btn.textContent = '🎤';
+  btn.classList.remove('listening');
+}
+
+function doClear() {
+  document.getElementById('inputText').value = '';
+  document.getElementById('resultBox').style.display = 'none';
+  lastTranslation = '';
+  setStatus('');
+  window.speechSynthesis && window.speechSynthesis.cancel();
+}
+
+function setStatus(msg) { document.getElementById('status').textContent = msg; }
+
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
