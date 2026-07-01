@@ -1946,19 +1946,22 @@ function backupAllToDrive() {
       return;
     }
     if (statusEl) { statusEl.style.display = 'block'; statusEl.textContent = '☁️ מגבה ' + unsynced.length + ' תמונות...'; }
-    var done = 0, failed = 0;
+    var done = 0, failed = 0, lastErr = '';
     function next(i) {
       if (i >= unsynced.length) {
-        var msg = '✅ ' + done + ' תמונות נשמרו ב-Google Drive';
-        if (failed) msg += ' | ⚠️ ' + failed + ' נכשלו';
-        if (statusEl) statusEl.textContent = msg;
-        toast(msg);
+        var msg = done > 0 ? '✅ ' + done + ' תמונות נשמרו ב-Google Drive' : '⚠️ לא נשמר כלום';
+        if (failed) msg += ' | ' + failed + ' נכשלו';
+        if (lastErr) msg += '\nשגיאה: ' + lastErr;
+        if (statusEl) { statusEl.style.whiteSpace = 'pre-wrap'; statusEl.textContent = msg; }
+        if (done > 0) toast('✅ ' + done + ' תמונות ב-Drive');
         renderPhotoDiary();
         return;
       }
       var p = unsynced[i];
-      if (statusEl) statusEl.textContent = '☁️ שולח ' + (i+1) + '/' + unsynced.length + ': ' + p.place + '...';
+      if (statusEl) statusEl.textContent = '☁️ שולח ' + (i+1) + '/' + unsynced.length + ': ' + (p.place || '?') + '...';
+      if (!p.dataUrl) { lastErr = 'dataUrl ריק לתמונה ' + (i+1); failed++; next(i+1); return; }
       compressForDrive(p.dataUrl, function(smallDataUrl) {
+        if (!smallDataUrl) { lastErr = 'דחיסה נכשלה לתמונה ' + (i+1); failed++; next(i+1); return; }
         google.script.run
           .withSuccessHandler(function(r) {
             if (r && r.ok) {
@@ -1966,14 +1969,14 @@ function backupAllToDrive() {
               p.driveUrl = r.url;
               dbUpdatePhoto(p, function() { done++; next(i+1); });
             } else {
-              console.error('Drive save failed:', r && r.error);
-              if (statusEl) statusEl.textContent = '⚠️ שגיאה: ' + (r && r.error || 'לא ידוע');
+              lastErr = (r && r.error) || 'שגיאה לא ידועה';
+              console.error('Drive save failed:', lastErr);
               failed++; next(i+1);
             }
           })
           .withFailureHandler(function(err) {
-            console.error('GAS call failed:', err);
-            if (statusEl) statusEl.textContent = '⚠️ שגיאת חיבור: ' + (err && err.message || 'לא ידוע');
+            lastErr = (err && err.message) || 'שגיאת חיבור';
+            console.error('GAS call failed:', lastErr);
             failed++; next(i+1);
           })
           .savePhotoToDrive(smallDataUrl, p.place, p.note || '', p.ts);
