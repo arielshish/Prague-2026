@@ -1138,3 +1138,59 @@ function savePhotoToDrive(dataUrl, place, note, timestamp) {
     return { ok: false, error: e.message };
   }
 }
+
+function savePhotoToGooglePhotos(dataUrl, place, note, timestamp) {
+  try {
+    var token = ScriptApp.getOAuthToken();
+
+    // שלב 1: העלה bytes וקבל upload token
+    var parts   = dataUrl.split(',');
+    var mime    = parts[0].split(';')[0].split(':')[1] || 'image/jpeg';
+    var bytes   = Utilities.base64Decode(parts[1]);
+    var blob    = Utilities.newBlob(bytes, mime);
+
+    var uploadResp = UrlFetchApp.fetch('https://photoslibrary.googleapis.com/v1/uploads', {
+      method: 'post',
+      contentType: 'application/octet-stream',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'X-Goog-Upload-Content-Type': mime,
+        'X-Goog-Upload-Protocol': 'raw'
+      },
+      payload: blob.getBytes(),
+      muteHttpExceptions: true
+    });
+
+    if (uploadResp.getResponseCode() !== 200) {
+      return { ok: false, error: 'Upload failed: ' + uploadResp.getContentText() };
+    }
+    var uploadToken = uploadResp.getContentText();
+
+    // שלב 2: צור media item עם תיאור
+    var d    = new Date(timestamp);
+    var desc = place + (note ? ' — ' + note : '') + ' | פראג ' + d.toLocaleDateString('he-IL');
+    var body = {
+      newMediaItems: [{
+        description: desc,
+        simpleMediaItem: { uploadToken: uploadToken }
+      }]
+    };
+
+    var createResp = UrlFetchApp.fetch('https://photoslibrary.googleapis.com/v1/mediaItems:batchCreate', {
+      method: 'post',
+      contentType: 'application/json',
+      headers: { 'Authorization': 'Bearer ' + token },
+      payload: JSON.stringify(body),
+      muteHttpExceptions: true
+    });
+
+    var result = JSON.parse(createResp.getContentText());
+    var item   = result.newMediaItemResults && result.newMediaItemResults[0];
+    if (item && item.status && item.status.message === 'Success') {
+      return { ok: true, id: item.mediaItem.id, url: item.mediaItem.productUrl };
+    }
+    return { ok: false, error: JSON.stringify(result) };
+  } catch(e) {
+    return { ok: false, error: e.message };
+  }
+}

@@ -395,7 +395,7 @@
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
       <button id="btnNewPhoto" style="background:linear-gradient(135deg,rgba(236,72,153,0.2),rgba(168,85,247,0.2));border:1px solid rgba(236,72,153,0.35);border-radius:16px;padding:14px 8px;font-size:12px;font-weight:800;color:#F9A8D4;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">📷 צלם תמונה</button>
-      <button id="btnBackupDrive" style="background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(59,130,246,0.2));border:1px solid rgba(16,185,129,0.35);border-radius:16px;padding:14px 8px;font-size:12px;font-weight:800;color:#6EE7B7;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">☁️ גבה ל-Drive</button>
+      <button id="btnBackupDrive" style="background:linear-gradient(135deg,rgba(59,130,246,0.2),rgba(99,102,241,0.2));border:1px solid rgba(59,130,246,0.35);border-radius:16px;padding:14px 8px;font-size:12px;font-weight:800;color:#93C5FD;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🖼️ שמור ל-Google Photos</button>
     </div>
     <div id="driveBackupStatus" style="display:none;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:12px;padding:10px 14px;font-size:12px;color:#6EE7B7;margin-bottom:12px;text-align:center;"></div>
     <div id="photoDiaryEmpty" style="text-align:center;padding:40px 20px;color:rgba(241,245,249,0.3);font-size:13px;">עדיין אין תמונות — לחצו על הכפתור למעלה להתחיל!</div>
@@ -1869,7 +1869,7 @@ function backupAllToDrive() {
             } else { failed++; next(i+1); }
           })
           .withFailureHandler(function() { failed++; next(i+1); })
-          .savePhotoToDrive(smallDataUrl, p.place, p.note || '', p.ts);
+          .savePhotoToGooglePhotos(smallDataUrl, p.place, p.note || '', p.ts);
       });
     }
     next(0);
