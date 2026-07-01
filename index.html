@@ -259,10 +259,24 @@
     </div>
     <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:16px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
       <div style="font-size:13px;font-weight:700;color:#6EE7B7;">התקדמות</div>
-      <div id="packProgress" style="font-size:13px;font-weight:800;color:#F1F5F9;">0 / 0</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div id="packProgress" style="font-size:13px;font-weight:800;color:#F1F5F9;">0 / 0</div>
+        <button id="btnSyncPack" style="background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:4px 9px;font-size:11px;font-weight:700;color:#6EE7B7;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">☁️ סנכרן</button>
+      </div>
     </div>
     <div id="packList" style="display:grid;gap:8px;"></div>
+    <button id="btnAddPackCat" style="width:100%;background:rgba(255,255,255,0.05);border:1px dashed rgba(255,255,255,0.2);border-radius:14px;padding:12px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.5);cursor:pointer;font-family:'Rubik',Arial,sans-serif;margin-top:8px;">➕ הוסף קטגוריה</button>
   </section>
+
+  <!-- מודל הוספת פריט/קטגוריה לצ'ק-ליסט -->
+  <div id="packItemModal" style="display:none;position:fixed;inset:0;z-index:80;align-items:flex-end;justify-content:center;">
+    <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);" id="packItemOverlay"></div>
+    <div style="position:relative;background:linear-gradient(160deg,#1e293b,#0f172a);border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;z-index:1;">
+      <h2 id="packItemTitle" style="margin:0 0 16px;font-size:17px;font-weight:900;color:#F1F5F9;">➕ הוסף פריט</h2>
+      <input id="packItemText" type="text" placeholder="שם הפריט..." style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:13px 14px;font-size:15px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:12px;">
+      <button id="btnSavePackItem" class="btn-primary" style="width:100%;">✅ הוסף</button>
+    </div>
+  </div>
 
   <!-- ═══ INFO ═══ -->
   <section id="info" class="tab">
@@ -529,7 +543,7 @@ function openTab(id) {
     if (btn) btn.style.color = name === id ? '#F4634A' : 'rgba(241,245,249,0.38)';
   });
   if (id === 'expenses') { loadExpenses(); syncBudgetFromSheets(); }
-  if (id === 'pack') renderPack();
+  if (id === 'pack') loadPack();
   if (id === 'restaurants') renderRestaurants();
 }
 
@@ -627,37 +641,126 @@ function renderRestaurants() {
 // ═══════════════════════════════════════════
 //  PACKING
 // ═══════════════════════════════════════════
-function getPackChecked() { try { return JSON.parse(localStorage.getItem('prague_pack_v1') || '{}'); } catch(e) { return {}; } }
-function savePackChecked(obj) { localStorage.setItem('prague_pack_v1', JSON.stringify(obj)); }
+var PACK_STATE = null; // [{cat, items:[{id,text,done}]}]
+var _packAddingCat = null; // שם קטגוריה שאליה מוסיפים פריט, null = קטגוריה חדשה
+
+function getDefaultPackCats() {
+  return JSON.parse(JSON.stringify(PACK_CATS.map(function(c) {
+    return {cat: c.cat, items: c.items.map(function(i) { return {id:i.id, text:i.text, done:false}; })};
+  })));
+}
+
+function loadPackLocal() {
+  try { return JSON.parse(localStorage.getItem('prague_pack_v2') || 'null'); } catch(e) { return null; }
+}
+function savePackLocal(state) { localStorage.setItem('prague_pack_v2', JSON.stringify(state)); }
+
+function loadPack() {
+  if (isGas()) {
+    google.script.run
+      .withSuccessHandler(function(r) {
+        if (r && r.ok && r.data && r.data.packing_list && r.data.packing_list.length) {
+          PACK_STATE = r.data.packing_list;
+          savePackLocal(PACK_STATE);
+        } else {
+          PACK_STATE = loadPackLocal() || getDefaultPackCats();
+        }
+        renderPack();
+      })
+      .withFailureHandler(function() {
+        PACK_STATE = loadPackLocal() || getDefaultPackCats();
+        renderPack();
+      })
+      .loadAppData();
+  } else {
+    PACK_STATE = loadPackLocal() || getDefaultPackCats();
+    renderPack();
+  }
+}
+
+function savePack() {
+  savePackLocal(PACK_STATE);
+  if (isGas()) {
+    google.script.run
+      .withSuccessHandler(function(r) { if (r && r.ok) toast('☁️ צ\'ק-ליסט סונכרן!'); })
+      .withFailureHandler(function() { toast('⚠️ שמור מקומית בלבד'); })
+      .savePackingList(PACK_STATE);
+  }
+}
 
 function renderPack() {
+  if (!PACK_STATE) { loadPack(); return; }
   var list = qs('packList'), prog = qs('packProgress');
   if (!list) return;
-  var checked = getPackChecked(), total = 0, done = 0, html = '';
-  PACK_CATS.forEach(function(cat) {
+  var total = 0, done = 0, html = '';
+  PACK_STATE.forEach(function(cat, ci) {
     html += '<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.11);border-radius:16px;padding:14px;margin-bottom:8px;">' +
-      '<div style="font-size:12px;font-weight:800;color:#F59E0B;margin-bottom:10px;">' + esc(cat.cat) + '</div>';
-    cat.items.forEach(function(item) {
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
+        '<div style="font-size:12px;font-weight:800;color:#F59E0B;">' + esc(cat.cat) + '</div>' +
+        '<div style="display:flex;gap:6px;">' +
+          '<button onclick="openAddPackItem(\'' + ci + '\')" style="background:rgba(245,158,11,0.15);border:none;border-radius:7px;padding:3px 8px;font-size:11px;color:#FCD34D;cursor:pointer;">➕</button>' +
+          '<button onclick="deletePackCat(' + ci + ')" style="background:rgba(239,68,68,0.12);border:none;border-radius:7px;padding:3px 8px;font-size:11px;color:#FCA5A5;cursor:pointer;">🗑</button>' +
+        '</div>' +
+      '</div>';
+    cat.items.forEach(function(item, ii) {
       total++;
-      var isChk = !!checked[item.id];
-      if (isChk) done++;
-      html += '<label style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06);cursor:pointer;">' +
-        '<input type="checkbox" data-pack-id="' + item.id + '" ' + (isChk ? 'checked' : '') + '>' +
-        '<span style="font-size:13px;color:' + (isChk ? 'rgba(241,245,249,0.32)' : 'rgba(241,245,249,0.85)') + ';' + (isChk ? 'text-decoration:line-through;' : '') + '">' + esc(item.text) + '</span></label>';
+      if (item.done) done++;
+      html += '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.06);">' +
+        '<input type="checkbox" data-ci="' + ci + '" data-ii="' + ii + '" ' + (item.done ? 'checked' : '') + ' style="accent-color:#6EE7B7;width:17px;height:17px;flex-shrink:0;">' +
+        '<span style="flex:1;font-size:13px;color:' + (item.done ? 'rgba(241,245,249,0.3)' : 'rgba(241,245,249,0.85)') + ';' + (item.done ? 'text-decoration:line-through;' : '') + '">' + esc(item.text) + '</span>' +
+        '<button onclick="deletePackItem(' + ci + ',' + ii + ')" style="background:none;border:none;color:rgba(239,68,68,0.5);font-size:14px;cursor:pointer;padding:2px 4px;line-height:1;">✕</button>' +
+      '</div>';
     });
     html += '</div>';
   });
   list.innerHTML = html;
   if (prog) prog.textContent = done + ' / ' + total;
-  list.querySelectorAll('input[data-pack-id]').forEach(function(cb) {
+  list.querySelectorAll('input[type=checkbox][data-ci]').forEach(function(cb) {
     cb.addEventListener('change', function() {
-      var c = getPackChecked();
-      c[this.getAttribute('data-pack-id')] = this.checked;
-      savePackChecked(c);
+      var ci = Number(this.getAttribute('data-ci')), ii = Number(this.getAttribute('data-ii'));
+      PACK_STATE[ci].items[ii].done = this.checked;
+      savePack();
       renderPack();
     });
   });
 }
+
+function openAddPackItem(catIdx) {
+  _packAddingCat = catIdx === null ? null : Number(catIdx);
+  var title = qs('packItemTitle'), inp = qs('packItemText');
+  if (title) title.textContent = catIdx === null ? '➕ קטגוריה חדשה' : '➕ הוסף פריט';
+  if (inp) { inp.value = ''; inp.placeholder = catIdx === null ? 'שם קטגוריה...' : 'שם הפריט...'; }
+  var m = qs('packItemModal'); if (m) { m.style.display = 'flex'; setTimeout(function() { if (inp) inp.focus(); }, 100); }
+}
+
+function savePackItem() {
+  var text = (qs('packItemText').value || '').trim();
+  if (!text) { toast('נא להזין טקסט'); return; }
+  if (_packAddingCat === null) {
+    PACK_STATE.push({cat: text, items: []});
+  } else {
+    PACK_STATE[_packAddingCat].items.push({id: 'u' + Date.now(), text: text, done: false});
+  }
+  savePack();
+  closePackItemModal();
+  renderPack();
+  toast('✅ נוסף!');
+}
+
+function deletePackItem(ci, ii) {
+  PACK_STATE[ci].items.splice(ii, 1);
+  savePack();
+  renderPack();
+}
+
+function deletePackCat(ci) {
+  if (!confirm('למחוק קטגוריה "' + PACK_STATE[ci].cat + '" עם כל הפריטים?')) return;
+  PACK_STATE.splice(ci, 1);
+  savePack();
+  renderPack();
+}
+
+function closePackItemModal() { var m = qs('packItemModal'); if (m) m.style.display = 'none'; }
 
 // ═══════════════════════════════════════════
 //  EXPENSES
@@ -944,7 +1047,11 @@ document.addEventListener('DOMContentLoaded', function() {
     'budgetOverlay':      function() { closeBudgetModal(); },
     'btnSaveRate':        function() { saveRate(); },
     'btnSaveExpense':     function() { saveExpense(); },
-    'btnResetPack':       function() { if (confirm("לאפס את כל הצ'ק-ליסט?")) { localStorage.removeItem('prague_pack_v1'); renderPack(); } },
+    'btnResetPack':       function() { if (confirm("לאפס את כל הצ'ק-ליסט?")) { PACK_STATE = getDefaultPackCats(); savePack(); renderPack(); } },
+    'btnSyncPack':        function() { loadPack(); toast('🔄 מסנכרן...'); },
+    'btnAddPackCat':      function() { openAddPackItem(null); },
+    'btnSavePackItem':    function() { savePackItem(); },
+    'packItemOverlay':    function() { closePackItemModal(); },
     'expModalBg':         function() { closeExpense(); },
     'btnBackDays':        function() { openTab('home'); },
     'btnBackShopping':    function() { openTab('home'); },
