@@ -514,14 +514,52 @@ var SHOPS = [
   {e:'🛒',n:'Nový Smíchov',stars:'★★★☆☆',hours:'09:00–21:00',metro:'מטרו B — Anděl',time:'~30 דק׳',brands:'אופנה, Tesco, אוכל',tip:'נוח אם נמצאים ב-Smíchov.',map:'https://www.google.com/maps/search/Novy+Smichov+Prague'}
 ];
 
+// level: 1=💰 עד 1,000 CZK | 2=💰💰 1,000–2,000 | 3=💰💰💰 2,000–3,500 | 4=💰💰💰💰 3,500+
 var RESTAURANTS = [
-  {icon:'🥩',name:'Gran Fierro',sub:'ערב הבשרים המאוזן',desc:'סטייקהאוס ארגנטינאי. מתאים למשפחה, אווירה נעימה. Ribeye / Tenderloin / בקר בלבד.',price:'350–500 ₪ למשפחה',badge:'מומלץ',badgeClr:'rgba(244,99,74,0.22)',badgeTxt:'#F4634A',mapUrl:'https://www.google.com/maps/search/Gran+Fierro+Prague'},
-  {icon:'👑',name:'George Prime Steak',sub:'הערב החגיגי',desc:'סטייקהאוס יוקרתי. לערב אחרון או חגיגה. יקר יותר — אבל הכי "וואו".',price:'650–950 ₪ למשפחה',badge:'פרמיום',badgeClr:'rgba(124,58,237,0.22)',badgeTxt:'#C084FC',mapUrl:'https://www.google.com/maps/search/George+Prime+Steak+Prague'},
-  {icon:'🔥',name:'Antricote',sub:'Dry aged בעיר העתיקה',desc:'מסעדת סטייקים במרכז. טובה לערב אחרי יום רכבות.',price:'400–650 ₪ למשפחה',badge:'טוב',badgeClr:'rgba(8,145,178,0.22)',badgeTxt:'#67E8F9',mapUrl:'https://www.google.com/maps/search/Antricote+Prague'},
-  {icon:'🍽️',name:'BeefHouse',sub:'בשר במחיר מאוזן',desc:'אופציה טובה לערב אחרי Zoo. נוחה מבחינת מחיר.',price:'350–550 ₪ למשפחה',badge:'נוח',badgeClr:'rgba(5,150,105,0.22)',badgeTxt:'#6EE7B7',mapUrl:'https://www.google.com/maps/search/BeefHouse+Prague'},
-  {icon:'🌉',name:'Mlýnec',sub:'ערב יפה ליד גשר קארל',desc:'מסעדה עם מיקום מעולה ליד הנהר. לבדוק מנות ללא חזיר.',price:'450–750 ₪ למשפחה',badge:'נוף',badgeClr:'rgba(29,78,216,0.22)',badgeTxt:'#93C5FD',mapUrl:'https://www.google.com/maps/search/Mlynec+Prague'},
-  {icon:'☕',name:'Café Savoy',sub:'קפה / בראנץ׳ וינאי',desc:"עצירת קפה מושלמת. מתאים ליום רגוע באזור קמפה.",price:'250–450 ₪ למשפחה',badge:'קפה',badgeClr:'rgba(146,64,14,0.3)',badgeTxt:'#FCD34D',mapUrl:'https://www.google.com/maps/search/Cafe+Savoy+Prague'},
-  {icon:'🚂',name:'Výtopna',sub:'חוויה לעדי — רכבת מביאה שתייה!',desc:'רכבות מביאות שתייה לשולחן. חוויה חזקה לעדי יסמין.',price:'250–400 ₪ למשפחה',badge:'חוויה',badgeClr:'rgba(220,38,38,0.22)',badgeTxt:'#FCA5A5',mapUrl:'https://www.google.com/maps/search/Vytopna+Railway+Restaurant+Prague'}
+  // ── 💰 זול ──────────────────────────────────────────
+  {level:1,icon:'🚂',name:'Výtopna',sub:'חוויה לעדי — רכבת מביאה שתייה!',
+   desc:'רכבות מדגם מביאות שתייה לשולחן. חוויה שעדי תזכור כל החיים. אוכל פשוט אך אווירה מנצחת — ממש מול כיכר וצסלב.',
+   price:'700–1,000 CZK',badge:'⭐ חוויה',badgeClr:'rgba(220,38,38,0.22)',badgeTxt:'#FCA5A5',
+   mapUrl:'https://www.google.com/maps/search/Vytopna+Railway+Restaurant+Prague'},
+  {level:1,icon:'👨‍👩‍👧',name:'Mistral Café',sub:'הכי פמילי-פרנדלי בפראג',
+   desc:'פינת משחקים לילדים, תפריט עשיר, אוכל טעים ובמחיר מצוין. קרוב לרובע היהודי. מנות בקר, דגים וצמחוני. מנוחת צהריים מושלמת.',
+   price:'800–1,200 CZK',badge:'⭐⭐ ילדים',badgeClr:'rgba(5,150,105,0.22)',badgeTxt:'#6EE7B7',
+   mapUrl:'https://www.google.com/maps/search/Mistral+Cafe+Prague+Valentinska'},
+  // ── 💰💰 בינוני ──────────────────────────────────────
+  {level:2,icon:'🍺',name:'Lokál Korunní',sub:'ביר פאב צ׳כי אמיתי — Vinohrady',
+   desc:'המסעדה הצ׳כית הכי אותנטית. מלאה מקומיים, אפס תיירים. svíčková = בקר בציר שמנת עם קנדרלי — המנה הצ׳כית הקלאסית. פילסנר מהחבית.',
+   price:'900–1,300 CZK',badge:'⭐⭐ מקומי',badgeClr:'rgba(8,145,178,0.22)',badgeTxt:'#67E8F9',
+   mapUrl:'https://www.google.com/maps/search/Lokal+Korunni+Prague'},
+  {level:2,icon:'🏛️',name:'Kantýna',sub:'קצביה+מסעדה בארמון Art Nouveau',
+   desc:'בוחרים את הנתח בקצביה, שוקלים ומגריל על המקום. טרטר בקר — הטוב ביותר בפראג. הבניין לשעבר בנק מרשים. קהל מקומי-עסקי בלבד.',
+   price:'900–1,400 CZK',badge:'⭐⭐ מומלץ',badgeClr:'rgba(245,158,11,0.22)',badgeTxt:'#FCD34D',
+   mapUrl:'https://www.google.com/maps/search/Kantyna+Prague+Politickych+veznu'},
+  {level:2,icon:'☕',name:'Café Savoy',sub:'קפה וינאי קלאסי — ליד קמפה',
+   desc:'קפה וינאי מהמאה ה-19. עיצוב מרהיב, בוקר או אחה"צ איטי. קרואסאן מהסוג הטוב, קפה מעולה. מתאים לאחרי טיול בקמפה.',
+   price:'900–1,400 CZK',badge:'קלאסי',badgeClr:'rgba(146,64,14,0.3)',badgeTxt:'#FCD34D',
+   mapUrl:'https://www.google.com/maps/search/Cafe+Savoy+Prague'},
+  {level:2,icon:'🥩',name:'Gran Fierro',sub:'סטייקהאוס ארגנטינאי',
+   desc:'בקר ארגנטינאי איכותי. Ribeye / Tenderloin / ללא חזיר. אווירה נעימה, מתאים למשפחה. מגוון נתחים, שירות טוב.',
+   price:'1,200–1,800 CZK',badge:'⭐ בשר',badgeClr:'rgba(244,99,74,0.22)',badgeTxt:'#F4634A',
+   mapUrl:'https://www.google.com/maps/search/Gran+Fierro+Prague'},
+  {level:2,icon:'🔥',name:'Čestr',sub:'בקר צ׳כי dry-aged — Vinohrady',
+   desc:'בשר מגזע "český strakatý skot" צ׳כי מקומי, מיושן ומגריל על פחם. תפריט מציג כל נתח על דיאגרמת פרה. קהל מקומי לחלוטין. חלופה מקומית ל-Gran Fierro.',
+   price:'1,500–2,000 CZK',badge:'⭐⭐ מקומי',badgeClr:'rgba(244,99,74,0.22)',badgeTxt:'#F4634A',
+   mapUrl:'https://www.google.com/maps/search/Cestr+Prague+Legerova'},
+  // ── 💰💰💰 יקר ──────────────────────────────────────
+  {level:3,icon:'🌉',name:'Mlýnec',sub:'נוף לגשר קארל — ערב מיוחד',
+   desc:'מיקום מדהים ממש מול גשר קארל ונהר וולטבה. אוכל אירופאי מודרני. לערב רומנטי או ספיישל. לשמור לסיום הטיול.',
+   price:'1,800–2,800 CZK',badge:'נוף',badgeClr:'rgba(29,78,216,0.22)',badgeTxt:'#93C5FD',
+   mapUrl:'https://www.google.com/maps/search/Mlynec+Prague'},
+  {level:3,icon:'🦑',name:'Aromi',sub:'דגים ופירות ים — מישלן Bib Gourmand',
+   desc:'הכי טוב לדגים בפראג. איטלקי עם פירות ים טריים, אוקטופוס בגריל, ריזוטו ים, פסטה עם כמהין. המלצת מישלן. ב-Vinohrady, רחוק מתיירים. הזמינו מקום מראש.',
+   price:'2,500–3,500 CZK',badge:'⭐⭐ מישלן',badgeClr:'rgba(124,58,237,0.22)',badgeTxt:'#C084FC',
+   mapUrl:'https://www.google.com/maps/search/Aromi+Prague+Namesti+Miru'},
+  // ── 💰💰💰💰 יוקרה ────────────────────────────────────
+  {level:4,icon:'👑',name:'George Prime Steak',sub:'הערב החגיגי — הכי "וואו" בפראג',
+   desc:'סטייקהאוס יוקרתי. dry-aged beef מהמדרגה הראשונה. לערב אחרון של הטיול או חגיגה. היקר מכולם — אבל חוויה בלתי נשכחת.',
+   price:'2,500–3,500 CZK',badge:'👑 פרמיום',badgeClr:'rgba(124,58,237,0.22)',badgeTxt:'#C084FC',
+   mapUrl:'https://www.google.com/maps/search/George+Prime+Steak+Prague'}
 ];
 
 var PACK_CATS = [
@@ -919,19 +957,41 @@ function renderShopping() {
 function renderRestaurants() {
   var list = qs('restaurantsList');
   if (!list || list.children.length > 0) return;
-  list.innerHTML = RESTAURANTS.map(function(r) {
-    return '<div style="background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.16);border-radius:20px;padding:18px;box-shadow:0 8px 26px rgba(0,0,0,0.3);">' +
-      '<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">' +
-      '<span style="font-size:32px;line-height:1;flex-shrink:0;margin-top:2px;">' + r.icon + '</span>' +
-      '<div style="flex:1;"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:3px;">' +
-      '<div style="font-size:15px;font-weight:800;color:#F1F5F9;">' + esc(r.name) + '</div>' +
-      '<div style="background:' + r.badgeClr + ';color:' + r.badgeTxt + ';border-radius:999px;padding:3px 9px;font-size:10px;font-weight:800;white-space:nowrap;">' + esc(r.badge) + '</div></div>' +
-      '<div style="font-size:12px;color:rgba(241,245,249,0.48);">' + esc(r.sub) + '</div></div></div>' +
-      '<div style="font-size:12px;color:rgba(241,245,249,0.62);line-height:1.65;margin-bottom:10px;">' + esc(r.desc) + '</div>' +
-      '<div style="background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:7px 12px;font-size:12px;color:#FCD34D;font-weight:600;margin-bottom:12px;">💰 ' + esc(r.price) + '</div>' +
-      '<a href="' + r.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:12px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;">🗺️ ניווט למסעדה</a>' +
+  var LEVEL_LABELS = ['','💰 זול','💰💰 בינוני','💰💰💰 יקר','💰💰💰💰 יוקרה'];
+  var LEVEL_COLORS = ['','rgba(5,150,105,0.18)','rgba(245,158,11,0.14)','rgba(239,68,68,0.14)','rgba(124,58,237,0.18)'];
+  var LEVEL_BORDER = ['','rgba(5,150,105,0.4)','rgba(245,158,11,0.35)','rgba(239,68,68,0.35)','rgba(124,58,237,0.4)'];
+  var LEVEL_TXT   = ['','#6EE7B7','#FCD34D','#FCA5A5','#C084FC'];
+  var lastLevel = 0;
+  var html = '';
+  RESTAURANTS.forEach(function(r) {
+    var lv = r.level || 1;
+    if (lv !== lastLevel) {
+      html += '<div style="display:flex;align-items:center;gap:10px;margin:' + (lastLevel ? '20px' : '4px') + ' 0 10px;">' +
+        '<div style="flex:1;height:1px;background:rgba(255,255,255,0.1);"></div>' +
+        '<div style="font-size:11px;font-weight:800;color:' + LEVEL_TXT[lv] + ';background:' + LEVEL_COLORS[lv] + ';border:1px solid ' + LEVEL_BORDER[lv] + ';border-radius:999px;padding:3px 12px;white-space:nowrap;">' + LEVEL_LABELS[lv] + ' למשפחה</div>' +
+        '<div style="flex:1;height:1px;background:rgba(255,255,255,0.1);"></div>' +
       '</div>';
-  }).join('');
+      lastLevel = lv;
+    }
+    html += '<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:20px;padding:18px;margin-bottom:10px;box-shadow:0 6px 20px rgba(0,0,0,0.25);">' +
+      '<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">' +
+      '<span style="font-size:30px;line-height:1;flex-shrink:0;margin-top:3px;">' + r.icon + '</span>' +
+      '<div style="flex:1;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:3px;">' +
+          '<div style="font-size:15px;font-weight:800;color:#F1F5F9;">' + esc(r.name) + '</div>' +
+          '<div style="background:' + r.badgeClr + ';color:' + r.badgeTxt + ';border-radius:999px;padding:3px 9px;font-size:10px;font-weight:800;white-space:nowrap;">' + esc(r.badge) + '</div>' +
+        '</div>' +
+        '<div style="font-size:11px;color:rgba(241,245,249,0.45);">' + esc(r.sub) + '</div>' +
+      '</div></div>' +
+      '<div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.7;margin-bottom:10px;">' + esc(r.desc) + '</div>' +
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">' +
+        '<div style="background:' + LEVEL_COLORS[lv] + ';border:1px solid ' + LEVEL_BORDER[lv] + ';border-radius:10px;padding:6px 12px;font-size:12px;font-weight:700;color:' + LEVEL_TXT[lv] + ';">' + LEVEL_LABELS[lv] + '</div>' +
+        '<div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:6px 12px;font-size:12px;font-weight:600;color:rgba(241,245,249,0.6);">🧾 ' + esc(r.price) + ' CZK</div>' +
+      '</div>' +
+      '<a href="' + r.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:11px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;">🗺️ ניווט למסעדה</a>' +
+    '</div>';
+  });
+  list.innerHTML = html;
 }
 
 // ═══════════════════════════════════════════
