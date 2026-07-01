@@ -1739,11 +1739,26 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!file) return;
     var reader = new FileReader();
     reader.onload = function(ev) {
-      var img = qs('photoPreviewImg');
-      var ph  = qs('photoPreviewPlaceholder');
-      if (img) { img.src = ev.target.result; img.style.display = 'block'; }
-      if (ph)  ph.style.display = 'none';
-      window._photoPendingDataUrl = ev.target.result;
+      // כווץ תמונה ל-max 1600px ו-JPEG 0.82 לפני שמירה
+      var srcImg = new Image();
+      srcImg.onload = function() {
+        var MAX = 1600, q = 0.82;
+        var w = srcImg.width, h = srcImg.height;
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else       { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        var canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(srcImg, 0, 0, w, h);
+        var compressed = canvas.toDataURL('image/jpeg', q);
+        var img = qs('photoPreviewImg');
+        var ph  = qs('photoPreviewPlaceholder');
+        if (img) { img.src = compressed; img.style.display = 'block'; }
+        if (ph)  ph.style.display = 'none';
+        window._photoPendingDataUrl = compressed;
+      };
+      srcImg.src = ev.target.result;
     };
     reader.readAsDataURL(file);
   });
@@ -1803,6 +1818,25 @@ function dbUpdatePhoto(entry, cb) {
   });
 }
 
+function compressForDrive(dataUrl, cb) {
+  // כווץ ל-1200px ו-JPEG 0.78 — מספיק איכות לגיבוי, בטוח מתחת ל-10MB
+  var img = new Image();
+  img.onload = function() {
+    var MAX = 1200, q = 0.78;
+    var w = img.width, h = img.height;
+    if (w > MAX || h > MAX) {
+      if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+      else       { w = Math.round(w * MAX / h); h = MAX; }
+    }
+    var c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    c.getContext('2d').drawImage(img, 0, 0, w, h);
+    cb(c.toDataURL('image/jpeg', q));
+  };
+  img.onerror = function() { cb(dataUrl); }; // fallback
+  img.src = dataUrl;
+}
+
 function backupAllToDrive() {
   if (!isGas()) { toast('⚠️ גיבוי ל-Drive עובד רק דרך האפליקציה המקוונת'); return; }
   var statusEl = qs('driveBackupStatus');
@@ -1825,16 +1859,18 @@ function backupAllToDrive() {
       }
       var p = unsynced[i];
       if (statusEl) statusEl.textContent = '☁️ שולח ' + (i+1) + '/' + unsynced.length + ': ' + p.place + '...';
-      google.script.run
-        .withSuccessHandler(function(r) {
-          if (r && r.ok) {
-            p.driveId  = r.id;
-            p.driveUrl = r.url;
-            dbUpdatePhoto(p, function() { done++; next(i+1); });
-          } else { failed++; next(i+1); }
-        })
-        .withFailureHandler(function() { failed++; next(i+1); })
-        .savePhotoToDrive(p.dataUrl, p.place, p.note || '', p.ts);
+      compressForDrive(p.dataUrl, function(smallDataUrl) {
+        google.script.run
+          .withSuccessHandler(function(r) {
+            if (r && r.ok) {
+              p.driveId  = r.id;
+              p.driveUrl = r.url;
+              dbUpdatePhoto(p, function() { done++; next(i+1); });
+            } else { failed++; next(i+1); }
+          })
+          .withFailureHandler(function() { failed++; next(i+1); })
+          .savePhotoToDrive(smallDataUrl, p.place, p.note || '', p.ts);
+      });
     }
     next(0);
   });
