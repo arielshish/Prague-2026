@@ -1118,8 +1118,9 @@ function saveTotalBudget(val) {
   localStorage.setItem('prague_total_budget', String(val));
   if (isGas()) {
     google.script.run
-      .saveTotalBudget(val)
-      .withFailureHandler(function(){});
+      .withSuccessHandler(function(r) { if (r && r.ok) toast('☁️ תקציב כולל סונכרן!'); })
+      .withFailureHandler(function() { toast('⚠️ שמור מקומית בלבד'); })
+      .saveTotalBudget(val);
   }
 }
 function saveBudget(b) {

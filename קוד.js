@@ -910,6 +910,14 @@ function loadAppData() {
          } catch(e) {
            result.budget_categories = null;
          }
+      } else if (key === 'total_budget') {
+         result.total_budget = Number(val) || 0;
+      } else if (key === 'days_custom') {
+         try {
+           result.days_custom = JSON.parse(val);
+         } catch(e) {
+           result.days_custom = null;
+         }
       }
     }
     return { ok: true, data: result };
