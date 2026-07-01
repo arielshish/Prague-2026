@@ -1749,7 +1749,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     gpsReader.readAsArrayBuffer(file);
 
-    // כווץ לתצוגה ולשמירה
+    // כווץ + הוסף מסגרת
     var reader = new FileReader();
     reader.onload = function(ev) {
       var srcImg = new Image();
@@ -1762,7 +1762,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         var canvas = document.createElement('canvas');
         canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(srcImg, 0, 0, w, h);
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(srcImg, 0, 0, w, h);
+        addPragueFrame(ctx, w, h);
         var compressed = canvas.toDataURL('image/jpeg', q);
         var img = qs('photoPreviewImg');
         var ph  = qs('photoPreviewPlaceholder');
@@ -1933,6 +1935,97 @@ function updateGpsDisplay(gps) {
     el.style.color = 'rgba(241,245,249,0.3)';
     el.style.display = 'block';
   }
+}
+
+function addPragueFrame(ctx, w, h) {
+  var s = w / 1080; // scale factor relative to 1080px base
+
+  // ── גרדיאנט תחתון ──
+  var gradH = h * 0.32;
+  var grad = ctx.createLinearGradient(0, h - gradH, 0, h);
+  grad.addColorStop(0,   'rgba(4,13,24,0)');
+  grad.addColorStop(0.4, 'rgba(4,13,24,0.72)');
+  grad.addColorStop(1,   'rgba(4,13,24,0.96)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, h - gradH, w, gradH);
+
+  // ── גרדיאנט עליון קטן ──
+  var gradTop = ctx.createLinearGradient(0, 0, 0, h * 0.12);
+  gradTop.addColorStop(0, 'rgba(4,13,24,0.55)');
+  gradTop.addColorStop(1, 'rgba(4,13,24,0)');
+  ctx.fillStyle = gradTop;
+  ctx.fillRect(0, 0, w, h * 0.12);
+
+  // ── מסגרת זהב ──
+  var bw = Math.max(3, Math.round(4 * s));
+  ctx.strokeStyle = 'rgba(252,211,77,0.7)';
+  ctx.lineWidth = bw;
+  ctx.strokeRect(bw/2, bw/2, w - bw, h - bw);
+
+  // ── קו זהב פנימי דק ──
+  var inset = bw + Math.round(7 * s);
+  ctx.strokeStyle = 'rgba(252,211,77,0.25)';
+  ctx.lineWidth = Math.max(1, Math.round(1.5 * s));
+  ctx.strokeRect(inset, inset, w - inset*2, h - inset*2);
+
+  // ── כוכבים קטנים ──
+  var stars = [[0.08,0.06],[0.92,0.06],[0.5,0.045],[0.15,0.035],[0.82,0.035]];
+  ctx.fillStyle = 'rgba(252,211,77,0.85)';
+  stars.forEach(function(st) {
+    var sx = st[0]*w, sy = st[1]*h, r = Math.max(2, 3*s);
+    ctx.beginPath(); ctx.arc(sx, sy, r, 0, Math.PI*2); ctx.fill();
+  });
+
+  // ── צללית טירת פראג ──
+  var cx = w * 0.5, cy = h - gradH * 0.72, sc = s * 0.9;
+  ctx.fillStyle = 'rgba(252,211,77,0.18)';
+  ctx.beginPath();
+  // גוף המרכזי
+  ctx.rect(cx - 90*sc, cy, 180*sc, 55*sc);
+  // מגדל שמאל גבוה
+  ctx.rect(cx - 78*sc, cy - 70*sc, 22*sc, 72*sc);
+  // שיפוד מגדל שמאל
+  ctx.rect(cx - 70*sc, cy - 88*sc, 6*sc, 20*sc);
+  // מגדל ימין
+  ctx.rect(cx + 56*sc, cy - 52*sc, 20*sc, 54*sc);
+  ctx.rect(cx + 62*sc, cy - 66*sc, 8*sc, 16*sc);
+  // מגדל אמצעי
+  ctx.rect(cx - 12*sc, cy - 40*sc, 24*sc, 42*sc);
+  ctx.rect(cx - 6*sc,  cy - 56*sc, 12*sc, 18*sc);
+  ctx.fill();
+
+  // ── שם המשפחה ──
+  var famSize = Math.round(52 * s);
+  ctx.font = '900 ' + famSize + 'px Rubik, Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  // צל
+  ctx.shadowColor = 'rgba(0,0,0,0.8)';
+  ctx.shadowBlur = 12 * s;
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText('משפחת שיש', w/2, h - Math.round(90 * s));
+
+  // ── כותרת ──
+  var titleSize = Math.round(30 * s);
+  ctx.font = '700 ' + titleSize + 'px Rubik, Arial, sans-serif';
+  ctx.fillStyle = '#FCD34D';
+  ctx.shadowBlur = 8 * s;
+  ctx.fillText('כובשת את פראג ✈️ 2026', w/2, h - Math.round(50 * s));
+
+  // ── קו הפרדה ──
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = 'rgba(252,211,77,0.4)';
+  ctx.lineWidth = Math.max(1, s);
+  var lineY = h - Math.round(107 * s);
+  var lineW = Math.round(200 * s);
+  ctx.beginPath();
+  ctx.moveTo(w/2 - lineW, lineY);
+  ctx.lineTo(w/2 + lineW, lineY);
+  ctx.stroke();
+
+  ctx.shadowBlur = 0;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
 }
 
 function compressForDrive(dataUrl, cb) {
