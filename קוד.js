@@ -1115,3 +1115,26 @@ function loadBudgetCategories() {
     return { ok: false, error: e.message };
   }
 }
+
+function savePhotoToDrive(dataUrl, place, note, timestamp) {
+  try {
+    var folderName = 'Prague 2026 — Photos';
+    var folders = DriveApp.getFoldersByName(folderName);
+    var folder = folders.hasNext() ? folders.next() : DriveApp.createFolder(folderName);
+
+    var parts   = dataUrl.split(',');
+    var mime    = parts[0].split(';')[0].split(':')[1] || 'image/jpeg';
+    var ext     = mime === 'image/png' ? '.png' : '.jpg';
+    var decoded = Utilities.base64Decode(parts[1]);
+    var blob    = Utilities.newBlob(decoded, mime, place.replace(/[\\/:*?"<>|]/g,'_') + '_' + timestamp + ext);
+
+    var file = folder.createFile(blob);
+    var date = new Date(timestamp);
+    var desc = place + (note ? ' — ' + note : '') + ' | ' + date.toLocaleDateString('he-IL') + ' ' + date.toLocaleTimeString('he-IL');
+    file.setDescription(desc);
+
+    return { ok: true, url: file.getUrl(), id: file.getId() };
+  } catch(e) {
+    return { ok: false, error: e.message };
+  }
+}

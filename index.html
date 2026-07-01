@@ -393,9 +393,11 @@
       <div><h2 style="font-size:18px;font-weight:900;">📷 יומן תמונות</h2><p style="font-size:12px;color:rgba(241,245,249,0.5);margin-top:3px;">תמונות מהטיול עם תיוג מקום</p></div>
       <button class="back-btn" id="btnBackPhotoDiary">← ראשי</button>
     </div>
-    <button id="btnNewPhoto" style="width:100%;background:linear-gradient(135deg,rgba(236,72,153,0.2),rgba(168,85,247,0.2));border:1px solid rgba(236,72,153,0.35);border-radius:18px;padding:18px;font-size:14px;font-weight:800;color:#F9A8D4;cursor:pointer;font-family:'Rubik',Arial,sans-serif;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:10px;">
-      📷 צלם תמונה חדשה
-    </button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+      <button id="btnNewPhoto" style="background:linear-gradient(135deg,rgba(236,72,153,0.2),rgba(168,85,247,0.2));border:1px solid rgba(236,72,153,0.35);border-radius:16px;padding:14px 8px;font-size:12px;font-weight:800;color:#F9A8D4;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">📷 צלם תמונה</button>
+      <button id="btnBackupDrive" style="background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(59,130,246,0.2));border:1px solid rgba(16,185,129,0.35);border-radius:16px;padding:14px 8px;font-size:12px;font-weight:800;color:#6EE7B7;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">☁️ גבה ל-Drive</button>
+    </div>
+    <div id="driveBackupStatus" style="display:none;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:12px;padding:10px 14px;font-size:12px;color:#6EE7B7;margin-bottom:12px;text-align:center;"></div>
     <div id="photoDiaryEmpty" style="text-align:center;padding:40px 20px;color:rgba(241,245,249,0.3);font-size:13px;">עדיין אין תמונות — לחצו על הכפתור למעלה להתחיל!</div>
     <div id="photoDiaryGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div>
   </section>
@@ -1721,6 +1723,7 @@ document.addEventListener('DOMContentLoaded', function() {
     'btnHomePhotoDiary':    function() { openTab('photodiary'); renderPhotoDiary(); },
     'btnBackPhotoDiary':    function() { openTab('home'); },
     'btnNewPhoto':          function() { openPhotoModal(null); },
+    'btnBackupDrive':       function() { backupAllToDrive(); },
     'btnSavePhoto':         function() { savePhotoEntry(); }
   };
 
@@ -1789,6 +1792,51 @@ function dbDeletePhoto(id, cb) {
     var tx  = db.transaction('photos','readwrite');
     tx.objectStore('photos').delete(id);
     tx.oncomplete = function() { cb && cb(); };
+  });
+}
+
+function dbUpdatePhoto(entry, cb) {
+  openPhotoDB(function(db) {
+    var tx  = db.transaction('photos','readwrite');
+    var req = tx.objectStore('photos').put(entry);
+    req.onsuccess = function() { cb && cb(); };
+  });
+}
+
+function backupAllToDrive() {
+  if (!isGas()) { toast('⚠️ גיבוי ל-Drive עובד רק דרך האפליקציה המקוונת'); return; }
+  var statusEl = qs('driveBackupStatus');
+  dbGetAllPhotos(function(photos) {
+    var unsynced = photos.filter(function(p) { return !p.driveId; });
+    if (!unsynced.length) {
+      if (statusEl) { statusEl.style.display = 'block'; statusEl.textContent = '✅ כל התמונות כבר מגובות ב-Drive!'; }
+      return;
+    }
+    if (statusEl) { statusEl.style.display = 'block'; statusEl.textContent = '☁️ מגבה ' + unsynced.length + ' תמונות...'; }
+    var done = 0, failed = 0;
+    function next(i) {
+      if (i >= unsynced.length) {
+        var msg = '✅ ' + done + ' תמונות גובו לגוגל דרייב';
+        if (failed) msg += ' | ⚠️ ' + failed + ' נכשלו';
+        if (statusEl) statusEl.textContent = msg;
+        toast(msg);
+        renderPhotoDiary();
+        return;
+      }
+      var p = unsynced[i];
+      if (statusEl) statusEl.textContent = '☁️ שולח ' + (i+1) + '/' + unsynced.length + ': ' + p.place + '...';
+      google.script.run
+        .withSuccessHandler(function(r) {
+          if (r && r.ok) {
+            p.driveId  = r.id;
+            p.driveUrl = r.url;
+            dbUpdatePhoto(p, function() { done++; next(i+1); });
+          } else { failed++; next(i+1); }
+        })
+        .withFailureHandler(function() { failed++; next(i+1); })
+        .savePhotoToDrive(p.dataUrl, p.place, p.note || '', p.ts);
+    }
+    next(0);
   });
 }
 
@@ -1887,6 +1935,7 @@ function renderPhotoDiary() {
           (p.note ? '<div style="font-size:10px;color:rgba(241,245,249,0.55);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(p.note) + '</div>' : '') +
         '</div>' +
         '<button onclick="deletePhoto(' + p.id + ')" style="position:absolute;top:6px;left:6px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;width:26px;height:26px;font-size:12px;cursor:pointer;color:white;">🗑</button>' +
+        (p.driveId ? '<div style="position:absolute;top:6px;right:6px;background:rgba(16,185,129,0.85);border-radius:999px;padding:2px 7px;font-size:9px;font-weight:800;color:white;">☁️</div>' : '<div style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.55);border-radius:999px;padding:2px 7px;font-size:9px;color:rgba(255,255,255,0.5);">לא מגובה</div>') +
       '</div>';
     }).join('');
   });
