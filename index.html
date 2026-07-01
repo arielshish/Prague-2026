@@ -1894,7 +1894,7 @@ function fetchLiveRate() {
   var rateEl = qs('rate');
   var rateStatus = qs('rateStatus');
   if (rateStatus) { rateStatus.textContent = '🔄 מעדכן שער...'; rateStatus.style.color = '#93C5FD'; }
-  fetch('https://api.frankfurter.app/latest?from=ILS&to=CZK')
+  fetch('https://open.er-api.com/v6/latest/ILS')
     .then(function(r) { return r.json(); })
     .then(function(data) {
       var live = data.rates && data.rates.CZK;
