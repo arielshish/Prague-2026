@@ -416,6 +416,7 @@
         </div>
       </div>
       <input id="photoFileInput" type="file" accept="image/*" capture="environment" style="display:none;">
+      <div id="photoGpsDisplay" style="display:none;font-size:11px;font-weight:600;color:#6EE7B7;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:7px 11px;margin-bottom:10px;"></div>
       <!-- שם המקום -->
       <div style="font-size:11px;font-weight:700;color:rgba(241,245,249,0.5);margin-bottom:6px;letter-spacing:0.5px;">📍 מקום</div>
       <div id="photoPlaceChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div>
@@ -1737,9 +1738,20 @@ document.addEventListener('DOMContentLoaded', function() {
   if (pfi) pfi.addEventListener('change', function(e) {
     var file = e.target.files && e.target.files[0];
     if (!file) return;
+    window._photoPendingGps = null;
+    window._photoPendingOrigFile = file;
+
+    // קרא GPS מ-EXIF לפני כל עיבוד
+    var gpsReader = new FileReader();
+    gpsReader.onload = function(ev) {
+      window._photoPendingGps = extractExifGps(ev.target.result);
+      updateGpsDisplay(window._photoPendingGps);
+    };
+    gpsReader.readAsArrayBuffer(file);
+
+    // כווץ לתצוגה ולשמירה
     var reader = new FileReader();
     reader.onload = function(ev) {
-      // כווץ תמונה ל-max 1600px ו-JPEG 0.82 לפני שמירה
       var srcImg = new Image();
       srcImg.onload = function() {
         var MAX = 1600, q = 0.82;
@@ -1818,6 +1830,93 @@ function dbUpdatePhoto(entry, cb) {
   });
 }
 
+// ═══════════════════════════════════════════
+//  EXIF GPS PARSER (pure JS, no dependencies)
+// ═══════════════════════════════════════════
+function extractExifGps(arrayBuffer) {
+  try {
+    var view = new DataView(arrayBuffer);
+    if (view.getUint16(0) !== 0xFFD8) return null; // not JPEG
+    var offset = 2, len = arrayBuffer.byteLength;
+    while (offset < len - 4) {
+      if (view.getUint8(offset) !== 0xFF) break;
+      var marker = view.getUint8(offset + 1);
+      var segLen = view.getUint16(offset + 2);
+      if (marker === 0xE1) { // APP1 — EXIF
+        var exifHeader = String.fromCharCode(
+          view.getUint8(offset+4), view.getUint8(offset+5),
+          view.getUint8(offset+6), view.getUint8(offset+7));
+        if (exifHeader === 'Exif') {
+          var tiffStart = offset + 10;
+          var byteOrder = view.getUint16(tiffStart);
+          var le = (byteOrder === 0x4949); // little-endian
+          var rd16 = function(o) { return le ? view.getUint16(tiffStart+o,true) : view.getUint16(tiffStart+o); };
+          var rd32 = function(o) { return le ? view.getUint32(tiffStart+o,true) : view.getUint32(tiffStart+o); };
+          var ifd0 = rd32(4);
+          var entries = rd16(ifd0);
+          var gpsOffset = null;
+          for (var i = 0; i < entries; i++) {
+            var eOff = ifd0 + 2 + i * 12;
+            if (rd16(eOff) === 0x8825) { gpsOffset = rd32(eOff + 8); break; }
+          }
+          if (gpsOffset === null) return null;
+          var gpsEntries = rd16(gpsOffset);
+          var lat = null, latRef = 'N', lng = null, lngRef = 'E', alt = null;
+          for (var j = 0; j < gpsEntries; j++) {
+            var gOff = gpsOffset + 2 + j * 12;
+            var tag  = rd16(gOff);
+            var vOff = rd32(gOff + 8);
+            if (tag === 1)  { latRef = String.fromCharCode(view.getUint8(tiffStart + vOff)); }
+            if (tag === 3)  { lngRef = String.fromCharCode(view.getUint8(tiffStart + vOff)); }
+            if (tag === 2)  { lat = readGpsDMS(view, tiffStart + vOff, le); }
+            if (tag === 4)  { lng = readGpsDMS(view, tiffStart + vOff, le); }
+            if (tag === 6)  { var n=rd32(gOff+8), d=1; try{var r=rd32(gOff+10); if(r) d=r;} catch(e){} alt = n/d; }
+          }
+          if (lat !== null && lng !== null) {
+            var latDec = dmsToDecimal(lat) * (latRef === 'S' ? -1 : 1);
+            var lngDec = dmsToDecimal(lng) * (lngRef === 'W' ? -1 : 1);
+            return { lat: latDec, lng: lngDec, alt: alt };
+          }
+        }
+      }
+      offset += 2 + segLen;
+    }
+  } catch(e) {}
+  return null;
+}
+
+function readGpsDMS(view, offset, le) {
+  var result = [];
+  for (var i = 0; i < 3; i++) {
+    var num = le ? view.getUint32(offset + i*8, true) : view.getUint32(offset + i*8);
+    var den = le ? view.getUint32(offset + i*8 + 4, true) : view.getUint32(offset + i*8 + 4);
+    result.push(den ? num / den : 0);
+  }
+  return result;
+}
+
+function dmsToDecimal(dms) {
+  return dms[0] + dms[1] / 60 + dms[2] / 3600;
+}
+
+function updateGpsDisplay(gps) {
+  var el = qs('photoGpsDisplay');
+  if (!el) return;
+  if (gps && gps.lat) {
+    var latStr = Math.abs(gps.lat).toFixed(5) + '° ' + (gps.lat >= 0 ? 'N' : 'S');
+    var lngStr = Math.abs(gps.lng).toFixed(5) + '° ' + (gps.lng >= 0 ? 'E' : 'W');
+    el.innerHTML = '📍 GPS: ' + latStr + ', ' + lngStr +
+      (gps.alt ? ' | ' + Math.round(gps.alt) + 'm' : '') +
+      ' <a href="https://www.google.com/maps?q=' + gps.lat + ',' + gps.lng +
+      '" target="_blank" style="color:#93C5FD;font-size:10px;text-decoration:none;">🗺️ מפה</a>';
+    el.style.display = 'block';
+  } else {
+    el.innerHTML = '📍 אין GPS בתמונה';
+    el.style.color = 'rgba(241,245,249,0.3)';
+    el.style.display = 'block';
+  }
+}
+
 function compressForDrive(dataUrl, cb) {
   // כווץ ל-1200px ו-JPEG 0.78 — מספיק איכות לגיבוי, בטוח מתחת ל-10MB
   var img = new Image();
@@ -1890,6 +1989,9 @@ var PLACE_SUGGESTIONS = (function() {
 function openPhotoModal(placeName) {
   _photoModalPlace = placeName || null;
   window._photoPendingDataUrl = null;
+  window._photoPendingGps = null;
+  window._photoPendingOrigFile = null;
+  var gpsEl = qs('photoGpsDisplay'); if (gpsEl) gpsEl.style.display = 'none';
   var img = qs('photoPreviewImg');
   var ph  = qs('photoPreviewPlaceholder');
   if (img) { img.src = ''; img.style.display = 'none'; }
@@ -1937,7 +2039,8 @@ function savePhotoEntry() {
     dataUrl: dataUrl,
     place:   place,
     note:    note,
-    ts:      Date.now()
+    ts:      Date.now(),
+    gps:     window._photoPendingGps || null
   };
   dbAddPhoto(entry, function() {
     closePhotoModal();
@@ -1963,6 +2066,9 @@ function renderPhotoDiary() {
     grid.innerHTML = photos.map(function(p) {
       var d = new Date(p.ts);
       var dateStr = d.getDate() + '/' + (d.getMonth()+1) + ' ' + d.getHours() + ':' + String(d.getMinutes()).padStart(2,'0');
+      var gpsTag = p.gps && p.gps.lat
+        ? '<a href="https://www.google.com/maps?q=' + p.gps.lat + ',' + p.gps.lng + '" target="_blank" style="position:absolute;bottom:62px;right:6px;background:rgba(59,130,246,0.85);border-radius:999px;padding:2px 7px;font-size:9px;font-weight:800;color:white;text-decoration:none;">🛰 GPS</a>'
+        : '';
       return '<div style="position:relative;border-radius:16px;overflow:hidden;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);">' +
         '<img src="' + p.dataUrl + '" style="width:100%;aspect-ratio:1;object-fit:cover;display:block;" loading="lazy" onclick="openPhotoViewer(' + p.id + ')">' +
         '<div style="padding:8px;">' +
@@ -1972,6 +2078,7 @@ function renderPhotoDiary() {
         '</div>' +
         '<button onclick="deletePhoto(' + p.id + ')" style="position:absolute;top:6px;left:6px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;width:26px;height:26px;font-size:12px;cursor:pointer;color:white;">🗑</button>' +
         (p.driveId ? '<div style="position:absolute;top:6px;right:6px;background:rgba(16,185,129,0.85);border-radius:999px;padding:2px 7px;font-size:9px;font-weight:800;color:white;">☁️</div>' : '<div style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.55);border-radius:999px;padding:2px 7px;font-size:9px;color:rgba(255,255,255,0.5);">לא מגובה</div>') +
+        gpsTag +
       '</div>';
     }).join('');
   });
@@ -1994,12 +2101,15 @@ function openPhotoViewer(id) {
       overlay.style.cssText = 'position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.95);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;';
       overlay.innerHTML =
         '<img src="' + p.dataUrl + '" style="max-width:100%;max-height:70vh;object-fit:contain;border-radius:12px;margin-bottom:16px;">' +
-        '<div style="text-align:center;color:#F1F5F9;">' +
+        '<div style="text-align:center;color:#F1F5F9;width:100%;max-width:400px;">' +
           '<div style="font-size:16px;font-weight:800;margin-bottom:4px;">📍 ' + esc(p.place) + '</div>' +
           '<div style="font-size:12px;color:rgba(241,245,249,0.5);margin-bottom:8px;">' + dateStr + '</div>' +
-          (p.note ? '<div style="font-size:13px;color:rgba(241,245,249,0.75);">' + esc(p.note) + '</div>' : '') +
+          (p.note ? '<div style="font-size:13px;color:rgba(241,245,249,0.75);margin-bottom:8px;">' + esc(p.note) + '</div>' : '') +
+          (p.gps && p.gps.lat
+            ? '<a href="https://www.google.com/maps?q=' + p.gps.lat + ',' + p.gps.lng + '" target="_blank" style="display:inline-block;background:rgba(59,130,246,0.2);border:1px solid rgba(59,130,246,0.4);border-radius:10px;padding:6px 14px;font-size:11px;font-weight:700;color:#93C5FD;text-decoration:none;margin-bottom:6px;">🛰 ' + p.gps.lat.toFixed(5) + ', ' + p.gps.lng.toFixed(5) + (p.gps.alt ? ' · ' + Math.round(p.gps.alt) + 'm' : '') + ' — פתח במפות</a>'
+            : '<div style="font-size:11px;color:rgba(241,245,249,0.25);margin-bottom:6px;">אין נתוני GPS</div>') +
         '</div>' +
-        '<button style="margin-top:20px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:13px;padding:12px 32px;color:#F1F5F9;font-size:14px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">סגור</button>';
+        '<button style="margin-top:16px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:13px;padding:12px 32px;color:#F1F5F9;font-size:14px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">סגור</button>';
       overlay.querySelector('button').onclick = function() { document.body.removeChild(overlay); };
       overlay.addEventListener('click', function(e) { if (e.target === overlay) document.body.removeChild(overlay); });
       document.body.appendChild(overlay);
