@@ -528,7 +528,7 @@ function openTab(id) {
     var btn = qs('nav-' + name);
     if (btn) btn.style.color = name === id ? '#F4634A' : 'rgba(241,245,249,0.38)';
   });
-  if (id === 'expenses') loadExpenses();
+  if (id === 'expenses') { loadExpenses(); syncBudgetFromSheets(); }
   if (id === 'pack') renderPack();
   if (id === 'restaurants') renderRestaurants();
 }
@@ -702,7 +702,26 @@ function loadBudget() {
   try { return JSON.parse(localStorage.getItem('prague_budget_v1') || 'null') || JSON.parse(JSON.stringify(DEFAULT_BUDGET)); }
   catch(e) { return JSON.parse(JSON.stringify(DEFAULT_BUDGET)); }
 }
-function saveBudget(b) { localStorage.setItem('prague_budget_v1', JSON.stringify(b)); }
+function saveBudget(b) {
+  localStorage.setItem('prague_budget_v1', JSON.stringify(b));
+  if (isGas()) {
+    google.script.run
+      .withSuccessHandler(function(r) { if (r && r.ok) toast('☁️ תקציב סונכרן!'); })
+      .withFailureHandler(function() { toast('⚠️ שמור מקומית בלבד'); })
+      .saveBudgetCategories(b);
+  }
+}
+function syncBudgetFromSheets() {
+  if (!isGas()) return;
+  google.script.run
+    .withSuccessHandler(function(r) {
+      if (r && r.ok && r.data) {
+        localStorage.setItem('prague_budget_v1', JSON.stringify(r.data));
+        renderBudget();
+      }
+    })
+    .loadBudgetCategories();
+}
 
 function renderBudget() {
   var budget = loadBudget();

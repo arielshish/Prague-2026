@@ -904,6 +904,12 @@ function loadAppData() {
          } catch(e) {
            result.packing_list = [];
          }
+      } else if (key === 'budget_categories') {
+         try {
+           result.budget_categories = JSON.parse(val);
+         } catch(e) {
+           result.budget_categories = null;
+         }
       }
     }
     return { ok: true, data: result };
@@ -954,5 +960,52 @@ function saveAppData(budget, packingList) {
     return { ok: false, error: e.message };
   } finally {
     try { lock.releaseLock(); } catch (ignore) {}
+  }
+}
+
+function saveBudgetCategories(categories) {
+  var lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(10000);
+    var ss = getSpreadsheet_();
+    var sheet = ss.getSheetByName(APP_DATA_SHEET_NAME);
+    if (!sheet) { initAppDataDB(); sheet = ss.getSheetByName(APP_DATA_SHEET_NAME); }
+    var data = sheet.getDataRange().getValues();
+    var found = false;
+    var json = JSON.stringify(categories);
+    for (var i = 1; i < data.length; i++) {
+      if (data[i][0] === 'budget_categories') {
+        sheet.getRange(i + 1, 2).setValue(json);
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      sheet.getRange(sheet.getLastRow() + 1, 1, 1, 2).setValues([['budget_categories', json]]);
+    }
+    SpreadsheetApp.flush();
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  } finally {
+    try { lock.releaseLock(); } catch (ignore) {}
+  }
+}
+
+function loadBudgetCategories() {
+  try {
+    var ss = getSpreadsheet_();
+    var sheet = ss.getSheetByName(APP_DATA_SHEET_NAME);
+    if (!sheet) return { ok: true, data: null };
+    var data = sheet.getDataRange().getValues();
+    for (var i = 1; i < data.length; i++) {
+      if (data[i][0] === 'budget_categories') {
+        try { return { ok: true, data: JSON.parse(data[i][1]) }; }
+        catch(e) { return { ok: true, data: null }; }
+      }
+    }
+    return { ok: true, data: null };
+  } catch(e) {
+    return { ok: false, error: e.message };
   }
 }
