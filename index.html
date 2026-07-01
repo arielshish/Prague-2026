@@ -1995,11 +1995,24 @@ function startVoiceRecognition() {
   var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) { setVoiceStatus('⚠️ זיהוי קול לא נתמך — הקלד ידנית'); return; }
   if (voiceListening) { if (voiceRecognition) voiceRecognition.stop(); return; }
+  var micBtn = qs('btnVoiceMic');
+  setVoiceStatus('🔐 מבקש הרשאת מיקרופון...');
+  // בקשת הרשאה מפורשת לפני Speech API — גורם לדפדפן להציג דיאלוג
+  navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(function(stream) {
+      stream.getTracks().forEach(function(t) { t.stop(); }); // סוגר את הסטרים מיד
+      doStartRecognition(SpeechRecognition, micBtn);
+    })
+    .catch(function(err) {
+      setVoiceStatus('⚠️ הרשאת מיקרופון נדחתה — אשרו בהגדרות הדפדפן');
+    });
+}
+
+function doStartRecognition(SpeechRecognition, micBtn) {
   voiceRecognition = new SpeechRecognition();
   voiceRecognition.lang = voiceSrcLang === 'he' ? 'he-IL' : 'cs-CZ';
   voiceRecognition.interimResults = true;
   voiceRecognition.continuous = false;
-  var micBtn = qs('btnVoiceMic');
   voiceListening = true;
   if (micBtn) micBtn.textContent = '⏹️';
   setVoiceStatus('🎤 מאזין... דברו עכשיו');
@@ -2014,7 +2027,7 @@ function startVoiceRecognition() {
     if (final) { setVoiceStatus('✅ זוהה — מתרגם...'); translateVoiceText(); }
   };
   voiceRecognition.onerror = function(e) {
-    setVoiceStatus('⚠️ ' + (e.error === 'not-allowed' ? 'נדרשת הרשאת מיקרופון' : 'שגיאה: ' + e.error));
+    setVoiceStatus('⚠️ ' + (e.error === 'not-allowed' ? 'הרשאה נדחתה — אשרו בהגדרות' : 'שגיאה: ' + e.error));
     voiceListening = false;
     if (micBtn) micBtn.textContent = '🎤';
   };
