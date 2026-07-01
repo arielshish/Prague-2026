@@ -103,6 +103,7 @@
       <button id="btnHomeInfo" style="background:rgba(168,85,247,0.10);border:1px solid rgba(168,85,247,0.22);border-radius:16px;padding:13px 8px;font-size:12px;font-weight:800;color:#C084FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;">📘<br><span style="font-size:11px;">מידע</span></button>
       <button id="btnHomeHistory" style="background:rgba(251,191,36,0.10);border:1px solid rgba(251,191,36,0.22);border-radius:16px;padding:13px 8px;font-size:12px;font-weight:800;color:#FDE68A;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;">🏛️<br><span style="font-size:11px;">היסטוריה</span></button>
       <button id="btnHomePhotoDiary" style="background:rgba(236,72,153,0.10);border:1px solid rgba(236,72,153,0.22);border-radius:16px;padding:13px 8px;font-size:12px;font-weight:800;color:#F9A8D4;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;">📷<br><span style="font-size:11px;">יומן תמונות</span></button>
+      <button id="btnHomeLang" style="background:rgba(168,85,247,0.10);border:1px solid rgba(168,85,247,0.22);border-radius:16px;padding:13px 8px;font-size:12px;font-weight:800;color:#C084FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;">🌐<br><span style="font-size:11px;">שפה ותרגום</span></button>
     </div>
     <div style="background:linear-gradient(135deg,rgba(244,99,74,0.13),rgba(244,99,74,0.055));border:1px solid rgba(244,99,74,0.24);border-radius:20px;padding:16px;margin-bottom:10px;">
       <div style="font-size:14px;font-weight:800;color:#F1F5F9;margin-bottom:7px;">🛍️ יום 7 — יום קניות</div>
@@ -600,55 +601,12 @@
         </div>
       </div>
 
-      <!-- מתרגם קולי -->
-      <div style="background:linear-gradient(135deg,rgba(168,85,247,0.13),rgba(99,102,241,0.1));border:1px solid rgba(168,85,247,0.3);border-radius:18px;padding:16px;">
-        <div style="font-size:14px;font-weight:700;color:#C084FC;margin-bottom:4px;">🌐 מתרגם חי — עברית ↔ צ'כית</div>
-        <div style="font-size:11px;color:rgba(241,245,249,0.4);margin-bottom:14px;">הקלידו טקסט — תרגום + השמעה אוטומטיים</div>
-
-        <!-- כפתורי שפה -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-          <button id="voiceLangHe" onclick="setVoiceLang('he','cs')" style="padding:9px;border-radius:11px;border:2px solid rgba(168,85,247,0.6);background:rgba(168,85,247,0.2);font-size:12px;font-weight:800;color:#C084FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🇮🇱 עברית → צ'כית</button>
-          <button id="voiceLangCs" onclick="setVoiceLang('cs','he')" style="padding:9px;border-radius:11px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);font-size:12px;font-weight:800;color:rgba(241,245,249,0.45);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🇨🇿 צ'כית → עברית</button>
-        </div>
-
-        <!-- תיבת קלט טקסט -->
-        <div style="position:relative;margin-bottom:10px;">
-          <textarea id="voiceInputText" placeholder="הקלידו כאן — תרגום אוטומטי תוך שנייה..." style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(168,85,247,0.3);border-radius:13px;padding:12px 14px;font-size:14px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;resize:none;height:70px;"></textarea>
-        </div>
-
-        <!-- כפתורי פעולה -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-          <button onclick="translateVoiceText()" style="background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.4);border-radius:13px;padding:12px 8px;font-size:12px;font-weight:800;color:#A5B4FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🌐 תרגם</button>
-          <button onclick="clearVoiceTranslator()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:13px;padding:12px 8px;font-size:12px;font-weight:800;color:rgba(241,245,249,0.4);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🗑️ נקה</button>
-        </div>
-
-        <!-- תוצאת תרגום -->
-        <div id="voiceTranslateResult" style="display:none;background:rgba(0,0,0,0.25);border:1px solid rgba(168,85,247,0.25);border-radius:13px;padding:14px;">
-          <div style="font-size:10px;color:rgba(241,245,249,0.35);margin-bottom:6px;letter-spacing:1px;">תרגום</div>
-          <div id="voiceTranslateText" style="font-size:16px;font-weight:700;color:#E9D5FF;line-height:1.5;margin-bottom:10px;"></div>
-          <button onclick="speakTranslation()" style="width:100%;background:rgba(168,85,247,0.25);border:1px solid rgba(168,85,247,0.4);border-radius:10px;padding:10px;font-size:13px;font-weight:800;color:#C084FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🔊 השמע בקול</button>
-        </div>
-
-        <div id="voiceStatus" style="font-size:11px;color:rgba(241,245,249,0.35);text-align:center;margin-top:8px;min-height:16px;"></div>
-      </div>
-
-      <!-- מילים בצ'כית -->
-      <div style="background:rgba(168,85,247,0.09);border:1px solid rgba(168,85,247,0.2);border-radius:18px;padding:16px;">
-        <div style="font-size:14px;font-weight:700;color:#C084FC;margin-bottom:10px;">🗣️ מילים שימושיות בצ'כית</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;font-size:12px;">
-          <div onclick="speakCzech('Děkuji')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Děkuji</strong> <span style="color:rgba(241,245,249,0.45);">תודה</span></span><span style="font-size:14px;">🔊</span></div>
-          <div onclick="speakCzech('Prosím')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Prosím</strong> <span style="color:rgba(241,245,249,0.45);">בבקשה</span></span><span style="font-size:14px;">🔊</span></div>
-          <div onclick="speakCzech('Ahoj')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Ahoj</strong> <span style="color:rgba(241,245,249,0.45);">שלום</span></span><span style="font-size:14px;">🔊</span></div>
-          <div onclick="speakCzech('Na shledanou')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Na shledanou</strong> <span style="color:rgba(241,245,249,0.45);">להתראות</span></span><span style="font-size:14px;">🔊</span></div>
-          <div onclick="speakCzech('Kolik?')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Kolik?</strong> <span style="color:rgba(241,245,249,0.45);">כמה עולה?</span></span><span style="font-size:14px;">🔊</span></div>
-          <div onclick="speakCzech('Kde je?')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Kde je?</strong> <span style="color:rgba(241,245,249,0.45);">איפה?</span></span><span style="font-size:14px;">🔊</span></div>
-          <div onclick="speakCzech('Nádraží')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Nádraží</strong> <span style="color:rgba(241,245,249,0.45);">תחנת רכבת</span></span><span style="font-size:14px;">🔊</span></div>
-          <div onclick="speakCzech('Nemocnice')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Nemocnice</strong> <span style="color:rgba(241,245,249,0.45);">בית חולים</span></span><span style="font-size:14px;">🔊</span></div>
-          <div onclick="speakCzech('Záchod')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Záchod</strong> <span style="color:rgba(241,245,249,0.45);">שירותים</span></span><span style="font-size:14px;">🔊</span></div>
-          <div onclick="speakCzech('Pomoc!')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Pomoc!</strong> <span style="color:rgba(241,245,249,0.45);">עזרה!</span></span><span style="font-size:14px;">🔊</span></div>
-          <div onclick="speakCzech('Bez vepřového')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Bez vepřového</strong> <span style="color:rgba(241,245,249,0.45);">ללא חזיר</span></span><span style="font-size:14px;">🔊</span></div>
-          <div onclick="speakCzech('Účet prosím')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Účet prosím</strong> <span style="color:rgba(241,245,249,0.45);">חשבון בבקשה</span></span><span style="font-size:14px;">🔊</span></div>
-        </div>
+      <!-- קישור לטאב שפה -->
+      <div style="background:linear-gradient(135deg,rgba(168,85,247,0.13),rgba(99,102,241,0.1));border:1px solid rgba(168,85,247,0.3);border-radius:18px;padding:16px;text-align:center;">
+        <div style="font-size:22px;margin-bottom:6px;">🌐</div>
+        <div style="font-size:14px;font-weight:800;color:#C084FC;margin-bottom:4px;">שפה ותרגום</div>
+        <div style="font-size:12px;color:rgba(241,245,249,0.45);margin-bottom:14px;">מתרגם קולי עברית ↔ צ'כית + ביטויים שימושיים</div>
+        <button onclick="openTab('lang')" style="width:100%;background:rgba(168,85,247,0.25);border:1px solid rgba(168,85,247,0.45);border-radius:13px;padding:12px;font-size:14px;font-weight:800;color:#C084FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">פתח שפה ותרגום →</button>
       </div>
 
       <!-- טיפים מהשטח -->
@@ -720,6 +678,66 @@
       </div>
     </div>
   </div>
+
+  <!-- ═══ LANG ═══ -->
+  <section id="lang" class="tab">
+    <div class="card card-hdr">
+      <div><h2 style="font-size:18px;font-weight:900;">🌐 שפה ותרגום</h2><p style="font-size:12px;color:rgba(241,245,249,0.5);margin-top:3px;">עברית ↔ צ'כית · מתרגם קולי + ביטויים</p></div>
+      <button class="back-btn" id="btnBackLang">← ראשי</button>
+    </div>
+    <div style="display:grid;gap:12px;">
+
+      <!-- מתרגם קולי -->
+      <div style="background:linear-gradient(135deg,rgba(168,85,247,0.15),rgba(99,102,241,0.1));border:1px solid rgba(168,85,247,0.35);border-radius:18px;padding:18px;text-align:center;">
+        <div style="font-size:36px;margin-bottom:8px;">🎤</div>
+        <div style="font-size:16px;font-weight:900;color:#C084FC;margin-bottom:6px;">מתרגם קולי מלא</div>
+        <div style="font-size:12px;color:rgba(241,245,249,0.5);margin-bottom:18px;line-height:1.6;">דיבור ישיר למיקרופון · תרגום אוטומטי · השמעה בקול<br>עובד ב-Safari/Chrome מחוץ לאפליקציה</div>
+        <a href="https://arielshish.github.io/Prague-2026/translator.html" target="_blank" rel="noopener" style="display:block;background:linear-gradient(135deg,rgba(168,85,247,0.4),rgba(99,102,241,0.35));border:1px solid rgba(168,85,247,0.6);border-radius:14px;padding:15px;font-size:15px;font-weight:900;color:#E9D5FF;text-decoration:none;margin-bottom:10px;">🎤 פתח מתרגם קולי</a>
+        <div style="font-size:11px;color:rgba(241,245,249,0.35);">נפתח בדפדפן — מאפשר גישה למיקרופון</div>
+      </div>
+
+      <!-- מתרגם טקסט -->
+      <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:18px;padding:16px;">
+        <div style="font-size:14px;font-weight:700;color:#C084FC;margin-bottom:4px;">⌨️ תרגום טקסט</div>
+        <div style="font-size:11px;color:rgba(241,245,249,0.4);margin-bottom:12px;">הקלידו — תרגום אוטומטי תוך שנייה</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+          <button id="voiceLangHe" onclick="setVoiceLang('he','cs')" style="padding:9px;border-radius:11px;border:2px solid rgba(168,85,247,0.6);background:rgba(168,85,247,0.2);font-size:12px;font-weight:800;color:#C084FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🇮🇱 עברית → צ'כית</button>
+          <button id="voiceLangCs" onclick="setVoiceLang('cs','he')" style="padding:9px;border-radius:11px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);font-size:12px;font-weight:800;color:rgba(241,245,249,0.45);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🇨🇿 צ'כית → עברית</button>
+        </div>
+        <textarea id="voiceInputText" placeholder="הקלידו כאן — תרגום אוטומטי תוך שנייה..." style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(168,85,247,0.3);border-radius:13px;padding:12px 14px;font-size:14px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;resize:none;height:70px;margin-bottom:10px;"></textarea>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+          <button onclick="translateVoiceText()" style="background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.4);border-radius:13px;padding:12px 8px;font-size:12px;font-weight:800;color:#A5B4FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🌐 תרגם</button>
+          <button onclick="clearVoiceTranslator()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:13px;padding:12px 8px;font-size:12px;font-weight:800;color:rgba(241,245,249,0.4);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🗑️ נקה</button>
+        </div>
+        <div id="voiceTranslateResult" style="display:none;background:rgba(0,0,0,0.25);border:1px solid rgba(168,85,247,0.25);border-radius:13px;padding:14px;">
+          <div style="font-size:10px;color:rgba(241,245,249,0.35);margin-bottom:6px;letter-spacing:1px;">תרגום</div>
+          <div id="voiceTranslateText" style="font-size:16px;font-weight:700;color:#E9D5FF;line-height:1.5;margin-bottom:10px;"></div>
+          <button onclick="speakTranslation()" style="width:100%;background:rgba(168,85,247,0.25);border:1px solid rgba(168,85,247,0.4);border-radius:10px;padding:10px;font-size:13px;font-weight:800;color:#C084FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🔊 השמע בקול</button>
+        </div>
+        <div id="voiceStatus" style="font-size:11px;color:rgba(241,245,249,0.35);text-align:center;margin-top:8px;min-height:16px;"></div>
+      </div>
+
+      <!-- ביטויים מהירים -->
+      <div style="background:rgba(168,85,247,0.09);border:1px solid rgba(168,85,247,0.2);border-radius:18px;padding:16px;">
+        <div style="font-size:14px;font-weight:700;color:#C084FC;margin-bottom:10px;">🗣️ ביטויים מהירים — לחץ להשמעה</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;font-size:12px;">
+          <div onclick="speakCzech('Děkuji')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Děkuji</strong> <span style="color:rgba(241,245,249,0.45);">תודה</span></span><span style="font-size:14px;">🔊</span></div>
+          <div onclick="speakCzech('Prosím')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Prosím</strong> <span style="color:rgba(241,245,249,0.45);">בבקשה</span></span><span style="font-size:14px;">🔊</span></div>
+          <div onclick="speakCzech('Ahoj')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Ahoj</strong> <span style="color:rgba(241,245,249,0.45);">שלום</span></span><span style="font-size:14px;">🔊</span></div>
+          <div onclick="speakCzech('Na shledanou')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Na shledanou</strong> <span style="color:rgba(241,245,249,0.45);">להתראות</span></span><span style="font-size:14px;">🔊</span></div>
+          <div onclick="speakCzech('Kolik?')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Kolik?</strong> <span style="color:rgba(241,245,249,0.45);">כמה עולה?</span></span><span style="font-size:14px;">🔊</span></div>
+          <div onclick="speakCzech('Kde je?')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Kde je?</strong> <span style="color:rgba(241,245,249,0.45);">איפה?</span></span><span style="font-size:14px;">🔊</span></div>
+          <div onclick="speakCzech('Nádraží')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Nádraží</strong> <span style="color:rgba(241,245,249,0.45);">תחנת רכבת</span></span><span style="font-size:14px;">🔊</span></div>
+          <div onclick="speakCzech('Nemocnice')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Nemocnice</strong> <span style="color:rgba(241,245,249,0.45);">בית חולים</span></span><span style="font-size:14px;">🔊</span></div>
+          <div onclick="speakCzech('Záchod')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Záchod</strong> <span style="color:rgba(241,245,249,0.45);">שירותים</span></span><span style="font-size:14px;">🔊</span></div>
+          <div onclick="speakCzech('Pomoc!')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Pomoc!</strong> <span style="color:rgba(241,245,249,0.45);">עזרה!</span></span><span style="font-size:14px;">🔊</span></div>
+          <div onclick="speakCzech('Bez vepřového')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Bez vepřového</strong> <span style="color:rgba(241,245,249,0.45);">ללא חזיר</span></span><span style="font-size:14px;">🔊</span></div>
+          <div onclick="speakCzech('Účet prosím')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Účet prosím</strong> <span style="color:rgba(241,245,249,0.45);">חשבון בבקשה</span></span><span style="font-size:14px;">🔊</span></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
 
   <!-- ═══ NAV ═══ -->
   <nav style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);height:76px;background:rgba(2,7,14,0.97);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-top:1px solid rgba(255,255,255,0.08);z-index:50;display:grid;grid-template-columns:repeat(6,1fr);">
@@ -1078,7 +1096,7 @@ function isGas() {
 // ═══════════════════════════════════════════
 //  NAVIGATION
 // ═══════════════════════════════════════════
-var ALL_TABS = ['home','days','shopping','expenses','flights','restaurants','pack','info','history','photodiary'];
+var ALL_TABS = ['home','days','shopping','expenses','flights','restaurants','pack','info','history','photodiary','lang'];
 
 function openTab(id) {
   ALL_TABS.forEach(function(name) {
@@ -2153,6 +2171,8 @@ document.addEventListener('DOMContentLoaded', function() {
     'btnBackHistory':       function() { openTab('home'); },
     'btnHomePhotoDiary':    function() { openTab('photodiary'); renderPhotoDiary(); },
     'btnBackPhotoDiary':    function() { openTab('home'); },
+    'btnHomeLang':          function() { openTab('lang'); },
+    'btnBackLang':          function() { openTab('home'); },
     'btnNewPhoto':          function() { openPhotoModal(null); },
     'btnShareAll':          function() { shareAllPhotos(); },
     'btnSavePhoto':         function() { savePhotoEntry(); }
