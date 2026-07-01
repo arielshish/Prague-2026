@@ -346,35 +346,273 @@
       <button class="back-btn" id="btnBackInfo">← ראשי</button>
     </div>
     <div style="display:grid;gap:12px;">
-      <div style="background:rgba(59,130,246,0.09);border:1px solid rgba(59,130,246,0.2);border-radius:18px;padding:16px;">
-        <div style="font-size:14px;font-weight:700;color:#93C5FD;margin-bottom:8px;">🚇 תחבורה מהמלון</div>
-        <div style="font-size:13px;color:rgba(241,245,249,0.62);line-height:1.7;"><strong style="color:#F1F5F9;">Comfort Hotel Prague City East</strong><br>מטרו A מ-Strašnická / Skalka למרכז<br>Můstek ← Primark · Náměstí Republiky ← Palladium<br>כרטיס יומי: 110 CZK · אפליקציה: PID Lítačka</div>
-      </div>
-      <div style="background:rgba(245,158,11,0.09);border:1px solid rgba(245,158,11,0.2);border-radius:18px;padding:16px;">
-        <div style="font-size:14px;font-weight:700;color:#FCD34D;margin-bottom:8px;">🚖 Bolt — מחירי אומדן</div>
-        <div style="font-size:12px;color:rgba(241,245,249,0.62);line-height:1.9;">שדה תעופה ↔ מלון: <strong style="color:#F1F5F9;">400–700 CZK</strong><br>מרכז העיר: <strong style="color:#F1F5F9;">150–280 CZK</strong><br>Prague Zoo: <strong style="color:#F1F5F9;">250–400 CZK</strong><br>Aquapalace: <strong style="color:#F1F5F9;">450–700 CZK</strong></div>
-      </div>
-      <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.18);border-radius:18px;padding:16px;">
-        <div style="font-size:14px;font-weight:700;color:#6EE7B7;margin-bottom:8px;">💳 כסף וכרטיס</div>
-        <div style="font-size:13px;color:rgba(241,245,249,0.62);line-height:1.7;">תמיד לשלם בכרטיס — ללא המרת DCC.<br>אם המסוף שואל — בחרו <strong style="color:#6EE7B7;">CZK</strong>, לא ILS!<br>כ-6.4 CZK = ₪1 · Tax Free מעל 2,000 CZK.</div>
-      </div>
-      <div style="background:rgba(168,85,247,0.09);border:1px solid rgba(168,85,247,0.2);border-radius:18px;padding:16px;">
-        <div style="font-size:14px;font-weight:700;color:#C084FC;margin-bottom:8px;">🗣️ מילים בצ'כית</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;font-size:12px;">
-          <div><strong style="color:#F1F5F9;">Děkuji</strong> <span style="color:rgba(241,245,249,0.45);">= תודה</span></div>
-          <div><strong style="color:#F1F5F9;">Prosím</strong> <span style="color:rgba(241,245,249,0.45);">= בבקשה</span></div>
-          <div><strong style="color:#F1F5F9;">Ahoj</strong> <span style="color:rgba(241,245,249,0.45);">= שלום</span></div>
-          <div><strong style="color:#F1F5F9;">Kolik?</strong> <span style="color:rgba(241,245,249,0.45);">= כמה עולה?</span></div>
-          <div><strong style="color:#F1F5F9;">Kde je?</strong> <span style="color:rgba(241,245,249,0.45);">= איפה?</span></div>
-          <div><strong style="color:#F1F5F9;">Nádraží</strong> <span style="color:rgba(241,245,249,0.45);">= תחנה</span></div>
+
+      <!-- טיסות -->
+      <div style="background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);border-radius:18px;padding:16px;">
+        <div style="font-size:14px;font-weight:700;color:#A5B4FC;margin-bottom:10px;">✈️ פרטי הטיסות</div>
+        <div style="display:grid;gap:8px;font-size:12px;color:rgba(241,245,249,0.7);line-height:1.8;">
+          <div style="background:rgba(99,102,241,0.1);border-radius:10px;padding:10px;">
+            <div style="font-weight:800;color:#F1F5F9;margin-bottom:2px;">🛫 הלוך — LY2521</div>
+            <div>ת"א (TLV) → פראג (PRG)</div>
+            <div>8 באוגוסט · המראה <strong style="color:#A5B4FC;">06:00</strong> · נחיתה <strong style="color:#A5B4FC;">08:45</strong></div>
+            <div style="font-size:11px;color:rgba(241,245,249,0.4);">⚠️ להגיע לשדה ב-04:00 לפחות!</div>
+          </div>
+          <div style="background:rgba(99,102,241,0.1);border-radius:10px;padding:10px;">
+            <div style="font-weight:800;color:#F1F5F9;margin-bottom:2px;">🛬 חזור — QS1286</div>
+            <div>פראג (PRG) → ת"א (TLV)</div>
+            <div>15 באוגוסט · המראה <strong style="color:#A5B4FC;">23:45</strong> · נחיתה <strong style="color:#A5B4FC;">04:35+1</strong></div>
+            <div style="font-size:11px;color:rgba(241,245,249,0.4);">⚠️ לצאת מהמלון לא יאוחר מ-20:30!</div>
+          </div>
         </div>
       </div>
-      <div style="background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.16);border-radius:18px;padding:16px;">
-        <div style="font-size:14px;font-weight:700;color:#F1F5F9;margin-bottom:7px;">⚙️ שער המרה</div>
+
+      <!-- תחבורה -->
+      <div style="background:rgba(59,130,246,0.09);border:1px solid rgba(59,130,246,0.2);border-radius:18px;padding:16px;">
+        <div style="font-size:14px;font-weight:700;color:#93C5FD;margin-bottom:10px;">🚇 תחבורה ציבורית</div>
+        <div style="font-size:12px;color:rgba(241,245,249,0.62);line-height:1.9;">
+          <div style="font-weight:700;color:#F1F5F9;margin-bottom:4px;">מהמלון (Comfort Hotel Prague City East):</div>
+          מטרו A מ-<strong style="color:#93C5FD;">Strašnická</strong> או <strong style="color:#93C5FD;">Skalka</strong><br>
+          <strong style="color:#93C5FD;">Můstek</strong> ← Primark · <strong style="color:#93C5FD;">Náměstí Republiky</strong> ← Palladium<br>
+          <strong style="color:#93C5FD;">Malostranská</strong> ← טירת פראג<br><br>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+            <div style="background:rgba(59,130,246,0.1);border-radius:8px;padding:8px;text-align:center;">
+              <div style="font-size:11px;color:rgba(241,245,249,0.5);">כרטיס 30 דקות</div>
+              <div style="font-size:16px;font-weight:900;color:#F1F5F9;">30 CZK</div>
+            </div>
+            <div style="background:rgba(59,130,246,0.1);border-radius:8px;padding:8px;text-align:center;">
+              <div style="font-size:11px;color:rgba(241,245,249,0.5);">כרטיס יומי</div>
+              <div style="font-size:16px;font-weight:900;color:#F1F5F9;">110 CZK</div>
+            </div>
+            <div style="background:rgba(59,130,246,0.1);border-radius:8px;padding:8px;text-align:center;">
+              <div style="font-size:11px;color:rgba(241,245,249,0.5);">3 ימים</div>
+              <div style="font-size:16px;font-weight:900;color:#F1F5F9;">310 CZK</div>
+            </div>
+            <div style="background:rgba(59,130,246,0.1);border-radius:8px;padding:8px;text-align:center;">
+              <div style="font-size:11px;color:rgba(241,245,249,0.5);">ילד עד 15</div>
+              <div style="font-size:16px;font-weight:900;color:#6EE7B7;">חינם!</div>
+            </div>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:rgba(241,245,249,0.45);">📱 אפליקציה: <strong style="color:#93C5FD;">PID Lítačka</strong> — כרטיסים דיגיטליים</div>
+        </div>
+      </div>
+
+      <!-- Bolt -->
+      <div style="background:rgba(245,158,11,0.09);border:1px solid rgba(245,158,11,0.2);border-radius:18px;padding:16px;">
+        <div style="font-size:14px;font-weight:700;color:#FCD34D;margin-bottom:10px;">🚖 Bolt — מחירי אומדן</div>
+        <div style="display:grid;gap:6px;font-size:12px;">
+          <div style="display:flex;justify-content:space-between;padding:7px 10px;background:rgba(245,158,11,0.08);border-radius:8px;">
+            <span style="color:rgba(241,245,249,0.6);">שדה תעופה ↔ מלון</span>
+            <strong style="color:#FCD34D;">400–700 CZK</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:7px 10px;background:rgba(245,158,11,0.08);border-radius:8px;">
+            <span style="color:rgba(241,245,249,0.6);">מלון ↔ מרכז העיר</span>
+            <strong style="color:#FCD34D;">150–280 CZK</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:7px 10px;background:rgba(245,158,11,0.08);border-radius:8px;">
+            <span style="color:rgba(241,245,249,0.6);">מלון ↔ Prague Zoo</span>
+            <strong style="color:#FCD34D;">250–400 CZK</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:7px 10px;background:rgba(245,158,11,0.08);border-radius:8px;">
+            <span style="color:rgba(241,245,249,0.6);">מלון ↔ Aquapalace</span>
+            <strong style="color:#FCD34D;">450–700 CZK</strong>
+          </div>
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:rgba(241,245,249,0.45);">⚠️ תמיד לשלם <strong style="color:#FCD34D;">בכרטיס דרך האפליקציה</strong> — לא במזומן לנהג</div>
+      </div>
+
+      <!-- כסף -->
+      <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.18);border-radius:18px;padding:16px;">
+        <div style="font-size:14px;font-weight:700;color:#6EE7B7;margin-bottom:10px;">💳 כסף, כרטיס וכספומטים</div>
+        <div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.9;">
+          ✅ תמיד לשלם <strong style="color:#6EE7B7;">בכרטיס</strong> — אין עמלת המרה<br>
+          ✅ אם המסוף שואל שפה — בחרו <strong style="color:#6EE7B7;">CZK</strong> (לא ILS!)<br>
+          ✅ כספומט: <strong style="color:#6EE7B7;">Raiffeisenbank / Moneta</strong> — ללא עמלה<br>
+          ❌ להימנע מ-Euronet / Travelex — עמלות גבוהות<br>
+          📦 Tax Free: מעל <strong style="color:#6EE7B7;">2,001 CZK</strong> — לבקש טופס ולשמור קבלות<br>
+          💱 שער: כ-<strong style="color:#6EE7B7;">6.4 CZK = ₪1</strong>
+        </div>
+      </div>
+
+      <!-- שער המרה -->
+      <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:18px;padding:16px;">
+        <div style="font-size:14px;font-weight:700;color:#F1F5F9;margin-bottom:7px;">⚙️ מחשבון שער המרה</div>
         <div style="font-size:12px;color:rgba(241,245,249,0.42);margin-bottom:10px;">כמה קרונות בשקל אחד</div>
         <input id="rate" type="number" step="0.1" value="6.4" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:12px 14px;font-size:14px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:ltr;box-sizing:border-box;margin-bottom:10px;">
         <button id="btnSaveRate" class="btn-primary">שמור שער</button>
       </div>
+
+      <!-- SIM ואינטרנט -->
+      <div style="background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.2);border-radius:18px;padding:16px;">
+        <div style="font-size:14px;font-weight:700;color:#67E8F9;margin-bottom:10px;">📱 SIM ואינטרנט</div>
+        <div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.9;">
+          <strong style="color:#F1F5F9;">Vodafone / T-Mobile</strong> — שניהם בשדה<br>
+          ~<strong style="color:#67E8F9;">300–500 CZK</strong> ל-SIM עם 10GB לחודש<br>
+          📶 <strong style="color:#67E8F9;">Roaming ישראלי</strong> — לבדוק עם הספק לפני הטיסה<br>
+          🏨 WiFi במלון — מהיר ובחינם בכל החדרים<br>
+          ☕ WiFi חינם: Starbucks, מקדונלד'ס, רוב בתי הקפה
+        </div>
+      </div>
+
+      <!-- מזג אוויר -->
+      <div style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);border-radius:18px;padding:16px;">
+        <div style="font-size:14px;font-weight:700;color:#FDE68A;margin-bottom:10px;">🌤️ מזג אוויר — אוגוסט בפראג</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;">
+          <div style="background:rgba(251,191,36,0.1);border-radius:10px;padding:8px;text-align:center;">
+            <div style="font-size:10px;color:rgba(241,245,249,0.5);">ממוצע יום</div>
+            <div style="font-size:20px;font-weight:900;color:#FDE68A;">25°</div>
+          </div>
+          <div style="background:rgba(251,191,36,0.1);border-radius:10px;padding:8px;text-align:center;">
+            <div style="font-size:10px;color:rgba(241,245,249,0.5);">שיא</div>
+            <div style="font-size:20px;font-weight:900;color:#F97316;">32°</div>
+          </div>
+          <div style="background:rgba(251,191,36,0.1);border-radius:10px;padding:8px;text-align:center;">
+            <div style="font-size:10px;color:rgba(241,245,249,0.5);">לילה</div>
+            <div style="font-size:20px;font-weight:900;color:#93C5FD;">15°</div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:rgba(241,245,249,0.6);line-height:1.8;">
+          ☀️ ימים חמים וארוכים — שמש עד 20:30<br>
+          🌧️ גשמי קיץ קצרים — מומלץ מטרייה קטנה<br>
+          👕 לבוש: קל ביום, שכבה לערב (15°)<br>
+          🧴 קרם שמש חובה — במיוחד Aquapalace וגן החיות
+        </div>
+      </div>
+
+      <!-- חשמל ומתאמים -->
+      <div style="background:rgba(139,92,246,0.09);border:1px solid rgba(139,92,246,0.2);border-radius:18px;padding:16px;">
+        <div style="font-size:14px;font-weight:700;color:#C4B5FD;margin-bottom:10px;">🔌 חשמל ומטענים</div>
+        <div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.9;">
+          🇨🇿 שקעים: <strong style="color:#C4B5FD;">Type E / F</strong> — אירופאי עגול<br>
+          ⚡ מתח: <strong style="color:#C4B5FD;">230V / 50Hz</strong> — זהה לישראל ✅<br>
+          🔌 מתאם: נדרש מתאם ישראל→אירופה<br>
+          💡 כבלי USB-C / Lightning — לוודא שהבאתם!<br>
+          🔋 סוללת גיבוי — חובה לימים הארוכים
+        </div>
+      </div>
+
+      <!-- מספרי חירום -->
+      <div style="background:rgba(239,68,68,0.09);border:1px solid rgba(239,68,68,0.2);border-radius:18px;padding:16px;">
+        <div style="font-size:14px;font-weight:700;color:#FCA5A5;margin-bottom:10px;">🆘 מספרי חירום</div>
+        <div style="display:grid;gap:6px;font-size:13px;">
+          <div style="display:flex;justify-content:space-between;padding:8px 11px;background:rgba(239,68,68,0.08);border-radius:9px;">
+            <span style="color:rgba(241,245,249,0.65);">🚨 חירום כללי</span>
+            <a href="tel:112" style="color:#FCA5A5;font-weight:900;text-decoration:none;">112</a>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 11px;background:rgba(239,68,68,0.08);border-radius:9px;">
+            <span style="color:rgba(241,245,249,0.65);">🚑 אמבולנס</span>
+            <a href="tel:155" style="color:#FCA5A5;font-weight:900;text-decoration:none;">155</a>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 11px;background:rgba(239,68,68,0.08);border-radius:9px;">
+            <span style="color:rgba(241,245,249,0.65);">🚒 כיבוי אש</span>
+            <a href="tel:150" style="color:#FCA5A5;font-weight:900;text-decoration:none;">150</a>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 11px;background:rgba(239,68,68,0.08);border-radius:9px;">
+            <span style="color:rgba(241,245,249,0.65);">👮 משטרה</span>
+            <a href="tel:158" style="color:#FCA5A5;font-weight:900;text-decoration:none;">158</a>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 11px;background:rgba(239,68,68,0.08);border-radius:9px;">
+            <span style="color:rgba(241,245,249,0.65);">🏥 בית חולים Na Homolce</span>
+            <a href="tel:+420257271111" style="color:#FCA5A5;font-weight:800;text-decoration:none;font-size:12px;">+420 257 271 111</a>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 11px;background:rgba(239,68,68,0.08);border-radius:9px;">
+            <span style="color:rgba(241,245,249,0.65);">🇮🇱 שגרירות ישראל</span>
+            <a href="tel:+420233097500" style="color:#FCA5A5;font-weight:800;text-decoration:none;font-size:12px;">+420 233 097 500</a>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 11px;background:rgba(239,68,68,0.08);border-radius:9px;">
+            <span style="color:rgba(241,245,249,0.65);">🏨 המלון</span>
+            <a href="tel:+420272101111" style="color:#FCA5A5;font-weight:800;text-decoration:none;font-size:12px;">+420 272 101 111</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- בריאות ובטיחות -->
+      <div style="background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.17);border-radius:18px;padding:16px;">
+        <div style="font-size:14px;font-weight:700;color:#6EE7B7;margin-bottom:10px;">💊 בריאות ובטיחות</div>
+        <div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.9;">
+          🏥 ביטוח נסיעות — לוודא שפעיל לפני הטיסה<br>
+          💊 בית מרקחת (Lékárna): פתוח עד 22:00 במרכז<br>
+          <strong style="color:#6EE7B7;">Palladium Pharmacy</strong> — קומת מרתף<br>
+          🚰 מים מהברז — שתייה בטוחה לחלוטין<br>
+          🌡️ קרם שמש + כובע לימים בחוץ<br>
+          👜 כייסים — לשמור תיקים קרוב לגוף באזור הצפוף<br>
+          🚫 אין טאקסי מהרחוב — תמיד Bolt בלבד!
+        </div>
+      </div>
+
+      <!-- אוכל וכשרות -->
+      <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:18px;padding:16px;">
+        <div style="font-size:14px;font-weight:700;color:#FDBA74;margin-bottom:10px;">🍽️ אוכל — טיפים חשובים</div>
+        <div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.9;">
+          🐷 אוכל צ'כי מסורתי = הרבה חזיר — לשאול תמיד!<br>
+          🥩 בשר בקר / עוף — זמין בכל מסעדה<br>
+          🐟 דגים — מצוינים בפראג (טרי מהנהר)<br>
+          🌱 צמחוני / טבעוני — אפשרויות טובות במרכז<br>
+          💡 "Bez vepřového" = ללא חזיר (לשמור את הביטוי)<br>
+          🍺 בירה טרייה = זולה ממים! ~50–60 CZK ל-500ml<br>
+          ☕ קפה: 70–120 CZK · מים: 40–60 CZK
+        </div>
+      </div>
+
+      <!-- אפליקציות חובה -->
+      <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.18);border-radius:18px;padding:16px;">
+        <div style="font-size:14px;font-weight:700;color:#93C5FD;margin-bottom:10px;">📲 אפליקציות חובה להוריד לפני</div>
+        <div style="display:grid;gap:7px;font-size:12px;">
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(59,130,246,0.08);border-radius:9px;">
+            <span style="font-size:20px;">🚖</span>
+            <div><div style="font-weight:700;color:#F1F5F9;">Bolt</div><div style="color:rgba(241,245,249,0.5);">נסיעות — זול ובטוח</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(59,130,246,0.08);border-radius:9px;">
+            <span style="font-size:20px;">🗺️</span>
+            <div><div style="font-weight:700;color:#F1F5F9;">Google Maps</div><div style="color:rgba(241,245,249,0.5);">ניווט — להוריד מפת פראג Offline!</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(59,130,246,0.08);border-radius:9px;">
+            <span style="font-size:20px;">🚇</span>
+            <div><div style="font-weight:700;color:#F1F5F9;">PID Lítačka</div><div style="color:rgba(241,245,249,0.5);">כרטיסי תחבורה ציבורית</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(59,130,246,0.08);border-radius:9px;">
+            <span style="font-size:20px;">💱</span>
+            <div><div style="font-weight:700;color:#F1F5F9;">XE Currency</div><div style="color:rgba(241,245,249,0.5);">המרת מטבעות בזמן אמת</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(59,130,246,0.08);border-radius:9px;">
+            <span style="font-size:20px;">🌤️</span>
+            <div><div style="font-weight:700;color:#F1F5F9;">Windy / AccuWeather</div><div style="color:rgba(241,245,249,0.5);">תחזית מדויקת לפראג</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- מילים בצ'כית -->
+      <div style="background:rgba(168,85,247,0.09);border:1px solid rgba(168,85,247,0.2);border-radius:18px;padding:16px;">
+        <div style="font-size:14px;font-weight:700;color:#C084FC;margin-bottom:10px;">🗣️ מילים שימושיות בצ'כית</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;font-size:12px;">
+          <div style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;"><strong style="color:#F1F5F9;">Děkuji</strong> <span style="color:rgba(241,245,249,0.45);">תודה</span></div>
+          <div style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;"><strong style="color:#F1F5F9;">Prosím</strong> <span style="color:rgba(241,245,249,0.45);">בבקשה</span></div>
+          <div style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;"><strong style="color:#F1F5F9;">Ahoj</strong> <span style="color:rgba(241,245,249,0.45);">שלום</span></div>
+          <div style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;"><strong style="color:#F1F5F9;">Na shledanou</strong> <span style="color:rgba(241,245,249,0.45);">להתראות</span></div>
+          <div style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;"><strong style="color:#F1F5F9;">Kolik?</strong> <span style="color:rgba(241,245,249,0.45);">כמה עולה?</span></div>
+          <div style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;"><strong style="color:#F1F5F9;">Kde je?</strong> <span style="color:rgba(241,245,249,0.45);">איפה?</span></div>
+          <div style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;"><strong style="color:#F1F5F9;">Nádraží</strong> <span style="color:rgba(241,245,249,0.45);">תחנת רכבת</span></div>
+          <div style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;"><strong style="color:#F1F5F9;">Nemocnice</strong> <span style="color:rgba(241,245,249,0.45);">בית חולים</span></div>
+          <div style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;"><strong style="color:#F1F5F9;">Záchod</strong> <span style="color:rgba(241,245,249,0.45);">שירותים</span></div>
+          <div style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;"><strong style="color:#F1F5F9;">Pomoc!</strong> <span style="color:rgba(241,245,249,0.45);">עזרה!</span></div>
+          <div style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;"><strong style="color:#F1F5F9;">Bez vepřového</strong> <span style="color:rgba(241,245,249,0.45);">ללא חזיר</span></div>
+          <div style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;"><strong style="color:#F1F5F9;">Účet prosím</strong> <span style="color:rgba(241,245,249,0.45);">חשבון בבקשה</span></div>
+        </div>
+      </div>
+
+      <!-- טיפים מהשטח -->
+      <div style="background:rgba(52,211,153,0.07);border:1px solid rgba(52,211,153,0.18);border-radius:18px;padding:16px;">
+        <div style="font-size:14px;font-weight:700;color:#6EE7B7;margin-bottom:10px;">💡 טיפים מהשטח</div>
+        <div style="display:grid;gap:6px;font-size:12px;color:rgba(241,245,249,0.65);">
+          <div style="padding:7px 10px;background:rgba(52,211,153,0.07);border-radius:8px;border-right:3px solid #6EE7B7;">🕐 אטרקציות — להגיע מוקדם (לפני 9:00) לפני ההמון</div>
+          <div style="padding:7px 10px;background:rgba(52,211,153,0.07);border-radius:8px;border-right:3px solid #6EE7B7;">🍽️ מסעדות בכיכר העיר — יקרות פי 3! ללכת לרחובות הצדדיים</div>
+          <div style="padding:7px 10px;background:rgba(52,211,153,0.07);border-radius:8px;border-right:3px solid #6EE7B7;">💶 Exchange בשדה — להחליף רק מינימום. שאר — כרטיס אשראי</div>
+          <div style="padding:7px 10px;background:rgba(52,211,153,0.07);border-radius:8px;border-right:3px solid #6EE7B7;">🎟️ כרטיסים לאטרקציות — להזמין Online מראש, חוסך תורים!</div>
+          <div style="padding:7px 10px;background:rgba(52,211,153,0.07);border-radius:8px;border-right:3px solid #6EE7B7;">🚰 מים — מהברז בטוח לחלוטין. להביא בקבוק ולחסוך כסף</div>
+          <div style="padding:7px 10px;background:rgba(52,211,153,0.07);border-radius:8px;border-right:3px solid #6EE7B7;">📸 גשר קארל — יפה במיוחד עם שקיעה (20:30 באוגוסט)</div>
+          <div style="padding:7px 10px;background:rgba(52,211,153,0.07);border-radius:8px;border-right:3px solid #6EE7B7;">🧳 כבודה ביציאה — לארוז בלילה האחרון, לא בבוקר הטיסה!</div>
+        </div>
+      </div>
+
     </div>
   </section>
 
