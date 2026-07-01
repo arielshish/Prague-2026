@@ -1122,57 +1122,31 @@ function savePhotoToDrive(dataUrl, place, note, timestamp) {
     var parts = dataUrl.split(',');
     if (parts.length < 2 || !parts[1]) return { ok: false, error: 'base64 part missing' };
 
-    var token    = ScriptApp.getOAuthToken();
     var mime     = parts[0].split(';')[0].split(':')[1] || 'image/jpeg';
     var ext      = mime === 'image/png' ? '.png' : '.jpg';
     var safeName = (place || 'photo').replace(/[\\/:*?"<>|]/g,'_').substring(0, 80);
-    var date     = new Date(timestamp);
-    var desc     = (place || '') + (note ? ' — ' + note : '') + ' | ' + date.toLocaleDateString('he-IL') + ' ' + date.toLocaleTimeString('he-IL');
 
-    // Get or create folder via Drive REST API (works with drive.file scope)
+    var decoded = Utilities.base64Decode(parts[1]);
+    var blob    = Utilities.newBlob(decoded, mime, safeName + '_' + timestamp + ext);
+
+    // Cache folder ID in UserProperties to avoid repeated searches
     var props    = PropertiesService.getUserProperties();
     var folderId = props.getProperty('prague2026_folder_id');
+    var folder;
+    if (folderId) {
+      try { folder = DriveApp.getFolderById(folderId); } catch(e) { folderId = null; }
+    }
     if (!folderId) {
-      var folderResp = UrlFetchApp.fetch('https://www.googleapis.com/drive/v3/files', {
-        method: 'post',
-        contentType: 'application/json',
-        headers: { 'Authorization': 'Bearer ' + token },
-        payload: JSON.stringify({ name: 'Prague 2026 — Photos', mimeType: 'application/vnd.google-apps.folder' }),
-        muteHttpExceptions: true
-      });
-      if (folderResp.getResponseCode() !== 200) {
-        return { ok: false, error: 'יצירת תיקייה נכשלה: ' + folderResp.getContentText() };
-      }
-      folderId = JSON.parse(folderResp.getContentText()).id;
-      props.setProperty('prague2026_folder_id', folderId);
+      var existing = DriveApp.getFoldersByName('Prague 2026 — Photos');
+      folder = existing.hasNext() ? existing.next() : DriveApp.createFolder('Prague 2026 — Photos');
+      props.setProperty('prague2026_folder_id', folder.getId());
     }
 
-    // Upload file via multipart upload
-    var boundary = 'prague2026boundary';
-    var metaPart = '--' + boundary + '\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n' +
-      JSON.stringify({ name: safeName + '_' + timestamp + ext, parents: [folderId], description: desc }) + '\r\n';
-    var dataPart = '--' + boundary + '\r\nContent-Type: ' + mime + '\r\n\r\n';
-    var endPart  = '\r\n--' + boundary + '--';
+    var file = folder.createFile(blob);
+    var date = new Date(timestamp);
+    file.setDescription((place || '') + (note ? ' — ' + note : '') + ' | ' + date.toLocaleDateString('he-IL') + ' ' + date.toLocaleTimeString('he-IL'));
 
-    var metaBytes = Utilities.newBlob(metaPart).getBytes();
-    var dataBytes = Utilities.base64Decode(parts[1]);
-    var endBytes  = Utilities.newBlob(endPart).getBytes();
-    var dataPartBytes = Utilities.newBlob(dataPart).getBytes();
-    var body = metaBytes.concat(dataPartBytes).concat(dataBytes).concat(endBytes);
-
-    var uploadResp = UrlFetchApp.fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webViewLink', {
-      method: 'post',
-      contentType: 'multipart/related; boundary=' + boundary,
-      headers: { 'Authorization': 'Bearer ' + token },
-      payload: body,
-      muteHttpExceptions: true
-    });
-
-    if (uploadResp.getResponseCode() !== 200) {
-      return { ok: false, error: 'העלאה נכשלה: ' + uploadResp.getContentText() };
-    }
-    var fileData = JSON.parse(uploadResp.getContentText());
-    return { ok: true, id: fileData.id, url: fileData.webViewLink };
+    return { ok: true, url: file.getUrl(), id: file.getId() };
   } catch(e) {
     Logger.log('savePhotoToDrive error: ' + e.stack);
     return { ok: false, error: e.message };
