@@ -789,7 +789,12 @@ function getDefaultPackCats() {
 }
 
 function loadPackLocal() {
-  try { return JSON.parse(localStorage.getItem('prague_pack_v2') || 'null'); } catch(e) { return null; }
+  try {
+    var d = JSON.parse(localStorage.getItem('prague_pack_v2') || 'null');
+    // ודא פורמט חדש (קטגוריות עם .items)
+    if (d && Array.isArray(d) && d.length > 0 && d[0].items) return d;
+    return null;
+  } catch(e) { return null; }
 }
 function savePackLocal(state) { localStorage.setItem('prague_pack_v2', JSON.stringify(state)); }
 
@@ -797,11 +802,16 @@ function loadPack() {
   if (isGas()) {
     google.script.run
       .withSuccessHandler(function(r) {
-        if (r && r.ok && r.data && r.data.packing_list && r.data.packing_list.length) {
-          PACK_STATE = r.data.packing_list;
+        var raw = r && r.ok && r.data && r.data.packing_list;
+        // פורמט חדש = מערך של קטגוריות עם .items
+        var isNewFormat = raw && Array.isArray(raw) && raw.length > 0 && raw[0].items;
+        if (isNewFormat) {
+          PACK_STATE = raw;
           savePackLocal(PACK_STATE);
         } else {
+          // פורמט ישן מ-Sheets (או ריק) — מחזירים defaults ושומרים
           PACK_STATE = loadPackLocal() || getDefaultPackCats();
+          savePack(); // שומר פורמט חדש ל-Sheets
         }
         renderPack();
       })
