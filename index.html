@@ -178,17 +178,40 @@
       </div>
     </div>
     <!-- תקציב מול בפועל -->
-    <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:15px;margin-bottom:14px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+    <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:16px;margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
         <div style="font-size:13px;font-weight:800;color:#F1F5F9;">📊 תקציב מול בפועל</div>
         <button id="btnEditBudget" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:4px 10px;font-size:11px;font-weight:700;color:rgba(241,245,249,0.7);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">✏️ ערוך</button>
       </div>
-      <div id="budgetRows" style="display:grid;gap:8px;"></div>
-      <div style="border-top:1px solid rgba(255,255,255,0.1);margin-top:12px;padding-top:10px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;text-align:center;">
-        <div><div style="font-size:10px;color:rgba(241,245,249,0.4);margin-bottom:3px;">תקציב</div><div id="budgetTotal" style="font-size:14px;font-weight:800;color:#F1F5F9;">₪0</div></div>
-        <div><div style="font-size:10px;color:rgba(241,245,249,0.4);margin-bottom:3px;">בפועל</div><div id="budgetActual" style="font-size:14px;font-weight:800;">₪0</div></div>
-        <div><div style="font-size:10px;color:rgba(241,245,249,0.4);margin-bottom:3px;">נותר</div><div id="budgetRemain" style="font-size:14px;font-weight:800;">₪0</div></div>
+      <!-- כרטיס סיכום גדול -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+        <div style="background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);border-radius:16px;padding:14px 12px;text-align:center;">
+          <div style="font-size:10px;font-weight:700;color:rgba(165,180,252,0.8);letter-spacing:0.8px;margin-bottom:6px;">💰 תקציב</div>
+          <div id="budgetTotal" style="font-size:22px;font-weight:900;color:#E0E7FF;letter-spacing:-0.5px;">₪0</div>
+        </div>
+        <div style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);border-radius:16px;padding:14px 12px;text-align:center;">
+          <div style="font-size:10px;font-weight:700;color:rgba(110,231,183,0.8);letter-spacing:0.8px;margin-bottom:6px;">🧾 בפועל</div>
+          <div id="budgetActual" style="font-size:22px;font-weight:900;color:#6EE7B7;letter-spacing:-0.5px;">₪0</div>
+        </div>
       </div>
+      <!-- נותר - שורה רחבה -->
+      <div id="budgetRemainBar" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <div style="font-size:12px;font-weight:700;color:rgba(241,245,249,0.6);">נותר לטיול</div>
+        <div id="budgetRemain" style="font-size:20px;font-weight:900;color:#6EE7B7;">₪0</div>
+      </div>
+      <!-- פס התקדמות -->
+      <div style="margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+          <div style="font-size:10px;color:rgba(241,245,249,0.4);">0%</div>
+          <div id="budgetPct" style="font-size:10px;font-weight:700;color:rgba(241,245,249,0.6);">0% נוצל</div>
+          <div style="font-size:10px;color:rgba(241,245,249,0.4);">100%</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.08);border-radius:8px;height:10px;overflow:hidden;">
+          <div id="budgetProgressBar" style="width:0%;height:100%;background:linear-gradient(90deg,#6EE7B7,#34D399);border-radius:8px;transition:width 0.5s;"></div>
+        </div>
+      </div>
+      <!-- פירוט קטגוריות -->
+      <div id="budgetRows" style="display:grid;gap:8px;"></div>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:14px;">
       <button id="btnAddExpense" class="btn-primary" style="flex:1;">➕ הוסף הוצאה</button>
@@ -1151,11 +1174,21 @@ function renderBudget() {
   }).join('');
 
   var remain = totalBudget - totalActual;
-  var actualEl = qs('budgetActual');
-  if (actualEl) { actualEl.textContent = '₪' + totalActual.toLocaleString('he-IL'); actualEl.style.color = totalActual > totalBudget ? '#FCA5A5' : '#6EE7B7'; }
+  var over = remain < 0;
+  var pct = totalBudget > 0 ? Math.min(Math.round(totalActual / totalBudget * 100), 100) : 0;
+  var barColor = pct < 70 ? 'linear-gradient(90deg,#6EE7B7,#34D399)' : pct < 90 ? 'linear-gradient(90deg,#FCD34D,#F59E0B)' : 'linear-gradient(90deg,#FCA5A5,#EF4444)';
+
   if (qs('budgetTotal')) qs('budgetTotal').textContent = '₪' + totalBudget.toLocaleString('he-IL');
+  var actualEl = qs('budgetActual');
+  if (actualEl) { actualEl.textContent = '₪' + totalActual.toLocaleString('he-IL'); actualEl.style.color = over ? '#FCA5A5' : '#6EE7B7'; }
   var remEl = qs('budgetRemain');
-  if (remEl) { remEl.textContent = '₪' + Math.abs(remain).toLocaleString('he-IL') + (remain < 0 ? ' חריגה' : ''); remEl.style.color = remain < 0 ? '#FCA5A5' : '#6EE7B7'; }
+  if (remEl) { remEl.textContent = (over ? '-' : '') + '₪' + Math.abs(remain).toLocaleString('he-IL'); remEl.style.color = over ? '#FCA5A5' : '#6EE7B7'; }
+  var remBar = qs('budgetRemainBar');
+  if (remBar) remBar.style.borderColor = over ? 'rgba(239,68,68,0.35)' : 'rgba(255,255,255,0.12)';
+  var pb = qs('budgetProgressBar');
+  if (pb) { pb.style.width = pct + '%'; pb.style.background = barColor; }
+  var pctEl = qs('budgetPct');
+  if (pctEl) { pctEl.textContent = pct + '% נוצל'; pctEl.style.color = pct >= 90 ? '#FCA5A5' : pct >= 70 ? '#FCD34D' : 'rgba(241,245,249,0.6)'; }
 }
 
 function openBudgetModal() {
