@@ -216,18 +216,8 @@ function init() {
     liveTimer = setTimeout(doTranslate, 600);
   });
 
-  // iOS: unlock speech synthesis בלחיצה ראשונה על המסך
-  document.body.addEventListener('touchend', function unlockAudio() {
-    var utt = new SpeechSynthesisUtterance('');
-    window.speechSynthesis.speak(utt);
-    document.body.removeEventListener('touchend', unlockAudio);
-  }, { once: true });
-
-  // טעינת קולות
-  if (window.speechSynthesis) {
-    window.speechSynthesis.getVoices();
-    window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
-  }
+  // preload voices (fallback)
+  window.speechSynthesis && window.speechSynthesis.getVoices();
 }
 
 function setLang(src, tgt) {
@@ -261,27 +251,21 @@ function doTranslate() {
 
 function speakResult() { if (lastTranslation) speak(lastTranslation, tgtLang); }
 
+var currentAudio = null;
 function speak(text, lang) {
-  if (!window.speechSynthesis) { alert('TTS לא נתמך'); return; }
-  window.speechSynthesis.cancel();
-  var utt = new SpeechSynthesisUtterance(text);
-  utt.lang = lang === 'cs' ? 'cs-CZ' : 'he-IL';
-  utt.rate = 0.82;
-  utt.volume = 1;
-  utt.onerror = function(e) { setStatus('⚠️ שגיאת קול: ' + e.error); };
-  utt.onend = function() { setStatus('✅ סיים'); };
-
-  var voices = window.speechSynthesis.getVoices();
-  var targetLang = lang === 'cs' ? 'cs' : 'he';
-  var match = voices.find(function(v) { return v.lang.startsWith(targetLang); });
-  if (!match) {
-    // fallback: try en voice with text as-is
-    setStatus('💡 אין קול ' + (lang === 'cs' ? 'צ\'כי' : 'עברי') + ' — מנסה ברירת מחדל');
-  } else {
-    utt.voice = match;
-  }
-  window.speechSynthesis.speak(utt);
-  setStatus('🔊 מנגן...');
+  if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+  var tl = lang === 'cs' ? 'cs' : 'he';
+  var url = 'https://translate.googleapis.com/translate_tts?ie=UTF-8&q=' + encodeURIComponent(text) + '&tl=' + tl + '&client=tw-ob';
+  var audio = new Audio(url);
+  audio.volume = 1;
+  currentAudio = audio;
+  audio.onended = function() { setStatus('✅ סיים'); };
+  audio.onerror = function() { setStatus('⚠️ שגיאת השמעה'); };
+  audio.play().then(function() {
+    setStatus('🔊 מנגן...');
+  }).catch(function(e) {
+    setStatus('⚠️ ' + e.message);
+  });
 }
 
 function toggleMic() {
@@ -343,14 +327,7 @@ function doClear() {
 function setStatus(msg) { document.getElementById('status').textContent = msg; }
 
 function testAudio() {
-  var utt = new SpeechSynthesisUtterance('Hello, audio test');
-  utt.lang = 'en-US';
-  utt.volume = 1;
-  utt.onerror = function(e) { setStatus('⚠️ שגיאה: ' + e.error); };
-  utt.onend = function() { setStatus('✅ קול עבד! עכשיו נסה צ\'כית'); };
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(utt);
-  setStatus('🔊 בדיקה...');
+  speak('Děkuji', 'cs');
 }
 
 window.addEventListener('DOMContentLoaded', init);
