@@ -1949,7 +1949,7 @@ function backupAllToDrive() {
     var done = 0, failed = 0;
     function next(i) {
       if (i >= unsynced.length) {
-        var msg = '✅ ' + done + ' תמונות גובו לגוגל דרייב';
+        var msg = '✅ ' + done + ' תמונות נשמרו ב-Google Photos';
         if (failed) msg += ' | ⚠️ ' + failed + ' נכשלו';
         if (statusEl) statusEl.textContent = msg;
         toast(msg);
