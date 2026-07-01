@@ -10,7 +10,7 @@
 - **Spreadsheet ID:** `10YqbLWnbwlVWtl_czqlIk4T_ksi9HcY4kIiLASKGBFE`
 - **GitHub repo:** `arielshish/prague-2026`
 - **Branch:** `claude/unknown-session-xpa0pr`
-- **Current version:** @148
+- **Current version:** @150
 
 ## Deploy — תמיד כך
 
@@ -113,10 +113,23 @@ healthCheck()
 ## שער המרה
 
 ```js
-fetch('https://api.frankfurter.app/latest?from=ILS&to=CZK')
+fetch('https://open.er-api.com/v6/latest/ILS')  // תומך ב-ILS (frankfurter.app לא תומך!)
+// data.rates.CZK → RATE
 // Auto-fetch 1.5s אחרי load
-// Cache: localStorage['pragueRate']
+// Cache: localStorage['prague_rate_v10']
 ```
+
+- כפתור "🔄 שער חי" — מושך שער בזמן אמת
+- כפתור "💾 שמור ידני" — שומר את הערך שהוקלד ידנית
+
+## מחשבון המרה דו-כיווני
+
+פונקציה: `initCalc()` — נקראת ב-DOMContentLoaded
+
+- שדה `#calcIls` — הקלד שקלים → מחשב קרונות אוטומטית
+- שדה `#calcCzk` — הקלד קרונות → מחשב שקלים אוטומטית
+- שני הכיוונים עובדים בזמן אמת לפי `RATE`
+- `#calcHint` — מציג תרגום טקסטואלי (לדוג׳ "₪100 = 640 Kč")
 
 ## Lessons Learned — בעיות שנפתרו
 
@@ -126,6 +139,7 @@ fetch('https://api.frankfurter.app/latest?from=ILS&to=CZK')
 | Auth prompt לכל משתמש | USER_ACCESSING | שינוי ל-USER_DEPLOYING |
 | Camera לא נפתחת | geolocation לפני camera חסמה iOS | geolocation רק ב-onChange אחרי בחירה |
 | GPS "מקום לא ידוע" | iOS מוחק EXIF GPS | navigator.geolocation + Nominatim zoom=18 |
+| שער המרה לא מתעדכן | frankfurter.app לא תומך ב-ILS (ECB rates בלבד) | הוחלף ב-open.er-api.com |
 
 ## כיצד להרחיב ליעד חדש
 
