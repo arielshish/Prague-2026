@@ -101,7 +101,8 @@
       <button id="btnHomeRestaurants" style="background:rgba(244,99,74,0.10);border:1px solid rgba(244,99,74,0.22);border-radius:16px;padding:13px 8px;font-size:12px;font-weight:800;color:#FCA5A5;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;">🍽️<br><span style="font-size:11px;">מסעדות</span></button>
       <button id="btnHomePack" style="background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.22);border-radius:16px;padding:13px 8px;font-size:12px;font-weight:800;color:#6EE7B7;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;">🧳<br><span style="font-size:11px;">ציוד</span></button>
       <button id="btnHomeInfo" style="background:rgba(168,85,247,0.10);border:1px solid rgba(168,85,247,0.22);border-radius:16px;padding:13px 8px;font-size:12px;font-weight:800;color:#C084FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;">📘<br><span style="font-size:11px;">מידע</span></button>
-      <button id="btnHomeHistory" style="background:rgba(251,191,36,0.10);border:1px solid rgba(251,191,36,0.22);border-radius:16px;padding:13px 8px;font-size:12px;font-weight:800;color:#FDE68A;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;grid-column:span 2;">📸<br><span style="font-size:11px;">היסטוריה ותמונות</span></button>
+      <button id="btnHomeHistory" style="background:rgba(251,191,36,0.10);border:1px solid rgba(251,191,36,0.22);border-radius:16px;padding:13px 8px;font-size:12px;font-weight:800;color:#FDE68A;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;">🏛️<br><span style="font-size:11px;">היסטוריה</span></button>
+      <button id="btnHomePhotoDiary" style="background:rgba(236,72,153,0.10);border:1px solid rgba(236,72,153,0.22);border-radius:16px;padding:13px 8px;font-size:12px;font-weight:800;color:#F9A8D4;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;">📷<br><span style="font-size:11px;">יומן תמונות</span></button>
     </div>
     <div style="background:linear-gradient(135deg,rgba(244,99,74,0.13),rgba(244,99,74,0.055));border:1px solid rgba(244,99,74,0.24);border-radius:20px;padding:16px;margin-bottom:10px;">
       <div style="font-size:14px;font-weight:800;color:#F1F5F9;margin-bottom:7px;">🛍️ יום 7 — יום קניות</div>
@@ -380,11 +381,52 @@
   <!-- ═══ HISTORY & PHOTO ═══ -->
   <section id="history" class="tab">
     <div class="card card-hdr">
-      <div><h2 style="font-size:18px;font-weight:900;">📸 היסטוריה ותמונות</h2><p style="font-size:12px;color:rgba(241,245,249,0.5);margin-top:3px;">מדריך תיירים — מה לצלם ולמה זה מיוחד</p></div>
+      <div><h2 style="font-size:18px;font-weight:900;">🏛️ היסטוריה ותמונות</h2><p style="font-size:12px;color:rgba(241,245,249,0.5);margin-top:3px;">מדריך תיירים — מה לצלם ולמה זה מיוחד</p></div>
       <button class="back-btn" id="btnBackHistory">← ראשי</button>
     </div>
     <div style="display:grid;gap:14px;" id="historyList"></div>
   </section>
+
+  <!-- ═══ PHOTO DIARY ═══ -->
+  <section id="photodiary" class="tab">
+    <div class="card card-hdr">
+      <div><h2 style="font-size:18px;font-weight:900;">📷 יומן תמונות</h2><p style="font-size:12px;color:rgba(241,245,249,0.5);margin-top:3px;">תמונות מהטיול עם תיוג מקום</p></div>
+      <button class="back-btn" id="btnBackPhotoDiary">← ראשי</button>
+    </div>
+    <button id="btnNewPhoto" style="width:100%;background:linear-gradient(135deg,rgba(236,72,153,0.2),rgba(168,85,247,0.2));border:1px solid rgba(236,72,153,0.35);border-radius:18px;padding:18px;font-size:14px;font-weight:800;color:#F9A8D4;cursor:pointer;font-family:'Rubik',Arial,sans-serif;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:10px;">
+      📷 צלם תמונה חדשה
+    </button>
+    <div id="photoDiaryEmpty" style="text-align:center;padding:40px 20px;color:rgba(241,245,249,0.3);font-size:13px;">עדיין אין תמונות — לחצו על הכפתור למעלה להתחיל!</div>
+    <div id="photoDiaryGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div>
+  </section>
+
+  <!-- מודל תיוג תמונה -->
+  <div id="photoTagModal" style="display:none;position:fixed;inset:0;z-index:90;align-items:flex-end;justify-content:center;">
+    <div style="position:absolute;inset:0;background:rgba(0,0,0,0.7);" id="photoTagOverlay"></div>
+    <div style="position:relative;background:linear-gradient(160deg,#1e293b,#0f172a);border-radius:28px 28px 0 0;padding:22px 20px 36px;width:100%;max-width:480px;z-index:1;max-height:90vh;overflow-y:auto;">
+      <h2 style="margin:0 0 14px;font-size:17px;font-weight:900;color:#F1F5F9;">📷 תמונה חדשה</h2>
+      <!-- תצוגה מקדימה -->
+      <div id="photoPreviewWrap" style="background:rgba(255,255,255,0.05);border:1px dashed rgba(255,255,255,0.2);border-radius:16px;height:200px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;overflow:hidden;cursor:pointer;" onclick="qs('photoFileInput').click()">
+        <img id="photoPreviewImg" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:16px;">
+        <div id="photoPreviewPlaceholder" style="text-align:center;color:rgba(241,245,249,0.4);">
+          <div style="font-size:40px;margin-bottom:8px;">📷</div>
+          <div style="font-size:12px;">לחצו לפתוח מצלמה</div>
+        </div>
+      </div>
+      <input id="photoFileInput" type="file" accept="image/*" capture="environment" style="display:none;">
+      <!-- שם המקום -->
+      <div style="font-size:11px;font-weight:700;color:rgba(241,245,249,0.5);margin-bottom:6px;letter-spacing:0.5px;">📍 מקום</div>
+      <div id="photoPlaceChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div>
+      <input id="photoPlaceCustom" type="text" placeholder="או כתבו מקום חופשי..." style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:12px;padding:10px 13px;font-size:13px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:12px;">
+      <!-- הערה -->
+      <div style="font-size:11px;font-weight:700;color:rgba(241,245,249,0.5);margin-bottom:6px;letter-spacing:0.5px;">✏️ הערה אישית (אופציונלי)</div>
+      <textarea id="photoNote" placeholder="מה הרגשתם? מה ראיתם?" rows="2" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:12px;padding:10px 13px;font-size:13px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;resize:none;margin-bottom:14px;"></textarea>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <button onclick="closePhotoModal()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:12px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">ביטול</button>
+        <button id="btnSavePhoto" style="background:linear-gradient(135deg,#ec4899,#8b5cf6);border:none;border-radius:13px;padding:12px;font-size:13px;font-weight:800;color:white;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">💾 שמור תמונה</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ═══ NAV ═══ -->
   <nav style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);height:76px;background:rgba(2,7,14,0.97);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-top:1px solid rgba(255,255,255,0.08);z-index:50;display:grid;grid-template-columns:repeat(6,1fr);">
@@ -743,7 +785,7 @@ function isGas() {
 // ═══════════════════════════════════════════
 //  NAVIGATION
 // ═══════════════════════════════════════════
-var ALL_TABS = ['home','days','shopping','expenses','flights','restaurants','pack','info','history'];
+var ALL_TABS = ['home','days','shopping','expenses','flights','restaurants','pack','info','history','photodiary'];
 
 function openTab(id) {
   ALL_TABS.forEach(function(name) {
@@ -1039,6 +1081,7 @@ function renderHistory() {
         '<div style="background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.18);border-radius:12px;padding:10px 12px;">' +
           '<div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.55;">' + s.tip + '</div>' +
         '</div>' +
+        '<button onclick="openPhotoModal(' + JSON.stringify(s.name) + ')" style="width:100%;background:linear-gradient(135deg,rgba(236,72,153,0.18),rgba(168,85,247,0.18));border:1px solid rgba(236,72,153,0.3);border-radius:13px;padding:11px;font-size:12px;font-weight:800;color:#F9A8D4;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">📷 צלם כאן — שמור ביומן</button>' +
       '</div>' +
     '</div>';
   }).join('');
@@ -1193,7 +1236,10 @@ function renderPhotoSpots() {
         '<div style="background:rgba(16,185,129,0.1);border-radius:10px;padding:7px 10px;font-size:11px;color:#6EE7B7;">💳 ' + esc(s.fee_txt) + '</div>' +
       '</div>' +
       '<div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:8px 11px;font-size:11px;color:#FCD34D;margin-bottom:10px;line-height:1.6;">💡 ' + esc(s.tip) + '</div>' +
-      '<a href="' + s.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:linear-gradient(90deg,#6366f1,#8b5cf6);color:white;text-decoration:none;border-radius:12px;padding:10px;font-weight:800;font-size:12px;font-family:\'Rubik\',Arial,sans-serif;">🗺️ ניווט למקום</a>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">' +
+        '<a href="' + s.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:linear-gradient(90deg,#6366f1,#8b5cf6);color:white;text-decoration:none;border-radius:12px;padding:10px;font-weight:800;font-size:12px;font-family:\'Rubik\',Arial,sans-serif;">🗺️ ניווט</a>' +
+        '<button onclick="openPhotoModal(' + JSON.stringify(s.name) + ')" style="background:linear-gradient(135deg,rgba(236,72,153,0.25),rgba(168,85,247,0.25));border:1px solid rgba(236,72,153,0.35);border-radius:12px;padding:10px;font-size:12px;font-weight:800;color:#F9A8D4;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">📷 צלם</button>' +
+      '</div>' +
     '</div>';
   });
   list.innerHTML = html;
@@ -1671,14 +1717,210 @@ document.addEventListener('DOMContentLoaded', function() {
     'btnBackPack':        function() { openTab('home'); },
     'btnBackInfo':        function() { openTab('home'); },
     'btnHomeHistory':     function() { openTab('history'); renderHistory(); },
-    'btnBackHistory':     function() { openTab('home'); }
+    'btnBackHistory':       function() { openTab('home'); },
+    'btnHomePhotoDiary':    function() { openTab('photodiary'); renderPhotoDiary(); },
+    'btnBackPhotoDiary':    function() { openTab('home'); },
+    'btnNewPhoto':          function() { openPhotoModal(null); },
+    'btnSavePhoto':         function() { savePhotoEntry(); }
   };
 
   Object.keys(btnMap).forEach(function(id) {
     var el = qs(id);
     if (el) el.addEventListener('click', btnMap[id]);
   });
+
+  // photo file input
+  var pfi = qs('photoFileInput');
+  if (pfi) pfi.addEventListener('change', function(e) {
+    var file = e.target.files && e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      var img = qs('photoPreviewImg');
+      var ph  = qs('photoPreviewPlaceholder');
+      if (img) { img.src = ev.target.result; img.style.display = 'block'; }
+      if (ph)  ph.style.display = 'none';
+      window._photoPendingDataUrl = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+  if (qs('photoTagOverlay')) qs('photoTagOverlay').addEventListener('click', closePhotoModal);
 });
+
+// ═══════════════════════════════════════════
+//  PHOTO DIARY — IndexedDB
+// ═══════════════════════════════════════════
+var _photoDB = null;
+function openPhotoDB(cb) {
+  if (_photoDB) return cb(_photoDB);
+  var req = indexedDB.open('prague2026photos', 1);
+  req.onupgradeneeded = function(e) {
+    var db = e.target.result;
+    if (!db.objectStoreNames.contains('photos')) {
+      var store = db.createObjectStore('photos', {keyPath:'id', autoIncrement:true});
+      store.createIndex('ts','ts');
+    }
+  };
+  req.onsuccess = function(e) { _photoDB = e.target.result; cb(_photoDB); };
+  req.onerror   = function()  { toast('⚠️ שגיאה בפתיחת מסד הנתונים'); };
+}
+
+function dbAddPhoto(entry, cb) {
+  openPhotoDB(function(db) {
+    var tx    = db.transaction('photos','readwrite');
+    var store = tx.objectStore('photos');
+    var req   = store.add(entry);
+    req.onsuccess = function() { cb && cb(req.result); };
+    req.onerror   = function() { toast('⚠️ שגיאה בשמירה'); };
+  });
+}
+
+function dbGetAllPhotos(cb) {
+  openPhotoDB(function(db) {
+    var tx    = db.transaction('photos','readonly');
+    var store = tx.objectStore('photos');
+    var req   = store.getAll();
+    req.onsuccess = function() { cb(req.result || []); };
+  });
+}
+
+function dbDeletePhoto(id, cb) {
+  openPhotoDB(function(db) {
+    var tx  = db.transaction('photos','readwrite');
+    tx.objectStore('photos').delete(id);
+    tx.oncomplete = function() { cb && cb(); };
+  });
+}
+
+var _photoModalPlace = null;
+window._photoPendingDataUrl = null;
+
+var PLACE_SUGGESTIONS = (function() {
+  var names = [];
+  if (typeof PHOTO_SPOTS !== 'undefined') PHOTO_SPOTS.forEach(function(s) { names.push(s.name); });
+  if (typeof HISTORY_SPOTS !== 'undefined') HISTORY_SPOTS.forEach(function(s) { names.push(s.name); });
+  if (typeof RESTAURANTS !== 'undefined') RESTAURANTS.forEach(function(r) { names.push(r.name); });
+  return names;
+}());
+
+function openPhotoModal(placeName) {
+  _photoModalPlace = placeName || null;
+  window._photoPendingDataUrl = null;
+  var img = qs('photoPreviewImg');
+  var ph  = qs('photoPreviewPlaceholder');
+  if (img) { img.src = ''; img.style.display = 'none'; }
+  if (ph)  ph.style.display = 'block';
+  var fi = qs('photoFileInput'); if (fi) fi.value = '';
+  var note = qs('photoNote'); if (note) note.value = '';
+  var custom = qs('photoPlaceCustom');
+  if (custom) custom.value = placeName || '';
+
+  // chips של מקומות מוצעים
+  var chips = qs('photoPlaceChips');
+  if (chips) {
+    var suggestions = placeName
+      ? [placeName]
+      : PLACE_SUGGESTIONS.slice(0, 8);
+    chips.innerHTML = suggestions.map(function(n) {
+      return '<button onclick="selectPlaceChip(this,' + JSON.stringify(n) + ')" style="background:rgba(236,72,153,0.15);border:1px solid rgba(236,72,153,0.3);border-radius:999px;padding:5px 12px;font-size:11px;font-weight:700;color:#F9A8D4;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">' + esc(n) + '</button>';
+    }).join('');
+  }
+
+  var m = qs('photoTagModal'); if (m) m.style.display = 'flex';
+  // פתח מצלמה אוטומטית
+  setTimeout(function() { var fi = qs('photoFileInput'); if (fi) fi.click(); }, 200);
+}
+
+function selectPlaceChip(btn, name) {
+  var custom = qs('photoPlaceCustom'); if (custom) custom.value = name;
+  var chips = qs('photoPlaceChips');
+  if (chips) chips.querySelectorAll('button').forEach(function(b) {
+    b.style.background = b === btn ? 'rgba(236,72,153,0.4)' : 'rgba(236,72,153,0.15)';
+    b.style.borderColor = b === btn ? 'rgba(236,72,153,0.8)' : 'rgba(236,72,153,0.3)';
+  });
+}
+
+function closePhotoModal() {
+  var m = qs('photoTagModal'); if (m) m.style.display = 'none';
+}
+
+function savePhotoEntry() {
+  var dataUrl = window._photoPendingDataUrl;
+  if (!dataUrl) { toast('⚠️ בחרו תמונה קודם'); return; }
+  var place = (qs('photoPlaceCustom') || {}).value || 'מקום לא ידוע';
+  var note  = (qs('photoNote') || {}).value || '';
+  var entry = {
+    dataUrl: dataUrl,
+    place:   place,
+    note:    note,
+    ts:      Date.now()
+  };
+  dbAddPhoto(entry, function() {
+    closePhotoModal();
+    toast('📷 תמונה נשמרה!');
+    if (qs('photodiary') && qs('photodiary').classList.contains('active')) {
+      renderPhotoDiary();
+    }
+  });
+}
+
+function renderPhotoDiary() {
+  dbGetAllPhotos(function(photos) {
+    var grid  = qs('photoDiaryGrid');
+    var empty = qs('photoDiaryEmpty');
+    if (!grid) return;
+    if (!photos.length) {
+      grid.innerHTML = '';
+      if (empty) empty.style.display = 'block';
+      return;
+    }
+    if (empty) empty.style.display = 'none';
+    photos.sort(function(a,b) { return b.ts - a.ts; });
+    grid.innerHTML = photos.map(function(p) {
+      var d = new Date(p.ts);
+      var dateStr = d.getDate() + '/' + (d.getMonth()+1) + ' ' + d.getHours() + ':' + String(d.getMinutes()).padStart(2,'0');
+      return '<div style="position:relative;border-radius:16px;overflow:hidden;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);">' +
+        '<img src="' + p.dataUrl + '" style="width:100%;aspect-ratio:1;object-fit:cover;display:block;" loading="lazy" onclick="openPhotoViewer(' + p.id + ')">' +
+        '<div style="padding:8px;">' +
+          '<div style="font-size:11px;font-weight:800;color:#F1F5F9;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">📍 ' + esc(p.place) + '</div>' +
+          '<div style="font-size:10px;color:rgba(241,245,249,0.4);">' + dateStr + '</div>' +
+          (p.note ? '<div style="font-size:10px;color:rgba(241,245,249,0.55);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(p.note) + '</div>' : '') +
+        '</div>' +
+        '<button onclick="deletePhoto(' + p.id + ')" style="position:absolute;top:6px;left:6px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;width:26px;height:26px;font-size:12px;cursor:pointer;color:white;">🗑</button>' +
+      '</div>';
+    }).join('');
+  });
+}
+
+function deletePhoto(id) {
+  if (!confirm('למחוק תמונה זו?')) return;
+  dbDeletePhoto(id, function() { renderPhotoDiary(); toast('🗑 נמחקה'); });
+}
+
+function openPhotoViewer(id) {
+  openPhotoDB(function(db) {
+    var tx  = db.transaction('photos','readonly');
+    var req = tx.objectStore('photos').get(id);
+    req.onsuccess = function() {
+      var p = req.result; if (!p) return;
+      var d = new Date(p.ts);
+      var dateStr = d.getDate() + '/' + (d.getMonth()+1) + '/' + d.getFullYear() + ' ' + d.getHours() + ':' + String(d.getMinutes()).padStart(2,'0');
+      var overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.95);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;';
+      overlay.innerHTML =
+        '<img src="' + p.dataUrl + '" style="max-width:100%;max-height:70vh;object-fit:contain;border-radius:12px;margin-bottom:16px;">' +
+        '<div style="text-align:center;color:#F1F5F9;">' +
+          '<div style="font-size:16px;font-weight:800;margin-bottom:4px;">📍 ' + esc(p.place) + '</div>' +
+          '<div style="font-size:12px;color:rgba(241,245,249,0.5);margin-bottom:8px;">' + dateStr + '</div>' +
+          (p.note ? '<div style="font-size:13px;color:rgba(241,245,249,0.75);">' + esc(p.note) + '</div>' : '') +
+        '</div>' +
+        '<button style="margin-top:20px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:13px;padding:12px 32px;color:#F1F5F9;font-size:14px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">סגור</button>';
+      overlay.querySelector('button').onclick = function() { document.body.removeChild(overlay); };
+      overlay.addEventListener('click', function(e) { if (e.target === overlay) document.body.removeChild(overlay); });
+      document.body.appendChild(overlay);
+    };
+  });
+}
 </script>
 </body>
 </html>
