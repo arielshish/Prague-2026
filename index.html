@@ -437,8 +437,12 @@
       <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:18px;padding:16px;">
         <div style="font-size:14px;font-weight:700;color:#F1F5F9;margin-bottom:7px;">⚙️ מחשבון שער המרה</div>
         <div style="font-size:12px;color:rgba(241,245,249,0.42);margin-bottom:10px;">כמה קרונות בשקל אחד</div>
-        <input id="rate" type="number" step="0.1" value="6.4" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:12px 14px;font-size:14px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:ltr;box-sizing:border-box;margin-bottom:10px;">
-        <button id="btnSaveRate" class="btn-primary">שמור שער</button>
+        <input id="rate" type="number" step="0.01" value="6.4" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:12px 14px;font-size:14px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:ltr;box-sizing:border-box;margin-bottom:10px;">
+        <div id="rateStatus" style="font-size:11px;color:rgba(241,245,249,0.4);margin-bottom:10px;min-height:16px;"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <button id="btnSaveRate" class="btn-ghost" style="font-size:12px;padding:10px;">💾 שמור ידני</button>
+          <button id="btnLiveRate" class="btn-primary" style="font-size:12px;padding:10px;">🔄 שער חי</button>
+        </div>
       </div>
 
       <!-- SIM ואינטרנט -->
@@ -1886,6 +1890,27 @@ function saveRate() {
   toast('✅ שער נשמר');
 }
 
+function fetchLiveRate() {
+  var rateEl = qs('rate');
+  var rateStatus = qs('rateStatus');
+  if (rateStatus) { rateStatus.textContent = '🔄 מעדכן שער...'; rateStatus.style.color = '#93C5FD'; }
+  fetch('https://api.frankfurter.app/latest?from=ILS&to=CZK')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var live = data.rates && data.rates.CZK;
+      if (live) {
+        RATE = Math.round(live * 100) / 100;
+        localStorage.setItem('prague_rate_v10', String(RATE));
+        if (rateEl) rateEl.value = RATE;
+        if (rateStatus) { rateStatus.textContent = '✅ שער חי: ' + RATE + ' CZK/₪ (עודכן ' + new Date().toLocaleTimeString('he-IL') + ')'; rateStatus.style.color = '#6EE7B7'; }
+        if (isGas()) google.script.run.saveSetting('exchange_rate', String(RATE));
+      }
+    })
+    .catch(function() {
+      if (rateStatus) { rateStatus.textContent = '⚠️ לא ניתן לעדכן — שר השמור: ' + RATE; rateStatus.style.color = '#FCD34D'; }
+    });
+}
+
 function exportCsv() {
   var rows = ['תאריך,שם,CZK,ILS,הערה'].concat(EXPENSES.map(function(e) {
     return [e.date||'', e.name, e.czk||0, e.ils||0, e.note||''].map(function(v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(',');
@@ -1903,6 +1928,7 @@ function exportCsv() {
 document.addEventListener('DOMContentLoaded', function() {
   // Countdown
   var rateEl = qs('rate'); if (rateEl) rateEl.value = RATE;
+  setTimeout(fetchLiveRate, 1500); // שער חי בטעינה
   var target = new Date('2026-08-08T05:35:00');
   var diff = Math.ceil((target - new Date()) / 86400000);
   var dEl = qs('daysLeft'); if (dEl) dEl.textContent = Math.max(diff, 0);
@@ -1939,6 +1965,7 @@ document.addEventListener('DOMContentLoaded', function() {
     'btnAddBudgetCat':    function() { var b=loadBudget(); b.push({cat:'קטגוריה חדשה',ils:0}); saveBudget(b); openBudgetModal(); },
     'budgetOverlay':      function() { closeBudgetModal(); },
     'btnSaveRate':        function() { saveRate(); },
+    'btnLiveRate':        function() { fetchLiveRate(); },
     'btnSaveExpense':     function() { saveExpense(); },
     'btnResetPack':       function() { if (confirm("לאפס את כל הצ'ק-ליסט?")) { PACK_STATE = getDefaultPackCats(); savePack(); renderPack(); } },
     'btnSyncPack':        function() { loadPack(); toast('🔄 מסנכרן...'); },
@@ -2388,17 +2415,7 @@ function openPhotoModal(placeName) {
 
   var m = qs('photoTagModal'); if (m) m.style.display = 'flex';
 
-  // בקש מיקום מיד כדי שיהיה מוכן כשהתמונה נלקחת
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function(pos) {
-      if (!window._photoPendingGps) {
-        window._photoPendingGps = { lat: pos.coords.latitude, lng: pos.coords.longitude, alt: pos.coords.altitude };
-        updateGpsDisplay(window._photoPendingGps);
-      }
-    }, function() {}, { timeout: 10000, enableHighAccuracy: true });
-  }
-
-  // פתח מצלמה אוטומטית
+  // פתח מצלמה אוטומטית — המיקום ייבקש אחרי בחירת התמונה
   setTimeout(function() { var fi = qs('photoFileInput'); if (fi) fi.click(); }, 200);
 }
 
