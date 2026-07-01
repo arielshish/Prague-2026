@@ -213,8 +213,18 @@ function init() {
     liveTimer = setTimeout(doTranslate, 600);
   });
 
+  // iOS: unlock speech synthesis בלחיצה ראשונה על המסך
+  document.body.addEventListener('touchend', function unlockAudio() {
+    var utt = new SpeechSynthesisUtterance('');
+    window.speechSynthesis.speak(utt);
+    document.body.removeEventListener('touchend', unlockAudio);
+  }, { once: true });
+
   // טעינת קולות
-  window.speechSynthesis && window.speechSynthesis.getVoices();
+  if (window.speechSynthesis) {
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
+  }
 }
 
 function setLang(src, tgt) {
@@ -241,8 +251,7 @@ function doTranslate() {
       lastTranslation = result;
       document.getElementById('resultText').textContent = result;
       document.getElementById('resultBox').style.display = 'block';
-      setStatus('✅ תרגום מוכן');
-      speak(result, tgtLang);
+      setStatus('✅ תרגום מוכן — לחץ 🔊 להשמעה');
     })
     .catch(function() { setStatus('⚠️ שגיאת חיבור'); });
 }
