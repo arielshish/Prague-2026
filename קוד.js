@@ -1118,23 +1118,29 @@ function loadBudgetCategories() {
 
 function savePhotoToDrive(dataUrl, place, note, timestamp) {
   try {
-    var folderName = 'Prague 2026 — Photos';
-    var folders = DriveApp.getFoldersByName(folderName);
-    var folder = folders.hasNext() ? folders.next() : DriveApp.createFolder(folderName);
+    if (!dataUrl || dataUrl.indexOf(',') === -1) return { ok: false, error: 'dataUrl empty or invalid' };
+    var parts = dataUrl.split(',');
+    if (parts.length < 2 || !parts[1]) return { ok: false, error: 'base64 part missing' };
 
-    var parts   = dataUrl.split(',');
     var mime    = parts[0].split(';')[0].split(':')[1] || 'image/jpeg';
     var ext     = mime === 'image/png' ? '.png' : '.jpg';
-    var decoded = Utilities.base64Decode(parts[1]);
-    var blob    = Utilities.newBlob(decoded, mime, place.replace(/[\\/:*?"<>|]/g,'_') + '_' + timestamp + ext);
+    var safeName = (place || 'photo').replace(/[\\/:*?"<>|]/g,'_').substring(0, 80);
 
-    var file = folder.createFile(blob);
+    var decoded = Utilities.base64Decode(parts[1]);
+    var blob    = Utilities.newBlob(decoded, mime, safeName + '_' + timestamp + ext);
+
+    var folderName = 'Prague 2026 — Photos';
+    var folders = DriveApp.getFoldersByName(folderName);
+    var folder  = folders.hasNext() ? folders.next() : DriveApp.createFolder(folderName);
+    var file    = folder.createFile(blob);
+
     var date = new Date(timestamp);
-    var desc = place + (note ? ' — ' + note : '') + ' | ' + date.toLocaleDateString('he-IL') + ' ' + date.toLocaleTimeString('he-IL');
+    var desc = (place || '') + (note ? ' — ' + note : '') + ' | ' + date.toLocaleDateString('he-IL') + ' ' + date.toLocaleTimeString('he-IL');
     file.setDescription(desc);
 
     return { ok: true, url: file.getUrl(), id: file.getId() };
   } catch(e) {
+    Logger.log('savePhotoToDrive error: ' + e.stack);
     return { ok: false, error: e.message };
   }
 }
