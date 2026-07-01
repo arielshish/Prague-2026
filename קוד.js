@@ -1021,6 +1021,28 @@ function saveBudgetCategories(categories) {
   }
 }
 
+function saveTotalBudget(totalBudget) {
+  var lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(10000);
+    var ss = getSpreadsheet_();
+    var sheet = ss.getSheetByName(APP_DATA_SHEET_NAME);
+    if (!sheet) { initAppDataDB(); sheet = ss.getSheetByName(APP_DATA_SHEET_NAME); }
+    var data = sheet.getDataRange().getValues();
+    var found = false;
+    for (var i = 1; i < data.length; i++) {
+      if (data[i][0] === 'total_budget') { sheet.getRange(i + 1, 2).setValue(totalBudget); found = true; break; }
+    }
+    if (!found) { sheet.getRange(sheet.getLastRow() + 1, 1, 1, 2).setValues([['total_budget', totalBudget]]); }
+    SpreadsheetApp.flush();
+    return { ok: true };
+  } catch(e) {
+    return { ok: false, error: e.message };
+  } finally {
+    try { lock.releaseLock(); } catch(ignore) {}
+  }
+}
+
 function saveDaysCustom(daysData) {
   var lock = LockService.getScriptLock();
   try {

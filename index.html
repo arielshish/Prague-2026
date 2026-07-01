@@ -101,6 +101,7 @@
       <button id="btnHomeRestaurants" style="background:rgba(244,99,74,0.10);border:1px solid rgba(244,99,74,0.22);border-radius:16px;padding:13px 8px;font-size:12px;font-weight:800;color:#FCA5A5;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;">🍽️<br><span style="font-size:11px;">מסעדות</span></button>
       <button id="btnHomePack" style="background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.22);border-radius:16px;padding:13px 8px;font-size:12px;font-weight:800;color:#6EE7B7;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;">🧳<br><span style="font-size:11px;">ציוד</span></button>
       <button id="btnHomeInfo" style="background:rgba(168,85,247,0.10);border:1px solid rgba(168,85,247,0.22);border-radius:16px;padding:13px 8px;font-size:12px;font-weight:800;color:#C084FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;">📘<br><span style="font-size:11px;">מידע</span></button>
+      <button id="btnHomeHistory" style="background:rgba(251,191,36,0.10);border:1px solid rgba(251,191,36,0.22);border-radius:16px;padding:13px 8px;font-size:12px;font-weight:800;color:#FDE68A;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;grid-column:span 2;">📸<br><span style="font-size:11px;">היסטוריה ותמונות</span></button>
     </div>
     <div style="background:linear-gradient(135deg,rgba(244,99,74,0.13),rgba(244,99,74,0.055));border:1px solid rgba(244,99,74,0.24);border-radius:20px;padding:16px;margin-bottom:10px;">
       <div style="font-size:14px;font-weight:800;color:#F1F5F9;margin-bottom:7px;">🛍️ יום 7 — יום קניות</div>
@@ -183,12 +184,10 @@
         <button id="btnEditBudget" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:4px 10px;font-size:11px;font-weight:700;color:rgba(241,245,249,0.7);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">✏️ ערוך</button>
       </div>
       <div id="budgetRows" style="display:grid;gap:8px;"></div>
-      <div style="border-top:1px solid rgba(255,255,255,0.1);margin-top:12px;padding-top:10px;display:flex;justify-content:space-between;align-items:center;">
-        <div style="font-size:11px;font-weight:700;color:rgba(241,245,249,0.5);">סה"כ</div>
-        <div style="display:flex;gap:12px;align-items:center;">
-          <div style="font-size:11px;color:rgba(241,245,249,0.4);">תקציב: <span id="budgetTotal" style="color:#F1F5F9;font-weight:800;">₪0</span></div>
-          <div style="font-size:11px;color:rgba(241,245,249,0.4);">בפועל: <span id="budgetActual" style="font-weight:800;">₪0</span></div>
-        </div>
+      <div style="border-top:1px solid rgba(255,255,255,0.1);margin-top:12px;padding-top:10px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;text-align:center;">
+        <div><div style="font-size:10px;color:rgba(241,245,249,0.4);margin-bottom:3px;">תקציב</div><div id="budgetTotal" style="font-size:14px;font-weight:800;color:#F1F5F9;">₪0</div></div>
+        <div><div style="font-size:10px;color:rgba(241,245,249,0.4);margin-bottom:3px;">בפועל</div><div id="budgetActual" style="font-size:14px;font-weight:800;">₪0</div></div>
+        <div><div style="font-size:10px;color:rgba(241,245,249,0.4);margin-bottom:3px;">נותר</div><div id="budgetRemain" style="font-size:14px;font-weight:800;">₪0</div></div>
       </div>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:14px;">
@@ -202,9 +201,14 @@
   <!-- מודל עריכת תקציב -->
   <div id="budgetModal" style="display:none;position:fixed;inset:0;z-index:80;align-items:flex-end;justify-content:center;">
     <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);" id="budgetOverlay"></div>
-    <div style="position:relative;background:linear-gradient(160deg,#1e293b,#0f172a);border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;z-index:1;">
-      <h2 style="margin:0 0 18px;font-size:18px;font-weight:900;color:#F1F5F9;">✏️ עריכת תקציב</h2>
-      <div id="budgetInputs" style="display:grid;gap:10px;margin-bottom:18px;"></div>
+    <div style="position:relative;background:linear-gradient(160deg,#1e293b,#0f172a);border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;z-index:1;max-height:85vh;overflow-y:auto;">
+      <h2 style="margin:0 0 14px;font-size:18px;font-weight:900;color:#F1F5F9;">✏️ עריכת תקציב</h2>
+      <div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);border-radius:14px;padding:14px;margin-bottom:16px;">
+        <div style="font-size:11px;font-weight:700;color:#FCD34D;margin-bottom:8px;letter-spacing:0.5px;">💰 תקציב כולל לטיול (₪)</div>
+        <input id="budgetTotalInput" type="number" placeholder="לדוג׳ 15000" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(245,158,11,0.35);border-radius:10px;padding:11px 13px;font-size:18px;font-weight:800;color:#FCD34D;font-family:'Rubik',Arial,sans-serif;box-sizing:border-box;text-align:center;">
+      </div>
+      <div style="font-size:11px;font-weight:700;color:rgba(241,245,249,0.5);margin-bottom:10px;letter-spacing:0.5px;">📊 פירוט לפי קטגוריה (₪)</div>
+      <div id="budgetInputs" style="display:grid;gap:10px;margin-bottom:16px;"></div>
       <button id="btnAddBudgetCat" style="width:100%;background:rgba(255,255,255,0.07);border:1px dashed rgba(255,255,255,0.2);border-radius:13px;padding:11px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;margin-bottom:14px;">➕ הוסף קטגוריה</button>
       <button id="btnSaveBudget" class="btn-primary" style="width:100%;">💾 שמור</button>
     </div>
@@ -340,6 +344,15 @@
         <button id="btnSaveRate" class="btn-primary">שמור שער</button>
       </div>
     </div>
+  </section>
+
+  <!-- ═══ HISTORY & PHOTO ═══ -->
+  <section id="history" class="tab">
+    <div class="card card-hdr">
+      <div><h2 style="font-size:18px;font-weight:900;">📸 היסטוריה ותמונות</h2><p style="font-size:12px;color:rgba(241,245,249,0.5);margin-top:3px;">מדריך תיירים — מה לצלם ולמה זה מיוחד</p></div>
+      <button class="back-btn" id="btnBackHistory">← ראשי</button>
+    </div>
+    <div style="display:grid;gap:14px;" id="historyList"></div>
   </section>
 
   <!-- ═══ NAV ═══ -->
@@ -558,7 +571,7 @@ function isGas() {
 // ═══════════════════════════════════════════
 //  NAVIGATION
 // ═══════════════════════════════════════════
-var ALL_TABS = ['home','days','shopping','expenses','flights','restaurants','pack','info'];
+var ALL_TABS = ['home','days','shopping','expenses','flights','restaurants','pack','info','history'];
 
 function openTab(id) {
   ALL_TABS.forEach(function(name) {
@@ -736,6 +749,128 @@ function executeMove(targetDayIdx) {
 
 function closeAddStopModal() { var m = qs('addStopModal'); if (m) m.style.display = 'none'; }
 function closeMoveStopModal() { var m = qs('moveStopModal'); if (m) m.style.display = 'none'; }
+
+// ═══════════════════════════════════════════
+//  HISTORY & PHOTO SPOTS
+// ═══════════════════════════════════════════
+var HISTORY_SPOTS = [
+  {
+    emoji:'🌉', name:'גשר קארל – Charles Bridge',
+    year:'1357', tag:'📸 #1 לצלם',
+    history:'נבנה ב-1357 בפקודת קיסר קרל הרביעי. 520 מטר אורך, 30 פסלי קדושים בארוק משני הצדדים. נחשב לאחד הגשרים היפים בעולם. ריאן גוסלינג, מדונה — כולם צולמו כאן. בנוי מאבן חוֹל כדי שעמיד בשיטפונות.',
+    photo:'📍 עמדו בצד המזרחי של הגשר (צד Old Town) בזריחה 5:30-6:30 — אין תיירים, אור רך וזהוב, טירת פראג ברקע. ❌ הימנעו מ-10:00-17:00 — עמוס ואי אפשר לצלם.',
+    tip:'שמרו מקום על פסל ג׳ון נפומוק (הפסל הכי ישן, 1683) — נגיעה בו מביאה מזל לפי המסורת. ✨'
+  },
+  {
+    emoji:'🏰', name:'טירת פראג – Pražský hrad',
+    year:'870 לספירה', tag:'📸 מלכותי',
+    history:'הטירה הגדולה בעולם לפי שטח — 70,000 מ"ר! נבנתה ב-870 ע"י הנסיך Bořivoj. כאן ישבו מלכי בוהמיה, נשמרה כתר הממלכה, ונחתמה עצמאות צ׳כיה ב-1918. צ׳כים מגיעים לבכות כאן ביום הלאומי.',
+    photo:'📍 הזריחה הכי דרמטית — עמדו על Malostranské náměstí (כיכר מאלה סטרנה) ב-5:45. הטירה מוארת בזהוב מעל גגות פסטל. מהחומות הפנימיות — נוף 180° על פראג כולה.',
+    tip:'כניסה לחצר החיצונית = חינם 24/7. מגדל טירת פראג בשקיעה מ-22:00 — מוזהב ומדהים. ✨'
+  },
+  {
+    emoji:'⏰', name:'שעון האסטרונומי – Orloj',
+    year:'1410', tag:'📸 איקוני',
+    history:'שעון הציבור העתיק ביותר שעדיין פועל בעולם! נבנה ב-1410 ע"י האסטרונום Mikuláš z Kadaně. מציג שעה, מיקום השמש והירח, מזלות ועונות. כל שעה — תהלוכת שנים עשר השליחים מהחלונות הקטנים. האגדה אומרת שמי שיבנה שעון טוב יותר — יעוור.',
+    photo:'📍 עמדו ממש מול השעון ב-XX:59:45 — הסתכלו למעלה לחלונות הקטנים בעוד 15 שניות לשעה. 📍 מגדל Old Town Hall (230 CZK) — נוף אווירי מושלם על כיכר ומעל השעון.',
+    tip:'המון תיירים מביטים ציפייה ואז מאוכזבים — זה קצר. הפתעה: הנוף מה-KOKO coffee בקומה שנייה של אחד הבתים מתחת = חינם ומושלם. ✨'
+  },
+  {
+    emoji:'🏙️', name:'כיכר העיר העתיקה – Old Town Square',
+    year:'המאה ה-12', tag:'📸 לב פראג',
+    history:'הייתה שוק מרכזי כבר ב-1100. ב-1621 הוצאו כאן להורג 27 מנהיגי המרד הבוהמי — עיגולים לבנים ברצפה מסמנים את המקום עד היום. הכנסייה הגותית Týn (1385) שולטת ברקע. Kinský Palace שבצד — שם הכריז קומוניסטים על השתלטות ב-1948.',
+    photo:'📍 מגדל Old Town Hall — תמונה אווירית מושלמת על הכיכר ו-Týn. 📍 לפנות בוקר 6:00 — הכיכר ריקה לגמרי, אור רך, השתקפויות. ❌ ב-20:00 — מוזיקאי רחוב, אבל שווה לחוות.',
+    tip:'עיגולי האבן הלבנים ברצפה = 27 ראשים שנערפו. עצרו לרגע. הכנסיית Týn פתוחה לביקור חינם בבוקר — מעטים יודעים. ✨'
+  },
+  {
+    emoji:'🗼', name:'מגדל פטרין – Petřín Tower',
+    year:'1891', tag:'📸 נוף 360°',
+    history:'נבנה ב-1891 לתערוכת יובל ורסוב — בהשראת מגדל אייפל שנחנך שנתיים קודם. 63 מטר גובה + גבעה 327 מטר = נוף מ-390 מטר! הצ׳כים התחרו עם הצרפתים. הגגות האדומים של פראג נראים כמו מפה מדמיינת.',
+    photo:'📍 עלו ברכבל (lanovka) בשקיעה 20:30 — שמיים כתומים, גגות אדומים, טירה מוזהבת. 📍 מהגינות בבסיס הגבעה — תמונת postcard קלאסית עם הגשר ברקע.',
+    tip:'מבוך המראות לידו (60 CZK) — עדיף לפני הגדולים! ילדים מאבדים את עצמם 20 דקות. גני הפרחים ביוני-אוגוסט = שטיחים של ורדים. ✨'
+  },
+  {
+    emoji:'🏛️', name:'Municipal House – Obecní dům',
+    year:'1912', tag:'📸 Art Nouveau',
+    history:'נבנה ב-1906-1912 על שרידי ארמון מלכותי מימי הביניים. כל חדר עוצב ע"י אמן אחר, כולל Alfons Mucha (אולם הראשי). ב-28 באוקטובר 1918 הוכרזה כאן עצמאות צ׳כוסלובקיה. מוזיאון, בית קפה, מסעדה ואולמות קונצרטים — הכל מקורי.',
+    photo:'📍 הכניסה הראשית מבחוץ — כיפת ברונזה, פסיפסים, פסלים. צלמו מהצד של רחוב Náměstí Republiky. 📍 בית הקפה (Kavárna) — תקרות ספוגת זהב, מנורות קריסטל = שווה כוס קפה רק בשביל הצילום.',
+    tip:'הלובי פתוח חינם — היכנסו! הסיור בתשלום (250 CZK) שווה רק לאוהבי ארכיטקטורה. בלילה — מוזיקה חיה ואורות רך. ✨'
+  },
+  {
+    emoji:'💃', name:'בית הריקוד – Dancing House',
+    year:'1996', tag:'📸 מודרני',
+    history:'תוכנן ע"י פרנק גרי (ארכיטקט Guggenheim ביאלבו) ו-Vlado Milunić. נקרא "Fred & Ginger" על שם האסטייר ורוג׳רס — הבניין "רוקד"! שנוי במחלוקת בזמן הבנייה, היום — אחד הסמלים של פראג העכשווית. ממוקם על הנהר, גישה מגשר.',
+    photo:'📍 עמדו על גשר Jiráskův (10 דקות הליכה) — נוף מלא של הבניין עם הנהר. 📍 חצי שעה לפני שקיעה — השמשות מחזירות אור כתום כמו שריפה.',
+    tip:'הגג (150 CZK) שווה רק לשתייה ונוף — הנוף עצמו מהגשר טוב יותר לצילום. ✨'
+  },
+  {
+    emoji:'✡️', name:'הרובע היהודי – Josefov',
+    year:'המאה ה-13', tag:'📸 היסטוריה עמוקה',
+    history:'יהודים גרו בפראג מהמאה ה-10. ב-1215 חויבו לגור בגטו נפרד — Josefov. בית הקברות העתיק (1439) מכיל 12 שכבות קברים — 12,000 מצבות, 100,000 קבורים. ב-1782 הקיסר יוסף השני ביטל את הגטו — לכן "Josefov". בשואה נרצחו 80,000 מיהודי בוהמיה — הנאצים שמרו את האוסף "כמוזיאון לעם שנמחה".',
+    photo:'📍 בית הקברות — תמונות בשחור-לבן = הכי מרגשות. 📍 בית הכנסת הספרדי (הכי יפה) — פנים מוזהבת ומקסימאלית.',
+    tip:'⚠️ סגור בשבת. בית הכנסת הישן-חדש (Old-New) — פעיל מ-1270 ועד היום. הגדול ביותר בגולה שהחזיק. ✨'
+  },
+  {
+    emoji:'🏝️', name:'אי קמפה – Kampa Island',
+    year:'המאה ה-17', tag:'📸 קסם מוסתר',
+    history:'נוצר ע"י תעלת Čertovka ("שטן" — על שם אישה זקופה-לשון שגרה ליד) שנחפרה במאה ה-13 להנעת ריחיים. ב-1978 הוכרז פארק. פסלי David Černý: "Babies" — 3 תינוקות מתכת ענקיים ללא פנים, מגיעים מגן העדן; "Quo Vadis" — מכוניות "טרבנט" ע"ג רגלי אנשים = ביקורת הגירה.',
+    photo:'📍 נוף מ-Kampa על גשר קארל מלמטה — אחת התמונות המיוחדות שרוב תיירים מפספסים! 📍 תינוקות המתכת — צלמו בשחר כשאין אנשים, קצת מרתיע ומדהים.',
+    tip:'גלידת Angelato ברחוב Újezd (5 דקות הליכה) = ה-gelato הכי טוב בפראג. חייבים. ✨'
+  },
+  {
+    emoji:'🏯', name:'Vyšehrad – המבצר הנסתר',
+    year:'המאה ה-10', tag:'📸 שקט ומרהיב',
+    history:'לפי האגדה הצ׳כית — כאן נוסדה פראג. הנסיכה Libuše עמדה על הצוק, הביטה צפונה ואמרה "אראה עיר גדולה". בית הקברות הלאומי Slavín — קבורים: Dvořák, Smetana, Mucha, Neruda. הנסיכה עצמה מיוצגת בפסל דרמטי בפארק.',
+    photo:'📍 מהחומות הדרומיות — נוף על Vltava ופראג ללא תיירים ועמוסות. 📍 קבר Dvořák — פשוט ומרגש. 📍 הכנסייה הגותית הניאו מבחוץ — עם שמיים כהים = תמונה דרמטית.',
+    tip:'פחות תיירים מהטירה = יותר מקום לצלם. פיקניק על הדשא עם נוף = חוויה מושלמת. ✨'
+  },
+  {
+    emoji:'🌊', name:'שפת הנהר Vltava – בלילה',
+    year:'נצחי', tag:'📸 שעת הזהב',
+    history:'Vltava ("הנהר הבר") — 430 ק"מ, עובר דרך 17 ערים. שמו מקורו בסלטי: "vlt" = בר/פרא + "aha" = מים. סמטנה כתב עליו את הסימפוניה "מולדות" (1879) — המנגינה הלאומית הבלתי רשמית של צ׳כיה. בשיטפון 2002 הציף 40% מפראג.',
+    photo:'📍 Nusle Bridge בלילה — פראג מלמטה, הנהר מהחלון. 📍 מגשר Čechův בלילה — שלושת גשרים מוארים בשורה. 📍 שייט בשקיעה 20:00-21:00 — גשר קארל מלמטה עם אור זהוב = תמונת הטיול.',
+    tip:'הצד המערבי (Malá Straná) בשקיעה = הצד הטוב לצלם. החזור מהצד המזרחי. ✨'
+  },
+  {
+    emoji:'📚', name:'Clementinum – הספרייה הבארוקית',
+    year:'1722', tag:'📸 הכי יפה בעולם',
+    history:'נבנה ע"י הישועים ב-1722 כחלק ממתחם שכלל אוניברסיטה, כנסיות וטורים אסטרונומיים. הספרייה הבארוקית — תקרה מצוירת עם 2 שכבות מרפסות עץ, 20,000 כרכים ישנים, גלובוס מ-1750. National Geographic בחרה אותה "הספרייה היפה בעולם". נמדדו כאן טמפרטורות מ-1775 ברציפות — הסדרה הארוכה ביותר באירופה.',
+    photo:'📍 הספרייה הבארוקית — הסתכלו מלמטה למעלה, טלפון אנכי = תמונת אינסטגרם מושלמת. 📍 מגדל האסטרונומי (150 CZK נוסף) — נוף אחר לגמרי על פראג לעומת הטירה.',
+    tip:'⚠️ חובה להזמין מראש — klementinum.com. מתמלא שבועות מראש. אין לבוא ללא הזמנה. ✨'
+  }
+];
+
+function renderHistory() {
+  var list = qs('historyList');
+  if (!list || list.children.length > 0) return;
+  list.innerHTML = HISTORY_SPOTS.map(function(s) {
+    return '<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:20px;overflow:hidden;">' +
+      '<div style="background:linear-gradient(135deg,rgba(251,191,36,0.18),rgba(251,191,36,0.06));padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.08);">' +
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">' +
+          '<div style="display:flex;align-items:center;gap:10px;">' +
+            '<span style="font-size:26px;">' + s.emoji + '</span>' +
+            '<div><div style="font-size:14px;font-weight:900;color:#F1F5F9;line-height:1.2;">' + s.name + '</div>' +
+            '<div style="font-size:10px;color:rgba(241,245,249,0.45);margin-top:3px;">🏛️ ' + s.year + '</div></div>' +
+          '</div>' +
+          '<span style="background:rgba(251,191,36,0.18);border:1px solid rgba(251,191,36,0.3);border-radius:999px;padding:3px 9px;font-size:10px;font-weight:700;color:#FDE68A;white-space:nowrap;">' + s.tag + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div style="padding:14px 16px;display:grid;gap:10px;">' +
+        '<div>' +
+          '<div style="font-size:10px;font-weight:700;color:#93C5FD;letter-spacing:0.5px;margin-bottom:5px;">📖 הסיפור</div>' +
+          '<div style="font-size:12px;color:rgba(241,245,249,0.7);line-height:1.65;">' + s.history + '</div>' +
+        '</div>' +
+        '<div style="background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.18);border-radius:12px;padding:10px 12px;">' +
+          '<div style="font-size:10px;font-weight:700;color:#FDE68A;letter-spacing:0.5px;margin-bottom:5px;">📸 איך לצלם</div>' +
+          '<div style="font-size:12px;color:rgba(241,245,249,0.75);line-height:1.65;">' + s.photo + '</div>' +
+        '</div>' +
+        '<div style="background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.18);border-radius:12px;padding:10px 12px;">' +
+          '<div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.55;">' + s.tip + '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
 
 // ═══════════════════════════════════════════
 //  SHOPPING
@@ -953,6 +1088,17 @@ function loadBudget() {
   try { return JSON.parse(localStorage.getItem('prague_budget_v1') || 'null') || JSON.parse(JSON.stringify(DEFAULT_BUDGET)); }
   catch(e) { return JSON.parse(JSON.stringify(DEFAULT_BUDGET)); }
 }
+function loadTotalBudget() {
+  return Number(localStorage.getItem('prague_total_budget') || '0') || 0;
+}
+function saveTotalBudget(val) {
+  localStorage.setItem('prague_total_budget', String(val));
+  if (isGas()) {
+    google.script.run
+      .saveTotalBudget(val)
+      .withFailureHandler(function(){});
+  }
+}
 function saveBudget(b) {
   localStorage.setItem('prague_budget_v1', JSON.stringify(b));
   if (isGas()) {
@@ -967,23 +1113,30 @@ function syncBudgetFromSheets() {
   google.script.run
     .withSuccessHandler(function(r) {
       if (r && r.ok && r.data) {
-        localStorage.setItem('prague_budget_v1', JSON.stringify(r.data));
+        if (r.data.budget_categories) {
+          localStorage.setItem('prague_budget_v1', JSON.stringify(r.data.budget_categories));
+        }
+        if (r.data.total_budget) {
+          localStorage.setItem('prague_total_budget', String(r.data.total_budget));
+        }
         renderBudget();
       }
     })
-    .loadBudgetCategories();
+    .loadAppData();
 }
 
 function renderBudget() {
   var budget = loadBudget();
   var totalActual = 0;
   EXPENSES.forEach(function(e) { totalActual += Number(e.ils) || 0; });
-  var totalBudget = budget.reduce(function(s,b) { return s + (Number(b.ils)||0); }, 0);
+  var catTotal = budget.reduce(function(s,b) { return s + (Number(b.ils)||0); }, 0);
+  var manualTotal = loadTotalBudget();
+  var totalBudget = manualTotal || catTotal;
 
   var rows = qs('budgetRows');
   if (!rows) return;
-  rows.innerHTML = budget.map(function(b, i) {
-    var pct = totalBudget ? Math.round((Number(b.ils)||0) / totalBudget * totalActual) : 0;
+  rows.innerHTML = budget.map(function(b) {
+    var pct = catTotal ? Math.round((Number(b.ils)||0) / catTotal * totalActual) : 0;
     var ratio = (Number(b.ils)||0) > 0 ? Math.min(pct / (Number(b.ils)||0), 1) : 0;
     var color = ratio < 0.7 ? '#6EE7B7' : ratio < 0.9 ? '#FCD34D' : '#FCA5A5';
     return '<div>' +
@@ -997,16 +1150,18 @@ function renderBudget() {
     '</div>';
   }).join('');
 
+  var remain = totalBudget - totalActual;
   var actualEl = qs('budgetActual');
-  if (actualEl) {
-    actualEl.textContent = '₪' + totalActual.toLocaleString('he-IL');
-    actualEl.style.color = totalActual > totalBudget ? '#FCA5A5' : '#6EE7B7';
-  }
+  if (actualEl) { actualEl.textContent = '₪' + totalActual.toLocaleString('he-IL'); actualEl.style.color = totalActual > totalBudget ? '#FCA5A5' : '#6EE7B7'; }
   if (qs('budgetTotal')) qs('budgetTotal').textContent = '₪' + totalBudget.toLocaleString('he-IL');
+  var remEl = qs('budgetRemain');
+  if (remEl) { remEl.textContent = '₪' + Math.abs(remain).toLocaleString('he-IL') + (remain < 0 ? ' חריגה' : ''); remEl.style.color = remain < 0 ? '#FCA5A5' : '#6EE7B7'; }
 }
 
 function openBudgetModal() {
   var budget = loadBudget();
+  var totalVal = loadTotalBudget();
+  var ti = qs('budgetTotalInput'); if (ti) ti.value = totalVal || '';
   var inp = qs('budgetInputs');
   if (!inp) return;
   inp.innerHTML = budget.map(function(b, i) {
@@ -1029,10 +1184,13 @@ function removeBudgetRow(i) {
 function closeBudgetModal() { var m = qs('budgetModal'); if (m) m.style.display = 'none'; }
 
 function saveBudgetFromModal() {
+  var totalVal = Number((qs('budgetTotalInput') || {}).value || 0) || 0;
+  if (totalVal) saveTotalBudget(totalVal);
   var inputs = document.querySelectorAll('#budgetInputs input');
   var map = {};
   inputs.forEach(function(inp) {
     var i = inp.getAttribute('data-bi'), f = inp.getAttribute('data-field');
+    if (!i) return;
     if (!map[i]) map[i] = {};
     map[i][f] = inp.value;
   });
@@ -1211,7 +1369,9 @@ document.addEventListener('DOMContentLoaded', function() {
     'btnBackFlights':     function() { openTab('home'); },
     'btnBackRestaurants': function() { openTab('home'); },
     'btnBackPack':        function() { openTab('home'); },
-    'btnBackInfo':        function() { openTab('home'); }
+    'btnBackInfo':        function() { openTab('home'); },
+    'btnHomeHistory':     function() { openTab('history'); renderHistory(); },
+    'btnBackHistory':     function() { openTab('home'); }
   };
 
   Object.keys(btnMap).forEach(function(id) {
