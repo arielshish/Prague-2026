@@ -294,10 +294,18 @@
   <!-- ═══ RESTAURANTS ═══ -->
   <section id="restaurants" class="tab">
     <div class="card card-hdr">
-      <div><h2 style="font-size:18px;font-weight:900;">🍽️ מסעדות</h2><p style="font-size:12px;color:rgba(241,245,249,0.5);margin-top:3px;">ללא חזיר · בקר בלבד · מומלצות</p></div>
+      <div><h2 style="font-size:18px;font-weight:900;">🍽️ אוכל ומקומות</h2><p style="font-size:12px;color:rgba(241,245,249,0.5);margin-top:3px;">ללא חזיר · בקר בלבד · מסודר מזול ליקר</p></div>
       <button class="back-btn" id="btnBackRestaurants">← ראשי</button>
     </div>
+    <!-- טאבים פנימיים -->
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button id="tabResBtn" onclick="switchFoodTab('restaurants')" style="flex:1;padding:9px;border-radius:12px;border:none;font-size:12px;font-weight:800;font-family:'Rubik',Arial,sans-serif;cursor:pointer;background:rgba(244,99,74,0.25);color:#F4634A;">🍽️ מסעדות</button>
+      <button id="tabDesBtn" onclick="switchFoodTab('desserts')" style="flex:1;padding:9px;border-radius:12px;border:none;font-size:12px;font-weight:800;font-family:'Rubik',Arial,sans-serif;cursor:pointer;background:rgba(255,255,255,0.07);color:rgba(241,245,249,0.5);">🍦 קינוחים</button>
+      <button id="tabPhotoBtn" onclick="switchFoodTab('photo')" style="flex:1;padding:9px;border-radius:12px;border:none;font-size:12px;font-weight:800;font-family:'Rubik',Arial,sans-serif;cursor:pointer;background:rgba(255,255,255,0.07);color:rgba(241,245,249,0.5);">📸 לצלם</button>
+    </div>
     <div id="restaurantsList" style="display:grid;gap:12px;"></div>
+    <div id="dessertsList" style="display:none;grid-template-columns:1fr;gap:12px;"></div>
+    <div id="photoSpotsList" style="display:none;grid-template-columns:1fr;gap:12px;"></div>
   </section>
 
   <!-- ═══ PACK ═══ -->
@@ -560,6 +568,109 @@ var RESTAURANTS = [
    desc:'סטייקהאוס יוקרתי. dry-aged beef מהמדרגה הראשונה. לערב אחרון של הטיול או חגיגה. היקר מכולם — אבל חוויה בלתי נשכחת.',
    price:'2,500–3,500 CZK',badge:'👑 פרמיום',badgeClr:'rgba(124,58,237,0.22)',badgeTxt:'#C084FC',
    mapUrl:'https://www.google.com/maps/search/George+Prime+Steak+Prague'}
+];
+
+// level: 1=💰 עד 100 CZK | 2=💰💰 100–250 | 3=💰💰💰 250–500
+var DESSERTS = [
+  {level:1,icon:'🍦',name:'Angelato',sub:'גלידה איטלקית אמנותית — מקומיים בלבד',
+   desc:'גלידה טרייה יומית ללא תוספים מלאכותיים. טעמים מטורפים: פיסטוק, גבינת פרמזן, סרפדים, רוברב. פתוחה מ-2007. שני סניפים — ממש ליד המרכז.',
+   price:'50–90 CZK לכדור',rating:'⭐⭐⭐⭐⭐',tag:'מקומי ✨',tagClr:'#6EE7B7',
+   where:'Rytířská (עיר עתיקה) + Újezd (מלה סטרנה)',
+   mapUrl:'https://www.google.com/maps/search/Angelato+Prague'},
+  {level:1,icon:'🍦',name:'Puro Gelato',sub:'גלידה טהורה — 3 סניפים שכונתיים',
+   desc:'"פורו" = טהור. רכיבים נקיים, ללא גלידה מלאכותית. מאוד אהוב על ידי מקומיים ב-Karlín ו-Vršovice.',
+   price:'50–90 CZK לכדור',rating:'⭐⭐⭐⭐⭐',tag:'מקומי ✨',tagClr:'#6EE7B7',
+   where:'Výtoň / Karlín / Vršovice',
+   mapUrl:'https://www.google.com/maps/search/Puro+Gelato+Prague'},
+  {level:1,icon:'🎂',name:'Kus Koláče',sub:'קולאצ׳ה — מוכרים לפני הצהריים!',
+   desc:'מתמחים בקולאצ׳ה הצ׳כי הקלאסי — בצק שמרים עגול עם גבינה/פרגית/ריבה. מקומיים עומדים בתור. מגיעים בבוקר — מאוחר יותר נגמר.',
+   price:'40–70 CZK ליחידה',rating:'⭐⭐⭐⭐⭐',tag:'אייקוני 🇨🇿',tagClr:'#FCD34D',
+   where:'מרכז פראג — בדקו כתובת עדכנית',
+   mapUrl:'https://www.google.com/maps/search/Kus+Kolace+Prague'},
+  {level:1,icon:'🍰',name:'Ovocný Světozor',sub:'מדובניק הזול ביותר בפראג',
+   desc:'רשת בתי קפה של שרות עצמי — 12 סניפים. מדובניק (עוגת דבש בציר שמנת קרמל) כאן עולה פי 3 פחות מבתי קפה תיירותיים. חובה לנסות.',
+   price:'100–200 CZK לאדם',rating:'⭐⭐⭐⭐½',tag:'מוסד מקומי',tagClr:'#FCD34D',
+   where:'12 סניפים — Vinohradská, Vodičkova, Holešovice ועוד',
+   mapUrl:'https://www.google.com/maps/search/Ovocny+Svetozor+Prague'},
+  {level:1,icon:'🥐',name:'Pekárna Praktika',sub:'מאפייה אמנותית עם טחנת קמח פנימית',
+   desc:'הבעלים טוחן גרגרים ישירות מחוות צ׳כיות קטנות. קולאצ׳ה מקמח שיפון — ייחודי בפראג. לחם שאור, בוכטי. אהוב על שפים ומקומיים.',
+   price:'30–80 CZK למאפה',rating:'⭐⭐⭐⭐⭐',tag:'אמנותי 🌾',tagClr:'#6EE7B7',
+   where:'Vinohrady / Vršovice',
+   mapUrl:'https://www.google.com/maps/search/Pekarna+Praktika+Prague'},
+  {level:2,icon:'🍮',name:'Cukrárna Myšák',sub:'קונדיטוריה היסטורית — עיר חדשה',
+   desc:'מוסד פראגי אמיתי. וונצ׳קי (אקלר שמנת), לסקוניקי (עוגיות מרנג), שטרודל תפוחים עם שמנת כפולה. מתכונים קלאסיים, רכיבים איכותיים.',
+   price:'150–300 CZK לאדם',rating:'⭐⭐⭐⭐½',tag:'היסטורי',tagClr:'#93C5FD',
+   where:'ליד כיכר וצסלב, עיר חדשה',
+   mapUrl:'https://www.google.com/maps/search/Cukrarna+Mysak+Prague'},
+  {level:2,icon:'🍰',name:'Erhartova Cukrárna',sub:'קונדיטוריה מ-1937 — Vinohrady',
+   desc:'פתוחה מ-1937. 10–20 עוגות שונות יומיות — הכל עשוי ביד. וונצ׳קי, עוגות עונתיות, שוקולדים. דירוג גוגל 4.3. מגיע להזמין מקום.',
+   price:'200–300 CZK לאדם',rating:'⭐⭐⭐⭐½',tag:'1937 ✨',tagClr:'#C084FC',
+   where:'Vinohradská 125, Vinohrady',
+   mapUrl:'https://www.google.com/maps/search/Erhartova+Cukrarna+Prague'},
+  {level:2,icon:'🍫',name:'Steiner & Kovarik',sub:'שוקולד צ׳כי — פרס Great Taste',
+   desc:'מייצרים שוקולד מהאפונה (bean-to-bar) מאז 2005. זכו בפרס Great Taste 2015. טעמים: שפן מריינאה, מוקה, ניל. 6 חנויות בפראג. מתנה מושלמת.',
+   price:'150–400 CZK לקופסה',rating:'⭐⭐⭐⭐⭐',tag:'פרס 🏆',tagClr:'#FCD34D',
+   where:'6 חנויות בפראג — steinerkovarik.com',
+   mapUrl:'https://www.google.com/maps/search/Steiner+Kovarik+Prague+Chocolate'},
+  {level:1,icon:'⚠️',name:'Trdelník (טרדלניק)',sub:'מלכודת תיירים — מה לדעת',
+   desc:'עוגת ארובה — לא אוכל צ׳כי אמיתי (מקורו רומניה/סלובקיה). מקומיים לא אוכלים. הגרסה עם גלידה עולה 150–200 CZK ותיירים זורקים חצי. אם בכל זאת — תאכלו רק טרי ועם קינמון פשוט.',
+   price:'80–200 CZK',rating:'⭐⭐ (נסיון אינסטגרם בלבד)',tag:'⚠️ תיירותי',tagClr:'#FCA5A5',
+   where:'כל העיר העתיקה',
+   mapUrl:'https://www.google.com/maps/search/Trdlo+Prague'}
+];
+
+// photo spots sorted cheap→expensive (by entrance fee)
+var PHOTO_SPOTS = [
+  {fee:0,icon:'🌉',name:'גשר קארל',sub:'#1 האייקוני של פראג',
+   desc:'30 פסלי ברוק, פראג קאסל ברקע, השתקפויות בנהר. הקסם האמיתי: הגיעו לפני 5:30 בבוקר — הגשר כמעט ריק, ערפל על הפסלים.',
+   best:'זריחה (~5:00 בקיץ)',crowds:'קיצוני בצהריים / ריק בשחר',fee_txt:'חינם',rating:'⭐⭐⭐⭐⭐',
+   tip:'צלמו מצד מלה סטרנה חזרה לכיוון מגדל העיר העתיקה — הנוף הזה מרהיב יותר מהצד השני.',
+   mapUrl:'https://www.google.com/maps/search/Charles+Bridge+Prague'},
+  {fee:0,icon:'🌿',name:'פארק לטנה (Letná)',sub:'נקודת התצפית של המקומיים',
+   desc:'תצפית הנסתרת שתיירים מפספסים. עם עדשת טלה 70–200 מ"מ: גשר קארל + המטרונום הענק + 4 גשרים בפריים אחד. המקומיים באים לכאן, תיירים הולכים לפטז׳ין.',
+   best:'אחה"צ / שעת הזהב',crowds:'נמוכות — מקומיים בלבד',fee_txt:'חינם',rating:'⭐⭐⭐⭐⭐',
+   tip:'גן נסתר. המטרונום הענק (מקום פסל סטלין לשעבר) — רקע דרמטי מושלם.',
+   mapUrl:'https://www.google.com/maps/search/Letna+Park+Viewpoint+Prague'},
+  {fee:0,icon:'🏘️',name:'רחוב נובי סבט',sub:'הרחוב הקסום שאף תייר לא מוצא',
+   desc:'רחוב מהמאה ה-17 עם בקתות קטנות צבועות — נראה כמו אגדת ילדים. אחד מהמקומות הפחות מצולמים בפראג למרות שהוא מדהים. קרוב לטירה אבל תיירים עוברים בלי לשים לב.',
+   best:'בוקר מוקדם (לפני 9)',crowds:'נמוכות מאוד',fee_txt:'חינם',rating:'⭐⭐⭐⭐⭐',
+   tip:'אביב — פרחים מסביב לבקתות. סתיו — עלים זהובים. בחורף עם שלג — לא מהעולם הזה.',
+   mapUrl:'https://www.google.com/maps/search/Novy+Svet+Street+Prague+Hradcany'},
+  {fee:0,icon:'🦚',name:'גן ולנשטיין',sub:'גן בארוק נסתר — טווסים חופשיים',
+   desc:'גן בארוק מהמאה ה-17 עם לוג׳יה מקושתת מרהיבה (Sala Terrena). פסל ברונזה, מזרקה, וטווסים שמסתובבים חופשי. כמעט לא מוזכר במדריכי תיירים.',
+   best:'בוקר ימי חול',crowds:'נמוכות מאוד — מקומיים בלבד',fee_txt:'חינם',rating:'⭐⭐⭐⭐⭐',
+   tip:'צלמו דרך הקשתות של ה-Sala Terrena — פריים מושלם. פתוח אפריל–אוקטובר.',
+   mapUrl:'https://www.google.com/maps/search/Wallenstein+Garden+Prague+Mala+Strana'},
+  {fee:0,icon:'🎨',name:'חומת לנון',sub:'גרפיטי שמשתנה בכל ביקור',
+   desc:"קיר שמתחלף תמיד — ציטוטים, ציורים, שירה. כל ביקור שונה. ממש ליד מלה סטרנה.",
+   best:'לפני 9 בבוקר',crowds:'גבוהות בצהריים / ריק בשחר',fee_txt:'חינם',rating:'⭐⭐⭐⭐',
+   tip:'שעת הכחול עם אור הפנסים על הקיר הצבעוני — צילום מנצח.',
+   mapUrl:'https://www.google.com/maps/search/Lennon+Wall+Prague'},
+  {fee:0,icon:'🏛️',name:'רחובות מלה סטרנה',sub:'ריצוף אבנים ופנסים בחצות',
+   desc:'Thunovská, Nerudova — רחובות צרים עם חזיתות בארוק ופנסי גז. אחרי גשם: השתקפויות מהחלומות. הפנסים נשארים דולקים עד ~8 בבוקר.',
+   best:'זריחה / אחרי גשם',crowds:'נמוכות בבוקר',fee_txt:'חינם',rating:'⭐⭐⭐⭐½',
+   tip:"חפשו את 'רחוב הטריפיק ליט' — הנתיב הצר של 50 ס\"מ שמוסדר ברמזור. צילום אייקוני.",
+   mapUrl:'https://www.google.com/maps/search/Nerudova+Street+Prague'},
+  {fee:0,icon:'🏔️',name:'ויישהראד — שביל המצוק',sub:'תצפית נסתרת על הוולטבה',
+   desc:'שביל לאורך חומת המבצר מצד הנהר — נוף פתוח לכיוון הטירה ועיר העתיקה. כמעט אף תייר. מקומיים עם כלבים ורצים.',
+   best:'שקיעה (צפייה צפונה)',crowds:'נמוכות מאוד',fee_txt:'חינם',rating:'⭐⭐⭐⭐½',
+   tip:'הצמוד בית הקברות הגותי/Art Nouveau — ציורי מאוד לצילום.',
+   mapUrl:'https://www.google.com/maps/search/Vysehrad+Prague+cliff+walk'},
+  {fee:150,icon:'📚',name:'מנזר סטרהוב — ספרייה',sub:'הספרייה הכי מצולמת באירופה',
+   desc:'שתי אולמות קריאה בארוקיות מהמאה ה-17 — בין הפנימים היפים ביותר ביבשת. חובה לעדשה רחבה. גם לטרס חיצוני — פנורמה על הטירה והעיר.',
+   best:'פתיחה בבוקר',crowds:'בינוניות',fee_txt:'~150 CZK לספרייה',rating:'⭐⭐⭐⭐½',
+   tip:'עדשה 15–35 מ"מ חובה לאולמות הפנימיים. הטרס בחינם — לא כולם יודעים.',
+   mapUrl:'https://www.google.com/maps/search/Strahov+Monastery+Library+Prague'},
+  {fee:250,icon:'🗼',name:'מגדל פטז׳ין',sub:'360° — הנוף הרחב ביותר בפראג',
+   desc:'נקודת התצפית הגבוהה ביותר. פנורמה מלאה: גשר קארל, טירה, עיר עתיקה. מגיעים ברכבל (כרטיס חשמלית) מתחנת Újezd.',
+   best:'בוקר / אחה"צ (הימנעו מערפל קיצי)',crowds:'בינוניות — פחות מגשר קארל',fee_txt:'250 CZK + 150 CZK מעלית',rating:'⭐⭐⭐⭐½',
+   tip:'שלבו עם מנזר סטרהוב (5 דקות הליכה) — כפל שווה.',
+   mapUrl:'https://www.google.com/maps/search/Petrin+Tower+Prague'},
+  {fee:300,icon:'🕰️',name:'שעון אסטרונומי — מגדל',sub:'פנורמה + שעון אייקוני',
+   desc:'השעון האסטרונומי מ-1410 — פסל האפוסטולים כל שעה בדיוק. עלייה למגדל: פנורמה על גגות העיר העתיקה, כנסיית טין, כיכר.',
+   best:'9 בבוקר (פתיחה)',crowds:'גבוהות בצהריים — נמוכות בפתיחה',fee_txt:'~300 CZK מגדל (50% הנחה בשעה הראשונה)',rating:'⭐⭐⭐⭐⭐',
+   tip:'2 דקות אחרי שהאפוסטולים מסיימים — הקהל מתפזר, אז מצלמים את השעון נקי.',
+   mapUrl:'https://www.google.com/maps/search/Astronomical+Clock+Prague+Old+Town+Hall'}
 ];
 
 var PACK_CATS = [
@@ -992,6 +1103,101 @@ function renderRestaurants() {
     '</div>';
   });
   list.innerHTML = html;
+}
+
+function switchFoodTab(tab) {
+  qs('restaurantsList').style.display  = tab === 'restaurants' ? 'grid' : 'none';
+  qs('dessertsList').style.display     = tab === 'desserts'    ? 'grid' : 'none';
+  qs('photoSpotsList').style.display   = tab === 'photo'       ? 'grid' : 'none';
+  var active = 'background:rgba(244,99,74,0.25);color:#F4634A;';
+  var idle   = 'background:rgba(255,255,255,0.07);color:rgba(241,245,249,0.5);';
+  qs('tabResBtn').style.cssText   += tab==='restaurants' ? active : idle;
+  qs('tabDesBtn').style.cssText   += tab==='desserts'    ? active : idle;
+  qs('tabPhotoBtn').style.cssText += tab==='photo'       ? active : idle;
+  if (tab === 'desserts'  && !qs('dessertsList').children.length)   renderDesserts();
+  if (tab === 'photo'     && !qs('photoSpotsList').children.length) renderPhotoSpots();
+}
+
+function renderDesserts() {
+  var list = qs('dessertsList');
+  if (!list) return;
+  var LEVEL_LABELS = ['','💰 זול (עד 100 CZK)','💰💰 בינוני (100–300 CZK)','💰💰💰 יקר'];
+  var LEVEL_COLORS = ['','rgba(5,150,105,0.18)','rgba(245,158,11,0.14)','rgba(239,68,68,0.14)'];
+  var LEVEL_BORDER = ['','rgba(5,150,105,0.4)','rgba(245,158,11,0.35)','rgba(239,68,68,0.35)'];
+  var LEVEL_TXT   = ['','#6EE7B7','#FCD34D','#FCA5A5'];
+  var lastLevel = 0, html = '';
+  DESSERTS.forEach(function(d) {
+    var lv = d.level || 1;
+    if (lv !== lastLevel) {
+      html += '<div style="display:flex;align-items:center;gap:10px;margin:' + (lastLevel?'18px':'4px') + ' 0 10px;">' +
+        '<div style="flex:1;height:1px;background:rgba(255,255,255,0.1);"></div>' +
+        '<div style="font-size:11px;font-weight:800;color:' + LEVEL_TXT[lv] + ';background:' + LEVEL_COLORS[lv] + ';border:1px solid ' + LEVEL_BORDER[lv] + ';border-radius:999px;padding:3px 12px;white-space:nowrap;">' + LEVEL_LABELS[lv] + '</div>' +
+        '<div style="flex:1;height:1px;background:rgba(255,255,255,0.1);"></div></div>';
+      lastLevel = lv;
+    }
+    html += '<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:20px;padding:16px;margin-bottom:10px;">' +
+      '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;">' +
+        '<span style="font-size:28px;line-height:1;flex-shrink:0;">' + d.icon + '</span>' +
+        '<div style="flex:1;">' +
+          '<div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:2px;">' +
+            '<div style="font-size:14px;font-weight:800;color:#F1F5F9;">' + esc(d.name) + '</div>' +
+            '<div style="background:rgba(255,255,255,0.08);border-radius:999px;padding:2px 9px;font-size:10px;font-weight:800;color:' + d.tagClr + ';white-space:nowrap;">' + esc(d.tag) + '</div>' +
+          '</div>' +
+          '<div style="font-size:11px;color:rgba(241,245,249,0.45);">' + esc(d.sub) + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.7;margin-bottom:8px;">' + esc(d.desc) + '</div>' +
+      '<div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">' +
+        '<div style="font-size:13px;">' + d.rating + '</div>' +
+        '<div style="background:' + LEVEL_COLORS[lv] + ';border:1px solid ' + LEVEL_BORDER[lv] + ';border-radius:10px;padding:4px 10px;font-size:11px;font-weight:700;color:' + LEVEL_TXT[lv] + ';">' + esc(d.price) + '</div>' +
+      '</div>' +
+      '<div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:7px 11px;font-size:11px;color:rgba(241,245,249,0.45);margin-bottom:10px;">📍 ' + esc(d.where) + '</div>' +
+      '<a href="' + d.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:linear-gradient(90deg,#ec4899,#f97316);color:white;text-decoration:none;border-radius:12px;padding:10px;font-weight:800;font-size:12px;font-family:\'Rubik\',Arial,sans-serif;">🗺️ ניווט</a>' +
+    '</div>';
+  });
+  list.innerHTML = html;
+  list.style.display = 'grid';
+}
+
+function renderPhotoSpots() {
+  var list = qs('photoSpotsList');
+  if (!list) return;
+  var html = '';
+  var lastFree = null;
+  PHOTO_SPOTS.forEach(function(s) {
+    var isFree = s.fee === 0;
+    if (lastFree !== isFree) {
+      var lbl = isFree ? '📸 חינם לחלוטין' : '🎟️ כניסה בתשלום';
+      var clr = isFree ? '#6EE7B7' : '#FCD34D';
+      html += '<div style="display:flex;align-items:center;gap:10px;margin:' + (lastFree!==null?'18px':'4px') + ' 0 10px;">' +
+        '<div style="flex:1;height:1px;background:rgba(255,255,255,0.1);"></div>' +
+        '<div style="font-size:11px;font-weight:800;color:' + clr + ';background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:999px;padding:3px 12px;white-space:nowrap;">' + lbl + '</div>' +
+        '<div style="flex:1;height:1px;background:rgba(255,255,255,0.1);"></div></div>';
+      lastFree = isFree;
+    }
+    html += '<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:20px;padding:16px;margin-bottom:10px;">' +
+      '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;">' +
+        '<span style="font-size:28px;line-height:1;flex-shrink:0;">' + s.icon + '</span>' +
+        '<div style="flex:1;">' +
+          '<div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:2px;">' +
+            '<div style="font-size:14px;font-weight:800;color:#F1F5F9;">' + esc(s.name) + '</div>' +
+            '<div style="font-size:13px;">' + s.rating + '</div>' +
+          '</div>' +
+          '<div style="font-size:11px;color:rgba(241,245,249,0.45);">' + esc(s.sub) + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.7;margin-bottom:8px;">' + esc(s.desc) + '</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;">' +
+        '<div style="background:rgba(99,102,241,0.12);border-radius:10px;padding:7px 10px;font-size:11px;color:rgba(165,180,252,0.85);">🕐 ' + esc(s.best) + '</div>' +
+        '<div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:7px 10px;font-size:11px;color:rgba(241,245,249,0.55);">👥 ' + esc(s.crowds) + '</div>' +
+        '<div style="background:rgba(16,185,129,0.1);border-radius:10px;padding:7px 10px;font-size:11px;color:#6EE7B7;">💳 ' + esc(s.fee_txt) + '</div>' +
+      '</div>' +
+      '<div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:8px 11px;font-size:11px;color:#FCD34D;margin-bottom:10px;line-height:1.6;">💡 ' + esc(s.tip) + '</div>' +
+      '<a href="' + s.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:linear-gradient(90deg,#6366f1,#8b5cf6);color:white;text-decoration:none;border-radius:12px;padding:10px;font-weight:800;font-size:12px;font-family:\'Rubik\',Arial,sans-serif;">🗺️ ניווט למקום</a>' +
+    '</div>';
+  });
+  list.innerHTML = html;
+  list.style.display = 'grid';
 }
 
 // ═══════════════════════════════════════════
