@@ -395,9 +395,9 @@
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
       <button id="btnNewPhoto" style="background:linear-gradient(135deg,rgba(236,72,153,0.2),rgba(168,85,247,0.2));border:1px solid rgba(236,72,153,0.35);border-radius:16px;padding:14px 8px;font-size:12px;font-weight:800;color:#F9A8D4;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">📷 צלם תמונה</button>
-      <button id="btnBackupDrive" style="background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(59,130,246,0.2));border:1px solid rgba(16,185,129,0.35);border-radius:16px;padding:14px 8px;font-size:12px;font-weight:800;color:#6EE7B7;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">☁️ גבה ל-Drive</button>
+      <button id="btnShareAll" style="background:linear-gradient(135deg,rgba(37,211,102,0.2),rgba(59,130,246,0.2));border:1px solid rgba(37,211,102,0.35);border-radius:16px;padding:14px 8px;font-size:12px;font-weight:800;color:#86EFAC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">📤 שתף תמונות</button>
     </div>
-    <div id="driveBackupStatus" style="display:none;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:12px;padding:10px 14px;font-size:12px;color:#6EE7B7;margin-bottom:12px;text-align:center;"></div>
+    <div id="driveBackupStatus" style="display:none;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:12px;padding:10px 14px;font-size:12px;color:#6EE7B7;margin-bottom:12px;text-align:center;white-space:pre-wrap;"></div>
     <div id="photoDiaryEmpty" style="text-align:center;padding:40px 20px;color:rgba(241,245,249,0.3);font-size:13px;">עדיין אין תמונות — לחצו על הכפתור למעלה להתחיל!</div>
     <div id="photoDiaryGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div>
   </section>
@@ -1724,7 +1724,7 @@ document.addEventListener('DOMContentLoaded', function() {
     'btnHomePhotoDiary':    function() { openTab('photodiary'); renderPhotoDiary(); },
     'btnBackPhotoDiary':    function() { openTab('home'); },
     'btnNewPhoto':          function() { openPhotoModal(null); },
-    'btnBackupDrive':       function() { backupAllToDrive(); },
+    'btnShareAll':          function() { shareAllPhotos(); },
     'btnSavePhoto':         function() { savePhotoEntry(); }
   };
 
@@ -1936,53 +1936,47 @@ function compressForDrive(dataUrl, cb) {
   img.src = dataUrl;
 }
 
-function backupAllToDrive() {
-  if (!isGas()) { toast('⚠️ גיבוי ל-Drive עובד רק דרך האפליקציה המקוונת'); return; }
+function shareAllPhotos() {
   var statusEl = qs('driveBackupStatus');
   dbGetAllPhotos(function(photos) {
-    var unsynced = photos.filter(function(p) { return !p.driveId; });
-    if (!unsynced.length) {
-      if (statusEl) { statusEl.style.display = 'block'; statusEl.textContent = '✅ כל התמונות כבר מגובות ב-Drive!'; }
+    if (!photos.length) {
+      toast('אין תמונות לשיתוף');
       return;
     }
-    if (statusEl) { statusEl.style.display = 'block'; statusEl.textContent = '☁️ מגבה ' + unsynced.length + ' תמונות...'; }
-    var done = 0, failed = 0, lastErr = '';
-    function next(i) {
-      if (i >= unsynced.length) {
-        var msg = done > 0 ? '✅ ' + done + ' תמונות נשמרו ב-Google Drive' : '⚠️ לא נשמר כלום';
-        if (failed) msg += ' | ' + failed + ' נכשלו';
-        if (lastErr) msg += '\nשגיאה: ' + lastErr;
-        if (statusEl) { statusEl.style.whiteSpace = 'pre-wrap'; statusEl.textContent = msg; }
-        if (done > 0) toast('✅ ' + done + ' תמונות ב-Drive');
-        renderPhotoDiary();
-        return;
-      }
-      var p = unsynced[i];
-      if (statusEl) statusEl.textContent = '☁️ שולח ' + (i+1) + '/' + unsynced.length + ': ' + (p.place || '?') + '...';
-      if (!p.dataUrl) { lastErr = 'dataUrl ריק לתמונה ' + (i+1); failed++; next(i+1); return; }
-      compressForDrive(p.dataUrl, function(smallDataUrl) {
-        if (!smallDataUrl) { lastErr = 'דחיסה נכשלה לתמונה ' + (i+1); failed++; next(i+1); return; }
-        google.script.run
-          .withSuccessHandler(function(r) {
-            if (r && r.ok) {
-              p.driveId  = r.id;
-              p.driveUrl = r.url;
-              dbUpdatePhoto(p, function() { done++; next(i+1); });
-            } else {
-              lastErr = (r && r.error) || 'שגיאה לא ידועה';
-              console.error('Drive save failed:', lastErr);
-              failed++; next(i+1);
-            }
-          })
-          .withFailureHandler(function(err) {
-            lastErr = (err && err.message) || 'שגיאת חיבור';
-            console.error('GAS call failed:', lastErr);
-            failed++; next(i+1);
-          })
-          .savePhotoToDrive(smallDataUrl, p.place, p.note || '', p.ts);
+    if (!navigator.share) {
+      toast('⚠️ דפדפן זה לא תומך בשיתוף — נסו מ-Safari');
+      return;
+    }
+    if (statusEl) { statusEl.style.display = 'block'; statusEl.textContent = '⏳ מכין תמונות לשיתוף...'; }
+    var files = [];
+    var pending = photos.length;
+    photos.forEach(function(p, idx) {
+      var dataUrl = p.dataUrl;
+      if (!dataUrl) { pending--; if (pending === 0) doShare(); return; }
+      fetch(dataUrl)
+        .then(function(r) { return r.blob(); })
+        .then(function(blob) {
+          var ext  = blob.type === 'image/png' ? '.png' : '.jpg';
+          var name = (p.place || 'photo').replace(/[^\w֐-׾]/g,'_').substring(0,40) + '_' + idx + ext;
+          files.push(new File([blob], name, { type: blob.type }));
+          pending--;
+          if (pending === 0) doShare();
+        })
+        .catch(function() { pending--; if (pending === 0) doShare(); });
+    });
+    function doShare() {
+      if (!files.length) { toast('⚠️ לא הצלחנו להכין תמונות'); if (statusEl) statusEl.style.display = 'none'; return; }
+      if (statusEl) statusEl.style.display = 'none';
+      navigator.share({
+        title: 'פראג 2026 — משפחת שיש 🏰',
+        text: 'תמונות מהטיול שלנו לפראג! 📸',
+        files: files
+      }).then(function() {
+        toast('✅ שותף בהצלחה!');
+      }).catch(function(err) {
+        if (err.name !== 'AbortError') toast('⚠️ שיתוף בוטל');
       });
     }
-    next(0);
   });
 }
 
@@ -2088,7 +2082,7 @@ function renderPhotoDiary() {
           (p.note ? '<div style="font-size:10px;color:rgba(241,245,249,0.55);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(p.note) + '</div>' : '') +
         '</div>' +
         '<button onclick="deletePhoto(' + p.id + ')" style="position:absolute;top:6px;left:6px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;width:26px;height:26px;font-size:12px;cursor:pointer;color:white;">🗑</button>' +
-        (p.driveId ? '<div style="position:absolute;top:6px;right:6px;background:rgba(16,185,129,0.85);border-radius:999px;padding:2px 7px;font-size:9px;font-weight:800;color:white;">☁️</div>' : '<div style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.55);border-radius:999px;padding:2px 7px;font-size:9px;color:rgba(255,255,255,0.5);">לא מגובה</div>') +
+        '<button onclick="sharePhoto(' + p.id + ')" style="position:absolute;top:36px;left:6px;background:rgba(37,211,102,0.75);border:none;border-radius:50%;width:26px;height:26px;font-size:12px;cursor:pointer;color:white;">📤</button>' +
         gpsTag +
       '</div>';
     }).join('');
@@ -2098,6 +2092,28 @@ function renderPhotoDiary() {
 function deletePhoto(id) {
   if (!confirm('למחוק תמונה זו?')) return;
   dbDeletePhoto(id, function() { renderPhotoDiary(); toast('🗑 נמחקה'); });
+}
+
+function sharePhoto(id) {
+  if (!navigator.share) { toast('⚠️ שיתוף לא נתמך — נסו מ-Safari'); return; }
+  openPhotoDB(function(db) {
+    var tx = db.transaction('photos','readonly');
+    var req = tx.objectStore('photos').get(id);
+    req.onsuccess = function() {
+      var p = req.result;
+      if (!p || !p.dataUrl) { toast('⚠️ תמונה לא נמצאה'); return; }
+      fetch(p.dataUrl).then(function(r){ return r.blob(); }).then(function(blob) {
+        var ext  = blob.type === 'image/png' ? '.png' : '.jpg';
+        var name = (p.place || 'photo').replace(/[^\w֐-׾]/g,'_').substring(0,40) + ext;
+        var file = new File([blob], name, { type: blob.type });
+        navigator.share({
+          title: 'פראג 2026 — ' + (p.place || ''),
+          text: (p.place || '') + (p.note ? ' | ' + p.note : '') + ' 📍',
+          files: [file]
+        }).catch(function(e){ if (e.name !== 'AbortError') toast('שיתוף בוטל'); });
+      });
+    };
+  });
 }
 
 function openPhotoViewer(id) {
