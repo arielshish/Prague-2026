@@ -251,21 +251,20 @@ function doTranslate() {
 
 function speakResult() { if (lastTranslation) speak(lastTranslation, tgtLang); }
 
-var currentAudio = null;
 function speak(text, lang) {
-  if (currentAudio) { currentAudio.pause(); currentAudio = null; }
-  var tl = lang === 'cs' ? 'cs' : 'he';
-  var url = 'https://translate.googleapis.com/translate_tts?ie=UTF-8&q=' + encodeURIComponent(text) + '&tl=' + tl + '&client=tw-ob';
-  var audio = new Audio(url);
-  audio.volume = 1;
-  currentAudio = audio;
-  audio.onended = function() { setStatus('✅ סיים'); };
-  audio.onerror = function() { setStatus('⚠️ שגיאת השמעה'); };
-  audio.play().then(function() {
-    setStatus('🔊 מנגן...');
-  }).catch(function(e) {
-    setStatus('⚠️ ' + e.message);
-  });
+  if (!window.speechSynthesis) { setStatus('⚠️ TTS לא נתמך'); return; }
+  window.speechSynthesis.cancel();
+  var utt = new SpeechSynthesisUtterance(text);
+  utt.lang = lang === 'cs' ? 'cs-CZ' : 'he-IL';
+  utt.rate = 0.85;
+  utt.volume = 1;
+  utt.onstart = function() { setStatus('🔊 מנגן...'); };
+  utt.onend   = function() { setStatus('✅ סיים'); };
+  utt.onerror = function(e) { setStatus('⚠️ ' + e.error); };
+  var voices = window.speechSynthesis.getVoices();
+  var match = voices.find(function(v){ return v.lang.startsWith(lang==='cs'?'cs':'he'); });
+  if (match) utt.voice = match;
+  window.speechSynthesis.speak(utt);
 }
 
 function toggleMic() {
@@ -327,7 +326,15 @@ function doClear() {
 function setStatus(msg) { document.getElementById('status').textContent = msg; }
 
 function testAudio() {
-  speak('Děkuji', 'cs');
+  if (!window.speechSynthesis) { setStatus('⚠️ אין TTS'); return; }
+  window.speechSynthesis.cancel();
+  var utt = new SpeechSynthesisUtterance('Hello one two three');
+  utt.lang = 'en-US';
+  utt.volume = 1;
+  utt.onstart = function() { setStatus('🔊 מנגן...'); };
+  utt.onend   = function() { setStatus('✅ קול עבד! נסה עכשיו ביטוי צ\'כי'); };
+  utt.onerror = function(e) { setStatus('⚠️ ' + e.error); };
+  window.speechSynthesis.speak(utt);
 }
 
 window.addEventListener('DOMContentLoaded', init);
