@@ -168,6 +168,9 @@
 
   </div>
 
+  <div style="text-align:center;padding:8px;">
+    <button onclick="testAudio()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:8px 18px;font-size:11px;color:rgba(241,245,249,0.4);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🔈 בדיקת קול (Hello)</button>
+  </div>
   <a href="https://script.google.com/macros/s/AKfycbyR8p3GbMaOnJ5_47acO_Ejo4-rkL_r_Iw-n2PY5mNWnOTZZmhlaukzXuJyDe2QQjMC/exec" class="back-link">← חזרה לאפליקציה</a>
 </div>
 
@@ -259,15 +262,26 @@ function doTranslate() {
 function speakResult() { if (lastTranslation) speak(lastTranslation, tgtLang); }
 
 function speak(text, lang) {
-  if (!window.speechSynthesis) return;
+  if (!window.speechSynthesis) { alert('TTS לא נתמך'); return; }
   window.speechSynthesis.cancel();
   var utt = new SpeechSynthesisUtterance(text);
   utt.lang = lang === 'cs' ? 'cs-CZ' : 'he-IL';
-  utt.rate = 0.88;
+  utt.rate = 0.82;
+  utt.volume = 1;
+  utt.onerror = function(e) { setStatus('⚠️ שגיאת קול: ' + e.error); };
+  utt.onend = function() { setStatus('✅ סיים'); };
+
   var voices = window.speechSynthesis.getVoices();
-  var match = voices.find(function(v) { return v.lang.startsWith(lang === 'cs' ? 'cs' : 'he'); });
-  if (match) utt.voice = match;
+  var targetLang = lang === 'cs' ? 'cs' : 'he';
+  var match = voices.find(function(v) { return v.lang.startsWith(targetLang); });
+  if (!match) {
+    // fallback: try en voice with text as-is
+    setStatus('💡 אין קול ' + (lang === 'cs' ? 'צ\'כי' : 'עברי') + ' — מנסה ברירת מחדל');
+  } else {
+    utt.voice = match;
+  }
   window.speechSynthesis.speak(utt);
+  setStatus('🔊 מנגן...');
 }
 
 function toggleMic() {
@@ -327,6 +341,17 @@ function doClear() {
 }
 
 function setStatus(msg) { document.getElementById('status').textContent = msg; }
+
+function testAudio() {
+  var utt = new SpeechSynthesisUtterance('Hello, audio test');
+  utt.lang = 'en-US';
+  utt.volume = 1;
+  utt.onerror = function(e) { setStatus('⚠️ שגיאה: ' + e.error); };
+  utt.onend = function() { setStatus('✅ קול עבד! עכשיו נסה צ\'כית'); };
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utt);
+  setStatus('🔊 בדיקה...');
+}
 
 window.addEventListener('DOMContentLoaded', init);
 </script>
