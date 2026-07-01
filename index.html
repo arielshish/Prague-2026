@@ -120,11 +120,36 @@
   <section id="days" class="tab">
     <div class="card card-hdr">
       <div><h2 style="font-size:18px;font-weight:900;">📅 מסלול ימים</h2><p style="font-size:12px;color:rgba(241,245,249,0.5);margin-top:3px;">8–15 אוגוסט 2026</p></div>
-      <button class="back-btn" id="btnBackDays">← ראשי</button>
+      <div style="display:flex;gap:6px;">
+        <button class="back-btn" id="btnSyncDays">☁️</button>
+        <button class="back-btn" id="btnBackDays">← ראשי</button>
+      </div>
     </div>
     <div id="dayButtons" style="display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
     <div id="dayCard" class="card"></div>
   </section>
+
+  <!-- מודל הוספת תחנה ליום -->
+  <div id="addStopModal" style="display:none;position:fixed;inset:0;z-index:80;align-items:flex-end;justify-content:center;">
+    <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);" id="addStopOverlay"></div>
+    <div style="position:relative;background:linear-gradient(160deg,#1e293b,#0f172a);border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;z-index:1;">
+      <h2 id="addStopTitle" style="margin:0 0 14px;font-size:17px;font-weight:900;color:#F1F5F9;">➕ הוסף תחנה</h2>
+      <input id="addStopEmoji" type="text" maxlength="4" placeholder="😀" style="width:56px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:11px 10px;font-size:22px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;text-align:center;box-sizing:border-box;margin-bottom:10px;">
+      <input id="addStopName" type="text" placeholder="שם המקום" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:12px 14px;font-size:14px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:10px;">
+      <input id="addStopTime" type="text" placeholder="⏱ זמן (לדוג׳ 2-3 שעות)" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:12px 14px;font-size:14px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:10px;">
+      <textarea id="addStopDesc" placeholder="תיאור קצר..." style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:12px 14px;font-size:13px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;resize:none;height:70px;margin-bottom:14px;"></textarea>
+      <button id="btnSaveAddStop" class="btn-primary" style="width:100%;">✅ הוסף</button>
+    </div>
+  </div>
+
+  <!-- מודל העברת תחנה ליום אחר -->
+  <div id="moveStopModal" style="display:none;position:fixed;inset:0;z-index:80;align-items:flex-end;justify-content:center;">
+    <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);" id="moveStopOverlay"></div>
+    <div style="position:relative;background:linear-gradient(160deg,#1e293b,#0f172a);border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;z-index:1;">
+      <h2 style="margin:0 0 14px;font-size:17px;font-weight:900;color:#F1F5F9;">↔️ העבר לאיזה יום?</h2>
+      <div id="moveDayPicker" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;"></div>
+    </div>
+  </div>
 
   <!-- ═══ SHOPPING ═══ -->
   <section id="shopping" class="tab">
@@ -543,6 +568,7 @@ function openTab(id) {
     if (btn) btn.style.color = name === id ? '#F4634A' : 'rgba(241,245,249,0.38)';
   });
   if (id === 'expenses') { loadExpenses(); syncBudgetFromSheets(); }
+  if (id === 'days') renderDays();
   if (id === 'pack') loadPack();
   if (id === 'restaurants') renderRestaurants();
 }
@@ -550,13 +576,53 @@ function openTab(id) {
 // ═══════════════════════════════════════════
 //  DAYS
 // ═══════════════════════════════════════════
+var DAYS_STATE = null; // deep clone of DAYS, mutable
+var _moveStopFrom = null; // {dayIdx, stopIdx}
+
+function getDaysState() {
+  if (!DAYS_STATE) {
+    var saved = null;
+    try { saved = JSON.parse(localStorage.getItem('prague_days_v1') || 'null'); } catch(e) {}
+    DAYS_STATE = saved || JSON.parse(JSON.stringify(DAYS));
+  }
+  return DAYS_STATE;
+}
+
+function saveDaysState() {
+  localStorage.setItem('prague_days_v1', JSON.stringify(DAYS_STATE));
+  if (isGas()) {
+    google.script.run
+      .withSuccessHandler(function(r) { if (r && r.ok) toast('☁️ ימים סונכרנו!'); })
+      .withFailureHandler(function() { toast('⚠️ שמור מקומית בלבד'); })
+      .saveDaysCustom(DAYS_STATE);
+  }
+}
+
+function loadDaysFromSheets() {
+  if (!isGas()) { renderDays(); return; }
+  toast('🔄 מסנכרן...');
+  google.script.run
+    .withSuccessHandler(function(r) {
+      if (r && r.ok && r.data) {
+        DAYS_STATE = r.data;
+        localStorage.setItem('prague_days_v1', JSON.stringify(DAYS_STATE));
+      } else {
+        DAYS_STATE = getDaysState();
+      }
+      renderDays();
+    })
+    .withFailureHandler(function() { DAYS_STATE = getDaysState(); renderDays(); })
+    .loadDaysCustom();
+}
+
 function selectDay(i) { currentDay = i; renderDays(); }
 
 function renderDays() {
+  var state = getDaysState();
   var i = currentDay || 1;
   var btnContainer = qs('dayButtons');
   if (!btnContainer) return;
-  btnContainer.innerHTML = DAYS.map(function(d, idx) {
+  btnContainer.innerHTML = state.map(function(d, idx) {
     var a = idx + 1 === i;
     return '<button data-day="' + (idx+1) + '" style="min-width:42px;border:0;border-radius:12px;padding:7px 8px;background:' +
       (a ? '#F4634A' : 'rgba(255,255,255,0.09)') + ';color:' + (a ? 'white' : 'rgba(241,245,249,0.55)') +
@@ -566,38 +632,110 @@ function renderDays() {
   btnContainer.querySelectorAll('button[data-day]').forEach(function(btn) {
     btn.addEventListener('click', function() { selectDay(Number(this.getAttribute('data-day'))); });
   });
-  var d = DAYS[i - 1];
+  var d = state[i - 1];
   var card = qs('dayCard');
   if (!card) return;
-  var stopsHtml = d.stops.map(function(s) {
+  var stopsHtml = (d.stops || []).map(function(s, si) {
     return '<div style="position:relative;margin-bottom:10px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.13);border-radius:14px;padding:13px;margin-right:16px;">' +
       '<div style="position:absolute;right:-20px;top:16px;width:8px;height:8px;border-radius:50%;background:#F4634A;box-shadow:0 0 7px rgba(244,99,74,0.55);"></div>' +
       '<div style="display:flex;align-items:flex-start;gap:10px;">' +
-      '<div style="font-size:22px;line-height:1;margin-top:1px;flex-shrink:0;">' + s.emoji + '</div>' +
-      '<div style="flex:1;"><div style="font-size:13px;font-weight:800;color:#F1F5F9;margin-bottom:2px;">' + esc(s.name) + '</div>' +
-      '<div style="font-size:11px;color:rgba(241,245,249,0.42);margin-bottom:6px;">⏱️ ' + esc(s.time) + '</div>' +
-      '<div style="font-size:12px;color:rgba(241,245,249,0.6);margin-bottom:8px;">' + esc(s.desc) + '</div>' +
-      '<a href="' + s.mapUrl + '" target="_blank" rel="noopener" class="nav-map-btn">🗺️ נווט</a>' +
+      '<div style="font-size:22px;line-height:1;margin-top:1px;flex-shrink:0;">' + (s.emoji||'📍') + '</div>' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:2px;">' +
+          '<div style="font-size:13px;font-weight:800;color:#F1F5F9;">' + esc(s.name) + '</div>' +
+          '<div style="display:flex;gap:4px;flex-shrink:0;">' +
+            '<button onclick="openMoveStop(' + (i-1) + ',' + si + ')" style="background:rgba(59,130,246,0.18);border:none;border-radius:7px;padding:3px 7px;font-size:10px;color:#93C5FD;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">↔</button>' +
+            '<button onclick="deleteStop(' + (i-1) + ',' + si + ')" style="background:rgba(239,68,68,0.15);border:none;border-radius:7px;padding:3px 7px;font-size:10px;color:#FCA5A5;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">✕</button>' +
+          '</div>' +
+        '</div>' +
+        '<div style="font-size:11px;color:rgba(241,245,249,0.42);margin-bottom:6px;">⏱️ ' + esc(s.time||'') + '</div>' +
+        '<div style="font-size:12px;color:rgba(241,245,249,0.6);margin-bottom:8px;">' + esc(s.desc||'') + '</div>' +
+        (s.mapUrl ? '<a href="' + s.mapUrl + '" target="_blank" rel="noopener" class="nav-map-btn">🗺️ נווט</a>' : '') +
       '</div></div></div>';
   }).join('');
-  var tipsHtml = d.tips.map(function(t) {
+  var tipsHtml = (d.tips || []).map(function(t) {
     return '<div style="font-size:12px;color:rgba(241,245,249,0.65);padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.06);">💡 ' + esc(t) + '</div>';
   }).join('');
   card.innerHTML =
     '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">' +
-    '<span style="font-size:28px;">' + d.emoji + '</span>' +
-    '<div><div style="font-size:15px;font-weight:900;color:#F1F5F9;">' + esc(d.title) + '</div>' +
-    '<div style="font-size:12px;color:rgba(241,245,249,0.42);">📅 ' + esc(d.date) + '</div></div></div>' +
-    '<p style="font-size:12px;color:rgba(241,245,249,0.55);line-height:1.6;margin-bottom:4px;">' + esc(d.story) + '</p>' +
-    '<div style="background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.2);border-radius:12px;padding:8px 12px;margin:10px 0;font-size:12px;color:#FCD34D;font-weight:600;">⭐ ' + esc(d.peak) + '</div>' +
+    '<span style="font-size:28px;">' + (d.emoji||'📅') + '</span>' +
+    '<div><div style="font-size:15px;font-weight:900;color:#F1F5F9;">' + esc(d.title||'') + '</div>' +
+    '<div style="font-size:12px;color:rgba(241,245,249,0.42);">📅 ' + esc(d.date||'') + '</div></div></div>' +
+    '<p style="font-size:12px;color:rgba(241,245,249,0.55);line-height:1.6;margin-bottom:4px;">' + esc(d.story||'') + '</p>' +
+    (d.peak ? '<div style="background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.2);border-radius:12px;padding:8px 12px;margin:10px 0;font-size:12px;color:#FCD34D;font-weight:600;">⭐ ' + esc(d.peak) + '</div>' : '') +
     '<div style="font-size:11px;font-weight:800;color:#F4634A;letter-spacing:0.5px;text-transform:uppercase;margin:14px 0 8px;">🧭 מסלול היום</div>' +
     '<div style="padding-right:20px;border-right:2px dashed rgba(244,99,74,0.3);">' + stopsHtml + '</div>' +
-    '<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:12px;margin-top:12px;">' +
+    '<button onclick="openAddStop(' + (i-1) + ')" style="width:100%;background:rgba(255,255,255,0.05);border:1px dashed rgba(255,255,255,0.2);border-radius:13px;padding:10px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.5);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;margin:8px 0 12px;">➕ הוסף תחנה</button>' +
+    (d.meals ? '<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:12px;margin-top:4px;">' +
     '<div style="font-size:11px;font-weight:800;color:#93C5FD;margin-bottom:7px;text-transform:uppercase;letter-spacing:0.5px;">🍽️ ארוחות</div>' +
-    '<div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.7;"><strong style="color:rgba(241,245,249,0.82);">צהריים:</strong> ' + esc(d.meals.lunch) + '<br><strong style="color:rgba(241,245,249,0.82);">ערב:</strong> ' + esc(d.meals.dinner) + '</div></div>' +
-    '<div style="margin-top:10px;"><div style="font-size:11px;font-weight:800;color:#6EE7B7;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">💡 טיפים</div>' + tipsHtml + '</div>' +
-    '<a href="' + d.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:12px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;margin-top:14px;">🗺️ מסלול מלא במפה</a>';
+    '<div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.7;"><strong style="color:rgba(241,245,249,0.82);">צהריים:</strong> ' + esc(d.meals.lunch||'') + '<br><strong style="color:rgba(241,245,249,0.82);">ערב:</strong> ' + esc(d.meals.dinner||'') + '</div></div>' : '') +
+    (tipsHtml ? '<div style="margin-top:10px;"><div style="font-size:11px;font-weight:800;color:#6EE7B7;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">💡 טיפים</div>' + tipsHtml + '</div>' : '') +
+    (d.mapUrl ? '<a href="' + d.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:12px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;margin-top:14px;">🗺️ מסלול מלא במפה</a>' : '');
 }
+
+function deleteStop(dayIdx, stopIdx) {
+  if (!confirm('למחוק תחנה זו?')) return;
+  getDaysState()[dayIdx].stops.splice(stopIdx, 1);
+  saveDaysState();
+  renderDays();
+  toast('🗑️ תחנה נמחקה');
+}
+
+function openAddStop(dayIdx) {
+  _moveStopFrom = null;
+  var title = qs('addStopTitle');
+  if (title) title.textContent = '➕ הוסף תחנה — יום ' + (dayIdx + 1);
+  ['addStopEmoji','addStopName','addStopTime','addStopDesc'].forEach(function(id) { var el = qs(id); if (el) el.value = ''; });
+  qs('btnSaveAddStop').setAttribute('data-day', dayIdx);
+  var m = qs('addStopModal'); if (m) { m.style.display = 'flex'; setTimeout(function() { var n = qs('addStopName'); if (n) n.focus(); }, 100); }
+}
+
+function saveAddStop() {
+  var dayIdx = Number(qs('btnSaveAddStop').getAttribute('data-day'));
+  var name = (qs('addStopName').value || '').trim();
+  if (!name) { toast('חסר שם המקום'); return; }
+  var stop = {
+    emoji: (qs('addStopEmoji').value || '📍').trim() || '📍',
+    name: name,
+    time: (qs('addStopTime').value || '').trim(),
+    desc: (qs('addStopDesc').value || '').trim(),
+    mapUrl: ''
+  };
+  getDaysState()[dayIdx].stops.push(stop);
+  saveDaysState();
+  closeAddStopModal();
+  renderDays();
+  toast('✅ תחנה נוספה!');
+}
+
+function openMoveStop(dayIdx, stopIdx) {
+  _moveStopFrom = {dayIdx: dayIdx, stopIdx: stopIdx};
+  var state = getDaysState();
+  var picker = qs('moveDayPicker');
+  if (!picker) return;
+  picker.innerHTML = state.map(function(d, idx) {
+    var isCurrent = idx === dayIdx;
+    return '<button onclick="executeMove(' + idx + ')" style="background:' + (isCurrent ? 'rgba(244,99,74,0.2)' : 'rgba(255,255,255,0.09)') + ';border:1px solid ' + (isCurrent ? 'rgba(244,99,74,0.4)' : 'rgba(255,255,255,0.15)') + ';border-radius:12px;padding:10px 6px;font-size:12px;font-weight:800;color:' + (isCurrent ? '#F4634A' : '#F1F5F9') + ';cursor:' + (isCurrent ? 'default' : 'pointer') + ';font-family:\'Rubik\',Arial,sans-serif;">' +
+      (d.emoji||'📅') + '<br><span style="font-size:10px;">' + (idx+1) + '</span></button>';
+  }).join('');
+  var m = qs('moveStopModal'); if (m) m.style.display = 'flex';
+}
+
+function executeMove(targetDayIdx) {
+  if (!_moveStopFrom) return;
+  var src = _moveStopFrom;
+  if (src.dayIdx === targetDayIdx) { closeMoveStopModal(); return; }
+  var state = getDaysState();
+  var stop = state[src.dayIdx].stops.splice(src.stopIdx, 1)[0];
+  state[targetDayIdx].stops.push(stop);
+  saveDaysState();
+  closeMoveStopModal();
+  renderDays();
+  toast('↔️ הועבר ליום ' + (targetDayIdx + 1));
+}
+
+function closeAddStopModal() { var m = qs('addStopModal'); if (m) m.style.display = 'none'; }
+function closeMoveStopModal() { var m = qs('moveStopModal'); if (m) m.style.display = 'none'; }
 
 // ═══════════════════════════════════════════
 //  SHOPPING
@@ -1054,6 +1192,10 @@ document.addEventListener('DOMContentLoaded', function() {
     'packItemOverlay':    function() { closePackItemModal(); },
     'expModalBg':         function() { closeExpense(); },
     'btnBackDays':        function() { openTab('home'); },
+    'btnSyncDays':        function() { loadDaysFromSheets(); },
+    'btnSaveAddStop':     function() { saveAddStop(); },
+    'addStopOverlay':     function() { closeAddStopModal(); },
+    'moveStopOverlay':    function() { closeMoveStopModal(); },
     'btnBackShopping':    function() { openTab('home'); },
     'btnBackExpenses':    function() { openTab('home'); },
     'btnBackFlights':     function() { openTab('home'); },
