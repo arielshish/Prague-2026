@@ -1122,18 +1122,26 @@ function savePhotoToDrive(dataUrl, place, note, timestamp) {
     var parts = dataUrl.split(',');
     if (parts.length < 2 || !parts[1]) return { ok: false, error: 'base64 part missing' };
 
-    var mime    = parts[0].split(';')[0].split(':')[1] || 'image/jpeg';
-    var ext     = mime === 'image/png' ? '.png' : '.jpg';
+    var mime     = parts[0].split(';')[0].split(':')[1] || 'image/jpeg';
+    var ext      = mime === 'image/png' ? '.png' : '.jpg';
     var safeName = (place || 'photo').replace(/[\\/:*?"<>|]/g,'_').substring(0, 80);
 
     var decoded = Utilities.base64Decode(parts[1]);
     var blob    = Utilities.newBlob(decoded, mime, safeName + '_' + timestamp + ext);
 
-    var folderName = 'Prague 2026 — Photos';
-    var folders = DriveApp.getFoldersByName(folderName);
-    var folder  = folders.hasNext() ? folders.next() : DriveApp.createFolder(folderName);
-    var file    = folder.createFile(blob);
+    // Use UserProperties to remember the folder ID (avoids getFoldersByName which needs full drive scope)
+    var props    = PropertiesService.getUserProperties();
+    var folderId = props.getProperty('prague2026_folder_id');
+    var folder;
+    if (folderId) {
+      try { folder = DriveApp.getFolderById(folderId); } catch(ignore) { folderId = null; }
+    }
+    if (!folderId) {
+      folder   = DriveApp.createFolder('Prague 2026 — Photos');
+      props.setProperty('prague2026_folder_id', folder.getId());
+    }
 
+    var file = folder.createFile(blob);
     var date = new Date(timestamp);
     var desc = (place || '') + (note ? ' — ' + note : '') + ' | ' + date.toLocaleDateString('he-IL') + ' ' + date.toLocaleTimeString('he-IL');
     file.setDescription(desc);
