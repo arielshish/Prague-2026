@@ -2432,185 +2432,266 @@ function addPragueFrame(ctx, w, h) {
   var s = w / 1080;
   ctx.save();
 
+  // ── פונקציית עזר: צללית קו הרקיע של פראג ──
+  function drawPragueSkyline(ctx, w, baseY, sc, fillColor) {
+    ctx.fillStyle = fillColor;
+    ctx.beginPath();
+    // גשר קארל — קשתות
+    ctx.moveTo(0, baseY);
+    for (var bi=0; bi<6; bi++) {
+      var bx = w*0.05 + bi*(w*0.13);
+      ctx.lineTo(bx, baseY); ctx.lineTo(bx+w*0.02, baseY-18*sc);
+      ctx.quadraticCurveTo(bx+w*0.065, baseY-32*sc, bx+w*0.11, baseY-18*sc);
+      ctx.lineTo(bx+w*0.13, baseY);
+    }
+    // טירת פראג + כנסייה
+    var cx = w*0.55;
+    ctx.lineTo(cx-100*sc, baseY);
+    ctx.lineTo(cx-100*sc, baseY-40*sc); ctx.lineTo(cx-85*sc, baseY-40*sc);
+    ctx.lineTo(cx-85*sc, baseY-70*sc); ctx.lineTo(cx-80*sc, baseY-85*sc); // מגדל
+    ctx.lineTo(cx-75*sc, baseY-70*sc); ctx.lineTo(cx-60*sc, baseY-70*sc);
+    ctx.lineTo(cx-60*sc, baseY-50*sc); ctx.lineTo(cx-30*sc, baseY-50*sc);
+    ctx.lineTo(cx-30*sc, baseY-90*sc); ctx.lineTo(cx-24*sc, baseY-110*sc); // קתדרלה
+    ctx.lineTo(cx-18*sc, baseY-90*sc); ctx.lineTo(cx+18*sc, baseY-90*sc);
+    ctx.lineTo(cx+24*sc, baseY-110*sc); ctx.lineTo(cx+30*sc, baseY-90*sc);
+    ctx.lineTo(cx+30*sc, baseY-50*sc); ctx.lineTo(cx+60*sc, baseY-50*sc);
+    ctx.lineTo(cx+60*sc, baseY-65*sc); ctx.lineTo(cx+65*sc, baseY-80*sc);
+    ctx.lineTo(cx+70*sc, baseY-65*sc); ctx.lineTo(cx+90*sc, baseY-65*sc);
+    ctx.lineTo(cx+90*sc, baseY-40*sc); ctx.lineTo(cx+100*sc, baseY-40*sc);
+    ctx.lineTo(cx+100*sc, baseY);
+    // שעון אסטרונומי — מגדל
+    var ox = w*0.83;
+    ctx.lineTo(ox-22*sc, baseY); ctx.lineTo(ox-22*sc, baseY-60*sc);
+    ctx.lineTo(ox-26*sc, baseY-60*sc); ctx.lineTo(ox-26*sc, baseY-75*sc);
+    ctx.lineTo(ox, baseY-95*sc); ctx.lineTo(ox+26*sc, baseY-75*sc);
+    ctx.lineTo(ox+26*sc, baseY-60*sc); ctx.lineTo(ox+22*sc, baseY-60*sc);
+    ctx.lineTo(ox+22*sc, baseY); ctx.lineTo(w, baseY);
+    ctx.lineTo(w, baseY+10*sc); ctx.lineTo(0, baseY+10*sc);
+    ctx.closePath(); ctx.fill();
+  }
+
   if (design === 0) {
-    // ══ עיצוב 1: CINEMATIC — גרדיאנט כהה + טירה + זהב ══
-    var gradH = h * 0.35;
-    var g = ctx.createLinearGradient(0, h - gradH, 0, h);
-    g.addColorStop(0, 'rgba(4,13,24,0)');
-    g.addColorStop(0.45, 'rgba(4,13,24,0.78)');
-    g.addColorStop(1, 'rgba(4,13,24,0.97)');
-    ctx.fillStyle = g;
-    ctx.fillRect(0, h - gradH, w, gradH);
-    var gt = ctx.createLinearGradient(0, 0, 0, h * 0.1);
-    gt.addColorStop(0, 'rgba(4,13,24,0.5)');
-    gt.addColorStop(1, 'rgba(4,13,24,0)');
-    ctx.fillStyle = gt;
-    ctx.fillRect(0, 0, w, h * 0.1);
-    // מסגרת זהב כפולה
-    ctx.strokeStyle = 'rgba(252,211,77,0.75)'; ctx.lineWidth = Math.max(4, 5*s);
-    ctx.strokeRect(ctx.lineWidth/2, ctx.lineWidth/2, w - ctx.lineWidth, h - ctx.lineWidth);
-    ctx.strokeStyle = 'rgba(252,211,77,0.28)'; ctx.lineWidth = Math.max(1, 1.5*s);
-    var ins = Math.round(12*s);
-    ctx.strokeRect(ins, ins, w - ins*2, h - ins*2);
+    // ══ עיצוב 1: GOLDEN PRAGUE — שקיעה זהובה + קו רקיע + מסגרת מלכותית ══
+    // גרדיאנט שקיעה תחתון
+    var gradH = h * 0.42;
+    var g = ctx.createLinearGradient(0, h-gradH, 0, h);
+    g.addColorStop(0,'rgba(10,8,4,0)'); g.addColorStop(0.4,'rgba(10,8,4,0.72)'); g.addColorStop(1,'rgba(4,3,2,0.97)');
+    ctx.fillStyle=g; ctx.fillRect(0,h-gradH,w,gradH);
+    // גרדיאנט כתום-זהב בשמים
+    var sky = ctx.createLinearGradient(0,0,0,h*0.45);
+    sky.addColorStop(0,'rgba(180,60,0,0.0)'); sky.addColorStop(1,'rgba(252,140,30,0.18)');
+    ctx.fillStyle=sky; ctx.fillRect(0,0,w,h*0.45);
+    // קו רקיע של פראג
+    drawPragueSkyline(ctx, w, h-gradH*0.62, s*0.9, 'rgba(252,211,77,0.13)');
     // כוכבים
-    ctx.fillStyle = 'rgba(252,211,77,0.9)';
-    [[0.07,0.05],[0.93,0.05],[0.5,0.038],[0.18,0.03],[0.8,0.03]].forEach(function(p) {
-      ctx.beginPath(); ctx.arc(p[0]*w, p[1]*h, Math.max(2,3*s), 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle='rgba(252,211,77,0.85)';
+    [[0.08,0.06],[0.92,0.055],[0.5,0.04],[0.22,0.03],[0.78,0.035],[0.38,0.055],[0.65,0.025]].forEach(function(p){
+      ctx.beginPath(); ctx.arc(p[0]*w,p[1]*h,Math.max(1.5,2.5*s),0,Math.PI*2); ctx.fill();
     });
-    // צללית טירה
-    var cx=w*0.5, cy=h-gradH*0.68, sc=s*0.95;
-    ctx.fillStyle='rgba(252,211,77,0.16)'; ctx.beginPath();
-    ctx.rect(cx-95*sc,cy,190*sc,58*sc); ctx.rect(cx-82*sc,cy-75*sc,24*sc,77*sc);
-    ctx.rect(cx-74*sc,cy-95*sc,8*sc,22*sc); ctx.rect(cx+58*sc,cy-55*sc,22*sc,57*sc);
-    ctx.rect(cx+64*sc,cy-70*sc,10*sc,17*sc); ctx.rect(cx-13*sc,cy-45*sc,26*sc,47*sc);
-    ctx.rect(cx-7*sc,cy-62*sc,14*sc,19*sc); ctx.fill();
-    ctx.shadowColor='rgba(0,0,0,0.85)'; ctx.shadowBlur=14*s;
+    // מסגרת זהב כפולה
+    ctx.strokeStyle='rgba(252,211,77,0.8)'; ctx.lineWidth=Math.max(4,5*s);
+    ctx.strokeRect(ctx.lineWidth/2,ctx.lineWidth/2,w-ctx.lineWidth,h-ctx.lineWidth);
+    ctx.strokeStyle='rgba(252,211,77,0.3)'; ctx.lineWidth=Math.max(1,1.5*s);
+    var ins=Math.round(13*s); ctx.strokeRect(ins,ins,w-ins*2,h-ins*2);
+    // פינות מעוטרות
+    var lc=Math.round(35*s), lt=Math.max(2,3*s);
+    ctx.strokeStyle='rgba(252,211,77,0.6)'; ctx.lineWidth=lt;
+    [[0,0,1,1],[w,0,-1,1],[0,h,1,-1],[w,h,-1,-1]].forEach(function(p){
+      ctx.beginPath(); ctx.moveTo(p[0]+p[2]*(ins+lc),p[1]+p[3]*ins);
+      ctx.lineTo(p[0]+p[2]*ins,p[1]+p[3]*ins); ctx.lineTo(p[0]+p[2]*ins,p[1]+p[3]*(ins+lc)); ctx.stroke();
+    });
+    // טקסט
+    ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=16*s;
     ctx.textAlign='center'; ctx.textBaseline='alphabetic';
-    ctx.font='900 '+Math.round(54*s)+'px Rubik,Arial,sans-serif';
-    ctx.fillStyle='#FFF'; ctx.fillText('משפחת שיש', w/2, h-Math.round(92*s));
-    ctx.font='700 '+Math.round(31*s)+'px Rubik,Arial,sans-serif';
-    ctx.fillStyle='#FCD34D'; ctx.fillText('כובשת את פראג ✈️ 2026', w/2, h-Math.round(52*s));
+    ctx.font='900 '+Math.round(56*s)+'px Rubik,Arial,sans-serif';
+    ctx.fillStyle='#FFF'; ctx.fillText('משפחת שיש', w/2, h-Math.round(88*s));
+    ctx.font='600 '+Math.round(28*s)+'px Rubik,Arial,sans-serif';
+    ctx.fillStyle='#FCD34D'; ctx.fillText('פראג · Prague · אוגוסט 2026', w/2, h-Math.round(50*s));
     ctx.shadowBlur=0;
-    ctx.strokeStyle='rgba(252,211,77,0.45)'; ctx.lineWidth=Math.max(1,s);
-    ctx.beginPath(); ctx.moveTo(w/2-200*s,h-112*s); ctx.lineTo(w/2+200*s,h-112*s); ctx.stroke();
+    ctx.strokeStyle='rgba(252,211,77,0.5)'; ctx.lineWidth=Math.max(1,s);
+    ctx.beginPath(); ctx.moveTo(w/2-180*s,h-108*s); ctx.lineTo(w/2+180*s,h-108*s); ctx.stroke();
 
   } else if (design === 1) {
-    // ══ עיצוב 2: POLAROID — רקע לבן תחתון, טקסט שחור ══
-    var pb = Math.round(h * 0.2); // גובה הפס הלבן
-    ctx.fillStyle = '#FFFEF7';
-    ctx.fillRect(0, h - pb, w, pb);
-    // צל פנימי עדין
-    var ps = ctx.createLinearGradient(0, h - pb, 0, h - pb + pb*0.3);
-    ps.addColorStop(0, 'rgba(0,0,0,0.06)'); ps.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = ps; ctx.fillRect(0, h - pb, w, pb*0.3);
-    // מסגרת לבנה מסביב לתמונה
-    ctx.strokeStyle = '#FFFEF7'; ctx.lineWidth = Math.round(16*s);
-    ctx.strokeRect(ctx.lineWidth/2, ctx.lineWidth/2, w-ctx.lineWidth, h-ctx.lineWidth);
-    // טקסט שחור
-    ctx.shadowColor='rgba(0,0,0,0.15)'; ctx.shadowBlur=4*s;
+    // ══ עיצוב 2: POLAROID PRAGUE — פולארויד עם גשר קארל ══
+    var pb = Math.round(h * 0.22);
+    ctx.fillStyle='#FFFEF5';
+    ctx.fillRect(0,h-pb,w,pb);
+    var ps=ctx.createLinearGradient(0,h-pb,0,h-pb+pb*0.25);
+    ps.addColorStop(0,'rgba(0,0,0,0.07)'); ps.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=ps; ctx.fillRect(0,h-pb,w,pb*0.25);
+    // מסגרת לבנה
+    ctx.strokeStyle='#FFFEF5'; ctx.lineWidth=Math.round(18*s);
+    ctx.strokeRect(ctx.lineWidth/2,ctx.lineWidth/2,w-ctx.lineWidth,h-ctx.lineWidth);
+    // קו רקיע קטן בפס הלבן
+    ctx.save();
+    ctx.fillStyle='rgba(90,60,20,0.12)';
+    ctx.beginPath();
+    // קשתות גשר קארל מיניאטורי
+    var bY=h-pb*0.72, bSc=s*0.55;
+    ctx.moveTo(w*0.05,bY);
+    for(var bi2=0;bi2<7;bi2++){
+      var bx2=w*0.05+bi2*(w*0.13);
+      ctx.lineTo(bx2,bY); ctx.lineTo(bx2+w*0.015,bY-14*bSc);
+      ctx.quadraticCurveTo(bx2+w*0.065,bY-26*bSc,bx2+w*0.115,bY-14*bSc);
+      ctx.lineTo(bx2+w*0.13,bY);
+    }
+    ctx.lineTo(w*0.96,bY); ctx.lineTo(w*0.96,bY+8*bSc); ctx.lineTo(w*0.04,bY+8*bSc);
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+    // טקסט
+    ctx.shadowColor='rgba(0,0,0,0.12)'; ctx.shadowBlur=4*s;
     ctx.textAlign='center'; ctx.textBaseline='alphabetic';
-    ctx.font='900 '+Math.round(44*s)+'px Rubik,Arial,sans-serif';
-    ctx.fillStyle='#1a1a2e'; ctx.fillText('משפחת שיש', w/2, h-Math.round(pb*0.48));
-    ctx.font='500 '+Math.round(25*s)+'px Rubik,Arial,sans-serif';
-    ctx.fillStyle='#4a4a7a'; ctx.fillText('Prague · August 2026', w/2, h-Math.round(pb*0.18));
-    // פרחי דקורציה
-    ctx.shadowBlur=0; ctx.font=Math.round(28*s)+'px Arial';
-    ctx.fillText('🏰', w*0.15, h-Math.round(pb*0.28));
-    ctx.fillText('✈️', w*0.85, h-Math.round(pb*0.28));
-    // קו ורוד/זהב דק
-    ctx.strokeStyle='#d4a843'; ctx.lineWidth=Math.max(1,2*s);
-    ctx.beginPath(); ctx.moveTo(w*0.25,h-Math.round(pb*0.62)); ctx.lineTo(w*0.75,h-Math.round(pb*0.62)); ctx.stroke();
+    ctx.font='900 '+Math.round(46*s)+'px Rubik,Arial,sans-serif';
+    ctx.fillStyle='#1a1520'; ctx.fillText('משפחת שיש 🏰', w/2, h-Math.round(pb*0.44));
+    ctx.font='500 '+Math.round(24*s)+'px Rubik,Arial,sans-serif';
+    ctx.fillStyle='#5a3e1b'; ctx.fillText('Charles Bridge · Prague · 2026', w/2, h-Math.round(pb*0.14));
+    ctx.shadowBlur=0;
+    ctx.strokeStyle='#c8962a'; ctx.lineWidth=Math.max(1,2*s);
+    ctx.beginPath(); ctx.moveTo(w*0.2,h-pb*0.58); ctx.lineTo(w*0.8,h-pb*0.58); ctx.stroke();
 
   } else if (design === 2) {
-    // ══ עיצוב 3: FILM STRIP — פס קולנועי שחור ══
-    var fh = Math.round(h * 0.13);
-    // פסים שחורים
-    ctx.fillStyle='rgba(0,0,0,0.92)';
-    ctx.fillRect(0, 0, w, fh);
-    ctx.fillRect(0, h-fh, w, fh);
-    // חורי פילם
-    ctx.fillStyle='rgba(255,255,255,0.12)';
-    var holes=8, hw=Math.round(22*s), hh=Math.round(16*s), hy=(fh-hh)/2;
-    for(var i=0;i<holes;i++){
-      var hx=Math.round((w/(holes+1))*(i+1)-hw/2);
-      ctx.beginPath(); ctx.roundRect(hx,hy,hw,hh,Math.round(3*s)); ctx.fill();
-      ctx.beginPath(); ctx.roundRect(hx,h-fh+hy,hw,hh,Math.round(3*s)); ctx.fill();
-    }
-    // טקסט למעלה
-    ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=8*s;
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.font='300 '+Math.round(22*s)+'px Rubik,Arial,sans-serif';
-    ctx.fillStyle='rgba(255,255,255,0.7)'; ctx.letterSpacing='0.2em';
-    ctx.fillText('★  SHISH FAMILY  ★', w/2, fh/2);
-    // טקסט תחתון
-    ctx.font='800 '+Math.round(34*s)+'px Rubik,Arial,sans-serif';
-    ctx.fillStyle='#FCD34D'; ctx.fillText('פראג 2026', w/2, h-fh*0.55);
+    // ══ עיצוב 3: NIGHT PRAGUE — לילה כחול + קו רקיע זוהר ══
+    // שמים כחול-כהה
+    var nightG = ctx.createLinearGradient(0,0,0,h*0.5);
+    nightG.addColorStop(0,'rgba(5,10,35,0.85)'); nightG.addColorStop(1,'rgba(5,10,35,0)');
+    ctx.fillStyle=nightG; ctx.fillRect(0,0,w,h*0.5);
+    // ירח
+    ctx.fillStyle='rgba(255,240,160,0.85)';
+    ctx.beginPath(); ctx.arc(w*0.85,h*0.1,Math.round(28*s),0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='rgba(5,10,35,0.85)';
+    ctx.beginPath(); ctx.arc(w*0.875,h*0.088,Math.round(24*s),0,Math.PI*2); ctx.fill();
+    // כוכבים
+    ctx.fillStyle='rgba(255,255,220,0.8)';
+    [[0.1,0.06],[0.25,0.04],[0.4,0.08],[0.55,0.03],[0.65,0.07],[0.15,0.12],[0.48,0.12]].forEach(function(p){
+      ctx.beginPath(); ctx.arc(p[0]*w,p[1]*h,Math.max(1,2*s),0,Math.PI*2); ctx.fill();
+    });
+    // גרדיאנט תחתון כהה
+    var ng=ctx.createLinearGradient(0,h*0.55,0,h);
+    ng.addColorStop(0,'rgba(4,8,28,0)'); ng.addColorStop(0.5,'rgba(4,8,28,0.75)'); ng.addColorStop(1,'rgba(2,4,16,0.96)');
+    ctx.fillStyle=ng; ctx.fillRect(0,h*0.55,w,h*0.45);
+    // קו רקיע פראג זוהר
+    drawPragueSkyline(ctx, w, h*0.72, s*0.85, 'rgba(10,20,60,0.9)');
+    // הילת אורות על הבניינים
+    ctx.fillStyle='rgba(252,180,50,0.07)';
+    drawPragueSkyline(ctx, w, h*0.72-4*s, s*0.85, 'rgba(252,180,50,0.07)');
+    // חלונות מואירים — נקודות
+    ctx.fillStyle='rgba(255,220,100,0.55)';
+    [[0.57,0.66],[0.61,0.64],[0.54,0.68],[0.65,0.67],[0.82,0.62],[0.85,0.60]].forEach(function(p){
+      ctx.beginPath(); ctx.arc(p[0]*w,p[1]*h,Math.max(2,3*s),0,Math.PI*2); ctx.fill();
+    });
+    // מסגרת כחולה-זהב
+    ctx.strokeStyle='rgba(100,140,255,0.5)'; ctx.lineWidth=Math.max(3,4*s);
+    ctx.strokeRect(ctx.lineWidth/2,ctx.lineWidth/2,w-ctx.lineWidth,h-ctx.lineWidth);
+    // פינות זהב
+    var lc2=Math.round(45*s);
+    ctx.strokeStyle='rgba(252,211,77,0.7)'; ctx.lineWidth=Math.max(2,3*s);
+    [[0,0,1,1],[w,0,-1,1],[0,h,1,-1],[w,h,-1,-1]].forEach(function(p){
+      ctx.beginPath(); ctx.moveTo(p[0]+p[2]*lc2,p[1]+p[3]*8*s);
+      ctx.lineTo(p[0]+p[2]*8*s,p[1]+p[3]*8*s); ctx.lineTo(p[0]+p[2]*8*s,p[1]+p[3]*lc2); ctx.stroke();
+    });
+    // טקסט
+    ctx.shadowColor='rgba(0,0,0,0.95)'; ctx.shadowBlur=18*s;
+    ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+    ctx.font='900 '+Math.round(52*s)+'px Rubik,Arial,sans-serif';
+    ctx.fillStyle='#EEF2FF'; ctx.fillText('משפחת שיש', w/2, h-Math.round(82*s));
+    ctx.font='500 '+Math.round(26*s)+'px Rubik,Arial,sans-serif';
+    ctx.fillStyle='rgba(180,210,255,0.9)'; ctx.fillText('לילה בפראג · Prague by Night', w/2, h-Math.round(48*s));
     ctx.shadowBlur=0;
-    // מסגרת דקה
-    ctx.strokeStyle='rgba(252,211,77,0.3)'; ctx.lineWidth=Math.max(1,2*s);
-    ctx.strokeRect(ctx.lineWidth/2, fh, w-ctx.lineWidth, h-fh*2);
 
   } else if (design === 3) {
-    // ══ עיצוב 4: STAMP — חותמת עגולה בפינה ══
-    // וילון גרדיאנט עדין בפינה ימין תחתון
-    var rg = ctx.createRadialGradient(w*0.82, h*0.82, 0, w*0.82, h*0.82, w*0.45);
-    rg.addColorStop(0,'rgba(4,13,24,0.65)'); rg.addColorStop(1,'rgba(4,13,24,0)');
+    // ══ עיצוב 4: STAMP — חותמת עם שעון אסטרונומי ══
+    var rg=ctx.createRadialGradient(w*0.8,h*0.8,0,w*0.8,h*0.8,w*0.5);
+    rg.addColorStop(0,'rgba(20,10,4,0.7)'); rg.addColorStop(1,'rgba(4,13,24,0)');
     ctx.fillStyle=rg; ctx.fillRect(0,0,w,h);
-    // מסגרת דקה לבנה
-    ctx.strokeStyle='rgba(255,255,255,0.55)'; ctx.lineWidth=Math.max(3,4*s);
+    ctx.strokeStyle='rgba(255,255,255,0.45)'; ctx.lineWidth=Math.max(3,4*s);
     ctx.strokeRect(ctx.lineWidth/2,ctx.lineWidth/2,w-ctx.lineWidth,h-ctx.lineWidth);
     // חותמת עגולה
-    var sr=Math.round(140*s), scx=w-Math.round(160*s), scy=h-Math.round(160*s);
-    ctx.strokeStyle='rgba(252,211,77,0.9)'; ctx.lineWidth=Math.max(2,3*s);
-    ctx.beginPath(); ctx.arc(scx,scy,sr,0,Math.PI*2); ctx.stroke();
-    ctx.strokeStyle='rgba(252,211,77,0.4)'; ctx.lineWidth=Math.max(1,1.5*s);
-    ctx.beginPath(); ctx.arc(scx,scy,sr-Math.round(10*s),0,Math.PI*2); ctx.stroke();
-    // טקסט בחותמת — עקום
-    ctx.shadowColor='rgba(0,0,0,0.8)'; ctx.shadowBlur=8*s;
-    ctx.save();
-    ctx.translate(scx,scy);
-    // טקסט עליון עקום
-    var topTxt='★ PRAGUE 2026 ★', topR=sr-Math.round(22*s);
-    ctx.font='700 '+Math.round(20*s)+'px Rubik,Arial,sans-serif';
+    var sr=Math.round(148*s), scx=w-Math.round(168*s), scy=h-Math.round(168*s);
+    ctx.save(); ctx.translate(scx,scy);
+    // רקע חותמת
+    ctx.fillStyle='rgba(20,10,4,0.6)';
+    ctx.beginPath(); ctx.arc(0,0,sr,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='rgba(252,211,77,0.95)'; ctx.lineWidth=Math.max(2,3*s);
+    ctx.beginPath(); ctx.arc(0,0,sr,0,Math.PI*2); ctx.stroke();
+    ctx.strokeStyle='rgba(252,211,77,0.35)'; ctx.lineWidth=Math.max(1,1.5*s);
+    ctx.beginPath(); ctx.arc(0,0,sr-Math.round(11*s),0,Math.PI*2); ctx.stroke();
+    // שעון אסטרונומי — עיגול כחול
+    var cr=Math.round(70*s);
+    ctx.strokeStyle='rgba(100,150,255,0.7)'; ctx.lineWidth=Math.max(1.5,2*s);
+    ctx.beginPath(); ctx.arc(0,0,cr,0,Math.PI*2); ctx.stroke();
+    // קווי שעון
+    ctx.strokeStyle='rgba(252,211,77,0.6)'; ctx.lineWidth=Math.max(1,s);
+    for(var ti=0;ti<12;ti++){
+      var ta=ti*Math.PI/6;
+      var r1=cr-Math.round(8*s), r2=cr-Math.round(2*s);
+      ctx.beginPath(); ctx.moveTo(Math.cos(ta)*r1,Math.sin(ta)*r1);
+      ctx.lineTo(Math.cos(ta)*r2,Math.sin(ta)*r2); ctx.stroke();
+    }
+    // מחוגים
+    ctx.strokeStyle='rgba(255,220,100,0.85)'; ctx.lineWidth=Math.max(2,2.5*s);
+    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,-cr*0.7); ctx.stroke();
+    ctx.strokeStyle='rgba(255,100,50,0.85)'; ctx.lineWidth=Math.max(1.5,2*s);
+    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(cr*0.5,-cr*0.3); ctx.stroke();
+    // טקסט עקום
+    var topTxt='✦ ORLOJ · PRAGUE · 2026 ✦', topR=sr-Math.round(24*s);
+    ctx.font='700 '+Math.round(18*s)+'px Rubik,Arial,sans-serif';
     ctx.fillStyle='#FCD34D';
     for(var ci=0;ci<topTxt.length;ci++){
-      var cAngle=-Math.PI/2+(ci-topTxt.length/2+0.5)*(Math.PI/topTxt.length*2.1);
-      ctx.save(); ctx.rotate(cAngle); ctx.translate(0,-topR);
+      var cA=-Math.PI/2+(ci-topTxt.length/2+0.5)*(Math.PI/topTxt.length*2.05);
+      ctx.save(); ctx.rotate(cA); ctx.translate(0,-topR);
       ctx.rotate(Math.PI/2); ctx.textAlign='center';
       ctx.fillText(topTxt[ci],0,0); ctx.restore();
     }
-    // טקסט מרכזי
+    // טקסט מרכז
+    ctx.shadowColor='rgba(0,0,0,0.8)'; ctx.shadowBlur=8*s;
     ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.font='900 '+Math.round(30*s)+'px Rubik,Arial,sans-serif';
-    ctx.fillStyle='#FFF'; ctx.fillText('משפחת', 0, -Math.round(12*s));
-    ctx.fillText('שיש', 0, Math.round(24*s));
-    ctx.font=Math.round(32*s)+'px Arial'; ctx.fillText('🏰', 0, Math.round(60*s));
+    ctx.font='800 '+Math.round(24*s)+'px Rubik,Arial,sans-serif';
+    ctx.fillStyle='#FFF'; ctx.fillText('משפחת שיש', 0, Math.round(92*s));
     ctx.restore();
     ctx.shadowBlur=0;
 
   } else {
-    // ══ עיצוב 5: MAGAZINE — סרט אלכסוני + כיתוב צד ══
-    // גרדיאנט שמאל כהה
-    var mg = ctx.createLinearGradient(0, 0, w*0.55, h);
-    mg.addColorStop(0,'rgba(4,13,24,0.82)'); mg.addColorStop(0.6,'rgba(4,13,24,0.2)'); mg.addColorStop(1,'rgba(4,13,24,0)');
-    ctx.fillStyle=mg; ctx.fillRect(0,0,w,h);
-    // פס אלכסוני זהב
-    ctx.save();
-    ctx.fillStyle='rgba(252,211,77,0.9)';
-    ctx.beginPath();
-    ctx.moveTo(0, h*0.52); ctx.lineTo(0, h*0.52+Math.round(6*s));
-    ctx.lineTo(w*0.62, h*0.52+Math.round(6*s)); ctx.lineTo(w*0.62, h*0.52);
-    ctx.fill();
-    // פס אלכסוני קטן
-    ctx.fillStyle='rgba(252,211,77,0.35)';
-    ctx.beginPath();
-    ctx.moveTo(0,h*0.52+Math.round(12*s)); ctx.lineTo(0,h*0.52+Math.round(14*s));
-    ctx.lineTo(w*0.5,h*0.52+Math.round(14*s)); ctx.lineTo(w*0.5,h*0.52+Math.round(12*s));
-    ctx.fill();
-    ctx.restore();
-    // כותרת ראשית — שמאל אנכי
-    ctx.save();
-    ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=16*s;
-    ctx.textAlign='right'; ctx.textBaseline='alphabetic';
-    ctx.font='300 '+Math.round(18*s)+'px Rubik,Arial,sans-serif';
-    ctx.fillStyle='rgba(252,211,77,0.8)';
-    ctx.fillText('AUGUST 2026', Math.round(w*0.55), h*0.48);
-    ctx.font='900 '+Math.round(62*s)+'px Rubik,Arial,sans-serif';
-    ctx.fillStyle='#FFFFFF';
-    ctx.fillText('משפחת', Math.round(w*0.58), h*0.38);
-    ctx.fillText('שיש', Math.round(w*0.58), h*0.285);
-    ctx.font='500 '+Math.round(22*s)+'px Rubik,Arial,sans-serif';
-    ctx.fillStyle='rgba(252,211,77,0.9)';
-    ctx.fillText('פראג • Prague • אוגוסט 2026', Math.round(w*0.57), h*0.555);
+    // ══ עיצוב 5: VLTAVA — נהר וולטאווה + גשר + אדום ══
+    // גרדיאנט שמים
+    var skyR=ctx.createLinearGradient(0,0,0,h*0.5);
+    skyR.addColorStop(0,'rgba(160,30,20,0.0)'); skyR.addColorStop(1,'rgba(200,60,20,0.22)');
+    ctx.fillStyle=skyR; ctx.fillRect(0,0,w,h*0.5);
+    // גרדיאנט תחתון כהה-אדום
+    var botR=ctx.createLinearGradient(0,h*0.6,0,h);
+    botR.addColorStop(0,'rgba(60,8,4,0)'); botR.addColorStop(0.5,'rgba(60,8,4,0.75)'); botR.addColorStop(1,'rgba(30,4,2,0.96)');
+    ctx.fillStyle=botR; ctx.fillRect(0,h*0.6,w,h*0.4);
+    // קו רקיע פראג
+    drawPragueSkyline(ctx, w, h*0.7, s*0.9, 'rgba(40,5,3,0.85)');
+    // נהר וולטאווה — גלים
+    var riverY=h*0.75;
+    ctx.fillStyle='rgba(30,60,120,0.35)';
+    ctx.beginPath(); ctx.moveTo(0,riverY);
+    for(var ri=0;ri<8;ri++){
+      ctx.quadraticCurveTo(w*(ri+0.5)/8,riverY-12*s,w*(ri+1)/8,riverY);
+    }
+    ctx.lineTo(w,h*0.85); ctx.lineTo(0,h*0.85); ctx.closePath(); ctx.fill();
+    ctx.fillStyle='rgba(50,100,200,0.2)';
+    ctx.beginPath(); ctx.moveTo(0,riverY+8*s);
+    for(var ri2=0;ri2<8;ri2++){
+      ctx.quadraticCurveTo(w*(ri2+0.5)/8,riverY-6*s,w*(ri2+1)/8,riverY+8*s);
+    }
+    ctx.lineTo(w,h*0.86); ctx.lineTo(0,h*0.86); ctx.closePath(); ctx.fill();
+    // השתקפות
+    ctx.fillStyle='rgba(252,180,50,0.12)';
+    ctx.fillRect(w*0.48,riverY,w*0.06,h*0.1);
+    // מסגרת אדומה-זהב
+    ctx.strokeStyle='rgba(200,50,30,0.75)'; ctx.lineWidth=Math.max(4,6*s);
+    ctx.strokeRect(ctx.lineWidth/2,ctx.lineWidth/2,w-ctx.lineWidth,h-ctx.lineWidth);
+    ctx.strokeStyle='rgba(252,211,77,0.45)'; ctx.lineWidth=Math.max(1,2*s);
+    var insR=Math.round(14*s); ctx.strokeRect(insR,insR,w-insR*2,h-insR*2);
+    // טקסט
+    ctx.shadowColor='rgba(0,0,0,0.95)'; ctx.shadowBlur=18*s;
+    ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+    ctx.font='900 '+Math.round(54*s)+'px Rubik,Arial,sans-serif';
+    ctx.fillStyle='#FFF'; ctx.fillText('משפחת שיש', w/2, h-Math.round(86*s));
+    ctx.font='600 '+Math.round(26*s)+'px Rubik,Arial,sans-serif';
+    ctx.fillStyle='rgba(255,160,100,0.95)'; ctx.fillText('על גדות הוולטאווה · פראג 2026', w/2, h-Math.round(50*s));
     ctx.shadowBlur=0;
-    // מסגרת פינות — L-shape
-    var lc=Math.round(40*s), lt=Math.max(3,4*s);
-    ctx.strokeStyle='rgba(252,211,77,0.7)'; ctx.lineWidth=lt;
-    // פינה שמאל עליון
-    ctx.beginPath(); ctx.moveTo(lt/2,lc+lt/2); ctx.lineTo(lt/2,lt/2); ctx.lineTo(lc+lt/2,lt/2); ctx.stroke();
-    // פינה ימין תחתון
-    ctx.beginPath(); ctx.moveTo(w-lt/2,h-lc-lt/2); ctx.lineTo(w-lt/2,h-lt/2); ctx.lineTo(w-lc-lt/2,h-lt/2); ctx.stroke();
-    ctx.restore();
   }
 
   ctx.restore();
