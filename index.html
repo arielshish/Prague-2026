@@ -602,8 +602,8 @@
 
       <!-- מתרגם קולי -->
       <div style="background:linear-gradient(135deg,rgba(168,85,247,0.13),rgba(99,102,241,0.1));border:1px solid rgba(168,85,247,0.3);border-radius:18px;padding:16px;">
-        <div style="font-size:14px;font-weight:700;color:#C084FC;margin-bottom:4px;">🎤 מתרגם קולי — עברית ↔ צ'כית</div>
-        <div style="font-size:11px;color:rgba(241,245,249,0.4);margin-bottom:14px;">דברו עברית — תקבלו צ'כית בקול</div>
+        <div style="font-size:14px;font-weight:700;color:#C084FC;margin-bottom:4px;">🌐 מתרגם חי — עברית ↔ צ'כית</div>
+        <div style="font-size:11px;color:rgba(241,245,249,0.4);margin-bottom:14px;">הקלידו טקסט — תרגום + השמעה אוטומטיים</div>
 
         <!-- כפתורי שפה -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
@@ -613,12 +613,11 @@
 
         <!-- תיבת קלט טקסט -->
         <div style="position:relative;margin-bottom:10px;">
-          <textarea id="voiceInputText" placeholder="הקלידו טקסט או לחצו על המיקרופון..." style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(168,85,247,0.3);border-radius:13px;padding:12px 14px;font-size:14px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;resize:none;height:70px;"></textarea>
+          <textarea id="voiceInputText" placeholder="הקלידו כאן — תרגום אוטומטי תוך שנייה..." style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(168,85,247,0.3);border-radius:13px;padding:12px 14px;font-size:14px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;resize:none;height:70px;"></textarea>
         </div>
 
         <!-- כפתורי פעולה -->
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
-          <button id="btnVoiceMic" onclick="startVoiceRecognition()" style="background:rgba(168,85,247,0.2);border:1px solid rgba(168,85,247,0.4);border-radius:13px;padding:12px 8px;font-size:20px;cursor:pointer;">🎤</button>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
           <button onclick="translateVoiceText()" style="background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.4);border-radius:13px;padding:12px 8px;font-size:12px;font-weight:800;color:#A5B4FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🌐 תרגם</button>
           <button onclick="clearVoiceTranslator()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:13px;padding:12px 8px;font-size:12px;font-weight:800;color:rgba(241,245,249,0.4);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🗑️ נקה</button>
         </div>
@@ -1992,49 +1991,10 @@ function speakText(text, lang) {
 }
 
 function startVoiceRecognition() {
-  var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) { setVoiceStatus('⚠️ זיהוי קול לא נתמך — הקלד ידנית'); return; }
-  if (voiceListening) { if (voiceRecognition) voiceRecognition.stop(); return; }
-  var micBtn = qs('btnVoiceMic');
-  setVoiceStatus('🔐 מבקש הרשאת מיקרופון...');
-  // בקשת הרשאה מפורשת לפני Speech API — גורם לדפדפן להציג דיאלוג
-  navigator.mediaDevices.getUserMedia({ audio: true })
-    .then(function(stream) {
-      stream.getTracks().forEach(function(t) { t.stop(); }); // סוגר את הסטרים מיד
-      doStartRecognition(SpeechRecognition, micBtn);
-    })
-    .catch(function(err) {
-      setVoiceStatus('⚠️ הרשאת מיקרופון נדחתה — אשרו בהגדרות הדפדפן');
-    });
-}
-
-function doStartRecognition(SpeechRecognition, micBtn) {
-  voiceRecognition = new SpeechRecognition();
-  voiceRecognition.lang = voiceSrcLang === 'he' ? 'he-IL' : 'cs-CZ';
-  voiceRecognition.interimResults = true;
-  voiceRecognition.continuous = false;
-  voiceListening = true;
-  if (micBtn) micBtn.textContent = '⏹️';
-  setVoiceStatus('🎤 מאזין... דברו עכשיו');
-  voiceRecognition.onresult = function(e) {
-    var interim = '', final = '';
-    for (var i = e.resultIndex; i < e.results.length; i++) {
-      if (e.results[i].isFinal) final += e.results[i][0].transcript;
-      else interim += e.results[i][0].transcript;
-    }
-    var inp = qs('voiceInputText');
-    if (inp) inp.value = final || interim;
-    if (final) { setVoiceStatus('✅ זוהה — מתרגם...'); translateVoiceText(); }
-  };
-  voiceRecognition.onerror = function(e) {
-    setVoiceStatus('⚠️ ' + (e.error === 'not-allowed' ? 'הרשאה נדחתה — אשרו בהגדרות' : 'שגיאה: ' + e.error));
-    voiceListening = false;
-    if (micBtn) micBtn.textContent = '🎤';
-  };
-  voiceRecognition.onend = function() {
-    voiceListening = false;
-    if (micBtn) micBtn.textContent = '🎤';
-  };
+  // מיקרופון חסום ב-GAS iframe — השתמשו בהקלדה + תרגום אוטומטי
+  setVoiceStatus('💡 הקלידו בשדה למעלה — תרגום אוטומטי תוך שנייה');
+  var inp = qs('voiceInputText');
+  if (inp) inp.focus();
   voiceRecognition.start();
 }
 
