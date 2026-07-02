@@ -781,13 +781,37 @@
 <!-- ═══ EXPENSE MODAL ═══ -->
 <div id="expenseModal" style="display:none;position:fixed;inset:0;z-index:80;align-items:flex-end;justify-content:center;">
   <div id="expModalBg" style="position:absolute;inset:0;background:rgba(2,7,14,0.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);"></div>
-  <div style="position:relative;width:min(430px,100%);background:#071220;border:1px solid rgba(255,255,255,0.13);border-top:1px solid rgba(255,255,255,0.22);border-radius:26px 26px 0 0;padding:22px 18px 36px;box-shadow:0 -24px 64px rgba(0,0,0,0.65);animation:sheetUp 0.3s ease both;direction:rtl;text-align:right;max-height:90vh;overflow-y:auto;">
-    <div style="width:34px;height:4px;background:rgba(255,255,255,0.18);border-radius:2px;margin:0 auto 18px;"></div>
-    <h2 id="expenseTitle" style="margin:0 0 18px;font-size:18px;font-weight:900;color:#F1F5F9;">➕ הוסף הוצאה</h2>
-    <!-- שם חופשי -->
-    <input id="expName" type="text" placeholder="שם / קטגוריה" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:13px 14px;font-size:15px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:8px;">
-    <!-- Drill-down: שלב 1 — קטגוריות ראשיות -->
-    <div id="ddStep1" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
+  <div style="position:relative;width:min(430px,100%);background:#071220;border:1px solid rgba(255,255,255,0.13);border-top:1px solid rgba(255,255,255,0.22);border-radius:26px 26px 0 0;padding:22px 18px 36px;box-shadow:0 -24px 64px rgba(0,0,0,0.65);animation:sheetUp 0.3s ease both;direction:rtl;text-align:right;">
+    <div style="width:34px;height:4px;background:rgba(255,255,255,0.18);border-radius:2px;margin:0 auto 14px;"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <h2 id="expenseTitle" style="margin:0;font-size:18px;font-weight:900;color:#F1F5F9;">➕ הוסף הוצאה</h2>
+      <button onclick="closeExpense()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:10px;padding:6px 13px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">ביטול</button>
+    </div>
+    <!-- שם + כפתור בחירה מרשימה -->
+    <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:10px;align-items:stretch;">
+      <input id="expName" type="text" placeholder="שם / קטגוריה" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:13px 14px;font-size:15px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;">
+      <button type="button" onclick="openDDOverlay()" style="background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.3);border-radius:13px;padding:0 13px;font-size:13px;font-weight:700;color:#C084FC;cursor:pointer;white-space:nowrap;font-family:'Rubik',Arial,sans-serif;">📋 בחר</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+      <input id="expCzk" type="number" inputmode="decimal" placeholder="CZK" style="background:rgba(245,158,11,0.09);border:1px solid rgba(245,158,11,0.3);border-radius:13px;padding:13px 12px;font-size:15px;color:#F59E0B;font-family:'Rubik',Arial,sans-serif;direction:ltr;font-weight:700;box-sizing:border-box;width:100%;">
+      <input id="expIls" type="number" inputmode="decimal" placeholder="₪" style="background:rgba(244,99,74,0.09);border:1px solid rgba(244,99,74,0.3);border-radius:13px;padding:13px 12px;font-size:15px;color:#F4634A;font-family:'Rubik',Arial,sans-serif;direction:ltr;font-weight:700;box-sizing:border-box;width:100%;">
+    </div>
+    <input id="expNote" type="text" placeholder="הערה (אופציונלי)" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:13px 14px;font-size:14px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:14px;">
+    <button id="btnSaveExpense" style="width:100%;background:linear-gradient(135deg,#F4634A,#e8522e);color:white;border:0;border-radius:15px;padding:16px;font-size:15px;font-weight:900;cursor:pointer;font-family:'Rubik',Arial,sans-serif;box-shadow:0 8px 22px rgba(244,99,74,0.38);">שמור הוצאה 💸</button>
+  </div>
+</div>
+
+<!-- ═══ DRILL-DOWN OVERLAY ═══ -->
+<div id="ddOverlay" style="display:none;position:fixed;inset:0;z-index:90;background:rgba(2,7,14,0.95);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);direction:rtl;">
+  <div style="width:min(430px,100%);margin:0 auto;height:100%;display:flex;flex-direction:column;padding:0 16px;">
+    <!-- header -->
+    <div style="display:flex;align-items:center;gap:12px;padding:56px 0 16px;">
+      <button id="ddBackBtn" onclick="ddBack()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.7);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">← חזרה</button>
+      <span id="ddSubTitle" style="font-size:16px;font-weight:900;color:#F1F5F9;flex:1;"></span>
+      <button onclick="closeDDOverlay()" style="background:none;border:none;font-size:20px;color:rgba(241,245,249,0.4);cursor:pointer;padding:8px;">✕</button>
+    </div>
+    <!-- שלב 1: קטגוריות -->
+    <div id="ddStep1" style="display:flex;flex-wrap:wrap;gap:8px;padding-bottom:16px;">
       <button type="button" onclick="ddOpenSub('מסעדות')" class="cat-chip">🍽️ מסעדות</button>
       <button type="button" onclick="ddOpenSub('קינוחים')" class="cat-chip">🍦 קינוחים</button>
       <button type="button" onclick="ddOpenSub('קניות')" class="cat-chip">🛍️ קניות</button>
@@ -797,22 +821,13 @@
       <button type="button" onclick="ddPickFree('🏨 מלון')" class="cat-chip">🏨 מלון</button>
       <button type="button" onclick="ddPickFree('✈️ טיסות')" class="cat-chip">✈️ טיסות</button>
       <button type="button" onclick="ddPickFree('🎁 מזכרות')" class="cat-chip">🎁 מזכרות</button>
+      <button type="button" onclick="ddPickFree('💊 בריאות')" class="cat-chip">💊 בריאות</button>
       <button type="button" onclick="ddPickFree('🔀 שונות')" class="cat-chip">🔀 שונות</button>
     </div>
-    <!-- Drill-down: שלב 2 — רשימה ספציפית -->
-    <div id="ddStep2" style="display:none;margin-bottom:8px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-        <button type="button" onclick="ddBack()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:5px 10px;font-size:12px;color:rgba(241,245,249,0.7);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">← חזרה</button>
-        <span id="ddSubTitle" style="font-size:12px;font-weight:700;color:rgba(241,245,249,0.5);"></span>
-      </div>
-      <div id="ddSubList" style="display:flex;flex-direction:column;gap:5px;max-height:220px;overflow-y:auto;-webkit-overflow-scrolling:touch;"></div>
+    <!-- שלב 2: רשימה ספציפית -->
+    <div id="ddStep2" style="display:none;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+      <div id="ddSubList" style="display:flex;flex-direction:column;gap:8px;padding-bottom:30px;"></div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-      <input id="expCzk" type="number" placeholder="CZK" style="background:rgba(245,158,11,0.09);border:1px solid rgba(245,158,11,0.3);border-radius:13px;padding:13px 12px;font-size:15px;color:#F59E0B;font-family:'Rubik',Arial,sans-serif;direction:ltr;font-weight:700;box-sizing:border-box;width:100%;">
-      <input id="expIls" type="number" placeholder="₪" style="background:rgba(244,99,74,0.09);border:1px solid rgba(244,99,74,0.3);border-radius:13px;padding:13px 12px;font-size:15px;color:#F4634A;font-family:'Rubik',Arial,sans-serif;direction:ltr;font-weight:700;box-sizing:border-box;width:100%;">
-    </div>
-    <input id="expNote" type="text" placeholder="הערה (אופציונלי)" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:13px 14px;font-size:14px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:16px;">
-    <button id="btnSaveExpense" style="width:100%;background:linear-gradient(135deg,#F4634A,#e8522e);color:white;border:0;border-radius:15px;padding:16px;font-size:15px;font-weight:900;cursor:pointer;font-family:'Rubik',Arial,sans-serif;box-shadow:0 8px 22px rgba(244,99,74,0.38);">שמור הוצאה</button>
   </div>
 </div>
 
@@ -1984,18 +1999,26 @@ function openExpense() {
   var m = qs('expenseModal'); if (m) m.style.display = 'flex';
 }
 
-function closeExpense() { var m = qs('expenseModal'); if (m) m.style.display = 'none'; ddBack(); }
+function closeExpense() { var m = qs('expenseModal'); if (m) m.style.display = 'none'; closeDDOverlay(); }
+
+function openDDOverlay() {
+  var o = qs('ddOverlay'); if (o) o.style.display = 'block';
+  ddBack();
+  var t = qs('ddSubTitle'); if (t) t.textContent = 'בחר קטגוריה';
+}
+function closeDDOverlay() { var o = qs('ddOverlay'); if (o) o.style.display = 'none'; }
 
 function ddPickFree(cat) {
   var n = qs('expName'); if (n) n.value = cat;
-  ddBack();
-  qs('expCzk').focus();
+  closeDDOverlay();
 }
 
 function ddBack() {
   var s1 = qs('ddStep1'), s2 = qs('ddStep2');
   if (s1) s1.style.display = 'flex';
   if (s2) s2.style.display = 'none';
+  var t = qs('ddSubTitle'); if (t) t.textContent = 'בחר קטגוריה';
+  var bb = qs('ddBackBtn'); if (bb) bb.style.display = 'none';
 }
 
 function ddOpenSub(cat) {
@@ -2004,40 +2027,40 @@ function ddOpenSub(cat) {
   if (!s1 || !s2 || !list) return;
   var items = [];
   if (cat === 'מסעדות') {
-    items = RESTAURANTS.map(function(r) { return {icon: r.icon, name: r.name, sub: r.sub, price: r.price, cat: '🍽️ ' + r.name}; });
+    items = RESTAURANTS.map(function(r) { return {icon:r.icon, name:r.name, sub:r.sub, price:r.price, val:'🍽️ '+r.name}; });
   } else if (cat === 'קינוחים') {
-    items = DESSERTS.map(function(r) { return {icon: r.icon, name: r.name, sub: r.where || r.sub || '', price: r.price, cat: '🍦 ' + r.name}; });
+    items = DESSERTS.map(function(r) { return {icon:r.icon, name:r.name, sub:r.where||'', price:r.price, val:'🍦 '+r.name}; });
   } else if (cat === 'קניות') {
-    items = SHOPS.map(function(r) { return {icon: r.e, name: r.n, sub: r.brands || '', price: '', cat: '🛍️ ' + r.n}; });
+    items = SHOPS.map(function(r) { return {icon:r.e, name:r.n, sub:r.brands||'', price:'', val:'🛍️ '+r.n}; });
   } else if (cat === 'אטרקציות') {
-    var days = DAYS || [];
-    days.forEach(function(d) {
-      (d.stops || []).forEach(function(s) {
-        items.push({icon: s.emoji || '🎟️', name: s.name, sub: s.desc || '', price: '', cat: '🎟️ ' + s.name});
+    var seen = {};
+    (DAYS||[]).forEach(function(d) {
+      (d.stops||[]).forEach(function(s) {
+        if (!seen[s.name]) { seen[s.name]=1; items.push({icon:s.emoji||'🎟️', name:s.name, sub:s.desc||'', price:'', val:'🎟️ '+s.name}); }
       });
     });
   }
   if (title) title.textContent = cat;
-  list.innerHTML = items.map(function(it, i) {
-    return '<button type="button" onclick="ddPickItem(' + i + ',\'' + cat + '\')" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:9px 12px;text-align:right;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;">' +
-      '<div style="font-size:13px;font-weight:700;color:#F1F5F9;">' + (it.icon||'') + ' ' + it.name + '</div>' +
-      (it.sub ? '<div style="font-size:10px;color:rgba(241,245,249,0.4);margin-top:2px;">' + it.sub + '</div>' : '') +
-      (it.price ? '<div style="font-size:10px;color:#F59E0B;margin-top:1px;">' + it.price + '</div>' : '') +
+  var bb = qs('ddBackBtn'); if (bb) bb.style.display = 'inline-block';
+  list.innerHTML = items.map(function(it,i) {
+    return '<button type="button" onclick="ddPickItem('+i+')" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:11px 14px;text-align:right;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;width:100%;">' +
+      '<div style="font-size:14px;font-weight:700;color:#F1F5F9;">'+(it.icon||'')+' '+it.name+'</div>' +
+      (it.sub?'<div style="font-size:11px;color:rgba(241,245,249,0.4);margin-top:3px;">'+it.sub+'</div>':'') +
+      (it.price?'<div style="font-size:11px;color:#F59E0B;margin-top:2px;">'+it.price+'</div>':'') +
       '</button>';
   }).join('');
+  s2._items = items;
   s1.style.display = 'none';
   s2.style.display = 'block';
-  // store items for selection
-  s2._items = items;
 }
 
-function ddPickItem(i, cat) {
+function ddPickItem(i) {
   var s2 = qs('ddStep2');
   var items = s2 && s2._items;
   if (!items || !items[i]) return;
-  var n = qs('expName'); if (n) n.value = items[i].cat;
-  ddBack();
-  qs('expCzk').focus();
+  var n = qs('expName'); if (n) n.value = items[i].val;
+  closeDDOverlay();
+  setTimeout(function(){ var c=qs('expCzk'); if(c) c.focus(); }, 100);
 }
 
 function calcIls() { var c = Number(qs('expCzk').value || 0); if (c > 0) qs('expIls').value = Math.round(c / RATE); }
