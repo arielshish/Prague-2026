@@ -122,6 +122,18 @@
       <div style="font-size:13px;font-weight:700;color:#93C5FD;margin-bottom:5px;">🚇 מהמלון למרכז</div>
       <div style="font-size:12px;color:rgba(241,245,249,0.55);line-height:1.65;">מטרו A מ-Strašnická · Primark → <strong style="color:#F1F5F9;">Můstek</strong> · Palladium → <strong style="color:#F1F5F9;">Náměstí Republiky</strong></div>
     </div>
+
+    <!-- מזג אוויר -->
+    <div style="background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.22);border-radius:20px;padding:16px;margin-top:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:800;color:#7DD3FC;">🌤️ מזג אוויר — פראג</div>
+        <button onclick="fetchWeather(true)" style="background:none;border:none;font-size:11px;color:rgba(125,211,252,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;font-weight:700;">🔄 רענן</button>
+      </div>
+      <div id="weatherRow" style="display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:4px;">
+        <div style="color:rgba(241,245,249,0.3);font-size:12px;padding:8px 0;">טוען...</div>
+      </div>
+      <div id="weatherUpdated" style="font-size:10px;color:rgba(241,245,249,0.25);margin-top:8px;text-align:left;"></div>
+    </div>
   </section>
 
   <!-- ═══ DAYS ═══ -->
@@ -2428,6 +2440,70 @@ function fetchLiveRate() {
     });
 }
 
+var WMO_EMOJI = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'🌨️',73:'🌨️',75:'❄️',80:'🌦️',81:'🌧️',82:'🌧️',95:'⛈️',96:'⛈️',99:'⛈️'};
+var WMO_DESC = {0:'שמש',1:'בהיר',2:'מעונן חלקית',3:'מעונן',45:'ערפל',48:'ערפל',51:'גשם קל',53:'גשם',55:'גשם',61:'גשם קל',63:'גשם',65:'גשם כבד',71:'שלג קל',73:'שלג',75:'שלג כבד',80:'מקלחות',81:'מקלחות',82:'מקלחות כבדות',95:'סופת ברקים',96:'סופת ברקים',99:'סופת ברקים'};
+var HEB_DAYS = ['א׳','ב׳','ג׳','ד׳','ה׳','ו׳','ש׳'];
+var HEB_MONTHS = ['ינו','פבר','מרץ','אפר','מאי','יונ','יול','אוג','ספט','אוק','נוב','דצמ'];
+
+function fetchWeather(force) {
+  var CACHE_KEY = 'prague_weather_v2';
+  if (!force) {
+    try {
+      var c = localStorage.getItem(CACHE_KEY);
+      if (c) { var p = JSON.parse(c); if (Date.now() - p._ts < 3600000) { renderWeather(p); return; } }
+    } catch(e) {}
+  }
+  var row = document.getElementById('weatherRow');
+  if (row) row.innerHTML = '<div style="color:rgba(241,245,249,0.4);font-size:12px;padding:8px;">טוען מזג אוויר...</div>';
+  fetch('https://api.open-meteo.com/v1/forecast?latitude=50.08&longitude=14.44&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weathercode&timezone=Europe%2FPrague&forecast_days=14')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      data._ts = Date.now();
+      localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+      renderWeather(data);
+    })
+    .catch(function() {
+      var row = document.getElementById('weatherRow');
+      if (row) row.innerHTML = '<div style="color:#FCA5A5;font-size:12px;padding:8px;">⚠️ לא ניתן לטעון מזג אוויר</div>';
+    });
+}
+
+function renderWeather(data) {
+  var row = document.getElementById('weatherRow');
+  var upd = document.getElementById('weatherUpdated');
+  if (!row || !data || !data.daily) return;
+  var d = data.daily;
+  var tripStart = new Date('2026-08-08');
+  var tripEnd = new Date('2026-08-15');
+  var html = '';
+  for (var i = 0; i < d.time.length; i++) {
+    var dt = new Date(d.time[i] + 'T12:00:00');
+    var inTrip = dt >= tripStart && dt <= tripEnd;
+    var emoji = WMO_EMOJI[d.weathercode[i]] || '🌡️';
+    var desc = WMO_DESC[d.weathercode[i]] || '';
+    var tmax = Math.round(d.temperature_2m_max[i]);
+    var tmin = Math.round(d.temperature_2m_min[i]);
+    var rain = d.precipitation_sum[i] > 0 ? '<div style="font-size:9px;color:#93C5FD;">💧' + d.precipitation_sum[i].toFixed(1) + 'מ"מ</div>' : '';
+    var dayName = HEB_DAYS[dt.getDay()];
+    var dayDate = dt.getDate() + ' ' + HEB_MONTHS[dt.getMonth()];
+    var border = inTrip ? '1px solid rgba(125,211,252,0.5)' : '1px solid rgba(255,255,255,0.07)';
+    var bg = inTrip ? 'rgba(14,165,233,0.18)' : 'rgba(255,255,255,0.04)';
+    var badge = inTrip ? '<div style="font-size:8px;color:#7DD3FC;font-weight:800;margin-bottom:2px;">✈️ טיול</div>' : '';
+    html += '<div style="min-width:60px;background:' + bg + ';border:' + border + ';border-radius:12px;padding:8px 6px;text-align:center;flex-shrink:0;">'
+      + badge
+      + '<div style="font-size:10px;font-weight:800;color:rgba(241,245,249,0.9);">' + dayName + '</div>'
+      + '<div style="font-size:9px;color:rgba(241,245,249,0.45);margin-bottom:4px;">' + dayDate + '</div>'
+      + '<div style="font-size:22px;line-height:1;">' + emoji + '</div>'
+      + '<div style="font-size:9px;color:rgba(241,245,249,0.5);margin:2px 0;">' + desc + '</div>'
+      + '<div style="font-size:12px;font-weight:800;color:#F1F5F9;">' + tmax + '°</div>'
+      + '<div style="font-size:10px;color:rgba(241,245,249,0.45);">' + tmin + '°</div>'
+      + rain
+      + '</div>';
+  }
+  row.innerHTML = html || '<div style="color:rgba(241,245,249,0.4);font-size:12px;">אין נתונים</div>';
+  if (upd) upd.textContent = 'עודכן: ' + new Date().toLocaleString('he-IL', {hour:'2-digit',minute:'2-digit',day:'numeric',month:'numeric'});
+}
+
 function exportCsv() {
   var rows = ['תאריך,שם,CZK,ILS,הערה'].concat(EXPENSES.map(function(e) {
     return [e.date||'', e.name, e.czk||0, e.ils||0, e.note||''].map(function(v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(',');
@@ -2445,7 +2521,8 @@ function exportCsv() {
 document.addEventListener('DOMContentLoaded', function() {
   // Countdown
   var rateEl = qs('rate'); if (rateEl) rateEl.value = RATE;
-  setTimeout(fetchLiveRate, 1500); // שער חי בטעינה
+  setTimeout(fetchLiveRate, 1500);
+  setTimeout(fetchWeather, 800);
   initCalc();
   initVoiceLive();
   var target = new Date('2026-08-08T05:35:00');
