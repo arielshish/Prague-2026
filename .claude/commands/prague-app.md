@@ -10,7 +10,7 @@
 - **Spreadsheet ID:** `10YqbLWnbwlVWtl_czqlIk4T_ksi9HcY4kIiLASKGBFE`
 - **GitHub repo:** `arielshish/prague-2026`
 - **Branch:** `claude/unknown-session-xpa0pr`
-- **Current version:** @150
+- **Current version:** @158
 
 ## Deploy — תמיד כך
 
@@ -38,6 +38,7 @@ clasp deploy -i AKfycbyR8p3GbMaOnJ5_47acO_Ejo4-rkL_r_Iw-n2PY5mNWnOTZZmhlaukzXuJy
 
 - `קוד.js` — כל ה-backend (GAS functions)
 - `index.html` — כל ה-frontend (SPA)
+- `translator.html` — מתרגם קולי עצמאי (GitHub Pages), עברית↔צ׳כית
 - `appsscript.json` — הגדרות OAuth + webapp
 
 ## appsscript.json — חשוב
@@ -86,7 +87,7 @@ healthCheck()
 ## טאבים ב-Frontend
 
 `#home` · `#days` · `#shopping` · `#expenses` · `#flights`
-`#restaurants` · `#pack` · `#info` · `#history` · `#photo`
+`#restaurants` · `#pack` · `#info` · `#history` · `#photodiary` · `#lang`
 
 ## יומן תמונות — Photo Diary
 
@@ -99,12 +100,12 @@ healthCheck()
 4. Reverse geocoding: Nominatim `zoom=18&addressdetails=1&Accept-Language=he,en`
 5. מציג: POI → רחוב → שכונה → עיר → מדינה + קישור מפות
 
-**5 עיצובי מסגרת (אקראי):**
-- `0` CINEMATIC — גרדיאנט כהה + צללית טירה + גבול זהב כפול
-- `1` POLAROID — פס לבן תחתון + טקסט שחור + אמוג'י
-- `2` FILM STRIP — פסי שחור + חורי סרט + SHISH FAMILY
-- `3` STAMP — חותמת זהב עגולה + ★ PRAGUE 2026 ★
-- `4` MAGAZINE — גרדיאנט שמאלי + טקסט עברי גדול + סימוני פינה
+**5 עיצובי מסגרת פראגאיים (אקראי) — `drawPragueSkyline()` helper:**
+- `0` GOLDEN PRAGUE — שקיעה זהובה + קו רקיע פראגאי (גשר קארל + טירה + אורלוי)
+- `1` POLAROID PRAGUE — פס לבן תחתון + מיני גשר קארל + "Charles Bridge · Prague · 2026"
+- `2` NIGHT PRAGUE — שמיים כחולים + ירח + כוכבים + קו רקיע זוהר
+- `3` STAMP ORLOJ — חותמת עגולה עם שעון אסטרונומי + "✦ ORLOJ · PRAGUE · 2026 ✦"
+- `4` VLTAVA — גרדיאנט אדום + גלי הוולטאווה + "על גדות הוולטאווה · פראג 2026"
 
 המסגרת נשרפת לתוך dataUrl לפני שמירה ל-IndexedDB.
 
@@ -140,6 +141,9 @@ fetch('https://open.er-api.com/v6/latest/ILS')  // תומך ב-ILS (frankfurter.
 | Camera לא נפתחת | geolocation לפני camera חסמה iOS | geolocation רק ב-onChange אחרי בחירה |
 | GPS "מקום לא ידוע" | iOS מוחק EXIF GPS | navigator.geolocation + Nominatim zoom=18 |
 | שער המרה לא מתעדכן | frankfurter.app לא תומך ב-ILS (ECB rates בלבד) | הוחלף ב-open.er-api.com |
+| מיקרופון בתוך GAS iframe | iframe חוסם getUserMedia | translator.html עצמאי ב-GitHub Pages |
+| TTS לא עובד iOS | Silent Mode פעיל + Google TTS חסום CORS | SpeechSynthesis + לוודא שקט כבוי |
+| GitHub Pages 404 | Pages לא מופעל + workflow ללא enablement:true | configure-pages@v5 עם enablement:true |
 
 ## כיצד להרחיב ליעד חדש
 
