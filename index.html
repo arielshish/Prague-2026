@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>פראג 2026 - משפחת שיש</title>
@@ -16,7 +16,10 @@
   @keyframes riverDrift{0%,100%{transform:translateX(0)}50%{transform:translateX(-6px)}}
   @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
   *{box-sizing:border-box;margin:0;padding:0;}
-  body{background:#040D18;direction:rtl;text-align:right;font-family:'Rubik',Arial,sans-serif;color:#F1F5F9;}
+  body{background:#040D18;direction:rtl;text-align:right;font-family:'Rubik',Arial,sans-serif;color:#F1F5F9;overflow-x:hidden;-webkit-text-size-adjust:100%;}
+  html{overflow-x:hidden;}
+  input,textarea,select{font-size:16px!important;}
+  button{touch-action:manipulation;}
   #app{width:min(430px,100%);min-height:100vh;margin:0 auto;background:linear-gradient(180deg,#040D18 0%,#071525 50%,#0A1A2E 100%);position:relative;overflow-x:hidden;padding-bottom:90px;}
   .tab{display:none;padding:14px 14px 0;animation:rise 0.25s ease both;}
   .tab.active{display:block;}
