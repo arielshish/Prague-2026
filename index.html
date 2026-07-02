@@ -107,6 +107,7 @@
       <button id="btnHomeInfo" style="background:rgba(168,85,247,0.10);border:1px solid rgba(168,85,247,0.22);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#C084FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;">📘<br><span style="font-size:10px;font-weight:700;">מידע</span></button>
       <button id="btnHomeHistory" style="background:rgba(251,191,36,0.10);border:1px solid rgba(251,191,36,0.22);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#FDE68A;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;">🏛️<br><span style="font-size:10px;font-weight:700;">היסטוריה</span></button>
       <button id="btnHomePhotoDiary" style="background:rgba(236,72,153,0.10);border:1px solid rgba(236,72,153,0.22);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#F9A8D4;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;">📷<br><span style="font-size:10px;font-weight:700;">תמונות</span></button>
+      <button id="btnHomeCommunity" style="background:rgba(52,211,153,0.10);border:1px solid rgba(52,211,153,0.25);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#6EE7B7;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;grid-column:1 / -1;">👥<br><span style="font-size:10px;font-weight:700;">המלצות קהילה</span></button>
       <button id="btnHomeLang" style="background:rgba(168,85,247,0.10);border:1px solid rgba(168,85,247,0.22);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#C084FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;grid-column:1 / -1;">🌐<br><span style="font-size:10px;font-weight:700;">שפה ותרגום</span></button>
     </div>
     <div style="background:linear-gradient(135deg,rgba(244,99,74,0.13),rgba(244,99,74,0.055));border:1px solid rgba(244,99,74,0.24);border-radius:20px;padding:16px;margin-bottom:10px;">
@@ -668,6 +669,17 @@
     </div>
   </section>
 
+  <!-- ═══ COMMUNITY ═══ -->
+  <section id="community" class="tab">
+    <div class="card card-hdr">
+      <div><h2 style="font-size:18px;font-weight:900;">👥 המלצות קהילה</h2><p style="font-size:12px;color:rgba(241,245,249,0.5);margin-top:3px;">ממטיילים ישראלים שחזרו מפראג</p></div>
+      <button class="back-btn" id="btnBackCommunity">← ראשי</button>
+    </div>
+    <!-- פילטר קטגוריה -->
+    <div id="commCatFilter" style="display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
+    <div id="commList" style="display:grid;gap:12px;"></div>
+  </section>
+
   <!-- ═══ HISTORY & PHOTO ═══ -->
   <section id="history" class="tab">
     <div class="card card-hdr">
@@ -1066,6 +1078,66 @@ var DESSERTS = [
    price:'80–200 CZK',rating:'⭐⭐ (נסיון אינסטגרם בלבד)',tag:'⚠️ תיירותי',tagClr:'#FCA5A5',
    where:'כל העיר העתיקה',
    mapUrl:'https://www.google.com/maps/search/Trdlo+Prague'}
+];
+
+// ═══ COMMUNITY RECOMMENDATIONS ═══
+var COMMUNITY = [
+  // ── 🍽️ מסעדות ──
+  {cat:'🍽️ מסעדות', icon:'✡️', name:'המזללה', fb:'⭐⭐⭐⭐⭐', google:'4.5', desc:'מסעדה כשרה שמשפחות ישראליות חוזרות אליה. אוכל מעולה, אווירה ישראלית.',
+   how:'מטרו A → Staroměstská + 5 דק׳ הליכה לרובע היהודי', mapUrl:'https://www.google.com/maps/search/HaMazlela+kosher+Prague'},
+  {cat:'🍽️ מסעדות', icon:'🥐', name:'קריוטוש כשר — רובע יהודי', fb:'⭐⭐⭐⭐⭐', google:'4.6', desc:'הכי טעים לפי כולם! קריוטוש כשר חם עם מילויים. עדיף על Little Chimney לדעת הקהילה.',
+   how:'מטרו A → Staroměstská + 5 דק׳ לרובע היהודי', mapUrl:'https://www.google.com/maps/search/kosher+Trdelnik+Jewish+Quarter+Prague'},
+  {cat:'🍽️ מסעדות', icon:'🥐', name:'Little Chimney', fb:'⭐⭐⭐⭐', google:'4.4', desc:'קריוטוש דובאי עם גלידת פיסטוק — מאוד טעים! ממש ליד גשר קארל, נוף מהמם.',
+   how:'הליכה מגשר קארל — צד מאלה סטרנה, 2 דק׳', mapUrl:'https://www.google.com/maps/search/Little+Chimney+Prague+Charles+Bridge'},
+  {cat:'🍽️ מסעדות', icon:'🍜', name:'Mango — מסעדה אסייתית', fb:'⭐⭐⭐⭐⭐', google:'4.3', desc:'מנות אסייתיות טעימות מאוד במחירים הוגנים. מומלץ מאוד מהשטח.',
+   how:'מטרו A/B → Můstek + 5 דק׳ הליכה', mapUrl:'https://www.google.com/maps/search/Mango+restaurant+Prague+center'},
+  {cat:'🍽️ מסעדות', icon:'🍣', name:'Yammi Sushi House', fb:'⭐⭐⭐⭐⭐', google:'4.4', desc:'סושי טעים מאוד בפראג. ממוקם ליד קניון פלדיום.',
+   how:'מטרו B → Náměstí Republiky + 3 דק׳', mapUrl:'https://www.google.com/maps/search/Yammi+Sushi+House+Prague'},
+  {cat:'🍽️ מסעדות', icon:'🍕', name:'Vapiano', fb:'⭐⭐⭐⭐', google:'4.1', desc:'פיצות ופסטות איכותיות עם מטבח פתוח. משפחה ישראלית חזרה פעמיים!',
+   how:'מטרו A/B → Můstek, מרכז העיר', mapUrl:'https://www.google.com/maps/search/Vapiano+Prague'},
+  {cat:'🍽️ מסעדות', icon:'🚂', name:'Výtopna', fb:'⭐⭐⭐⭐', google:'3.9', desc:'גימיק נחמד — רכבות מביאות שתייה לשולחן. אוכל בינוני אבל חוויה בלתי נשכחת לילדים!',
+   how:'מטרו A/C → Václavské náměstí — ממש בכיכר', mapUrl:'https://www.google.com/maps/search/Vytopna+Railway+Restaurant+Prague'},
+  // ── 🍦 קינוחים ──
+  {cat:'🍦 קינוחים', icon:'🐰', name:'Rabit', fb:'⭐⭐⭐⭐⭐', google:'4.6', desc:'גלידה ומקרון איכותיים. עצירה מומלצת בין אטרקציות העיר העתיקה.',
+   how:'הליכה מכיכר השעון — 3 דק׳', mapUrl:'https://www.google.com/maps/search/Rabit+ice+cream+Prague'},
+  {cat:'🍦 קינוחים', icon:'🍑', name:'Černá Madona', fb:'⭐⭐⭐⭐⭐', google:'4.5', desc:'קינוחי פירות יפים וטעימים. מיוחד ומרשים. חובה למי שאוהב קינוחי פירות.',
+   how:'מטרו B → náměstí Republiky + 5 דק׳', mapUrl:'https://www.google.com/maps/search/Černá+madona+Prague'},
+  {cat:'🍦 קינוחים', icon:'🌸', name:'מאפה פרג — מאקובי זאוין', fb:'⭐⭐⭐⭐⭐', google:'4.4', desc:'המאפה הצ׳כי הכי מיוחד. לקנות רק טרי! שאלו "makový závin" בכל מאפייה.',
+   how:'בכל מאפייה בעיר — עיר עתיקה, מאלה סטרנה', mapUrl:'https://www.google.com/maps/search/bakery+Prague+Old+Town'},
+  {cat:'🍦 קינוחים', icon:'🥪', name:'כריך פסטו — שוק האיכרים', fb:'⭐⭐⭐⭐⭐', google:'4.5', desc:'הכריך המפורסם של שוק האיכרים. חובה! שימו לב — המיקום עשוי להשתנות.',
+   how:'מטרו B → náměstí Republiky, בדקו מיקום עדכני של השוק', mapUrl:'https://www.google.com/maps/search/Prague+farmers+market+Naplavka'},
+  // ── 🎟️ אטרקציות ──
+  {cat:'🎟️ אטרקציות', icon:'🐱', name:'פסל קפקא המסתובב', fb:'⭐⭐⭐⭐', google:'4.4', desc:'פסל מסתובב מרשים של קפקא. מרכז קניות צמוד פתוח בבוקר (Sephora, Pepco). כניסה חינם!',
+   how:'מטרו A/C → Václavské náměstí + 3 דק׳ הליכה', mapUrl:'https://www.google.com/maps/search/Kafka+rotating+head+Prague'},
+  {cat:'🎟️ אטרקציות', icon:'🎨', name:'גלרית Lumia — מוזיאון האורות', fb:'⭐⭐⭐⭐⭐', google:'4.5', desc:'מוזיאון אורות מרשים ומרתק. 20% הנחה על מוזיאון הפלדה הצמוד אחרי כניסה.',
+   how:'מטרו B → náměstí Republiky + 5 דק׳', mapUrl:'https://www.google.com/maps/search/Galerie+Lumia+Prague'},
+  {cat:'🎟️ אטרקציות', icon:'🌀', name:'מוזיאון האשליות', fb:'⭐⭐⭐⭐⭐', google:'4.4', desc:'מוזיאון קטן עם הרבה מפתיע. יש מדריכים שעוזרים לצלם — יתרון גדול!',
+   how:'מטרו A → Staroměstská + 5 דק׳ בעיר העתיקה', mapUrl:'https://www.google.com/maps/search/Museum+of+Illusions+Prague'},
+  {cat:'🎟️ אטרקציות', icon:'🪄', name:'מוזיאון החושים', fb:'⭐⭐⭐⭐', google:'4.2', desc:'40–60 דק׳, מייצגים נחמדים. ממש ליד Primark. פחות צוות מהמוזיאון האשליות.',
+   how:'מטרו A/C → Václavské náměstí, ליד Primark', mapUrl:'https://www.google.com/maps/search/Museum+of+Senses+Prague'},
+  {cat:'🎟️ אטרקציות', icon:'🦁', name:'גן החיות של פראג', fb:'⭐⭐⭐⭐⭐', google:'4.7', desc:'גן חיות עצום ומושקע! לקנות כרטיסים באתר מראש. לתכנן לפי זמני האכלה. רכבל כסאות 40 CZK.',
+   how:'מטרו C → Nádraží Holešovice + אוטובוס 112 עד הכניסה', mapUrl:'https://www.google.com/maps/search/Prague+Zoo'},
+  {cat:'🎟️ אטרקציות', icon:'🏰', name:'מצודת פראג', fb:'⭐⭐⭐⭐', google:'4.5', desc:'כרטיס בסיסי מספיק. המבנים מרשימים יותר מבחוץ. סטארבקס בכניסה עליונה — נוף מקסים!',
+   how:'טראם 22 → Pražský hrad (כניסה עליונה) או Malostranské náměstí', mapUrl:'https://www.google.com/maps/search/Prague+Castle'},
+  {cat:'🎟️ אטרקציות', icon:'🚤', name:'שייט בוולטאווה', fb:'⭐⭐⭐⭐⭐', google:'4.6', desc:'שייט 20:00 מומלץ — שמש יורדת, נוף מהמם על העיר. לשלם באשראי במקום.',
+   how:'טראם לרציף 4 (Čechův most / Náměstí Jana Palacha)', mapUrl:'https://www.google.com/maps/search/Prague+boat+cruise+pier+4'},
+  {cat:'🎟️ אטרקציות', icon:'🏊', name:'Aquapalace Prague', fb:'⭐⭐⭐⭐⭐', google:'4.2', desc:'יום מים שלם! מגלשות, בריכת גלים, גקוזי, נהרות זרימה. אפשר בתחבורה ציבורית. בסופ"ש — הנחה באתר.',
+   how:'מטרו C → Opatov + אוטובוס 363 ישר לפתח הפארק', mapUrl:'https://www.google.com/maps/search/Aquapalace+Prague'},
+  {cat:'🎟️ אטרקציות', icon:'🏊', name:'בריכת Šutka', fb:'⭐⭐⭐⭐⭐', google:'4.3', desc:'3 בריכות: 50מ׳ עם מקפצות, בריכת ילדים, בריכה עם מגלשות. מתחם שלם ל-5 שעות. מחיר נמוך.',
+   how:'מטרו C → Střížkov + אוטובוס 200 כמה תחנות', mapUrl:'https://www.google.com/maps/search/Sutka+pool+Prague'},
+  {cat:'🎟️ אטרקציות', icon:'🎮', name:'Level — משחקייה', fb:'⭐⭐⭐⭐⭐', google:'4.4', desc:'משחקייה אינטראקטיבית ענקית. כרטיס שעה — הילדים מתים עליה! מומלץ לערב.',
+   how:'מטרו B → náměstí Republiky, ממוקם בעיר העתיקה', mapUrl:'https://www.google.com/maps/search/Level+gaming+Prague'},
+  {cat:'🎟️ אטרקציות', icon:'🏔️', name:'שמורת Adršpach', fb:'⭐⭐⭐⭐⭐', google:'4.8', desc:'טיול יומי מהמם! טבע מרשים ויפה. להביא אוכל מפראג — האוכל באזור לא מזמין.',
+   how:'רכבת מ-Praha hlavní nádraží → Adršpach ~3 שעות', mapUrl:'https://www.google.com/maps/search/Adrsbach+rock+city'},
+  // ── 🛍️ קניות ──
+  {cat:'🛍️ קניות', icon:'🛍️', name:'Primark — וצסלב', fb:'⭐⭐⭐⭐⭐', google:'4.3', desc:'ביגוד, ילדים, בית, מזוודות. להגיע בבוקר לפני ההמון. ממש בלב הפרסטיז׳ה.',
+   how:'מטרו A/C → Václavské náměstí, צעד אחד', mapUrl:'https://www.google.com/maps/search/Primark+Wenceslas+Square+Prague'},
+  {cat:'🛍️ קניות', icon:'🏬', name:'Palladium', fb:'⭐⭐⭐⭐⭐', google:'4.3', desc:'~180 חנויות, Albert סופר. לשלב עם ביקור בעיר העתיקה הצמודה.',
+   how:'מטרו B → náměstí Republiky — ממול לתחנה', mapUrl:'https://www.google.com/maps/place/Palladium+Prague'},
+  {cat:'🛍️ קניות', icon:'🏢', name:'Westfield Chodov', fb:'⭐⭐⭐⭐', google:'4.2', desc:'~300 חנויות: Zara, Mango, Reserved. הקניון הגדול ביותר — ליום גשם/חום.',
+   how:'מטרו C → Chodov — הקניון ממש מעל התחנה', mapUrl:'https://www.google.com/maps/search/Westfield+Chodov+Prague'},
+  {cat:'🛍️ קניות', icon:'🍫', name:'Albert Supermarket — Chodov', fb:'⭐⭐⭐⭐⭐', google:'4.1', desc:'סופר ענק בקומה -1 בחודוב. מחירים שפויים על שוקולדים לארץ. חובה לפני הטיסה!',
+   how:'מטרו C → Chodov, קומה -1 של Westfield Chodov', mapUrl:'https://www.google.com/maps/search/Albert+supermarket+Chodov+Prague'}
 ];
 
 // photo spots sorted cheap→expensive (by entrance fee)
@@ -1495,6 +1567,49 @@ function renderHistory() {
 }
 
 // ═══════════════════════════════════════════
+//  COMMUNITY
+// ═══════════════════════════════════════════
+var _commCat = 'הכל';
+function renderCommunity() {
+  var cats = ['הכל'].concat(COMMUNITY.reduce(function(a,c){ if(a.indexOf(c.cat)===-1) a.push(c.cat); return a; },[]));
+  var filterEl = qs('commCatFilter');
+  if (filterEl) {
+    filterEl.innerHTML = cats.map(function(c) {
+      var active = _commCat === c;
+      return '<button type="button" onclick="setCommCat(\''+c.replace(/'/g,'\\\'')+'\')" style="flex-shrink:0;background:'+(active?'rgba(52,211,153,0.25)':'rgba(255,255,255,0.07)')+';border:1px solid '+(active?'rgba(52,211,153,0.5)':'rgba(255,255,255,0.15)')+';border-radius:20px;padding:7px 14px;font-size:12px;font-weight:700;color:'+(active?'#6EE7B7':'rgba(241,245,249,0.7)')+';cursor:pointer;white-space:nowrap;font-family:\'Rubik\',Arial,sans-serif;">'+c+'</button>';
+    }).join('');
+  }
+  var list = qs('commList'); if (!list) return;
+  var items = _commCat === 'הכל' ? COMMUNITY : COMMUNITY.filter(function(c){ return c.cat === _commCat; });
+  list.innerHTML = items.map(function(p) {
+    var stars = p.google ? parseFloat(p.google) : 0;
+    var starBar = '';
+    for (var i=1;i<=5;i++) starBar += '<span style="color:'+(i<=Math.round(stars)?'#FCD34D':'rgba(255,255,255,0.2)')+'">★</span>';
+    return '<div class="card" style="padding:16px;">' +
+      '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px;">' +
+        '<div style="flex:1;">' +
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">' +
+            '<span style="font-size:20px;">' + p.icon + '</span>' +
+            '<div style="font-size:14px;font-weight:900;color:#F1F5F9;">' + p.name + '</div>' +
+          '</div>' +
+          '<div style="font-size:10px;color:rgba(52,211,153,0.8);font-weight:700;margin-bottom:6px;">' + p.cat + '</div>' +
+          '<div style="font-size:12px;color:rgba(241,245,249,0.6);line-height:1.55;margin-bottom:8px;">' + p.desc + '</div>' +
+          '<div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.18);border-radius:10px;padding:8px 10px;margin-bottom:8px;">' +
+            '<div style="font-size:10px;font-weight:800;color:#93C5FD;margin-bottom:3px;">🚇 איך להגיע</div>' +
+            '<div style="font-size:11px;color:rgba(241,245,249,0.65);line-height:1.5;">' + p.how + '</div>' +
+          '</div>' +
+          '<div style="display:flex;align-items:center;gap:12px;">' +
+            '<div style="font-size:11px;color:rgba(241,245,249,0.5);">👥 ' + (p.fb||'—') + '</div>' +
+            '<div style="font-size:11px;color:rgba(241,245,249,0.5);">🌐 Google ' + starBar + ' ' + (p.google||'') + '</div>' +
+          '</div>' +
+        '</div>' +
+        (p.mapUrl ? '<a href="'+p.mapUrl+'" target="_blank" rel="noopener" style="flex-shrink:0;background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.25);border-radius:12px;padding:10px 12px;font-size:11px;font-weight:700;color:#6EE7B7;text-decoration:none;text-align:center;line-height:1.3;">🗺️<br>נווט</a>' : '') +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+function setCommCat(cat) { _commCat = cat; renderCommunity(); }
+
 //  SHOPPING
 // ═══════════════════════════════════════════
 function renderShopping() {
@@ -2375,6 +2490,8 @@ document.addEventListener('DOMContentLoaded', function() {
     'btnBackRestaurants': function() { openTab('home'); },
     'btnBackPack':        function() { openTab('home'); },
     'btnBackInfo':        function() { openTab('home'); },
+    'btnHomeCommunity':   function() { openTab('community'); renderCommunity(); },
+    'btnBackCommunity':   function() { openTab('home'); },
     'btnHomeHistory':     function() { openTab('history'); renderHistory(); },
     'btnBackHistory':       function() { openTab('home'); },
     'btnHomePhotoDiary':    function() { openTab('photodiary'); renderPhotoDiary(); },
