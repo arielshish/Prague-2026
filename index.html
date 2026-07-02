@@ -221,6 +221,7 @@
     </div>
     <div style="display:flex;gap:8px;margin-bottom:14px;">
       <button id="btnAddExpense" class="btn-primary" style="flex:1;">➕ הוסף הוצאה</button>
+      <button onclick="closeExpense()" class="btn-ghost">ביטול</button>
       <button id="btnRefreshExp" class="btn-ghost">🔄</button>
       <button id="btnExportCsv" class="btn-ghost">CSV</button>
     </div>
@@ -1980,7 +1981,7 @@ function buildExpNameList() {
     { label:'☕ אוכל ושתייה', items:['☕ קפה','🥐 ארוחת בוקר','🍕 ארוחת צהריים','🍺 בר'] },
     { label:'🎁 שונות', items:['🎁 מזכרות','🏨 מלון','✈️ טיסות','💊 בריאות','🔀 שונות'] }
   ];
-  var html = '';
+  var html = '<button type="button" onclick="qs(\'expName\').focus()" style="display:block;width:100%;text-align:right;background:rgba(244,99,74,0.08);border:0;border-bottom:1px solid rgba(255,255,255,0.08);padding:11px 12px;font-size:13px;font-weight:700;color:#FCA5A5;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;">✏️ כתב חופשי — הקלד בשדה למעלה</button>';
   cats.forEach(function(cat) {
     if (!cat.items.length) return;
     html += '<div style="padding:8px 10px 4px;font-size:10px;font-weight:800;color:rgba(241,245,249,0.4);letter-spacing:1px;text-transform:uppercase;position:sticky;top:0;background:rgba(7,18,32,0.95);">'+cat.label+'</div>';
