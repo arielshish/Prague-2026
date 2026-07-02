@@ -793,8 +793,11 @@
     </div>
     <!-- שם -->
     <input id="expName" type="text" placeholder="🔍 חפש או הקלד חופשי..." oninput="filterExpNameList(this.value)" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:13px 14px;font-size:15px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:8px;">
+    <!-- קטגוריה לתקציב -->
+    <div id="expCatChips" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;"></div>
+    <input type="hidden" id="expCat" value="">
     <!-- רשימה נגללת -->
-    <div id="expNameList" style="max-height:220px;overflow-y:auto;-webkit-overflow-scrolling:touch;margin-bottom:10px;border:1px solid rgba(255,255,255,0.08);border-radius:14px;background:rgba(0,0,0,0.18);"></div>
+    <div id="expNameList" style="max-height:200px;overflow-y:auto;-webkit-overflow-scrolling:touch;margin-bottom:10px;border:1px solid rgba(255,255,255,0.08);border-radius:14px;background:rgba(0,0,0,0.18);"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
       <input id="expCzk" type="number" inputmode="decimal" placeholder="CZK" style="background:rgba(245,158,11,0.09);border:1px solid rgba(245,158,11,0.3);border-radius:13px;padding:13px 12px;font-size:15px;color:#F59E0B;font-family:'Rubik',Arial,sans-serif;direction:ltr;font-weight:700;box-sizing:border-box;width:100%;">
       <input id="expIls" type="number" inputmode="decimal" placeholder="₪" style="background:rgba(244,99,74,0.09);border:1px solid rgba(244,99,74,0.3);border-radius:13px;padding:13px 12px;font-size:15px;color:#F4634A;font-family:'Rubik',Arial,sans-serif;direction:ltr;font-weight:700;box-sizing:border-box;width:100%;">
@@ -2033,15 +2036,41 @@ function buildExpNameList() {
   el.innerHTML = html;
 }
 
+var EXP_CAT_DEFS = [
+  {key:'אוכל',   label:'🍽️ אוכל',      clr:'rgba(244,99,74,0.15)',  border:'rgba(244,99,74,0.4)',  txt:'#FCA5A5'},
+  {key:'אטרקציות',label:'🎟️ אטרקציות', clr:'rgba(168,85,247,0.15)', border:'rgba(168,85,247,0.4)', txt:'#C084FC'},
+  {key:'קניות',  label:'🛍️ קניות',     clr:'rgba(245,158,11,0.15)', border:'rgba(245,158,11,0.4)', txt:'#FCD34D'},
+  {key:'תחבורה', label:'🚖 תחבורה',    clr:'rgba(59,130,246,0.15)', border:'rgba(59,130,246,0.4)', txt:'#93C5FD'},
+  {key:'כללי',   label:'💡 כללי',      clr:'rgba(255,255,255,0.07)',border:'rgba(255,255,255,0.2)', txt:'rgba(241,245,249,0.6)'}
+];
+
+function buildCatChips(selectedKey) {
+  var el = qs('expCatChips'); if (!el) return;
+  el.innerHTML = EXP_CAT_DEFS.map(function(c) {
+    var active = selectedKey === c.key;
+    return '<button type="button" onclick="pickExpCat(\''+c.key+'\')" style="background:'+(active?c.clr.replace('0.15','0.35'):c.clr)+';border:1px solid '+(active?c.border:c.border.replace('0.4','0.2'))+';border-radius:20px;padding:5px 11px;font-size:11px;font-weight:700;color:'+c.txt+';cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;'+(active?'box-shadow:0 0 8px '+c.border+';':'')+'">'+(active?'✓ ':'')+c.label+'</button>';
+  }).join('');
+}
+
+function pickExpCat(key) {
+  var inp = qs('expCat'); if (inp) inp.value = key;
+  buildCatChips(key);
+}
+
 function pickExpName(btn) {
-  var n = qs('expName'); if (n) n.value = btn.getAttribute('data-val');
+  var val = btn.getAttribute('data-val');
+  var n = qs('expName'); if (n) n.value = val;
+  // auto-select category chip based on emoji
+  var guess = guessExpCat(val);
+  pickExpCat(guess || 'כללי');
   setTimeout(function(){ var c=qs('expCzk'); if(c) c.focus(); }, 80);
 }
 
 function openExpense() {
   EDIT_ID = null;
   var t = qs('expenseTitle'); if (t) t.textContent = '➕ הוסף הוצאה';
-  ['expName','expCzk','expIls','expNote'].forEach(function(id) { var el = qs(id); if (el) el.value = ''; });
+  ['expName','expCzk','expIls','expNote','expCat'].forEach(function(id) { var el = qs(id); if (el) el.value = ''; });
+  buildCatChips('');
   buildExpNameList();
   var m = qs('expenseModal'); if (m) m.style.display = 'flex';
 }
@@ -2055,6 +2084,12 @@ function saveExpense() {
   var btn = qs('btnSaveExpense');
   if (btn && btn.disabled) return;
   var name = qs('expName').value.trim();
+  var catKey = (qs('expCat') && qs('expCat').value) || '';
+  // אם נבחרה קטגוריה ידנית והשם לא מתחיל באמוג'י — הוסף prefix
+  if (catKey && !guessExpCat(name)) {
+    var catEmoji = {אוכל:'🍽️',אטרקציות:'🎟️',קניות:'🛍️',תחבורה:'🚖',כללי:'💡'};
+    if (catEmoji[catKey]) name = catEmoji[catKey] + ' ' + name;
+  }
   var czk = Number(qs('expCzk').value || 0);
   var ils = Number(qs('expIls').value || 0);
   var note = qs('expNote').value.trim();
@@ -2084,6 +2119,10 @@ function editExpense(id) {
   if (qs('expCzk')) qs('expCzk').value = e.czk || '';
   if (qs('expIls')) qs('expIls').value = e.ils || '';
   if (qs('expNote')) qs('expNote').value = e.note || '';
+  var gcat = guessExpCat(e.name||'');
+  if (qs('expCat')) qs('expCat').value = gcat||'';
+  buildCatChips(gcat||'');
+  buildExpNameList();
   var m = qs('expenseModal'); if (m) m.style.display = 'flex';
 }
 
