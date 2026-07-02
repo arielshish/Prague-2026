@@ -792,7 +792,7 @@
       <button onclick="closeExpense()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:10px;padding:6px 13px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">ביטול</button>
     </div>
     <!-- שם -->
-    <input id="expName" type="text" placeholder="שם / קטגוריה" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:13px 14px;font-size:15px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:8px;">
+    <input id="expName" type="text" placeholder="🔍 חפש או הקלד חופשי..." oninput="filterExpNameList(this.value)" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:13px 14px;font-size:15px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:8px;">
     <!-- רשימה נגללת -->
     <div id="expNameList" style="max-height:220px;overflow-y:auto;-webkit-overflow-scrolling:touch;margin-bottom:10px;border:1px solid rgba(255,255,255,0.08);border-radius:14px;background:rgba(0,0,0,0.18);"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
@@ -1988,6 +1988,22 @@ function renderExpenses() {
   });
 }
 
+var _expAllItems = [];
+
+function filterExpNameList(q) {
+  var el = qs('expNameList'); if (!el) return;
+  q = (q||'').trim().toLowerCase();
+  if (!q) { buildExpNameList(); return; }
+  var filtered = _expAllItems.filter(function(name) { return name.toLowerCase().indexOf(q) !== -1; });
+  if (!filtered.length) {
+    el.innerHTML = '<div style="padding:12px;font-size:12px;color:rgba(241,245,249,0.35);text-align:center;">אין תוצאות — הטקסט שהקלדת ישמר כמו שהוא</div>';
+    return;
+  }
+  el.innerHTML = filtered.map(function(name) {
+    return '<button type="button" onclick="pickExpName(this)" data-val="'+name.replace(/"/g,'&quot;')+'" style="display:block;width:100%;text-align:right;background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,0.05);padding:10px 12px;font-size:13px;font-weight:600;color:#F1F5F9;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;">'+name+'</button>';
+  }).join('');
+}
+
 function buildExpNameList() {
   var el = qs('expNameList'); if (!el) return;
   var cats = [
@@ -2003,6 +2019,9 @@ function buildExpNameList() {
     { label:'☕ אוכל ושתייה', items:['☕ קפה','🥐 ארוחת בוקר','🍕 ארוחת צהריים','🍺 בר'] },
     { label:'🎁 שונות', items:['🎁 מזכרות','🏨 מלון','✈️ טיסות','💊 בריאות','🔀 שונות'] }
   ];
+  _expAllItems = [];
+  cats.forEach(function(cat) { _expAllItems = _expAllItems.concat(cat.items); });
+
   var html = '<button type="button" onclick="qs(\'expName\').focus()" style="display:block;width:100%;text-align:right;background:rgba(244,99,74,0.08);border:0;border-bottom:1px solid rgba(255,255,255,0.08);padding:11px 12px;font-size:13px;font-weight:700;color:#FCA5A5;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;">✏️ כתב חופשי — הקלד בשדה למעלה</button>';
   cats.forEach(function(cat) {
     if (!cat.items.length) return;
