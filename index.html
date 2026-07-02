@@ -2160,7 +2160,12 @@ function buildExpNameList() {
         (DAYS||[]).forEach(function(d){ (d.stops||[]).forEach(function(s){ if(!seen[s.name]){ seen[s.name]=1; out.push((s.emoji||'🎟️')+' '+s.name); } }); });
         return out;
       })() },
-    { label:'🛍️ קניות', items: SHOPS.map(function(r){ return r.e+' '+r.n; }) },
+    { label:'🛍️ קניות', items: SHOPS.map(function(r){ return r.e+' '+r.n; }).concat(
+        COMMUNITY.filter(function(c){ return c.cat==='🛍️ קניות'; }).map(function(c){ return c.icon+' '+c.name; })
+      ) },
+    { label:'👥 קהילה — מסעדות', items: COMMUNITY.filter(function(c){ return c.cat==='🍽️ מסעדות'; }).map(function(c){ return c.icon+' '+c.name; }) },
+    { label:'👥 קהילה — אטרקציות', items: COMMUNITY.filter(function(c){ return c.cat==='🎟️ אטרקציות'; }).map(function(c){ return c.icon+' '+c.name; }) },
+    { label:'👥 קהילה — קינוחים', items: COMMUNITY.filter(function(c){ return c.cat==='🍦 קינוחים'; }).map(function(c){ return c.icon+' '+c.name; }) },
     { label:'🚖 תחבורה', items:['🚖 Bolt / Uber','🚇 מטרו','🚌 אוטובוס','🚋 טראם'] },
     { label:'☕ אוכל ושתייה', items:['☕ קפה','🥐 ארוחת בוקר','🍕 ארוחת צהריים','🍺 בר'] },
     { label:'🎁 שונות', items:['🎁 מזכרות','🏨 מלון','✈️ טיסות','💊 בריאות','🔀 שונות'] }
