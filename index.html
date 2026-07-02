@@ -1967,13 +1967,16 @@ function calcIls() { var c = Number(qs('expCzk').value || 0); if (c > 0) qs('exp
 function calcCzk() { var il = Number(qs('expIls').value || 0); if (il > 0) qs('expCzk').value = Math.round(il * RATE); }
 
 function saveExpense() {
+  var btn = qs('btnSaveExpense');
+  if (btn && btn.disabled) return;
   var name = qs('expName').value.trim();
   var czk = Number(qs('expCzk').value || 0);
   var ils = Number(qs('expIls').value || 0);
   var note = qs('expNote').value.trim();
   if (!name) { toast('חסר שם הוצאה'); return; }
-  var ok = function() { closeExpense(); loadExpenses(); toast('✅ נשמר!'); };
-  var fail = function() { toast('❌ שגיאה בשמירה'); };
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ שומר...'; }
+  var ok = function() { if (btn) { btn.disabled = false; btn.textContent = 'שמור הוצאה 💸'; } closeExpense(); loadExpenses(); toast('✅ נשמר!'); };
+  var fail = function() { if (btn) { btn.disabled = false; btn.textContent = 'שמור הוצאה 💸'; } toast('❌ שגיאה בשמירה'); };
   if (isGas()) {
     if (EDIT_ID) { google.script.run.withSuccessHandler(ok).withFailureHandler(fail).updateExpense(EDIT_ID, name, czk, ils, note); }
     else { google.script.run.withSuccessHandler(ok).withFailureHandler(fail).addExpense(name, czk, ils, note); }
