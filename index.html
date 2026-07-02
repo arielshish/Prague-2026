@@ -27,6 +27,7 @@
   .card{background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.16);border-radius:22px;padding:18px;margin-bottom:12px;box-shadow:0 8px 24px rgba(0,0,0,0.32);}
   .card-hdr{display:flex;align-items:center;justify-content:space-between;gap:8px;}
   .back-btn{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:10px;padding:7px 12px;font-size:11px;font-weight:700;color:rgba(241,245,249,0.55);cursor:pointer;font-family:'Rubik',Arial,sans-serif;white-space:nowrap;}
+  .cat-chip{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:6px 12px;font-size:12px;font-weight:700;color:rgba(241,245,249,0.8);cursor:pointer;font-family:'Rubik',Arial,sans-serif;}
   .btn-primary{background:#F4634A;color:white;border:0;border-radius:13px;padding:12px 16px;font-weight:800;font-size:13px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;box-shadow:0 5px 14px rgba(244,99,74,0.32);}
   .btn-ghost{background:rgba(255,255,255,0.09);color:rgba(241,245,249,0.75);border:1px solid rgba(255,255,255,0.15);border-radius:13px;padding:12px 14px;font-weight:700;font-size:13px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;}
   .nav-map-btn{display:inline-block;background:rgba(255,255,255,0.10);color:rgba(241,245,249,0.78);border:1px solid rgba(255,255,255,0.15);border-radius:9px;padding:5px 12px;font-size:11px;font-weight:700;text-decoration:none;font-family:'Rubik',Arial,sans-serif;}
@@ -783,7 +784,39 @@
   <div style="position:relative;width:min(430px,100%);background:#071220;border:1px solid rgba(255,255,255,0.13);border-top:1px solid rgba(255,255,255,0.22);border-radius:26px 26px 0 0;padding:22px 18px 36px;box-shadow:0 -24px 64px rgba(0,0,0,0.65);animation:sheetUp 0.3s ease both;direction:rtl;text-align:right;">
     <div style="width:34px;height:4px;background:rgba(255,255,255,0.18);border-radius:2px;margin:0 auto 18px;"></div>
     <h2 id="expenseTitle" style="margin:0 0 18px;font-size:18px;font-weight:900;color:#F1F5F9;">➕ הוסף הוצאה</h2>
-    <input id="expName" type="text" placeholder="שם / קטגוריה" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:13px 14px;font-size:15px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:10px;">
+    <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:10px;align-items:stretch;">
+      <input id="expName" type="text" list="expCatList" placeholder="שם / קטגוריה" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:13px 14px;font-size:15px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;">
+      <button type="button" onclick="showCatPicker()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:13px;padding:0 14px;font-size:18px;cursor:pointer;white-space:nowrap;">📋</button>
+    </div>
+    <datalist id="expCatList">
+      <option value="🍽️ אוכל ומסעדות">
+      <option value="🛍️ קניות">
+      <option value="🎟️ אטרקציות">
+      <option value="🚖 תחבורה">
+      <option value="☕ קפה וחטיפים">
+      <option value="🏨 מלון">
+      <option value="✈️ טיסות">
+      <option value="💊 בריאות ותרופות">
+      <option value="📱 תקשורת">
+      <option value="🎁 מזכרות ומתנות">
+      <option value="🍦 גלידה וממתקים">
+      <option value="🎢 פארק מים">
+      <option value="🔀 שונות">
+    </datalist>
+    <!-- בוחר קטגוריות מהירות -->
+    <div id="catPicker" style="display:none;flex-wrap:wrap;gap:7px;margin-bottom:10px;">
+      <div style="width:100%;font-size:11px;color:rgba(241,245,249,0.4);margin-bottom:2px;">בחר קטגוריה מהירה:</div>
+      <button type="button" onclick="pickCat('🍽️ אוכל ומסעדות')" class="cat-chip">🍽️ אוכל</button>
+      <button type="button" onclick="pickCat('🛍️ קניות')" class="cat-chip">🛍️ קניות</button>
+      <button type="button" onclick="pickCat('🎟️ אטרקציות')" class="cat-chip">🎟️ אטרקציות</button>
+      <button type="button" onclick="pickCat('🚖 תחבורה')" class="cat-chip">🚖 תחבורה</button>
+      <button type="button" onclick="pickCat('☕ קפה וחטיפים')" class="cat-chip">☕ קפה</button>
+      <button type="button" onclick="pickCat('🏨 מלון')" class="cat-chip">🏨 מלון</button>
+      <button type="button" onclick="pickCat('🍦 גלידה וממתקים')" class="cat-chip">🍦 גלידה</button>
+      <button type="button" onclick="pickCat('🎁 מזכרות')" class="cat-chip">🎁 מזכרות</button>
+      <button type="button" onclick="pickCat('🎢 פארק מים')" class="cat-chip">🎢 פארק</button>
+      <button type="button" onclick="pickCat('🔀 שונות')" class="cat-chip">🔀 שונות</button>
+    </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
       <input id="expCzk" type="number" placeholder="CZK" style="background:rgba(245,158,11,0.09);border:1px solid rgba(245,158,11,0.3);border-radius:13px;padding:13px 12px;font-size:15px;color:#F59E0B;font-family:'Rubik',Arial,sans-serif;direction:ltr;font-weight:700;box-sizing:border-box;width:100%;">
       <input id="expIls" type="number" placeholder="₪" style="background:rgba(244,99,74,0.09);border:1px solid rgba(244,99,74,0.3);border-radius:13px;padding:13px 12px;font-size:15px;color:#F4634A;font-family:'Rubik',Arial,sans-serif;direction:ltr;font-weight:700;box-sizing:border-box;width:100%;">
@@ -1961,7 +1994,10 @@ function openExpense() {
   var m = qs('expenseModal'); if (m) m.style.display = 'flex';
 }
 
-function closeExpense() { var m = qs('expenseModal'); if (m) m.style.display = 'none'; }
+function closeExpense() { var m = qs('expenseModal'); if (m) m.style.display = 'none'; hideCatPicker(); }
+function showCatPicker() { var p = qs('catPicker'); if (p) p.style.display = p.style.display === 'flex' ? 'none' : 'flex'; }
+function hideCatPicker() { var p = qs('catPicker'); if (p) p.style.display = 'none'; }
+function pickCat(cat) { var n = qs('expName'); if (n) n.value = cat; hideCatPicker(); qs('expCzk').focus(); }
 
 function calcIls() { var c = Number(qs('expCzk').value || 0); if (c > 0) qs('expIls').value = Math.round(c / RATE); }
 function calcCzk() { var il = Number(qs('expIls').value || 0); if (il > 0) qs('expCzk').value = Math.round(il * RATE); }
