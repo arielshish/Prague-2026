@@ -781,7 +781,7 @@
 <!-- ═══ EXPENSE MODAL ═══ -->
 <div id="expenseModal" style="display:none;position:fixed;inset:0;z-index:80;align-items:flex-end;justify-content:center;">
   <div id="expModalBg" style="position:absolute;inset:0;background:rgba(2,7,14,0.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);"></div>
-  <div style="position:relative;width:min(430px,100%);background:#071220;border:1px solid rgba(255,255,255,0.13);border-top:1px solid rgba(255,255,255,0.22);border-radius:26px 26px 0 0;padding:22px 18px 36px;box-shadow:0 -24px 64px rgba(0,0,0,0.65);animation:sheetUp 0.3s ease both;direction:rtl;text-align:right;">
+  <div style="position:relative;width:min(430px,100%);background:#071220;border:1px solid rgba(255,255,255,0.13);border-top:1px solid rgba(255,255,255,0.22);border-radius:26px 26px 0 0;padding:22px 18px 36px;box-shadow:0 -24px 64px rgba(0,0,0,0.65);animation:sheetUp 0.3s ease both;direction:rtl;text-align:right;max-height:90vh;overflow-y:auto;">
     <div style="width:34px;height:4px;background:rgba(255,255,255,0.18);border-radius:2px;margin:0 auto 18px;"></div>
     <h2 id="expenseTitle" style="margin:0 0 18px;font-size:18px;font-weight:900;color:#F1F5F9;">➕ הוסף הוצאה</h2>
     <!-- שם חופשי -->
@@ -805,7 +805,7 @@
         <button type="button" onclick="ddBack()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:5px 10px;font-size:12px;color:rgba(241,245,249,0.7);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">← חזרה</button>
         <span id="ddSubTitle" style="font-size:12px;font-weight:700;color:rgba(241,245,249,0.5);"></span>
       </div>
-      <div id="ddSubList" style="display:flex;flex-direction:column;gap:5px;max-height:160px;overflow-y:auto;"></div>
+      <div id="ddSubList" style="display:flex;flex-direction:column;gap:5px;max-height:220px;overflow-y:auto;-webkit-overflow-scrolling:touch;"></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
       <input id="expCzk" type="number" placeholder="CZK" style="background:rgba(245,158,11,0.09);border:1px solid rgba(245,158,11,0.3);border-radius:13px;padding:13px 12px;font-size:15px;color:#F59E0B;font-family:'Rubik',Arial,sans-serif;direction:ltr;font-weight:700;box-sizing:border-box;width:100%;">
