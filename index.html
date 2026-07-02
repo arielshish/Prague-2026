@@ -1845,6 +1845,27 @@ function syncBudgetFromSheets() {
     .loadAppData();
 }
 
+function guessExpCat(name) {
+  if (!name) return null;
+  if (/^(🍽️|🍦|☕|🥐|🍕|🍺|✡️|🌸|🍔|🥩)/.test(name)) return 'אוכל';
+  if (/^(🎟️|🏰|🏛️|🌊|🚤|🏊|🎠|🎡|🎢|🏟️|⏰|🏘️|🏝️|🛶|🚶|🌀|🚂|🧸)/.test(name)) return 'אטרקציות';
+  if (/^(🛍️|🏬|🏢|🏷️|🛒|🍫)/.test(name)) return 'קניות';
+  if (/^(🚖|🚇|🚌|🚋|✈️|🚕|🚙)/.test(name)) return 'תחבורה';
+  return null;
+}
+
+function catActualMap(budget) {
+  var map = {}, last = budget[budget.length-1];
+  EXPENSES.forEach(function(e) {
+    var ils = Number(e.ils)||0;
+    var guess = guessExpCat(e.name||'');
+    var matched = false;
+    if (guess) budget.forEach(function(b) { if (!matched && b.cat.indexOf(guess)!==-1){ map[b.cat]=(map[b.cat]||0)+ils; matched=true; } });
+    if (!matched && last) map[last.cat]=(map[last.cat]||0)+ils;
+  });
+  return map;
+}
+
 function renderBudget() {
   var budget = loadBudget();
   var totalActual = 0;
@@ -1852,11 +1873,12 @@ function renderBudget() {
   var catTotal = budget.reduce(function(s,b) { return s + (Number(b.ils)||0); }, 0);
   var manualTotal = loadTotalBudget();
   var totalBudget = manualTotal || catTotal;
+  var actualMap = catActualMap(budget);
 
   var rows = qs('budgetRows');
   if (!rows) return;
   rows.innerHTML = budget.map(function(b) {
-    var pct = catTotal ? Math.round((Number(b.ils)||0) / catTotal * totalActual) : 0;
+    var pct = actualMap[b.cat] || 0;
     var ratio = (Number(b.ils)||0) > 0 ? Math.min(pct / (Number(b.ils)||0), 1) : 0;
     var color = ratio < 0.7 ? '#6EE7B7' : ratio < 0.9 ? '#FCD34D' : '#FCA5A5';
     return '<div>' +
