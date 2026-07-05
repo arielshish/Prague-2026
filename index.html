@@ -1568,13 +1568,18 @@ function deleteStop(dayIdx, stopIdx) {
 var _currentBankTab = 'attr';
 
 function findItemInDays(name) {
-  // returns {dayNum, dayTitle, time} if found, else null
-  var state = getDaysState();
-  for (var i = 0; i < state.length; i++) {
-    var stops = state[i].stops || [];
-    for (var j = 0; j < stops.length; j++) {
-      if (stops[j].name && stops[j].name.trim() === name.trim()) {
-        return { dayNum: i + 1, dayTitle: state[i].title || ('יום ' + (i+1)), time: stops[j].time || '' };
+  var nameTrim = (name || '').trim();
+  // check saved/current state first, then original DAYS as fallback
+  var sources = [getDaysState()];
+  if (typeof DAYS !== 'undefined') sources.push(DAYS);
+  for (var s = 0; s < sources.length; s++) {
+    var state = sources[s];
+    for (var i = 0; i < state.length; i++) {
+      var stops = state[i].stops || [];
+      for (var j = 0; j < stops.length; j++) {
+        if ((stops[j].name || '').trim() === nameTrim) {
+          return { dayNum: i + 1, dayTitle: state[i].title || ('יום ' + (i+1)), time: stops[j].time || '' };
+        }
       }
     }
   }
