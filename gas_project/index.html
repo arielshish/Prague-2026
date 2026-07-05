@@ -155,9 +155,10 @@
     <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);" id="addStopOverlay"></div>
     <div style="position:relative;background:linear-gradient(160deg,#1e293b,#0f172a);border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;z-index:1;">
       <h2 id="addStopTitle" style="margin:0 0 12px;font-size:17px;font-weight:900;color:#F1F5F9;">➕ הוסף תחנה</h2>
-      <div style="display:flex;gap:8px;margin-bottom:10px;">
-        <button id="bankTabAttr" onclick="switchBankTab('attr')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(244,99,74,0.25);color:#F4634A;font-weight:700;font-size:12px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🎟️ אטרקציות</button>
-        <button id="bankTabRest" onclick="switchBankTab('rest')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(255,255,255,0.06);color:rgba(241,245,249,0.45);font-weight:700;font-size:12px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🍽️ מסעדות</button>
+      <div style="display:flex;gap:6px;margin-bottom:10px;">
+        <button id="bankTabAttr" onclick="switchBankTab('attr')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(244,99,74,0.25);color:#F4634A;font-weight:700;font-size:11px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🎟️ אטרקציות</button>
+        <button id="bankTabRest" onclick="switchBankTab('rest')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(255,255,255,0.06);color:rgba(241,245,249,0.45);font-weight:700;font-size:11px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🍽️ אוכל</button>
+        <button id="bankTabShop" onclick="switchBankTab('shop')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(255,255,255,0.06);color:rgba(241,245,249,0.45);font-weight:700;font-size:11px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🛍️ קניות</button>
       </div>
       <div id="attrBankRow" style="display:flex;gap:9px;overflow-x:auto;padding-bottom:10px;margin-bottom:14px;scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
       <div style="font-size:11px;font-weight:700;color:rgba(241,245,249,0.4);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;">✏️ או הקלד ידנית</div>
@@ -1617,17 +1618,28 @@ function buildBankCards(items, iconKey, nameKey, descKey, howKey) {
 
 function switchBankTab(tab) {
   _currentBankTab = tab;
-  var tabAttr = qs('bankTabAttr'), tabRest = qs('bankTabRest');
+  var tabs = { attr: 'bankTabAttr', rest: 'bankTabRest', shop: 'bankTabShop' };
+  var colors = { attr: ['rgba(244,99,74,0.25)','#F4634A'], rest: ['rgba(56,189,248,0.2)','#38BDF8'], shop: ['rgba(168,85,247,0.2)','#C084FC'] };
+  Object.keys(tabs).forEach(function(k) {
+    var el = qs(tabs[k]); if (!el) return;
+    if (k === tab) { el.style.background = colors[k][0]; el.style.color = colors[k][1]; }
+    else { el.style.background = 'rgba(255,255,255,0.06)'; el.style.color = 'rgba(241,245,249,0.45)'; }
+  });
+  var comm = typeof COMMUNITY !== 'undefined' ? COMMUNITY : [];
+  var rest = typeof RESTAURANTS !== 'undefined' ? RESTAURANTS : [];
   if (tab === 'attr') {
-    if (tabAttr) { tabAttr.style.background='rgba(244,99,74,0.25)'; tabAttr.style.color='#F4634A'; }
-    if (tabRest) { tabRest.style.background='rgba(255,255,255,0.06)'; tabRest.style.color='rgba(241,245,249,0.45)'; }
-    var items = (typeof COMMUNITY !== 'undefined' ? COMMUNITY : []).filter(function(c){ return c.cat === '🎟️ אטרקציות'; });
-    buildBankCards(items, 'icon', 'name', 'desc', 'how');
+    buildBankCards(comm.filter(function(c){ return c.cat === '🎟️ אטרקציות'; }), 'icon', 'name', 'desc', 'how');
+  } else if (tab === 'rest') {
+    // RESTAURANTS + COMMUNITY מסעדות + קינוחים
+    var foodItems = rest.map(function(r){ return {icon:r.icon,name:r.name,desc:r.desc||r.sub||'',how:''}; });
+    var commFood = comm.filter(function(c){ return c.cat === '🍽️ מסעדות' || c.cat === '🍦 קינוחים'; })
+      .map(function(c){ return {icon:c.icon,name:c.name,desc:c.desc||'',how:c.how||''}; });
+    // deduplicate by name
+    var seen = {}; var merged = [];
+    foodItems.concat(commFood).forEach(function(x){ if (!seen[x.name]){ seen[x.name]=1; merged.push(x); } });
+    buildBankCards(merged, 'icon', 'name', 'desc', 'how');
   } else {
-    if (tabRest) { tabRest.style.background='rgba(56,189,248,0.2)'; tabRest.style.color='#38BDF8'; }
-    if (tabAttr) { tabAttr.style.background='rgba(255,255,255,0.06)'; tabAttr.style.color='rgba(241,245,249,0.45)'; }
-    var items2 = (typeof RESTAURANTS !== 'undefined' ? RESTAURANTS : []);
-    buildBankCards(items2, 'icon', 'name', 'desc', 'how');
+    buildBankCards(comm.filter(function(c){ return c.cat === '🛍️ קניות'; }), 'icon', 'name', 'desc', 'how');
   }
 }
 
