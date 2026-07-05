@@ -154,8 +154,11 @@
   <div id="addStopModal" style="display:none;position:fixed;inset:0;z-index:80;align-items:flex-end;justify-content:center;">
     <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);" id="addStopOverlay"></div>
     <div style="position:relative;background:linear-gradient(160deg,#1e293b,#0f172a);border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;z-index:1;">
-      <h2 id="addStopTitle" style="margin:0 0 10px;font-size:17px;font-weight:900;color:#F1F5F9;">➕ הוסף תחנה</h2>
-      <div style="font-size:11px;font-weight:700;color:#F4634A;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;">🎟️ בחר מהבנק</div>
+      <h2 id="addStopTitle" style="margin:0 0 12px;font-size:17px;font-weight:900;color:#F1F5F9;">➕ הוסף תחנה</h2>
+      <div style="display:flex;gap:8px;margin-bottom:10px;">
+        <button id="bankTabAttr" onclick="switchBankTab('attr')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(244,99,74,0.25);color:#F4634A;font-weight:700;font-size:12px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🎟️ אטרקציות</button>
+        <button id="bankTabRest" onclick="switchBankTab('rest')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(255,255,255,0.06);color:rgba(241,245,249,0.45);font-weight:700;font-size:12px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🍽️ מסעדות</button>
+      </div>
       <div id="attrBankRow" style="display:flex;gap:9px;overflow-x:auto;padding-bottom:10px;margin-bottom:14px;scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
       <div style="font-size:11px;font-weight:700;color:rgba(241,245,249,0.4);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;">✏️ או הקלד ידנית</div>
       <input id="addStopEmoji" type="text" maxlength="4" placeholder="😀" style="width:56px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:11px 10px;font-size:22px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;text-align:center;box-sizing:border-box;margin-bottom:10px;">
@@ -1558,37 +1561,84 @@ function deleteStop(dayIdx, stopIdx) {
   toast('🗑️ תחנה נמחקה');
 }
 
+var _currentBankTab = 'attr';
+
+function findItemInDays(name) {
+  // returns {dayNum, dayTitle, time} if found, else null
+  var state = getDaysState();
+  for (var i = 0; i < state.length; i++) {
+    var stops = state[i].stops || [];
+    for (var j = 0; j < stops.length; j++) {
+      if (stops[j].name && stops[j].name.trim() === name.trim()) {
+        return { dayNum: i + 1, dayTitle: state[i].title || ('יום ' + (i+1)), time: stops[j].time || '' };
+      }
+    }
+  }
+  return null;
+}
+
+function buildBankCards(items, iconKey, nameKey, descKey, howKey) {
+  var bank = qs('attrBankRow');
+  if (!bank) return;
+  bank.innerHTML = '';
+  items.forEach(function(a) {
+    var name = a[nameKey] || '';
+    var existing = findItemInDays(name);
+    var card = document.createElement('div');
+    card.style.cssText = 'flex-shrink:0;width:138px;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.13);border-radius:14px;padding:10px 11px;cursor:pointer;transition:all .15s;position:relative;';
+    var existingBadge = existing
+      ? '<div style="margin-top:5px;padding:3px 6px;background:rgba(245,158,11,0.18);border:1px solid rgba(245,158,11,0.4);border-radius:7px;font-size:9px;font-weight:700;color:#FCD34D;line-height:1.3;">📅 יום ' + existing.dayNum + (existing.time ? ' · ' + existing.time : '') + '</div>'
+      : '';
+    card.innerHTML =
+      '<div style="font-size:22px;margin-bottom:4px;">' + (a[iconKey]||'📍') + '</div>' +
+      '<div style="font-size:12px;font-weight:700;color:#F1F5F9;line-height:1.3;">' + name + '</div>' +
+      (a[howKey||'how'] ? '<div style="font-size:10px;color:rgba(241,245,249,0.38);margin-top:3px;line-height:1.3;">' + (a[howKey||'how']||'').substring(0,40) + '</div>' : '') +
+      existingBadge;
+    card.addEventListener('click', (function(attr, ex) {
+      return function() {
+        if (ex) {
+          toast('📅 כבר מוצב ביום ' + ex.dayNum + (ex.time ? ' בשעה ' + ex.time : '') + ' — ' + ex.dayTitle);
+        }
+        var e = qs('addStopEmoji'); if (e) e.value = attr[iconKey]||'📍';
+        var n = qs('addStopName'); if (n) n.value = name;
+        var t = qs('addStopTime'); if (t) t.value = '';
+        var desc = attr[descKey]||'';
+        var how = attr[howKey||'how']||'';
+        var d = qs('addStopDesc'); if (d) d.value = desc.substring(0,120) + (how ? '\nהגעה: ' + how : '');
+        bank.querySelectorAll('div[style*="border-radius:14px"]').forEach(function(c){
+          c.style.background='rgba(255,255,255,0.06)'; c.style.border='1.5px solid rgba(255,255,255,0.13)';
+        });
+        card.style.background='rgba(244,99,74,0.22)'; card.style.border='1.5px solid #F4634A';
+      };
+    })(a, existing));
+    bank.appendChild(card);
+  });
+}
+
+function switchBankTab(tab) {
+  _currentBankTab = tab;
+  var tabAttr = qs('bankTabAttr'), tabRest = qs('bankTabRest');
+  if (tab === 'attr') {
+    if (tabAttr) { tabAttr.style.background='rgba(244,99,74,0.25)'; tabAttr.style.color='#F4634A'; }
+    if (tabRest) { tabRest.style.background='rgba(255,255,255,0.06)'; tabRest.style.color='rgba(241,245,249,0.45)'; }
+    var items = (typeof COMMUNITY !== 'undefined' ? COMMUNITY : []).filter(function(c){ return c.cat === '🎟️ אטרקציות'; });
+    buildBankCards(items, 'icon', 'name', 'desc', 'how');
+  } else {
+    if (tabRest) { tabRest.style.background='rgba(56,189,248,0.2)'; tabRest.style.color='#38BDF8'; }
+    if (tabAttr) { tabAttr.style.background='rgba(255,255,255,0.06)'; tabAttr.style.color='rgba(241,245,249,0.45)'; }
+    var items2 = (typeof RESTAURANTS !== 'undefined' ? RESTAURANTS : []);
+    buildBankCards(items2, 'icon', 'name', 'desc', 'how');
+  }
+}
+
 function openAddStop(dayIdx) {
   _moveStopFrom = null;
   var title = qs('addStopTitle');
   if (title) title.textContent = '➕ הוסף תחנה — יום ' + (dayIdx + 1);
   ['addStopEmoji','addStopName','addStopTime','addStopDesc'].forEach(function(id) { var el = qs(id); if (el) el.value = ''; });
   qs('btnSaveAddStop').setAttribute('data-day', dayIdx);
-  // fill attraction bank using data attributes (safe for Hebrew)
-  var bank = qs('attrBankRow');
-  if (bank) {
-    var attractions = (typeof COMMUNITY !== 'undefined' ? COMMUNITY : []).filter(function(c){ return c.cat === '🎟️ אטרקציות'; });
-    bank.innerHTML = '';
-    attractions.forEach(function(a, idx) {
-      var card = document.createElement('div');
-      card.style.cssText = 'flex-shrink:0;width:130px;background:rgba(244,99,74,0.10);border:1.5px solid rgba(244,99,74,0.28);border-radius:14px;padding:10px 11px;cursor:pointer;transition:background .15s;';
-      card.innerHTML = '<div style="font-size:22px;margin-bottom:5px;">' + (a.icon||'📍') + '</div>' +
-        '<div style="font-size:12px;font-weight:700;color:#F1F5F9;line-height:1.35;">' + (a.name||'') + '</div>' +
-        (a.how ? '<div style="font-size:10px;color:rgba(241,245,249,0.4);margin-top:4px;line-height:1.3;">' + a.how.substring(0,45) + '</div>' : '');
-      card.addEventListener('click', (function(attr) {
-        return function() {
-          var e = qs('addStopEmoji'); if (e) e.value = attr.icon||'📍';
-          var n = qs('addStopName'); if (n) n.value = attr.name||'';
-          var t = qs('addStopTime'); if (t) t.value = '';
-          var d = qs('addStopDesc'); if (d) d.value = (attr.desc||'').substring(0,100) + (attr.how ? '\nהגעה: '+attr.how : '');
-          // highlight selected
-          bank.querySelectorAll('div').forEach(function(c){ c.style.background='rgba(244,99,74,0.10)'; c.style.border='1.5px solid rgba(244,99,74,0.28)'; });
-          card.style.background='rgba(244,99,74,0.28)'; card.style.border='1.5px solid #F4634A';
-        };
-      })(a));
-      bank.appendChild(card);
-    });
-  }
+  _currentBankTab = 'attr';
+  switchBankTab('attr');
   var m = qs('addStopModal'); if (m) { m.style.display = 'flex'; }
 }
 
