@@ -1015,6 +1015,16 @@ function sendDailyReminders() {
   Logger.log('Reminders sent: ' + subject);
 }
 
+// Minimal test — just MailApp
+function testMailOnly() {
+  MailApp.sendEmail({
+    to: 'arielshish@gmail.com',
+    subject: 'בדיקת GAS מייל',
+    body: 'אם הגיע — MailApp עובד!'
+  });
+  Logger.log('testMailOnly done');
+}
+
 // Test function — run once to verify email looks correct
 function testSendReminders() {
   var today = new Date(); today.setHours(0,0,0,0);
