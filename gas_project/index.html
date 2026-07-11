@@ -73,14 +73,6 @@
   .nav-map-btn{display:inline-block;background:rgba(255,255,255,0.10);color:rgba(241,245,249,0.78);border:1px solid rgba(255,255,255,0.15);border-radius:9px;padding:5px 12px;font-size:11px;font-weight:700;text-decoration:none;font-family:'Rubik',Arial,sans-serif;}
   .tip-pill{background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:7px 11px;font-size:11px;color:#FCD34D;}
 </style>
-  <div style="font-size:26px;font-weight:900;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;">פראג 2026</div>
-  <div style="font-size:14px;color:rgba(241,245,249,0.5);font-family:'Rubik',Arial,sans-serif;">משפחת שיש</div>
-  <div style="width:100%;max-width:280px;display:flex;flex-direction:column;gap:10px;">
-    <input id="passwordInput" type="password" placeholder="סיסמה" onkeydown="if(event.key==='Enter')doGoogleLogin()" style="width:100%;padding:14px 16px;border-radius:13px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.07);color:#F1F5F9;font-size:16px;font-family:'Rubik',Arial,sans-serif;text-align:right;outline:none;">
-    <button onclick="doGoogleLogin()" style="width:100%;background:#F4634A;color:white;border:0;border-radius:13px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Rubik',Arial,sans-serif;box-shadow:0 4px 14px rgba(244,99,74,0.3);">כניסה 🔑</button>
-  </div>
-  <div id="loginError" style="color:#F87171;font-size:13px;font-family:'Rubik',Arial,sans-serif;display:none;"></div>
-</div>
 <div id="app">
 
   <!-- ═══ HEADER ═══ -->
@@ -1203,16 +1195,22 @@ function initReminders() {
   var el = document.getElementById('daysUntilTrip');
   if (el) el.textContent = days > 0 ? days : 'הטיול כבר התחיל!';
 
-  google.script.run
-    .withSuccessHandler(function(data) {
-      if (data && data.ok && data.remindersDone) {
-        try { remindersDone = JSON.parse(data.remindersDone); } catch(e) {}
-      }
-      renderReminders();
-      checkOverdueReminders();
-    })
-    .withFailureHandler(function() { renderReminders(); checkOverdueReminders(); })
-    .loadRemindersDone();
+  if (isGas()) {
+    google.script.run
+      .withSuccessHandler(function(data) {
+        if (data && data.ok && data.remindersDone) {
+          try { remindersDone = JSON.parse(data.remindersDone); } catch(e) {}
+        }
+        renderReminders();
+        checkOverdueReminders();
+      })
+      .withFailureHandler(function() { renderReminders(); checkOverdueReminders(); })
+      .loadRemindersDone();
+  } else {
+    try { remindersDone = JSON.parse(localStorage.getItem('prague_remindersDone') || '{}'); } catch(e) { remindersDone = {}; }
+    renderReminders();
+    checkOverdueReminders();
+  }
 }
 
 function filterReminders(f) {
@@ -1319,24 +1317,38 @@ function showReminderDetail(id) {
   document.body.appendChild(overlay);
 }
 
+function saveRemindersDoneLocal() {
+  localStorage.setItem('prague_remindersDone', JSON.stringify(remindersDone));
+}
+
 function markReminderDone(id) {
   remindersDone[id] = true;
   renderReminders();
-  showToast('⏳ שומר...', 1000);
-  google.script.run
-    .withSuccessHandler(function(r){ showToast(r&&r.ok ? '✅ סומן כבוצע ונשמר' : '⚠️ שגיאת שמירה', 2000); })
-    .withFailureHandler(function(e){ showToast('⚠️ שגיאת שמירה: ' + (e&&e.message||e), 3000); })
-    .saveRemindersDone(JSON.stringify(remindersDone));
+  if (isGas()) {
+    showToast('⏳ שומר...', 1000);
+    google.script.run
+      .withSuccessHandler(function(r){ showToast(r&&r.ok ? '✅ סומן כבוצע ונשמר' : '⚠️ שגיאת שמירה', 2000); })
+      .withFailureHandler(function(e){ showToast('⚠️ שגיאת שמירה: ' + (e&&e.message||e), 3000); })
+      .saveRemindersDone(JSON.stringify(remindersDone));
+  } else {
+    saveRemindersDoneLocal();
+    showToast('✅ סומן כבוצע', 2000);
+  }
 }
 
 function markReminderUndone(id) {
   delete remindersDone[id];
   renderReminders();
-  showToast('⏳ שומר...', 1000);
-  google.script.run
-    .withSuccessHandler(function(r){ showToast(r&&r.ok ? '↩️ בוטל ונשמר' : '⚠️ שגיאת שמירה', 2000); })
-    .withFailureHandler(function(e){ showToast('⚠️ שגיאת שמירה: ' + (e&&e.message||e), 3000); })
-    .saveRemindersDone(JSON.stringify(remindersDone));
+  if (isGas()) {
+    showToast('⏳ שומר...', 1000);
+    google.script.run
+      .withSuccessHandler(function(r){ showToast(r&&r.ok ? '↩️ בוטל ונשמר' : '⚠️ שגיאת שמירה', 2000); })
+      .withFailureHandler(function(e){ showToast('⚠️ שגיאת שמירה: ' + (e&&e.message||e), 3000); })
+      .saveRemindersDone(JSON.stringify(remindersDone));
+  } else {
+    saveRemindersDoneLocal();
+    showToast('↩️ בוטל', 2000);
+  }
 }
 
 function triggerReminderEmail() {
