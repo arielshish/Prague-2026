@@ -857,3 +857,177 @@ function saveAppData(budget, packingList) {
     try { lock.releaseLock(); } catch (ignore) {}
   }
 }
+
+// ===== AUTONOMOUS REMINDER ENGINE =====
+
+var TRIP_START = new Date('2026-08-08');
+var FAMILY_EMAILS = [
+  'arielshish@gmail.com',
+  'maridubi3@gmail.com',
+  'adiyasminshish@gmail.com',
+  'ariel.mariana.shish@gmail.com'
+];
+var FIRESTORE_PROJECT = 'prague2026';
+var FIRESTORE_API = 'https://firestore.googleapis.com/v1/projects/' + FIRESTORE_PROJECT + '/databases/(default)/documents/';
+
+var REMINDERS_DEF = [
+  { id:'r1',  emoji:'🏰', title:'כרטיסים לטירת פראג',        deadline:'2026-07-20', day:'11 אוגוסט', url:'https://www.hrad.cz/en/prague-castle-for-visitors/tickets', priority:'critical' },
+  { id:'r2',  emoji:'✡️', title:'כרטיסים לרובע היהודי',       deadline:'2026-07-20', day:'14 אוגוסט', url:'https://www.jewishmuseum.cz/en/', priority:'critical' },
+  { id:'r3',  emoji:'📚', title:'כרטיסים ל-Clementinum',       deadline:'2026-07-15', day:'גמיש',       url:'https://www.klementinum.com/en/', priority:'critical' },
+  { id:'r4',  emoji:'🚂', title:'כרטיסים לממלכת הרכבות',       deadline:'2026-07-25', day:'10 אוגוסט', url:'https://www.kralovstvi-zeleznic.cz/en/', priority:'critical' },
+  { id:'r5',  emoji:'🌆', title:'הזמנת שולחן ב-Oblaka',        deadline:'2026-07-18', day:'15 אוגוסט', url:'https://www.google.com/search?q=Oblaka+restaurant+Prague+reservation', priority:'critical' },
+  { id:'r6',  emoji:'🍷', title:'הזמנת שולחן ב-U Fleků',       deadline:'2026-07-25', day:'14 אוגוסט', url:'https://www.ufleku.cz/', priority:'critical' },
+  { id:'r7',  emoji:'🌊', title:'כרטיסים ל-Aquapalace',        deadline:'2026-07-30', day:'12 אוגוסט', url:'https://www.aquapalace.cz/en/', priority:'important' },
+  { id:'r8',  emoji:'🐘', title:'כרטיסים לגן חיות פראג',       deadline:'2026-07-30', day:'13 אוגוסט', url:'https://www.zoopraha.cz/en', priority:'important' },
+  { id:'r9',  emoji:'⛵', title:'הזמנת שייט בנהר Vltava',      deadline:'2026-07-30', day:'13 אוגוסט', url:'https://www.prague-venice.cz/', priority:'important' },
+  { id:'r10', emoji:'🩺', title:'ביטוח נסיעות לכולם',          deadline:'2026-07-25', day:'לפני הטיסה', url:'', priority:'important' },
+  { id:'r11', emoji:'💱', title:'המרת מטבע — CZK',             deadline:'2026-08-05', day:'לפני הטיסה', url:'', priority:'important' },
+  { id:'r12', emoji:'📱', title:'הורדת אפליקציות: Bolt, Mapy.cz, PID Lítačka, XE Currency, Google Translate', deadline:'2026-08-07', day:'לפני הטיסה', url:'', priority:'logistics' },
+  { id:'r13', emoji:'✈️', title:'צ\'ק-אין לטיסת הלוך (8 אוגוסט 06:00)', deadline:'2026-08-07', day:'7 אוגוסט', url:'', priority:'logistics' },
+  { id:'r14', emoji:'✈️', title:'צ\'ק-אין לטיסת חזור QS1286', deadline:'2026-08-14', day:'14 אוגוסט', url:'', priority:'logistics' },
+  { id:'r15', emoji:'🏨', title:'אישור הזמנת המלון',            deadline:'2026-07-25', day:'לפני הטיסה', url:'https://www.comforthotels.com/', priority:'logistics' },
+  { id:'r16', emoji:'🧳', title:'השלמת צ\'קליסט ציוד (80%+)',  deadline:'2026-08-05', day:'3 ימים לפני', url:'', priority:'logistics' },
+  { id:'r17', emoji:'🌤️', title:'בדיקת תחזית מזג אוויר לפראג', deadline:'2026-08-04', day:'4 ימים לפני', url:'', priority:'logistics' }
+];
+
+function getFirestoreToken_() {
+  return ScriptApp.getOAuthToken();
+}
+
+function getFirestoreDoc_(collection, docId) {
+  var token = getFirestoreToken_();
+  var url = FIRESTORE_API + collection + '/' + docId;
+  try {
+    var resp = UrlFetchApp.fetch(url, {
+      headers: { Authorization: 'Bearer ' + token },
+      muteHttpExceptions: true
+    });
+    if (resp.getResponseCode() !== 200) return null;
+    return JSON.parse(resp.getContentText());
+  } catch(e) { return null; }
+}
+
+function getRemindersDone_() {
+  var doc = getFirestoreDoc_('appdata', 'main');
+  if (!doc || !doc.fields) return {};
+  var field = doc.fields['remindersDone'];
+  if (!field) return {};
+  var raw = field.stringValue || field.mapValue || '';
+  try { return JSON.parse(raw); } catch(e) { return {}; }
+}
+
+function getPackingStats_() {
+  var doc = getFirestoreDoc_('packing', 'list');
+  if (!doc || !doc.fields || !doc.fields.items) return { total: 0, done: 0 };
+  var items = [];
+  try {
+    var arr = doc.fields.items.arrayValue;
+    items = (arr && arr.values) ? arr.values : [];
+  } catch(e) { return { total: 0, done: 0 }; }
+  var total = items.length;
+  var done = items.filter(function(v) {
+    try { return v.mapValue.fields.done.booleanValue === true; } catch(e) { return false; }
+  }).length;
+  return { total: total, done: done };
+}
+
+function buildReminderEmailHtml_(today, pending, packingStats, daysLeft) {
+  var critical = pending.filter(function(r){ return r.priority==='critical'; });
+  var important = pending.filter(function(r){ return r.priority==='important'; });
+  var logistics = pending.filter(function(r){ return r.priority==='logistics'; });
+
+  function section(title, color, items) {
+    if (!items.length) return '';
+    var rows = items.map(function(r) {
+      var dl = new Date(r.deadline);
+      var diff = Math.ceil((dl - today) / 86400000);
+      var urgencyText = diff < 0 ? '⚠️ עבר המועד!' : diff === 0 ? '⚠️ היום!' : diff + ' ימים';
+      return '<tr><td style="padding:10px 12px;border-bottom:1px solid #1e2a3a;">' +
+        r.emoji + ' <strong>' + r.title + '</strong>' +
+        '<br><span style="font-size:12px;color:#94a3b8;">📅 ' + r.day + ' · דדליין: ' + r.deadline.split('-').reverse().join('/') + ' · ' + urgencyText + '</span>' +
+        (r.url ? '<br><a href="' + r.url + '" style="font-size:12px;color:#818cf8;">🔗 לינק להזמנה</a>' : '') +
+        '</td></tr>';
+    }).join('');
+    return '<h3 style="color:' + color + ';margin:20px 0 8px;">' + title + '</h3>' +
+      '<table style="width:100%;border-collapse:collapse;background:#0f1f33;border-radius:10px;overflow:hidden;">' + rows + '</table>';
+  }
+
+  var packingLine = '';
+  if (packingStats.total > 0) {
+    var pct = Math.round(packingStats.done / packingStats.total * 100);
+    packingLine = '<div style="background:#0f1f33;border-radius:10px;padding:12px 16px;margin-top:16px;">' +
+      '🧳 <strong>צ\'קליסט ציוד:</strong> ' + packingStats.done + '/' + packingStats.total + ' (' + pct + '%)' +
+      (pct < 80 && daysLeft <= 5 ? ' <span style="color:#f87171;">⚠️ מהרו לסמן!</span>' : '') + '</div>';
+  }
+
+  return '<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"></head><body style="background:#040D18;color:#F1F5F9;font-family:Arial,sans-serif;padding:24px;direction:rtl;">' +
+    '<div style="max-width:600px;margin:0 auto;">' +
+    '<h1 style="font-size:24px;margin-bottom:4px;">🏰 פראג 2026 — תזכורות</h1>' +
+    '<p style="color:#94a3b8;margin-bottom:20px;">8–15 אוגוסט · עוד <strong style="color:#fbbf24;">' + daysLeft + ' ימים</strong> לטיסה! · ' + pending.length + ' פריטים פתוחים</p>' +
+    section('🔴 דחוף — הזמינו מיד!', '#f87171', critical) +
+    section('🟡 חשוב — טפלו השבוע', '#fbbf24', important) +
+    section('📋 לוגיסטיקה', '#94a3b8', logistics) +
+    packingLine +
+    '<div style="margin-top:24px;padding:16px;background:#0f1f33;border-radius:10px;font-size:13px;color:#64748b;">' +
+    '🌤️ מזג אוויר בפראג באוגוסט: 18–28°C ביום, 14–18°C בלילה. UV גבוה — קרם 50+ חובה. גשמים קצרים אפשריים — מטרייה קלה. מהלכים ~15 ק"מ ביום — נעלי הליכה נוחות!</div>' +
+    '<p style="margin-top:16px;font-size:11px;color:#475569;text-align:center;">נשלח אוטומטית מאפליקציית פראג 2026 · משפחת שיש 🇮🇱🇨🇿</p>' +
+    '</div></body></html>';
+}
+
+function sendDailyReminders() {
+  var today = new Date(); today.setHours(0,0,0,0);
+  var daysLeft = Math.ceil((TRIP_START - today) / 86400000);
+  if (daysLeft < 0 || daysLeft > 35) return; // only within 35 days of trip
+
+  var done = getRemindersDone_();
+  var pending = REMINDERS_DEF.filter(function(r) { return !done[r.id]; });
+  if (!pending.length) return;
+
+  // Check if any reminder needs urgent attention today
+  var urgent = pending.filter(function(r) {
+    var dl = new Date(r.deadline); dl.setHours(0,0,0,0);
+    var diff = Math.ceil((dl - today) / 86400000);
+    return diff <= 3; // due within 3 days or overdue
+  });
+
+  // Always send if: urgent items exist, OR it's every 3 days for general update
+  var dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
+  var shouldSend = urgent.length > 0 || (dayOfYear % 3 === 0);
+  if (!shouldSend) return;
+
+  var packingStats = getPackingStats_();
+  var html = buildReminderEmailHtml_(today, pending, packingStats, daysLeft);
+
+  var subject = urgent.length > 0
+    ? '⚠️ פראג 2026 — ' + urgent.length + ' תזכורות דחופות! (' + daysLeft + ' ימים לטיסה)'
+    : '🏰 פראג 2026 — עדכון שבועי (' + daysLeft + ' ימים לטיסה, ' + pending.length + ' פריטים)';
+
+  FAMILY_EMAILS.forEach(function(email) {
+    try {
+      MailApp.sendEmail({
+        to: email,
+        subject: subject,
+        htmlBody: html
+      });
+    } catch(e) { Logger.log('Failed to send to ' + email + ': ' + e.message); }
+  });
+
+  Logger.log('Reminders sent: ' + subject);
+}
+
+// Call this once to set up the daily trigger
+function setupDailyReminderTrigger() {
+  // Delete existing triggers for sendDailyReminders
+  ScriptApp.getProjectTriggers().forEach(function(t) {
+    if (t.getHandlerFunction() === 'sendDailyReminders') {
+      ScriptApp.deleteTrigger(t);
+    }
+  });
+  // Create new daily trigger at 09:00
+  ScriptApp.newTrigger('sendDailyReminders')
+    .timeBased()
+    .everyDays(1)
+    .atHour(9)
+    .create();
+  Logger.log('Daily reminder trigger set for 09:00');
+}
