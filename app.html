@@ -1378,6 +1378,167 @@ var EXPENSES = [];
 var EDIT_ID = null;
 var currentDay = 1;
 
+// ═══════════════════════════════════════════
+//  REMINDERS DATA
+// ═══════════════════════════════════════════
+var REMINDERS = [
+  // CRITICAL — Book NOW (red, urgent)
+  { id:'r1', emoji:'🏰', title:'כרטיסים לטירת פראג', desc:'hrad.cz — 350/175 CZK. ביוגוסט מלא! הזמינו עכשיו.', url:'https://www.hrad.cz/en/prague-castle-for-visitors/tickets', deadline:'2026-07-20', day:'11 אוגוסט', priority:'critical' },
+  { id:'r2', emoji:'✡️', title:'כרטיסים לרובע היהודי', desc:'jewishmuseum.cz — 500 CZK. מאוד פופולרי, נגמר מהר.', url:'https://www.jewishmuseum.cz/en/', deadline:'2026-07-20', day:'14 אוגוסט', priority:'critical' },
+  { id:'r3', emoji:'📚', title:'כרטיסים ל-Clementinum', desc:'klementinum.com — 300 CZK. סלוטים מוגבלים, נגמר שבועות מראש!', url:'https://www.klementinum.com/en/', deadline:'2026-07-15', day:'גמיש', priority:'critical' },
+  { id:'r4', emoji:'🚂', title:'כרטיסים לממלכת הרכבות', desc:'kralovstvi-zeleznic.cz — 300/200 CZK. הילדים ישתגעו — הזמינו מראש.', url:'https://www.kralovstvi-zeleznic.cz/en/', deadline:'2026-07-25', day:'10 אוגוסט', priority:'critical' },
+  { id:'r5', emoji:'🌆', title:'הזמנת מקום ב-Oblaka', desc:'מסעדה על הגג — ארוחה אחרונה. חייבים הזמנה! חפשו ב-Google.', url:'https://www.google.com/search?q=Oblaka+restaurant+Prague+reservation', deadline:'2026-07-18', day:'15 אוגוסט', priority:'critical' },
+  { id:'r6', emoji:'🍷', title:'הזמנת שולחן ב-U Fleků', desc:'הפאב ההיסטורי מ-1499. ארוחת פרידה — הזמינו מקום מראש.', url:'https://www.ufleku.cz/', deadline:'2026-07-25', day:'14 אוגוסט', priority:'critical' },
+
+  // IMPORTANT — do soon (orange)
+  { id:'r7', emoji:'🌊', title:'כרטיסים ל-Aquapalace', desc:'aquapalace.cz — 650/530 CZK. אפשר גם בכניסה אבל עדיף מראש בעונת קיץ.', url:'https://www.aquapalace.cz/en/', deadline:'2026-07-30', day:'12 אוגוסט', priority:'important' },
+  { id:'r8', emoji:'🐘', title:'כרטיסים לגן חיות פראג', desc:'zoopraha.cz — 300/200 CZK. Top 5 בעולם — מומלץ להזמין.', url:'https://www.zoopraha.cz/en', deadline:'2026-07-30', day:'13 אוגוסט', priority:'important' },
+  { id:'r9', emoji:'⛵', title:'הזמנת שייט בנהר Vltava', desc:'prague-venice.cz — 350 CZK. שייט שקיעה ב-13 אוגוסט — מומלץ להזמין.', url:'https://www.prague-venice.cz/', deadline:'2026-07-30', day:'13 אוגוסט', priority:'important' },
+  { id:'r10', emoji:'🩺', title:'ביטוח נסיעות', desc:'וודאו שיש לכולם ביטוח נסיעות תקף ל-8–16 אוגוסט.', url:'', deadline:'2026-07-25', day:'לפני הטיסה', priority:'important' },
+  { id:'r11', emoji:'💱', title:'המרת מטבע — CZK', desc:'המירו לפחות 5,000 CZK לכל אחד לפני הטיסה. בנק/דואר זול יותר מנמל תעופה.', url:'', deadline:'2026-08-05', day:'לפני 8 אוגוסט', priority:'important' },
+
+  // LOGISTICS — a week before
+  { id:'r12', emoji:'✈️', title:'צ\'ק-אין לטיסת הלוך', desc:'טיסת בוקר 8 אוגוסט המראה 06:00 — צ\'ק-אין פתח 7 אוגוסט 06:00.', url:'', deadline:'2026-08-07', day:'7 אוגוסט', priority:'logistics' },
+  { id:'r13', emoji:'✈️', title:'צ\'ק-אין לטיסת חזור', desc:'QS1286 — המראה 15 אוגוסט 23:45. צ\'ק-אין פתח 14 אוגוסט 23:45.', url:'', deadline:'2026-08-14', day:'14 אוגוסט', priority:'logistics' },
+  { id:'r14', emoji:'🏨', title:'אישור הזמנת המלון', desc:'Comfort Hotel Prague City East — אשרו הזמנה וצרו קשר עם בקשות מיוחדות.', url:'https://www.comforthotels.com/', deadline:'2026-07-25', day:'לפני הטיסה', priority:'logistics' },
+  { id:'r15', emoji:'📱', title:'הורדת אפליקציית Bolt', desc:'הרבה יותר זול מ-Uber. הגדירו כרטיס אשראי לפני הטיסה!', url:'https://bolt.eu/', deadline:'2026-08-07', day:'לפני הטיסה', priority:'logistics' },
+  { id:'r16', emoji:'🌐', title:'רומינג / SIM מקומי', desc:'הפעילו רומינג בינלאומי או קנו SIM בנמל התעופה בפראג.', url:'', deadline:'2026-08-05', day:'לפני הטיסה', priority:'logistics' },
+];
+
+var remindersFilter = 'all';
+var remindersDone = {};
+
+function initReminders() {
+  var tripDate = new Date('2026-08-08');
+  var today = new Date();
+  var days = Math.ceil((tripDate - today) / 86400000);
+  var el = document.getElementById('daysUntilTrip');
+  if (el) el.textContent = days > 0 ? days : 'הטיול כבר התחיל!';
+
+  google.script.run
+    .withSuccessHandler(function(data) {
+      remindersDone = (data && data.remindersDone) ? JSON.parse(data.remindersDone || '{}') : {};
+      renderReminders();
+      checkOverdueReminders();
+    })
+    .withFailureHandler(function() { renderReminders(); checkOverdueReminders(); })
+    .loadAppData('remindersDone');
+}
+
+function filterReminders(f) {
+  remindersFilter = f;
+  ['all','critical','important','logistics','done'].forEach(function(x) {
+    var btn = document.getElementById('rf-' + x);
+    if (btn) { btn.style.borderColor = x === f ? '#F4634A' : ''; btn.style.color = x === f ? '#F4634A' : ''; }
+  });
+  renderReminders();
+}
+
+function renderReminders() {
+  var container = document.getElementById('remindersList');
+  if (!container) return;
+  var today = new Date(); today.setHours(0,0,0,0);
+
+  var filtered = REMINDERS.filter(function(r) {
+    var done = remindersDone[r.id];
+    if (remindersFilter === 'done') return done;
+    if (remindersFilter !== 'all' && r.priority !== remindersFilter) return false;
+    if (remindersFilter === 'all' && done) return false;
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:32px;color:rgba(241,245,249,0.4);font-size:14px;">אין פריטים להצגה</div>';
+    return;
+  }
+
+  container.innerHTML = filtered.map(function(r) {
+    var done = remindersDone[r.id];
+    var deadline = new Date(r.deadline);
+    var diffDays = Math.ceil((deadline - today) / 86400000);
+    var urgency, urgencyColor, urgencyBg;
+    if (done) { urgency = '✅ בוצע'; urgencyColor = '#34D399'; urgencyBg = 'rgba(52,211,153,0.08)'; }
+    else if (diffDays < 0) { urgency = '⚠️ עבר המועד!'; urgencyColor = '#F87171'; urgencyBg = 'rgba(248,113,113,0.1)'; }
+    else if (diffDays <= 5) { urgency = '🔴 ' + diffDays + ' ימים!'; urgencyColor = '#F87171'; urgencyBg = 'rgba(248,113,113,0.1)'; }
+    else if (diffDays <= 14) { urgency = '🟡 ' + diffDays + ' ימים'; urgencyColor = '#FCD34D'; urgencyBg = 'rgba(252,211,77,0.08)'; }
+    else { urgency = '🟢 ' + diffDays + ' ימים'; urgencyColor = '#34D399'; urgencyBg = 'rgba(52,211,153,0.06)'; }
+
+    return '<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:16px;padding:15px;margin-bottom:10px;' + (done ? 'opacity:0.55;' : '') + '">' +
+      '<div style="display:flex;align-items:flex-start;gap:12px;">' +
+        '<div style="font-size:28px;line-height:1;">' + r.emoji + '</div>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">' +
+            '<span style="font-size:14px;font-weight:800;color:#F1F5F9;">' + r.title + '</span>' +
+            '<span style="font-size:11px;font-weight:700;color:' + urgencyColor + ';background:' + urgencyBg + ';padding:2px 8px;border-radius:8px;">' + urgency + '</span>' +
+          '</div>' +
+          '<div style="font-size:12px;color:rgba(241,245,249,0.6);margin-bottom:8px;">' + r.desc + '</div>' +
+          '<div style="font-size:11px;color:rgba(241,245,249,0.4);margin-bottom:10px;">📅 ' + r.day + ' · דדליין: ' + r.deadline.split('-').reverse().join('/') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+            (r.url ? '<a href="' + r.url + '" target="_blank" style="background:rgba(99,102,241,0.2);color:#A5B4FC;border:1px solid rgba(99,102,241,0.3);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;font-family:Rubik,Arial,sans-serif;">🔗 לאתר ההזמנה</a>' : '') +
+            (!done ? '<button onclick="markReminderDone(\'' + r.id + '\')" style="background:rgba(52,211,153,0.15);color:#34D399;border:1px solid rgba(52,211,153,0.3);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:Rubik,Arial,sans-serif;">✅ בוצע</button>' : '') +
+            (done ? '<button onclick="markReminderUndone(\'' + r.id + '\')" style="background:rgba(255,255,255,0.05);color:rgba(241,245,249,0.4);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:Rubik,Arial,sans-serif;">↩️ בטל</button>' : '') +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function markReminderDone(id) {
+  remindersDone[id] = true;
+  renderReminders();
+  google.script.run.withSuccessHandler(function(){}).withFailureHandler(function(){})
+    .saveAppData('remindersDone', JSON.stringify(remindersDone));
+}
+
+function markReminderUndone(id) {
+  delete remindersDone[id];
+  renderReminders();
+  google.script.run.withSuccessHandler(function(){}).withFailureHandler(function(){})
+    .saveAppData('remindersDone', JSON.stringify(remindersDone));
+}
+
+function sendRemindersEmail() {
+  var today = new Date(); today.setHours(0,0,0,0);
+  var pending = REMINDERS.filter(function(r) { return !remindersDone[r.id]; });
+  var critical = pending.filter(function(r) { return r.priority === 'critical'; });
+  var important = pending.filter(function(r) { return r.priority === 'important'; });
+  var logistics = pending.filter(function(r) { return r.priority === 'logistics'; });
+
+  var body = 'שלום משפחת שיש! 🏰\n\nהנה סיכום מה שצריך לסדר לפני פראג (8–15 אוגוסט):\n\n';
+
+  if (critical.length) {
+    body += '🔴 דחוף — הזמינו עכשיו:\n';
+    critical.forEach(function(r) { body += '• ' + r.emoji + ' ' + r.title + ' (' + r.day + ')\n  ' + r.desc + '\n  ' + (r.url || '') + '\n\n'; });
+  }
+  if (important.length) {
+    body += '🟡 חשוב — תוך שבועיים:\n';
+    important.forEach(function(r) { body += '• ' + r.emoji + ' ' + r.title + ' (' + r.day + ')\n  ' + r.desc + '\n\n'; });
+  }
+  if (logistics.length) {
+    body += '📋 לוגיסטיקה:\n';
+    logistics.forEach(function(r) { body += '• ' + r.emoji + ' ' + r.title + '\n  ' + r.desc + '\n\n'; });
+  }
+
+  body += 'בהצלחה ובמסע נהדר! 🇨🇿\n\nנשלח מאפליקציית פראג 2026 — משפחת שיש';
+
+  var emails = 'arielshish@gmail.com,maridubi3@gmail.com,adiyasminshish@gmail.com,ariel.mariana.shish@gmail.com';
+  var subject = encodeURIComponent('🏰 פראג 2026 — תזכורות לפני הטיסה (' + pending.length + ' פריטים פתוחים)');
+  var bodyEnc = encodeURIComponent(body);
+  window.location.href = 'mailto:' + emails + '?subject=' + subject + '&body=' + bodyEnc;
+}
+
+function checkOverdueReminders() {
+  var today = new Date(); today.setHours(0,0,0,0);
+  var overdue = REMINDERS.filter(function(r) {
+    if (remindersDone[r.id]) return false;
+    return new Date(r.deadline) < today;
+  });
+  if (overdue.length > 0) {
+    toast('⚠️ יש ' + overdue.length + ' תזכורות שעבר מועדן! לחץ על 🔔');
+  }
+}
+
 var DAYS = [
   {id:1,emoji:'✈️',date:'8 באוגוסט',title:'הצעדים הראשונים בעיר האגדות',sub:'נחיתה, מלון, נשימה ראשונה של פראג',
    story:'היום הראשון לא נועד לכבוש את פראג. הוא נועד להיכנס אליה לאט — להגיע למלון, להוריד תיקים ולהרגיש את הקצב של העיר.',
