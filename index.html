@@ -7,12 +7,17 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>פראג 2026 - משפחת שיש</title>
 <script>
-// Mobile redirect: GAS wraps in tiny iframe on mobile — break out to top frame
 (function(){
-  var mob = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  if (mob) {
-    var url = 'https://arielshish.github.io/Prague-2026/app.html';
-    try { window.top.location.replace(url); } catch(e) { window.location.replace(url); }
+  if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+    document.addEventListener('DOMContentLoaded', function() {
+      var d = document.createElement('div');
+      d.style.cssText = 'position:fixed;inset:0;background:#040D18;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:Rubik,Arial,sans-serif;text-align:center;padding:32px;';
+      d.innerHTML = '<div style="font-size:52px;margin-bottom:16px;">✈️</div>' +
+        '<div style="font-size:22px;font-weight:900;color:#F1F5F9;margin-bottom:10px;">פראג 2026</div>' +
+        '<div style="font-size:14px;color:rgba(241,245,249,0.6);margin-bottom:28px;">לחץ לפתיחת האפליקציה המלאה</div>' +
+        '<a href="https://arielshish.github.io/Prague-2026/app.html" target="_top" style="background:#F4634A;color:white;border-radius:16px;padding:16px 36px;font-size:17px;font-weight:800;text-decoration:none;display:block;">🚀 פתח אפליקציה</a>';
+      document.body.appendChild(d);
+    });
   }
 })();
 </script>
