@@ -18,44 +18,65 @@ var STOP_CATALOG = {
   'Palladium / מרכז העיר': { mapUrl: 'https://www.google.com/maps/place/Palladium+shopping+centre,+Prague', type: 'shopping' }
 };
 
-function doGet() {
+function doGet(e) {
   getOrCreateChecklistSheet();
+  // API mode: ?action=functionName&args=JSON
+  if (e && e.parameter && e.parameter.action) {
+    return doApiGet_(e);
+  }
   return HtmlService.createHtmlOutputFromFile('index')
     .setTitle('פראג 2026 - משפחת שיש')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
+function doApiGet_(e) {
+  try {
+    var action = e.parameter.action;
+    var args = [];
+    try { args = JSON.parse(e.parameter.args || '[]'); } catch(ignore) {}
+    var result = dispatchAction_(action, args);
+    return ContentService
+      .createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: false, error: err.message }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function dispatchAction_(action, args) {
+  switch (action) {
+    case 'loadExpenses':        return loadExpenses();
+    case 'addExpense':          return addExpense(args[0], args[1], args[2], args[3]);
+    case 'updateExpense':       return updateExpense(args[0], args[1], args[2], args[3], args[4]);
+    case 'deleteExpense':       return deleteExpense(args[0]);
+    case 'clearExpenses':       return clearExpenses();
+    case 'importExpenses':      return importExpenses(args[0]);
+    case 'saveSetting':         return saveSetting(args[0], args[1]);
+    case 'loadSettings':        return loadSettings();
+    case 'saveTotalBudget':     return saveTotalBudget(args[0]);
+    case 'loadBudgetSettings':  return loadBudgetSettings();
+    case 'saveBudgetCategories':return saveBudgetCategories(args[0]);
+    case 'syncChecklist':       return syncChecklist(args[0]);
+    case 'loadChecklist':       return loadChecklist();
+    case 'loadItinerary':       return loadItinerary();
+    case 'moveAttraction':      return moveAttraction(args[0], args[1]);
+    case 'loadAppData':         return loadAppData();
+    case 'saveAppData':         return saveAppData(args[0], args[1]);
+    case 'savePackingList':     return savePackingList(args[0]);
+    case 'saveDaysCustom':      return saveDaysCustom(args[0]);
+    case 'loadDaysFromSheets':  return loadDaysFromSheets_();
+    case 'healthCheck':         return healthCheck();
+    case 'getSummary':          return getSummary();
+    default:                    return { ok: false, error: 'Unknown action: ' + action };
+  }
+}
+
 function doPost(e) {
   try {
     var body = JSON.parse(e.postData.contents);
-    var action = body.action;
-    var args = body.args || [];
-    var result;
-    switch (action) {
-      case 'loadExpenses':        result = loadExpenses(); break;
-      case 'addExpense':          result = addExpense(args[0], args[1], args[2], args[3]); break;
-      case 'updateExpense':       result = updateExpense(args[0], args[1], args[2], args[3], args[4]); break;
-      case 'deleteExpense':       result = deleteExpense(args[0]); break;
-      case 'clearExpenses':       result = clearExpenses(); break;
-      case 'importExpenses':      result = importExpenses(args[0]); break;
-      case 'saveSetting':         result = saveSetting(args[0], args[1]); break;
-      case 'loadSettings':        result = loadSettings(); break;
-      case 'saveTotalBudget':     result = saveTotalBudget(args[0]); break;
-      case 'loadBudgetSettings':  result = loadBudgetSettings(); break;
-      case 'saveBudgetCategories':result = saveBudgetCategories(args[0]); break;
-      case 'syncChecklist':       result = syncChecklist(args[0]); break;
-      case 'loadChecklist':       result = loadChecklist(); break;
-      case 'loadItinerary':       result = loadItinerary(); break;
-      case 'moveAttraction':      result = moveAttraction(args[0], args[1]); break;
-      case 'loadAppData':         result = loadAppData(); break;
-      case 'saveAppData':         result = saveAppData(args[0], args[1]); break;
-      case 'savePackingList':     result = savePackingList(args[0]); break;
-      case 'saveDaysCustom':      result = saveDaysCustom(args[0]); break;
-      case 'loadDaysFromSheets':  result = loadDaysFromSheets_(); break;
-      case 'healthCheck':         result = healthCheck(); break;
-      case 'getSummary':          result = getSummary(); break;
-      default: result = { ok: false, error: 'Unknown action: ' + action };
-    }
+    var result = dispatchAction_(body.action, body.args || []);
     return ContentService
       .createTextOutput(JSON.stringify(result))
       .setMimeType(ContentService.MimeType.JSON);

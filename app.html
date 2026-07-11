@@ -74,7 +74,7 @@
   .tip-pill{background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:7px 11px;font-size:11px;color:#FCD34D;}
 </style>
 <script>
-// GitHub Pages GAS mock — routes google.script.run calls via fetch() POST to GAS REST API
+// GitHub Pages GAS mock — routes google.script.run calls via GET to GAS REST API
 (function() {
   var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbxbuSwh_YysA1cY_XraQDaxDK5Tudq9THc9pZw4ciRB3Dl_KShEmNP0C39yHreXKQDg/exec';
   if (typeof google !== 'undefined' && google && google.script && google.script.run) return;
@@ -96,14 +96,11 @@
     ALL_FNS.forEach(function(fn) {
       runner[fn] = function() {
         var args = Array.prototype.slice.call(arguments);
-        fetch(GAS_API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-          body: JSON.stringify({ action: fn, args: args })
-        })
-        .then(function(r) { return r.json(); })
-        .then(function(d) { if (sc) sc(d); })
-        .catch(function(e) { if (fc) fc(e); });
+        var url = GAS_API_URL + '?action=' + encodeURIComponent(fn) + '&args=' + encodeURIComponent(JSON.stringify(args));
+        fetch(url, { redirect: 'follow' })
+          .then(function(r) { return r.json(); })
+          .then(function(d) { if (sc) sc(d); })
+          .catch(function(e) { if (fc) fc(e); });
       };
     });
     return runner;
