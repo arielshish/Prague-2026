@@ -886,23 +886,90 @@ var FIRESTORE_PROJECT = 'prague2026';
 var FIRESTORE_API = 'https://firestore.googleapis.com/v1/projects/' + FIRESTORE_PROJECT + '/databases/(default)/documents/';
 
 var REMINDERS_DEF = [
-  { id:'r1',  emoji:'🏰', title:'כרטיסים לטירת פראג',        deadline:'2026-07-20', day:'11 אוגוסט', url:'https://www.hrad.cz/en/prague-castle-for-visitors/tickets', priority:'critical' },
-  { id:'r2',  emoji:'✡️', title:'כרטיסים לרובע היהודי',       deadline:'2026-07-20', day:'14 אוגוסט', url:'https://www.jewishmuseum.cz/en/', priority:'critical' },
-  { id:'r3',  emoji:'📚', title:'כרטיסים ל-Clementinum',       deadline:'2026-07-15', day:'גמיש',       url:'https://www.klementinum.com/en/', priority:'critical' },
-  { id:'r4',  emoji:'🚂', title:'כרטיסים לממלכת הרכבות',       deadline:'2026-07-25', day:'10 אוגוסט', url:'https://www.kralovstvi-zeleznic.cz/en/', priority:'critical' },
-  { id:'r5',  emoji:'🌆', title:'הזמנת שולחן ב-Oblaka',        deadline:'2026-07-18', day:'15 אוגוסט', url:'https://www.google.com/search?q=Oblaka+restaurant+Prague+reservation', priority:'critical' },
-  { id:'r6',  emoji:'🍷', title:'הזמנת שולחן ב-U Fleků',       deadline:'2026-07-25', day:'14 אוגוסט', url:'https://www.ufleku.cz/', priority:'critical' },
-  { id:'r7',  emoji:'🌊', title:'כרטיסים ל-Aquapalace',        deadline:'2026-07-30', day:'12 אוגוסט', url:'https://www.aquapalace.cz/en/', priority:'important' },
-  { id:'r8',  emoji:'🐘', title:'כרטיסים לגן חיות פראג',       deadline:'2026-07-30', day:'13 אוגוסט', url:'https://www.zoopraha.cz/en', priority:'important' },
-  { id:'r9',  emoji:'⛵', title:'הזמנת שייט בנהר Vltava',      deadline:'2026-07-30', day:'13 אוגוסט', url:'https://www.prague-venice.cz/', priority:'important' },
-  { id:'r10', emoji:'🩺', title:'ביטוח נסיעות לכולם',          deadline:'2026-07-25', day:'לפני הטיסה', url:'', priority:'important' },
-  { id:'r11', emoji:'💱', title:'המרת מטבע — CZK',             deadline:'2026-08-05', day:'לפני הטיסה', url:'', priority:'important' },
-  { id:'r12', emoji:'📱', title:'הורדת אפליקציות: Bolt, Mapy.cz, PID Lítačka, XE Currency, Google Translate', deadline:'2026-08-07', day:'לפני הטיסה', url:'', priority:'logistics' },
-  { id:'r13', emoji:'✈️', title:'צ\'ק-אין לטיסת הלוך (8 אוגוסט 06:00)', deadline:'2026-08-07', day:'7 אוגוסט', url:'', priority:'logistics' },
-  { id:'r14', emoji:'✈️', title:'צ\'ק-אין לטיסת חזור QS1286', deadline:'2026-08-14', day:'14 אוגוסט', url:'', priority:'logistics' },
-  { id:'r15', emoji:'🏨', title:'אישור הזמנת המלון',            deadline:'2026-07-25', day:'לפני הטיסה', url:'https://www.comforthotels.com/', priority:'logistics' },
-  { id:'r16', emoji:'🧳', title:'השלמת צ\'קליסט ציוד (80%+)',  deadline:'2026-08-05', day:'3 ימים לפני', url:'', priority:'logistics' },
-  { id:'r17', emoji:'🌤️', title:'בדיקת תחזית מזג אוויר לפראג', deadline:'2026-08-04', day:'4 ימים לפני', url:'', priority:'logistics' }
+  { id:'r1',  emoji:'🏰', title:'כרטיסים לטירת פראג',        deadline:'2026-07-20', day:'11 אוגוסט', url:'https://www.hrad.cz/en/prague-castle-for-visitors/tickets', priority:'critical',
+    details:'המצודה הגדולה בעולם — 70,000 מ"ר. כוללת קתדרלת סנט ויטוס (גותית, מאה 14), ארמון המלך, וסמטת הזהב עם בתי נפחים עתיקים. ביוגוסט תורים של שעה! כרטיס Circuit B (בסיסי) מספיק.',
+    tips:'להגיע לפני 9:00. טראם 22 לכניסה עליונה (Pražský hrad) — חוסך עלייה רגלית. סטארבקס ממול לנוף בחינם.',
+    duration:'2–4 שעות' },
+
+  { id:'r2',  emoji:'✡️', title:'כרטיסים לרובע היהודי',       deadline:'2026-07-20', day:'14 אוגוסט', url:'https://www.jewishmuseum.cz/en/', priority:'critical',
+    details:'הרובע היהודי (Josefov) — אחד מהשמורים בעולם. 6 בתי כנסת היסטוריים (מאה 13–17), בית קברות עתיק עם 12 שכבות קבורה, ואולם הטקסים עם ציורי ילדי טרזין. חוויה מרגשת מאוד.',
+    tips:'להקצות לפחות 3 שעות. בית הכנסת הספרדי הכי מרהיב חזותית. לא לפספס בית הקברות.',
+    duration:'2.5–4 שעות' },
+
+  { id:'r3',  emoji:'📚', title:'כרטיסים ל-Clementinum',       deadline:'2026-07-15', day:'גמיש', url:'https://www.klementinum.com/en/', priority:'critical',
+    details:'הספרייה הבארוקית מהמאה ה-18 — אחת מהיפות בעולם. קימור מצויר, ספרים מהמאה ה-15, ומגדל תצפית עם נוף 360° על פראג. כניסה בסיורים מודרכים בלבד — מוגבל ל-25 איש בסיור!',
+    tips:'להזמין עוד היום — נגמר חודש מראש בקיץ. הסיור 50 דקות. הנוף מהמגדל שווה לא פחות מהספרייה.',
+    duration:'50–70 דקות (סיור מודרך)' },
+
+  { id:'r4',  emoji:'🚂', title:'כרטיסים לממלכת הרכבות',       deadline:'2026-07-25', day:'10 אוגוסט', url:'https://www.kralovstvi-zeleznic.cz/en/', priority:'critical',
+    details:'דיורמה ענקית של 1:87 מצ\'כיה המיניאטורית — מסילות, כפרים, הרים ותאורה אוטומטית. הילדים משתגעים! ממוקם בלב העיר. הכי מרהיב כשמכבים האורות ורק תאורת המיניאטורה דולקת.',
+    tips:'לשאול מתי מכבים האורות לאפקט הלילה המיניאטורי — חוויה אחרת לגמרי.',
+    duration:'60–90 דקות' },
+
+  { id:'r5',  emoji:'🌆', title:'הזמנת שולחן ב-Oblaka',        deadline:'2026-07-18', day:'15 אוגוסט', url:'https://www.google.com/search?q=Oblaka+restaurant+Prague+reservation', priority:'critical',
+    details:'מסעדה על הגג של מגדל Žižkov (מגדל הטלוויזיה) בגובה 93 מטר — נוף פנורמי 360° על פראג. תפריט עכשווי-צ\'כי איכותי. חוויה יוצאת דופן לסיום הטיול — ארוחת ערב אחרונה.',
+    tips:'לבקש שולחן ליד החלון בהזמנה. ערב 15 אוגוסט — האחרון לפני הטיסה הלילית.',
+    duration:'90–120 דקות' },
+
+  { id:'r6',  emoji:'🍷', title:'הזמנת שולחן ב-U Fleků',       deadline:'2026-07-25', day:'14 אוגוסט', url:'https://www.ufleku.cz/', priority:'critical',
+    details:'הפאב המבשל הכי ישן בפראג — פועל ברציפות מ-1499! מגישים בירה כהה אחת בלבד שמבשלים בית (Flekovský tmavý). חצר עם 1,200 מקומות, מוזיקה חיה, ואוכל צ\'כי מסורתי.',
+    tips:'לבקש מקום בחצר (Biergarten) — יפה יותר. לצפות לבירה כהה בלבד. תיירותי אבל אותנטי באווירה.',
+    duration:'90–120 דקות' },
+
+  { id:'r7',  emoji:'🌊', title:'כרטיסים ל-Aquapalace',        deadline:'2026-07-30', day:'12 אוגוסט', url:'https://www.aquapalace.cz/en/', priority:'important',
+    details:'פארק מים פנים מהגדולים באירופה — 15,000 מ"ר. 8 מגלשות, בריכת גלים, גקוזי, נהרות זרימה, בריכה חיצונית חמה, ואזור ילדים. יום שלם בקלות! בסופי שבוע עמוס ביוגוסט.',
+    tips:'להביא מגבת — השכרה יקרה. אוכל יקר בפנים — מותר להביא חטיפים. ארונות מחזירים מטבע.',
+    duration:'5–8 שעות (יום שלם)' },
+
+  { id:'r8',  emoji:'🐘', title:'כרטיסים לגן חיות פראג',       deadline:'2026-07-30', day:'13 אוגוסט', url:'https://www.zoopraha.cz/en', priority:'important',
+    details:'Top 7 בעולם — 58 הקטאר, 5,000 בעלי חיים, 700 מינים. יש: ג\'ונגל אינדונזי, ערבות אפריקניות, יער גורילות, ורכבל כסאות פנורמי (40 CZK). ביוגוסט עמוס — Online חוסך תור ארוך.',
+    tips:'לבדוק זמני האכלה באתר — ג\'ירפות 11:30, פילים 15:00. רכבל כסאות חובה! נעלי הליכה — הגן בגבעה.',
+    duration:'4–6 שעות (יום שלם)' },
+
+  { id:'r9',  emoji:'⛵', title:'הזמנת שייט בנהר Vltava',      deadline:'2026-07-30', day:'13 אוגוסט', url:'https://www.prague-venice.cz/', priority:'important',
+    details:'שייט על הוולטאווה עם נוף על גשר קרל, המצודה והגגות האדומים מהמים. שייט שקיעה ב-20:00 — השמש הזהובה על המצודה הוא הנוף הכי מרהיב. חברת prague-venice מומלצת, 60–90 דק\'.',
+    tips:'להביא שכבה חמה — על המים קריר גם בקיץ. לשלם באשראי ישירות ברציף.',
+    duration:'60–90 דקות' },
+
+  { id:'r10', emoji:'🩺', title:'ביטוח נסיעות לכולם',          deadline:'2026-07-25', day:'לפני הטיסה', url:'', priority:'important',
+    details:'ביטוח נסיעות חובה לכל אחד. צ\'כיה באיחוד האירופי — טיפול בסיסי מכוסה בכרטיס ביטוח לאומי (EHIC). אבל ביטוח פרטי מכסה: ביטול טיסה, אובדן מטען, פינוי רפואי, ואשפוז ממושך.',
+    tips:'לוודא שהפוליסה כוללת ספורט אתגרי אם מתכננים Aquapalace. לשמור מסמכי ביטוח בטלפון.',
+    duration:'15 דקות (Online)' },
+
+  { id:'r11', emoji:'💱', title:'המרת מטבע — CZK',             deadline:'2026-08-05', day:'לפני 8 אוגוסט', url:'', priority:'important',
+    details:'הכתר הצ\'כי (CZK) — המטבע הרשמי. שע"ח: ~1 ₪ = ~6.5 CZK. לחמישה ימים: 3,000–5,000 CZK לאדם. המרה בנמל תעופה יקרה 10–15% יותר. משיכה מכספומט בפראג הכי משתלמת.',
+    tips:'הכי כדאי: למשוך CZK מכספומט בפראג עם Visa/Mastercard. עמלה ~30 CZK בלבד.',
+    duration:'10 דקות' },
+
+  { id:'r12', emoji:'📱', title:'הורדת אפליקציות: Bolt, Mapy.cz, PID Lítačka, XE Currency, Google Translate', deadline:'2026-08-07', day:'לפני הטיסה', url:'', priority:'logistics',
+    details:'Bolt — נסיעות שיתופיות, זול יותר מ-Uber. Mapy.cz — מפות צ\'כיה מדויקות עם מסלולים ומסעדות. PID Lítačka — כרטיסי תחבורה ציבורית דיגיטליים. XE Currency — שערי חליפין בזמן אמת. Google Translate — תרגום צ\'כי.',
+    tips:'להגדיר כרטיס אשראי ב-Bolt לפני הטיסה! להוריד מפת פראג Offline ב-Google Maps או Mapy.cz.',
+    duration:'15 דקות' },
+
+  { id:'r13', emoji:'✈️', title:'צ\'ק-אין לטיסת הלוך (8 אוגוסט 06:00)', deadline:'2026-08-07', day:'7 אוגוסט', url:'', priority:'logistics',
+    details:'Smart Wings QS1287 — תל אביב (TLV) → פראג (PRG). המראה 06:00, 8 אוגוסט. חלון צ\'ק-אין נפתח 24 שעות לפני ב-06:00 ביום שישי ה-7. לוודא דרכונים, ביטוח, ולהוריד כרטיס עלייה לטיסה.',
+    tips:'להגיע לשדה לפחות שעתיים לפני — כלומר ב-04:00! מומלץ להזמין מונית/Gett לילה לפני.',
+    duration:'5 דקות (Online)' },
+
+  { id:'r14', emoji:'✈️', title:'צ\'ק-אין לטיסת חזור QS1286', deadline:'2026-08-14', day:'14 אוגוסט', url:'', priority:'logistics',
+    details:'Smart Wings QS1286 — פראג (PRG) → תל אביב (TLV). המראה 23:45, 15 אוגוסט (חצות). חלון צ\'ק-אין נפתח 14 אוגוסט 23:45. הערב האחרון בפראג — לתכנן ולסיים חשבונות לפני.',
+    tips:'נסיעה לשדה סביב 21:00. שדה Václav Havel — 30 דק\' מהמרכז בטקסי.',
+    duration:'5 דקות (Online)' },
+
+  { id:'r15', emoji:'🏨', title:'אישור הזמנת המלון',            deadline:'2026-07-25', day:'לפני הטיסה', url:'https://www.comforthotels.com/', priority:'logistics',
+    details:'Comfort Hotel Prague City East — 8–15 אוגוסט. לאשר ישירות עם המלון שההזמנה קיימת, ולציין בקשות מיוחדות: קומה גבוהה, חדרים צמודים, early check-in. לשאול על WiFi ושעות ארוחת בוקר.',
+    tips:'לשלוח מייל למלון שבוע לפני. לשמור את כתובת המלון Offline ב-Google Maps.',
+    duration:'10 דקות' },
+
+  { id:'r16', emoji:'🧳', title:'השלמת צ\'קליסט ציוד (80%+)',  deadline:'2026-08-05', day:'3 ימים לפני', url:'', priority:'logistics',
+    details:'לעבור על צ\'קליסט הציוד באפליקציה ולוודא שמסמנים לפחות 80%. פריטים קריטיים: דרכונים תקפים, תרופות, מטען, ומזוודות. לשקול כבודה לפני הטיסה — עד 23 ק"ג לאדם.',
+    tips:'לצלם את הדרכונים ולשמור בענן. לבדוק תוקף תרופות. ללבוש נעלי הליכה לטיסה — חוסך מקום.',
+    duration:'30 דקות' },
+
+  { id:'r17', emoji:'🌤️', title:'בדיקת תחזית מזג אוויר לפראג', deadline:'2026-08-04', day:'4 ימים לפני', url:'', priority:'logistics',
+    details:'אוגוסט בפראג: 18–28°C ביום, 14–18°C בלילה. UV גבוה — קרם 50+ חובה. גשמים קצרים אפשריים. מהלכים כ-15 ק"מ ביום. לבדוק תחזית 10 ימים ב-AccuWeather או Windy לפני הנסיעה.',
+    tips:'להכין שכבת ביניים לערב — קריר על נהר הוולטאווה. מטרייה קומפקטית — שווה לקחת.',
+    duration:'5 דקות' }
 ];
 
 var GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxbuSwh_YysA1cY_XraQDaxDK5Tudq9THc9pZw4ciRB3Dl_KShEmNP0C39yHreXKQDg/exec';
@@ -989,20 +1056,30 @@ function buildReminderEmailHtml_(today, pending, packingStats, daysLeft) {
       var dl = new Date(r.deadline);
       var diff = Math.ceil((dl - today) / 86400000);
       var urgencyText = diff < 0 ? '⚠️ עבר המועד!' : diff === 0 ? '⚠️ היום!' : diff + ' ימים';
+      var urgencyColor = diff < 0 ? '#f87171' : diff <= 5 ? '#f87171' : diff <= 14 ? '#fbbf24' : '#34d399';
       var doneUrl = GAS_WEBAPP_URL + '?action=markReminderDone&id=' + r.id;
-      return '<tr><td style="padding:12px 14px;border-bottom:1px solid #1e2a3a;">' +
-        '<div style="display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap;">' +
+      return '<tr><td style="padding:16px 18px;border-bottom:1px solid #1e2a3a;">' +
+        '<div style="display:flex;align-items:flex-start;gap:12px;">' +
+        '<div style="font-size:26px;line-height:1;padding-top:2px;">' + r.emoji + '</div>' +
         '<div style="flex:1;">' +
-        r.emoji + ' <strong>' + r.title + '</strong>' +
-        '<br><span style="font-size:12px;color:#94a3b8;">📅 ' + r.day + ' · דדליין: ' + r.deadline.split('-').reverse().join('/') + ' · ' + urgencyText + '</span>' +
-        (r.url ? '<br><a href="' + r.url + '" style="font-size:12px;color:#818cf8;">🔗 לינק להזמנה</a>' : '') +
+          '<div style="font-size:15px;font-weight:bold;color:#f1f5f9;margin-bottom:5px;">' + r.title + '</div>' +
+          '<div style="font-size:12px;color:#94a3b8;margin-bottom:8px;">' +
+            '📅 ' + r.day + ' &nbsp;·&nbsp; דדליין: ' + r.deadline.split('-').reverse().join('/') +
+            ' &nbsp;·&nbsp; <span style="color:' + urgencyColor + ';font-weight:bold;">' + urgencyText + '</span>' +
+            (r.duration ? ' &nbsp;·&nbsp; ⏱️ ' + r.duration : '') +
+          '</div>' +
+          (r.details ? '<div style="font-size:13px;color:#cbd5e1;line-height:1.6;background:#0a1628;border-radius:8px;padding:10px 12px;margin-bottom:8px;">' + r.details + '</div>' : '') +
+          (r.tips ? '<div style="font-size:12px;color:#fde68a;background:rgba(251,191,36,0.07);border-right:3px solid rgba(251,191,36,0.5);padding:8px 12px;border-radius:0 8px 8px 0;margin-bottom:10px;line-height:1.5;">💡 ' + r.tips + '</div>' : '') +
+          '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">' +
+            (r.url ? '<a href="' + r.url + '" style="display:inline-block;background:rgba(99,102,241,0.2);color:#a5b4fc;text-decoration:none;border:1px solid rgba(99,102,241,0.4);border-radius:8px;padding:7px 14px;font-size:13px;font-weight:bold;">🔗 לאתר ההזמנה</a>' : '') +
+            '<a href="' + doneUrl + '" style="display:inline-block;background:#16a34a;color:white;text-decoration:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:bold;">✅ בוצע</a>' +
+          '</div>' +
         '</div>' +
-        '<a href="' + doneUrl + '" style="display:inline-block;background:#16a34a;color:white;text-decoration:none;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:bold;white-space:nowrap;margin-top:2px;">✅ בוצע</a>' +
         '</div>' +
         '</td></tr>';
     }).join('');
-    return '<h3 style="color:' + color + ';margin:20px 0 8px;">' + title + '</h3>' +
-      '<table style="width:100%;border-collapse:collapse;background:#0f1f33;border-radius:10px;overflow:hidden;">' + rows + '</table>';
+    return '<h3 style="color:' + color + ';margin:24px 0 10px;font-size:16px;">' + title + '</h3>' +
+      '<table style="width:100%;border-collapse:collapse;background:#0f1f33;border-radius:12px;overflow:hidden;">' + rows + '</table>';
   }
 
   var packingLine = '';
