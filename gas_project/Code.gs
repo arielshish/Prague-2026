@@ -18,12 +18,76 @@ var STOP_CATALOG = {
   'Palladium / מרכז העיר': { mapUrl: 'https://www.google.com/maps/place/Palladium+shopping+centre,+Prague', type: 'shopping' }
 };
 
-function doGet() {
-  getOrCreateChecklistSheet(); // Ensure the sheet is created immediately
+function doGet(e) {
+  // GitHub Pages API mode: ?action=fn&args=[]&callback=cb (JSONP)
+  if (e && e.parameter && e.parameter.action) {
+    try {
+      var action = e.parameter.action;
+      var args = [];
+      try { args = JSON.parse(e.parameter.args || '[]'); } catch(ignore) {}
+      var result = dispatch_(action, args);
+      var json = JSON.stringify(result);
+      var cb = e.parameter.callback;
+      if (cb) {
+        return ContentService.createTextOutput(cb + '(' + json + ')').setMimeType(ContentService.MimeType.JAVASCRIPT);
+      }
+      return ContentService.createTextOutput(json).setMimeType(ContentService.MimeType.JSON);
+    } catch(err) {
+      var ej = JSON.stringify({ok:false,error:err.message});
+      var cb2 = e.parameter.callback;
+      if (cb2) return ContentService.createTextOutput(cb2+'('+ej+')').setMimeType(ContentService.MimeType.JAVASCRIPT);
+      return ContentService.createTextOutput(ej).setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+  getOrCreateChecklistSheet();
   return HtmlService.createHtmlOutputFromFile('index')
     .setTitle('פראג 2026 - משפחת שיש')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+function dispatch_(action, args) {
+  switch (action) {
+    case 'loadExpenses':        return loadExpenses();
+    case 'addExpense':          return addExpense(args[0],args[1],args[2],args[3]);
+    case 'updateExpense':       return updateExpense(args[0],args[1],args[2],args[3],args[4]);
+    case 'deleteExpense':       return deleteExpense(args[0]);
+    case 'clearExpenses':       return clearExpenses();
+    case 'saveSetting':         return saveSetting(args[0],args[1]);
+    case 'loadSettings':        return loadSettings();
+    case 'saveTotalBudget':     return saveTotalBudget(args[0]);
+    case 'loadBudgetSettings':  return loadBudgetSettings();
+    case 'saveBudgetCategories':return saveBudgetCategories(args[0]);
+    case 'syncChecklist':       return syncChecklist(args[0]);
+    case 'loadChecklist':       return loadChecklist();
+    case 'loadItinerary':       return loadItinerary();
+    case 'moveAttraction':      return moveAttraction(args[0],args[1]);
+    case 'loadAppData':         return loadAppData();
+    case 'savePackingList':     return savePackingList_(args[0]);
+    case 'saveDaysCustom':      return saveSetting('days_custom', JSON.stringify(args[0]));
+    case 'loadDaysFromSheets':  return loadDaysFromSheets_();
+    case 'healthCheck':         return healthCheck();
+    default:                    return {ok:false,error:'Unknown: '+action};
+  }
+}
+
+function savePackingList_(list) {
+  return saveSetting('packing_list', JSON.stringify(list));
+}
+
+function loadDaysFromSheets_() {
+  try {
+    var sheet = getOrCreateSettingsSheet();
+    var lastRow = sheet.getLastRow();
+    if (lastRow <= 1) return {ok:true,data:null};
+    var data = sheet.getRange(2,1,lastRow-1,2).getValues();
+    for (var i = 0; i < data.length; i++) {
+      if (String(data[i][0]) === 'days_custom') {
+        try { return {ok:true,data:JSON.parse(data[i][1])}; } catch(e) {}
+      }
+    }
+    return {ok:true,data:null};
+  } catch(e) { return {ok:false,error:e.message}; }
 }
 
 function getSpreadsheet_() {
