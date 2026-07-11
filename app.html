@@ -77,6 +77,22 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
+// Firebase init for GitHub Pages (non-GAS) persistence
+var _fbApp = null;
+var _fbDb = null;
+function getFirestoreDb() {
+  if (_fbDb) return _fbDb;
+  if (!_fbApp) {
+    _fbApp = firebase.initializeApp({
+      apiKey: 'AIzaSyAF9QNVV5LZNNRlxS5MNT37_FhF6kh2nBY',
+      authDomain: 'prague2026.firebaseapp.com',
+      projectId: 'prague2026'
+    });
+  }
+  _fbDb = firebase.firestore(_fbApp);
+  return _fbDb;
+}
+
 // Firebase Firestore polyfill — replaces GAS/JSONP backend
 var APP_PASSWORD = 'Shish2026';
 var SESSION_KEY = 'prague_auth_ok';
@@ -1254,9 +1270,22 @@ function initReminders() {
       .withFailureHandler(function() { renderReminders(); checkOverdueReminders(); })
       .loadRemindersDone();
   } else {
-    try { remindersDone = JSON.parse(localStorage.getItem('prague_remindersDone') || '{}'); } catch(e) { remindersDone = {}; }
-    renderReminders();
-    checkOverdueReminders();
+    try {
+      getFirestoreDb().collection('appdata').doc('main').get().then(function(doc) {
+        if (doc.exists && doc.data().remindersDone) {
+          try { remindersDone = JSON.parse(doc.data().remindersDone); } catch(e) {}
+        }
+        renderReminders();
+        checkOverdueReminders();
+      }).catch(function() {
+        try { remindersDone = JSON.parse(localStorage.getItem('prague_remindersDone') || '{}'); } catch(e) {}
+        renderReminders();
+        checkOverdueReminders();
+      });
+    } catch(e) {
+      renderReminders();
+      checkOverdueReminders();
+    }
   }
 }
 
@@ -1365,7 +1394,11 @@ function showReminderDetail(id) {
 }
 
 function saveRemindersDoneLocal() {
-  localStorage.setItem('prague_remindersDone', JSON.stringify(remindersDone));
+  var json = JSON.stringify(remindersDone);
+  localStorage.setItem('prague_remindersDone', json);
+  try {
+    getFirestoreDb().collection('appdata').doc('main').set({ remindersDone: json }, { merge: true });
+  } catch(e) {}
 }
 
 function markReminderDone(id) {

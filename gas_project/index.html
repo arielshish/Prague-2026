@@ -1207,9 +1207,22 @@ function initReminders() {
       .withFailureHandler(function() { renderReminders(); checkOverdueReminders(); })
       .loadRemindersDone();
   } else {
-    try { remindersDone = JSON.parse(localStorage.getItem('prague_remindersDone') || '{}'); } catch(e) { remindersDone = {}; }
-    renderReminders();
-    checkOverdueReminders();
+    try {
+      getFirestoreDb().collection('appdata').doc('main').get().then(function(doc) {
+        if (doc.exists && doc.data().remindersDone) {
+          try { remindersDone = JSON.parse(doc.data().remindersDone); } catch(e) {}
+        }
+        renderReminders();
+        checkOverdueReminders();
+      }).catch(function() {
+        try { remindersDone = JSON.parse(localStorage.getItem('prague_remindersDone') || '{}'); } catch(e) {}
+        renderReminders();
+        checkOverdueReminders();
+      });
+    } catch(e) {
+      renderReminders();
+      checkOverdueReminders();
+    }
   }
 }
 
@@ -1318,7 +1331,11 @@ function showReminderDetail(id) {
 }
 
 function saveRemindersDoneLocal() {
-  localStorage.setItem('prague_remindersDone', JSON.stringify(remindersDone));
+  var json = JSON.stringify(remindersDone);
+  localStorage.setItem('prague_remindersDone', json);
+  try {
+    getFirestoreDb().collection('appdata').doc('main').set({ remindersDone: json }, { merge: true });
+  } catch(e) {}
 }
 
 function markReminderDone(id) {
