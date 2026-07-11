@@ -23,6 +23,43 @@
   #app{width:min(430px,100%);min-height:100vh;margin:0 auto;background:linear-gradient(180deg,#040D18 0%,#071525 50%,#0A1A2E 100%);position:relative;overflow-x:hidden;padding-bottom:90px;}
   .tab{display:none;padding:14px 14px 0;animation:rise 0.25s ease both;}
   .tab.active{display:block;}
+
+  /* ═══ DESKTOP LAYOUT ≥768px ═══ */
+  @media(min-width:768px){
+    #app{max-width:900px;padding-bottom:80px;}
+    .tab{padding:20px 28px 0;}
+    .card{border-radius:18px;}
+    /* side-by-side nav + content */
+    #desktopLayout{display:flex;min-height:calc(100vh - 194px);}
+    #desktopSideNav{
+      width:180px;flex-shrink:0;
+      position:sticky;top:0;align-self:flex-start;
+      display:flex;flex-direction:column;gap:4px;padding:16px 10px;
+      border-left:1px solid rgba(255,255,255,0.07);
+    }
+    #desktopSideNav button{
+      display:flex;flex-direction:row;align-items:center;gap:10px;
+      padding:10px 12px;border-radius:11px;font-size:13px;font-weight:700;
+      border:0;cursor:pointer;font-family:'Rubik',Arial,sans-serif;
+      background:transparent;color:rgba(241,245,249,0.5);
+      width:100%;text-align:right;justify-content:flex-end;
+      transition:background 0.15s,color 0.15s;
+    }
+    #desktopSideNav button:hover{background:rgba(255,255,255,0.07);color:#F1F5F9;}
+    #desktopSideNav button.desk-active{background:rgba(244,99,74,0.15);color:#F4634A;}
+    #desktopSideNav button span{font-size:18px;}
+    #mainContent{flex:1;min-width:0;}
+    /* hide mobile nav on desktop */
+    nav.mobile-nav{display:none!important;}
+    /* 2-col cards on desktop */
+    .desk-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .desk-grid .card{margin-bottom:0;}
+  }
+  @media(max-width:767px){
+    #desktopLayout{display:contents;}
+    #desktopSideNav{display:none!important;}
+    #mainContent{display:contents;}
+  }
   #dayButtons::-webkit-scrollbar{display:none;}
   input::placeholder{color:rgba(241,245,249,0.28)!important;}
   input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
@@ -36,8 +73,71 @@
   .nav-map-btn{display:inline-block;background:rgba(255,255,255,0.10);color:rgba(241,245,249,0.78);border:1px solid rgba(255,255,255,0.15);border-radius:9px;padding:5px 12px;font-size:11px;font-weight:700;text-decoration:none;font-family:'Rubik',Arial,sans-serif;}
   .tip-pill{background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:7px 11px;font-size:11px;color:#FCD34D;}
 </style>
+<script>
+// GitHub Pages GAS mock — routes google.script.run calls via GET to GAS REST API
+(function() {
+  var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbxbuSwh_YysA1cY_XraQDaxDK5Tudq9THc9pZw4ciRB3Dl_KShEmNP0C39yHreXKQDg/exec';
+  if (typeof google !== 'undefined' && google && google.script && google.script.run) return;
+  var ALL_FNS = [
+    'loadExpenses','addExpense','updateExpense','deleteExpense','clearExpenses','importExpenses',
+    'saveSetting','loadSettings',
+    'saveTotalBudget','loadBudgetSettings','saveBudgetCategories',
+    'syncBudgetFromSheets','syncChecklist','loadChecklist',
+    'loadItinerary','moveAttraction',
+    'loadAppData','saveAppData','savePackingList',
+    'saveDaysCustom','loadDaysFromSheets',
+    'healthCheck','getSummary'
+  ];
+  function makeRunner(sc, fc) {
+    var runner = {
+      withSuccessHandler: function(cb) { return makeRunner(cb, fc); },
+      withFailureHandler: function(cb) { return makeRunner(sc, cb); }
+    };
+    ALL_FNS.forEach(function(fn) {
+      runner[fn] = function() {
+        var args = Array.prototype.slice.call(arguments);
+        var url = GAS_API_URL + '?action=' + encodeURIComponent(fn) + '&args=' + encodeURIComponent(JSON.stringify(args));
+        fetch(url, { redirect: 'follow' })
+          .then(function(r) { return r.json(); })
+          .then(function(d) { if (sc) sc(d); })
+          .catch(function(e) { if (fc) fc(e); });
+      };
+    });
+    return runner;
+  }
+  window.google = { script: { run: makeRunner(null, null) } };
+})();
+</script>
 </head>
 <body>
+<div id="inAppBrowserBanner" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(4,13,24,0.97);align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:32px 24px;font-family:'Rubik',Arial,sans-serif;">
+  <div style="font-size:48px;margin-bottom:16px;">🧭</div>
+  <div style="font-size:20px;font-weight:900;color:#F1F5F9;margin-bottom:10px;">פתח ב-Safari</div>
+  <div style="font-size:14px;color:rgba(241,245,249,0.65);margin-bottom:24px;line-height:1.6;">האפליקציה לא עובדת טוב בדפדפן הפנימי של וואטסאפ.<br>לחץ על כפתור השיתוף ובחר "פתח ב-Safari"</div>
+  <div style="font-size:13px;color:rgba(241,245,249,0.4);">⬇️ לחץ על ⋯ או 🔗 בפינה ← פתח ב-Safari</div>
+</div>
+<script>
+(function(){
+  var ua = navigator.userAgent || '';
+  var isInApp = /FBAN|FBAV|Instagram|WhatsApp|Line\/|MicroMessenger|GSA\/|Twitter/i.test(ua);
+  if (isInApp) {
+    var b = document.getElementById('inAppBrowserBanner');
+    if (b) b.style.display = 'flex';
+    return;
+  }
+  // iOS Safari — הצע הוספה למסך הבית אם עדיין לא נוסף
+  var isIOS = /iPhone|iPad|iPod/.test(ua);
+  var isSafari = /Safari/.test(ua) && !/Chrome|CriOS|FxiOS/.test(ua);
+  var isStandalone = window.navigator.standalone === true;
+  var dismissed = sessionStorage.getItem('pwa_banner_dismissed');
+  if (isIOS && isSafari && !isStandalone && !dismissed) {
+    var banner = document.createElement('div');
+    banner.style.cssText = 'position:fixed;bottom:80px;left:12px;right:12px;z-index:999;background:linear-gradient(135deg,#1e293b,#0f172a);border:1px solid rgba(244,99,74,0.4);border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;font-family:Rubik,Arial,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,0.5);';
+    banner.innerHTML = '<div style="flex:1;"><div style="font-size:13px;font-weight:800;color:#F1F5F9;margin-bottom:2px;">📲 הוסף למסך הבית</div><div style="font-size:11px;color:rgba(241,245,249,0.55);">לחץ ⬆️ ← "הוסף למסך הבית" לחוויה מלאה</div></div><button onclick="sessionStorage.setItem(\'pwa_banner_dismissed\',\'1\');this.parentNode.remove();" style="background:transparent;border:0;font-size:18px;cursor:pointer;color:rgba(241,245,249,0.4);padding:4px;">✕</button>';
+    setTimeout(function() { document.body.appendChild(banner); }, 3000);
+  }
+})();
+</script>
 <div id="app">
 
   <!-- ═══ HEADER ═══ -->
@@ -211,7 +311,7 @@
     <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:16px;margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
         <div style="font-size:13px;font-weight:800;color:#F1F5F9;">📊 תקציב מול בפועל</div>
-        <button id="btnEditBudget" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:4px 10px;font-size:11px;font-weight:700;color:rgba(241,245,249,0.7);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">✏️ ערוך</button>
+        <button id="btnEditBudget" onclick="openBudgetModal()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:4px 10px;font-size:11px;font-weight:700;color:rgba(241,245,249,0.7);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">✏️ ערוך</button>
       </div>
       <!-- כרטיס סיכום גדול -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
@@ -254,17 +354,23 @@
 
   <!-- מודל עריכת תקציב -->
   <div id="budgetModal" style="display:none;position:fixed;inset:0;z-index:80;align-items:flex-end;justify-content:center;">
-    <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);" id="budgetOverlay"></div>
+    <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);pointer-events:none;" id="budgetOverlay"></div>
     <div style="position:relative;background:linear-gradient(160deg,#1e293b,#0f172a);border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;z-index:1;max-height:85vh;overflow-y:auto;">
-      <h2 style="margin:0 0 14px;font-size:18px;font-weight:900;color:#F1F5F9;">✏️ עריכת תקציב</h2>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <h2 style="margin:0;font-size:18px;font-weight:900;color:#F1F5F9;">✏️ עריכת תקציב</h2>
+        <button onclick="closeBudgetModal()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:10px;padding:6px 13px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">ביטול</button>
+      </div>
       <div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);border-radius:14px;padding:14px;margin-bottom:16px;">
         <div style="font-size:11px;font-weight:700;color:#FCD34D;margin-bottom:8px;letter-spacing:0.5px;">💰 תקציב כולל לטיול (₪)</div>
         <input id="budgetTotalInput" type="number" placeholder="לדוג׳ 15000" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(245,158,11,0.35);border-radius:10px;padding:11px 13px;font-size:18px;font-weight:800;color:#FCD34D;font-family:'Rubik',Arial,sans-serif;box-sizing:border-box;text-align:center;">
       </div>
       <div style="font-size:11px;font-weight:700;color:rgba(241,245,249,0.5);margin-bottom:10px;letter-spacing:0.5px;">📊 פירוט לפי קטגוריה (₪)</div>
       <div id="budgetInputs" style="display:grid;gap:10px;margin-bottom:16px;"></div>
-      <button id="btnAddBudgetCat" style="width:100%;background:rgba(255,255,255,0.07);border:1px dashed rgba(255,255,255,0.2);border-radius:13px;padding:11px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;margin-bottom:14px;">➕ הוסף קטגוריה</button>
-      <button id="btnSaveBudget" class="btn-primary" style="width:100%;">💾 שמור</button>
+      <button id="btnAddBudgetCat" onclick="(function(){var b=loadBudget();b.push({cat:'קטגוריה חדשה',ils:0});saveBudget(b);openBudgetModal();})()" style="width:100%;background:rgba(255,255,255,0.07);border:1px dashed rgba(255,255,255,0.2);border-radius:13px;padding:11px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;margin-bottom:14px;">➕ הוסף קטגוריה</button>
+      <div style="display:flex;gap:10px;">
+        <button onclick="closeBudgetModal()" style="flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:13px;padding:14px;font-size:14px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">ביטול</button>
+        <button id="btnSaveBudget" onclick="saveBudgetFromModalAndInvalidate()" style="flex:2;background:#F4634A;color:white;border:0;border-radius:13px;padding:14px;font-size:15px;font-weight:900;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">💾 שמור</button>
+      </div>
     </div>
   </div>
 
@@ -2208,18 +2314,17 @@ var DEFAULT_BUDGET = [
   {cat:'כללי ושונות 💡', ils:1000}
 ];
 function loadBudget() {
-  try { return JSON.parse(localStorage.getItem('prague_budget_v1') || 'null') || JSON.parse(JSON.stringify(DEFAULT_BUDGET)); }
-  catch(e) { return JSON.parse(JSON.stringify(DEFAULT_BUDGET)); }
+  try { return JSON.parse(localStorage.getItem('prague_budget_v1') || 'null') || window._memBudget || JSON.parse(JSON.stringify(DEFAULT_BUDGET)); }
+  catch(e) { return window._memBudget || JSON.parse(JSON.stringify(DEFAULT_BUDGET)); }
 }
 function loadTotalBudget() {
-  return Number(localStorage.getItem('prague_total_budget') || '0') || 0;
+  try { return Number(localStorage.getItem('prague_total_budget') || '0') || 0; } catch(e) { return window._memTotalBudget || 0; }
 }
 function saveTotalBudget(val) {
   localStorage.setItem('prague_total_budget', String(val));
   if (isGas()) {
     google.script.run
-      .withSuccessHandler(function(r) { if (r && r.ok) toast('☁️ תקציב כולל סונכרן!'); })
-      .withFailureHandler(function() { toast('⚠️ שמור מקומית בלבד'); })
+      .withFailureHandler(function() {})
       .saveTotalBudget(val);
   }
 }
@@ -2227,26 +2332,27 @@ function saveBudget(b) {
   localStorage.setItem('prague_budget_v1', JSON.stringify(b));
   if (isGas()) {
     google.script.run
-      .withSuccessHandler(function(r) { if (r && r.ok) toast('☁️ תקציב סונכרן!'); })
-      .withFailureHandler(function() { toast('⚠️ שמור מקומית בלבד'); })
+      .withFailureHandler(function() {})
       .saveBudgetCategories(b);
   }
 }
-function syncBudgetFromSheets() {
-  if (!isGas()) return;
+function syncBudgetFromSheets(cb) {
+  if (!isGas()) { if (cb) cb(); return; }
   google.script.run
     .withSuccessHandler(function(r) {
       if (r && r.ok && r.data) {
         if (r.data.budget_categories) {
           localStorage.setItem('prague_budget_v1', JSON.stringify(r.data.budget_categories));
         }
-        if (r.data.total_budget) {
+        if (r.data.total_budget != null) {
           localStorage.setItem('prague_total_budget', String(r.data.total_budget));
         }
-        renderBudget();
       }
+      renderBudget();
+      if (cb) cb();
     })
-    .loadAppData();
+    .withFailureHandler(function() { renderBudget(); if (cb) cb(); })
+    .loadBudgetSettings();
 }
 
 function guessExpCat(name) {
@@ -2314,9 +2420,9 @@ function renderBudget() {
   if (pctEl) { pctEl.textContent = pct + '% נוצל'; pctEl.style.color = pct >= 90 ? '#FCA5A5' : pct >= 70 ? '#FCD34D' : 'rgba(241,245,249,0.6)'; }
 }
 
-function openBudgetModal() {
-  var budget = loadBudget();
-  var totalVal = loadTotalBudget();
+function populateBudgetModal(budget, totalVal) {
+  budget = budget || loadBudget();
+  totalVal = (totalVal != null) ? totalVal : loadTotalBudget();
   var ti = qs('budgetTotalInput'); if (ti) ti.value = totalVal || '';
   var inp = qs('budgetInputs');
   if (!inp) return;
@@ -2327,7 +2433,38 @@ function openBudgetModal() {
       '<button onclick="removeBudgetRow(' + i + ')" style="background:rgba(239,68,68,0.15);border:none;border-radius:8px;padding:8px 10px;color:#FCA5A5;font-size:14px;cursor:pointer;">🗑</button>' +
     '</div>';
   }).join('');
+}
+
+var _budgetModalOpenTime = 0;
+function openBudgetModal() {
   var m = qs('budgetModal'); if (m) m.style.display = 'flex';
+  var openTime = Date.now();
+  _budgetModalOpenTime = openTime;
+  populateBudgetModal();
+  if (isGas()) {
+    google.script.run
+      .withSuccessHandler(function(r) {
+        // רק אם המודל עדיין פתוח ולא בוצעה שמירה מאז הפתיחה
+        if (openTime !== _budgetModalOpenTime) return;
+        var m2 = qs('budgetModal');
+        if (!m2 || m2.style.display === 'none') return;
+        if (r && r.ok && r.data) {
+          var cats = r.data.budget_categories || loadBudget();
+          var total = r.data.total_budget != null ? r.data.total_budget : loadTotalBudget();
+          // עדכן localStorage ואת שדות המודל
+          localStorage.setItem('prague_budget_v1', JSON.stringify(cats));
+          localStorage.setItem('prague_total_budget', String(total));
+          populateBudgetModal(cats, total);
+        }
+      })
+      .withFailureHandler(function() {})
+      .loadBudgetSettings();
+  }
+}
+
+function saveBudgetFromModalAndInvalidate() {
+  _budgetModalOpenTime = 0; // בטל callback ממתין
+  saveBudgetFromModal();
 }
 
 function removeBudgetRow(i) {
@@ -2341,7 +2478,6 @@ function closeBudgetModal() { var m = qs('budgetModal'); if (m) m.style.display 
 
 function saveBudgetFromModal() {
   var totalVal = Number((qs('budgetTotalInput') || {}).value || 0) || 0;
-  if (totalVal) saveTotalBudget(totalVal);
   var inputs = document.querySelectorAll('#budgetInputs input');
   var map = {};
   inputs.forEach(function(inp) {
@@ -2353,10 +2489,29 @@ function saveBudgetFromModal() {
   var budget = Object.keys(map).sort(function(a,b){return a-b;}).map(function(i) {
     return {cat: map[i].cat || '', ils: Number(map[i].ils) || 0};
   });
-  saveBudget(budget);
+
+  // סגור קודם — לפני כל קוד שעלול לזרוק שגיאה
   closeBudgetModal();
+
+  // שמור בזיכרון ו-localStorage (try-catch למקרה ש-iframe חוסם storage)
+  window._memTotalBudget = totalVal;
+  window._memBudget = budget;
+  try { localStorage.setItem('prague_total_budget', String(totalVal)); } catch(e) {}
+  try { localStorage.setItem('prague_budget_v1', JSON.stringify(budget)); } catch(e) {}
+
   renderBudget();
   toast('✅ תקציב עודכן!');
+
+  // שמור לשיטס
+  if (isGas()) {
+    google.script.run
+      .withSuccessHandler(function() { toast('☁️ סונכרן לגיליון!'); })
+      .withFailureHandler(function() { toast('⚠️ שגיאה בשמירה לגיליון'); })
+      .saveTotalBudget(totalVal);
+    google.script.run
+      .withFailureHandler(function() {})
+      .saveBudgetCategories(budget);
+  }
 }
 
 function renderExpenses() {
@@ -2779,6 +2934,7 @@ document.addEventListener('DOMContentLoaded', function() {
   renderDays();
   renderShopping();
   loadExpenses();
+  syncBudgetFromSheets();
 
   // CZK/ILS conversion
   var czkInput = qs('expCzk'), ilsInput = qs('expIls');
@@ -2803,9 +2959,9 @@ document.addEventListener('DOMContentLoaded', function() {
     'btnRefreshExp':      function() { loadExpenses(); },
     'btnExportCsv':       function() { exportCsv(); },
     'btnEditBudget':      function() { openBudgetModal(); },
-    'btnSaveBudget':      function() { saveBudgetFromModal(); },
+    'btnSaveBudget':      function() { saveBudgetFromModalAndInvalidate(); },
     'btnAddBudgetCat':    function() { var b=loadBudget(); b.push({cat:'קטגוריה חדשה',ils:0}); saveBudget(b); openBudgetModal(); },
-    'budgetOverlay':      function() { closeBudgetModal(); },
+    'budgetOverlay':      function(e) { if(e.target===this) closeBudgetModal(); },
     'btnSaveRate':        function() { saveRate(); },
     'btnLiveRate':        function() { fetchLiveRate(); },
     'btnSaveExpense':     function() { saveExpense(); },
@@ -2910,7 +3066,107 @@ document.addEventListener('DOMContentLoaded', function() {
     reader.readAsDataURL(file);
   });
   if (qs('photoTagOverlay')) qs('photoTagOverlay').addEventListener('click', closePhotoModal);
+
+  // Desktop sidebar
+  if (window.innerWidth >= 768) {
+    initDesktopLayout();
+  }
+  window.addEventListener('resize', function() {
+    var sidebar = document.getElementById('deskSidebar');
+    if (window.innerWidth >= 768 && !sidebar) initDesktopLayout();
+    if (window.innerWidth < 768 && sidebar) {
+      sidebar.parentNode.removeChild(sidebar);
+      var app = document.getElementById('app');
+      if (app) app.style.cssText = '';
+    }
+  });
 });
+
+function initDesktopLayout() {
+  var app = document.getElementById('app');
+  var nav = document.querySelector('nav');
+  if (!app || !nav) return;
+
+  // Hide mobile nav
+  nav.style.display = 'none';
+
+  // Widen app
+  app.style.maxWidth = '960px';
+  app.style.paddingBottom = '24px';
+  app.style.display = 'flex';
+  app.style.flexDirection = 'column';
+
+  // Create sidebar
+  var sidebar = document.createElement('div');
+  sidebar.id = 'deskSidebar';
+  sidebar.style.cssText = 'position:fixed;top:0;right:calc(50% + 470px - 960px/2 + 0px);width:190px;height:100vh;background:rgba(4,13,24,0.97);border-left:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;padding:24px 10px 16px;gap:4px;z-index:40;overflow-y:auto;direction:rtl;';
+
+  var navItems = [
+    { id:'home',       icon:'🏠', label:'ראשי' },
+    { id:'days',       icon:'📅', label:'ימים' },
+    { id:'shopping',   icon:'🛍️', label:'קניות' },
+    { id:'expenses',   icon:'💰', label:'הוצאות' },
+    { id:'flights',    icon:'✈️', label:'טיסות' },
+    { id:'pack',       icon:'🧳', label:'ציוד' },
+    { id:'restaurants',icon:'🍽️', label:'מסעדות' },
+    { id:'info',       icon:'ℹ️', label:'מידע' },
+    { id:'guides',     icon:'🗺️', label:'מדריכים' },
+    { id:'community',  icon:'👨‍👩‍👧', label:'קהילה' },
+    { id:'history',    icon:'📜', label:'היסטוריה' },
+    { id:'photodiary', icon:'📸', label:'יומן תמונות' },
+    { id:'lang',       icon:'🗣️', label:'שפה' },
+  ];
+
+  var logoDiv = document.createElement('div');
+  logoDiv.style.cssText = 'font-size:11px;font-weight:800;color:#FCD34D;letter-spacing:3px;text-align:center;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.08);';
+  logoDiv.textContent = 'PRAGUE 2026';
+  sidebar.appendChild(logoDiv);
+
+  navItems.forEach(function(item) {
+    var btn = document.createElement('button');
+    btn.id = 'deskNav-' + item.id;
+    btn.style.cssText = 'display:flex;flex-direction:row;align-items:center;gap:10px;padding:10px 12px;border-radius:11px;font-size:13px;font-weight:700;border:0;cursor:pointer;font-family:Rubik,Arial,sans-serif;background:transparent;color:rgba(241,245,249,0.5);width:100%;text-align:right;justify-content:flex-end;transition:background 0.15s,color 0.15s;';
+    btn.innerHTML = '<span style="font-size:11px;font-weight:700;">' + item.label + '</span><span style="font-size:18px;">' + item.icon + '</span>';
+    btn.addEventListener('click', function() {
+      openTab(item.id);
+      // special renders
+      if (item.id === 'community') renderCommunity();
+      if (item.id === 'history') renderHistory();
+      if (item.id === 'photodiary') renderPhotoDiary();
+    });
+    btn.addEventListener('mouseenter', function() { if (!btn.classList.contains('dk-act')) btn.style.background='rgba(255,255,255,0.07)'; btn.style.color='#F1F5F9'; });
+    btn.addEventListener('mouseleave', function() { if (!btn.classList.contains('dk-act')) { btn.style.background='transparent'; btn.style.color='rgba(241,245,249,0.5)'; } });
+    sidebar.appendChild(btn);
+  });
+
+  document.body.appendChild(sidebar);
+
+  // Add margin to app to make room for sidebar
+  app.style.marginRight = '190px';
+
+  // Override openTab to also update sidebar active state
+  var _origOpenTab = openTab;
+  window.openTab = function(id) {
+    _origOpenTab(id);
+    navItems.forEach(function(item) {
+      var b = document.getElementById('deskNav-' + item.id);
+      if (!b) return;
+      if (item.id === id) {
+        b.style.background = 'rgba(244,99,74,0.15)';
+        b.style.color = '#F4634A';
+        b.classList.add('dk-act');
+      } else {
+        b.style.background = 'transparent';
+        b.style.color = 'rgba(241,245,249,0.5)';
+        b.classList.remove('dk-act');
+      }
+    });
+  };
+
+  // Set initial active
+  var homeBtn = document.getElementById('deskNav-home');
+  if (homeBtn) { homeBtn.style.background='rgba(244,99,74,0.15)'; homeBtn.style.color='#F4634A'; homeBtn.classList.add('dk-act'); }
+}
 
 // ═══════════════════════════════════════════
 //  PHOTO DIARY — IndexedDB
