@@ -1239,14 +1239,20 @@ function renderReminders() {
 function markReminderDone(id) {
   remindersDone[id] = true;
   renderReminders();
-  google.script.run.withSuccessHandler(function(){}).withFailureHandler(function(){})
+  showToast('⏳ שומר...', 1000);
+  google.script.run
+    .withSuccessHandler(function(){ showToast('✅ סומן כבוצע ונשמר', 2000); })
+    .withFailureHandler(function(e){ showToast('⚠️ שגיאת שמירה: ' + (e&&e.message||e), 3000); })
     .saveAppData('remindersDone', JSON.stringify(remindersDone));
 }
 
 function markReminderUndone(id) {
   delete remindersDone[id];
   renderReminders();
-  google.script.run.withSuccessHandler(function(){}).withFailureHandler(function(){})
+  showToast('⏳ שומר...', 1000);
+  google.script.run
+    .withSuccessHandler(function(){ showToast('↩️ בוטל ונשמר', 2000); })
+    .withFailureHandler(function(e){ showToast('⚠️ שגיאת שמירה: ' + (e&&e.message||e), 3000); })
     .saveAppData('remindersDone', JSON.stringify(remindersDone));
 }
 
