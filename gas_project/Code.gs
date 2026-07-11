@@ -1015,6 +1015,22 @@ function sendDailyReminders() {
   Logger.log('Reminders sent: ' + subject);
 }
 
+// Test function — run once to verify email looks correct
+function testSendReminders() {
+  var today = new Date(); today.setHours(0,0,0,0);
+  var daysLeft = Math.ceil((TRIP_START - today) / 86400000);
+  var packingStats = getPackingStats_();
+  // Send all reminders (ignore done state) as a test
+  var html = buildReminderEmailHtml_(today, REMINDERS_DEF, packingStats, daysLeft);
+  var subject = '🧪 בדיקה — פראג 2026 תזכורות (' + daysLeft + ' ימים לטיסה)';
+  FAMILY_EMAILS.forEach(function(email) {
+    try {
+      MailApp.sendEmail({ to: email, subject: subject, htmlBody: html });
+    } catch(e) { Logger.log('Failed: ' + email + ' — ' + e.message); }
+  });
+  Logger.log('Test email sent to ' + FAMILY_EMAILS.length + ' recipients');
+}
+
 // Call this once to set up the daily trigger
 function setupDailyReminderTrigger() {
   // Delete existing triggers for sendDailyReminders
