@@ -1135,26 +1135,101 @@ var currentDay = 1;
 // ═══════════════════════════════════════════
 var REMINDERS = [
   // CRITICAL — Book NOW (red, urgent)
-  { id:'r1', emoji:'🏰', title:'כרטיסים לטירת פראג', desc:'hrad.cz — 350/175 CZK. ביוגוסט מלא! הזמינו עכשיו.', url:'https://www.hrad.cz/en/prague-castle-for-visitors/tickets', deadline:'2026-07-20', day:'11 אוגוסט', priority:'critical' },
-  { id:'r2', emoji:'✡️', title:'כרטיסים לרובע היהודי', desc:'jewishmuseum.cz — 500 CZK. מאוד פופולרי, נגמר מהר.', url:'https://www.jewishmuseum.cz/en/', deadline:'2026-07-20', day:'14 אוגוסט', priority:'critical' },
-  { id:'r3', emoji:'📚', title:'כרטיסים ל-Clementinum', desc:'klementinum.com — 300 CZK. סלוטים מוגבלים, נגמר שבועות מראש!', url:'https://www.klementinum.com/en/', deadline:'2026-07-15', day:'גמיש', priority:'critical' },
-  { id:'r4', emoji:'🚂', title:'כרטיסים לממלכת הרכבות', desc:'kralovstvi-zeleznic.cz — 300/200 CZK. הילדים ישתגעו — הזמינו מראש.', url:'https://www.kralovstvi-zeleznic.cz/en/', deadline:'2026-07-25', day:'10 אוגוסט', priority:'critical' },
-  { id:'r5', emoji:'🌆', title:'הזמנת מקום ב-Oblaka', desc:'מסעדה על הגג — ארוחה אחרונה. חייבים הזמנה! חפשו ב-Google.', url:'https://www.google.com/search?q=Oblaka+restaurant+Prague+reservation', deadline:'2026-07-18', day:'15 אוגוסט', priority:'critical' },
-  { id:'r6', emoji:'🍷', title:'הזמנת שולחן ב-U Fleků', desc:'הפאב ההיסטורי מ-1499. ארוחת פרידה — הזמינו מקום מראש.', url:'https://www.ufleku.cz/', deadline:'2026-07-25', day:'14 אוגוסט', priority:'critical' },
+  { id:'r1', emoji:'🏰', title:'כרטיסים לטירת פראג', desc:'hrad.cz — 350/175 CZK. ביוגוסט מלא! הזמינו עכשיו.',
+    details:'מצודת פראג היא המצודה הגדולה בעולם לפי גינס — 70,000 מ"ר. כוללת: קתדרלת סנט ויטוס (גותית מרהיבה מהמאה ה-14), ארמון המלך הבוהמי, וסמטת הזהב עם בתי נפחים עתיקים. ביוגוסט אוגוסט תורים של שעה בכניסה — חובה לקנות Online! כרטיס Circuit B (בסיסי) מספיק לחלוטין.',
+    tips:'💡 להגיע לפני 9:00 לפני ההמון. טראם 22 לכניסה עליונה (Pražský hrad) חוסך עלייה רגלית. סטארבקס ממול — נוף פנורמי בחינם.',
+    duration:'⏱️ 2–4 שעות',
+    url:'https://www.hrad.cz/en/prague-castle-for-visitors/tickets', deadline:'2026-07-20', day:'11 אוגוסט', priority:'critical' },
 
-  // IMPORTANT — do soon (orange)
-  { id:'r7', emoji:'🌊', title:'כרטיסים ל-Aquapalace', desc:'aquapalace.cz — 650/530 CZK. אפשר גם בכניסה אבל עדיף מראש בעונת קיץ.', url:'https://www.aquapalace.cz/en/', deadline:'2026-07-30', day:'12 אוגוסט', priority:'important' },
-  { id:'r8', emoji:'🐘', title:'כרטיסים לגן חיות פראג', desc:'zoopraha.cz — 300/200 CZK. Top 5 בעולם — מומלץ להזמין.', url:'https://www.zoopraha.cz/en', deadline:'2026-07-30', day:'13 אוגוסט', priority:'important' },
-  { id:'r9', emoji:'⛵', title:'הזמנת שייט בנהר Vltava', desc:'prague-venice.cz — 350 CZK. שייט שקיעה ב-13 אוגוסט — מומלץ להזמין.', url:'https://www.prague-venice.cz/', deadline:'2026-07-30', day:'13 אוגוסט', priority:'important' },
-  { id:'r10', emoji:'🩺', title:'ביטוח נסיעות', desc:'וודאו שיש לכולם ביטוח נסיעות תקף ל-8–16 אוגוסט.', url:'', deadline:'2026-07-25', day:'לפני הטיסה', priority:'important' },
-  { id:'r11', emoji:'💱', title:'המרת מטבע — CZK', desc:'המירו לפחות 5,000 CZK לכל אחד לפני הטיסה. בנק/דואר זול יותר מנמל תעופה.', url:'', deadline:'2026-08-05', day:'לפני 8 אוגוסט', priority:'important' },
+  { id:'r2', emoji:'✡️', title:'כרטיסים לרובע היהודי', desc:'jewishmuseum.cz — 500 CZK. מאוד פופולרי, נגמר מהר.',
+    details:'הרובע היהודי (Josefov) — אחד מהשמורים ביותר בעולם. כולל 6 בתי כנסת היסטוריים (מאה ה-13–17), בית עלמין עתיק עם 12 שכבות קבורה, ואולם הטקסים עם תצוגת ציורי ילדי טרזין. חוויה מרגשת ומשמעותית מאוד. הכרטיס המשותף כולל את כל האתרים.',
+    tips:'💡 להקצות לפחות 3 שעות — יש הרבה לראות. בית הכנסת הספרדי הכי מרהיב חזותית. בית הקברות — לא לפספס.',
+    duration:'⏱️ 2.5–4 שעות',
+    url:'https://www.jewishmuseum.cz/en/', deadline:'2026-07-20', day:'14 אוגוסט', priority:'critical' },
 
-  // LOGISTICS — a week before
-  { id:'r12', emoji:'✈️', title:'צ\'ק-אין לטיסת הלוך', desc:'טיסת בוקר 8 אוגוסט המראה 06:00 — צ\'ק-אין פתח 7 אוגוסט 06:00.', url:'', deadline:'2026-08-07', day:'7 אוגוסט', priority:'logistics' },
-  { id:'r13', emoji:'✈️', title:'צ\'ק-אין לטיסת חזור', desc:'QS1286 — המראה 15 אוגוסט 23:45. צ\'ק-אין פתח 14 אוגוסט 23:45.', url:'', deadline:'2026-08-14', day:'14 אוגוסט', priority:'logistics' },
-  { id:'r14', emoji:'🏨', title:'אישור הזמנת המלון', desc:'Comfort Hotel Prague City East — אשרו הזמנה וצרו קשר עם בקשות מיוחדות.', url:'https://www.comforthotels.com/', deadline:'2026-07-25', day:'לפני הטיסה', priority:'logistics' },
-  { id:'r15', emoji:'📱', title:'הורדת אפליקציית Bolt', desc:'הרבה יותר זול מ-Uber. הגדירו כרטיס אשראי לפני הטיסה!', url:'https://bolt.eu/', deadline:'2026-08-07', day:'לפני הטיסה', priority:'logistics' },
-  { id:'r16', emoji:'🌐', title:'רומינג / SIM מקומי', desc:'הפעילו רומינג בינלאומי או קנו SIM בנמל התעופה בפראג.', url:'', deadline:'2026-08-05', day:'לפני הטיסה', priority:'logistics' },
+  { id:'r3', emoji:'📚', title:'כרטיסים ל-Clementinum', desc:'klementinum.com — 300 CZK. סלוטים מוגבלים, נגמר שבועות מראש!',
+    details:'הספרייה הבארוקית של Clementinum — אחת מהיפות בעולם. אולם ספרים עתיק מהמאה ה-18 עם קימור מצויר, ספרים ישנים מהמאה ה-15, ומגדל תצפית עם נוף 360° על פראג. ה-Baroque Library Hall נחשב לאחת הספריות הכי יפות בעולם. כניסה בסיורים מודרכים בלבד — מוגבל ל-25 איש!',
+    tips:'💡 להזמין עוד היום — נגמר חודש מראש בקיץ. הסיור 50 דק׳. הנוף מהמגדל לא פחות מרהיב מהספרייה.',
+    duration:'⏱️ 50–70 דקות (סיור מודרך)',
+    url:'https://www.klementinum.com/en/', deadline:'2026-07-15', day:'גמיש', priority:'critical' },
+
+  { id:'r4', emoji:'🚂', title:'כרטיסים לממלכת הרכבות', desc:'kralovstvi-zeleznic.cz — 300/200 CZK. הילדים ישתגעו — הזמינו מראש.',
+    details:'ממלכת הרכבות (Království železnic) — דיורמה ענקית של 1:87 מ-צ\'כיה המיניאטורית. מסילות רכבת, כפרים, הרים, תחנות ותאורה אוטומטית. ילדים מטורפים על זה! ממוקם בלב העיר. לוקח בערך שעה-שעה וחצי להסתובב ולראות הכל.',
+    tips:'💡 הכי מרהיב כשמכבים האורות ורק התאורה המיניאטורית דולקת — לשאול מתי זה קורה.',
+    duration:'⏱️ 60–90 דקות',
+    url:'https://www.kralovstvi-zeleznic.cz/en/', deadline:'2026-07-25', day:'10 אוגוסט', priority:'critical' },
+
+  { id:'r5', emoji:'🌆', title:'הזמנת מקום ב-Oblaka', desc:'מסעדה על הגג — ארוחה אחרונה. חייבים הזמנה! חפשו ב-Google.',
+    details:'Oblaka — מסעדה על הגג של מגדל Žižkov (מגדל הטלוויזיה המפורסם). נוף פנורמי 360° על פראג בגובה 93 מטר. תפריט מסעדה עכשווית-צ׳כית איכותית. חוויה יוצאת דופן לסיום הטיול — ארוחת ערב אחרונה בפראג עם נוף שלא ישכח.',
+    tips:'💡 מיקרו ולצד הנוף — לבקש שולחן ליד החלון בהזמנה. ערב 15 אוגוסט — האחרון לפני הטיסה הלילית.',
+    duration:'⏱️ 90–120 דקות (ארוחת ערב)',
+    url:'https://www.google.com/search?q=Oblaka+restaurant+Prague+reservation', deadline:'2026-07-18', day:'15 אוגוסט', priority:'critical' },
+
+  { id:'r6', emoji:'🍷', title:'הזמנת שולחן ב-U Fleků', desc:'הפאב ההיסטורי מ-1499. ארוחת פרידה — הזמינו מקום מראש.',
+    details:'U Fleků — הפאב המבשל הכי ישן בפראג, פועל ברציפות מ-1499. מגישים בירה כהה אחת בלבד שמבשלים בית — Flekovský tmavý ležák. חצר גדולה עם 1,200 מקומות, מוזיקה חיה, ואוכל צ׳כי מסורתי. טיפוסי ומרתק — חוויה שאין כמותה.',
+    tips:'💡 לבקש מקום בחצר (Biergarten) — יפה יותר. לצפות לבירה כהה בלבד. תיירותי אבל אותנטי באווירה.',
+    duration:'⏱️ 90–120 דקות',
+    url:'https://www.ufleku.cz/', deadline:'2026-07-25', day:'14 אוגוסט', priority:'critical' },
+
+  { id:'r7', emoji:'🌊', title:'כרטיסים ל-Aquapalace', desc:'aquapalace.cz — 650/530 CZK. אפשר גם בכניסה אבל עדיף מראש בעונת קיץ.',
+    details:'פארק מים פנים מהגדולים באירופה המרכזית — 15,000 מ"ר. מגלשות, בריכת גלים, גקוזי, נהרות זרימה, בריכה חיצונית חמה, ואזור ילדים ייעודי. המחיר כולל גישה לכל האזורים. בסופי שבוע עמוס מאוד ביוגוסט.',
+    tips:'💡 להביא מגבת — השכרה יקרה מאוד. אוכל יקר בפנים — מותר להביא חטיפים. ארונות מחזירים מטבע.',
+    duration:'⏱️ 5–8 שעות (יום שלם)',
+    url:'https://www.aquapalace.cz/en/', deadline:'2026-07-30', day:'12 אוגוסט', priority:'important' },
+
+  { id:'r8', emoji:'🐘', title:'כרטיסים לגן חיות פראג', desc:'zoopraha.cz — 300/200 CZK. Top 5 בעולם — מומלץ להזמין.',
+    details:'גן החיות של פראג — מדורג Top 7 בעולם. 58 הקטאר, 5,000 בעלי חיים, 700 מינים. יש: ג׳ונגל אינדונזי, ערבות אפריקניות, יער גורילות, ורכבל כסאות פנורמי (40 CZK). ביוגוסט עמוס מאוד — כרטיסים Online חוסכים תור ארוך בכניסה.',
+    tips:'💡 לבדוק זמני האכלה באתר לפני הביקור — ג׳ירפות ב-11:30, פילים ב-15:00. רכבל כסאות חובה!',
+    duration:'⏱️ 4–6 שעות (יום שלם)',
+    url:'https://www.zoopraha.cz/en', deadline:'2026-07-30', day:'13 אוגוסט', priority:'important' },
+
+  { id:'r9', emoji:'⛵', title:'הזמנת שייט בנהר Vltava', desc:'prague-venice.cz — 350 CZK. שייט שקיעה ב-13 אוגוסט — מומלץ להזמין.',
+    details:'שייט על נהר הוולטאווה — הנהר שחוצה את פראג. נוף על גשר קרל, המצודה, הגגות האדומים, והאיים הקטנים. שייט שקיעה ב-20:00 הוא הכי מרהיב — השמש הזהובה על המצודה. חברת prague-venice מומלצת, כ-60–90 דק׳.',
+    tips:'💡 להביא שכבה חמה — על המים קריר גם בקיץ. לשלם באשראי ישירות ברציף. שייט 20:00 — הכי יפה.',
+    duration:'⏱️ 60–90 דקות',
+    url:'https://www.prague-venice.cz/', deadline:'2026-07-30', day:'13 אוגוסט', priority:'important' },
+
+  { id:'r10', emoji:'🩺', title:'ביטוח נסיעות', desc:'וודאו שיש לכולם ביטוח נסיעות תקף ל-8–16 אוגוסט.',
+    details:'ביטוח נסיעות חובה לכל אחד מהמשפחה. צ׳כיה היא חלק מהאיחוד האירופי — טיפול רפואי בסיסי מכוסה בכרטיס הביטוח הלאומי (טופס S1 או כרטיס EHIC). אבל ביטוח נסיעות פרטי מכסה: ביטול טיסה, אובדן מטען, פינוי רפואי, ואשפוז ממושך.',
+    tips:'💡 לבדוק שהפוליסה כוללת "ספורט אתגרי" אם מתכננים Aquapalace. לשמור את מסמכי הביטוח בטלפון.',
+    duration:'⏱️ 15 דקות (לרכוש Online)',
+    url:'', deadline:'2026-07-25', day:'לפני הטיסה', priority:'important' },
+
+  { id:'r11', emoji:'💱', title:'המרת מטבע — CZK', desc:'המירו לפחות 5,000 CZK לכל אחד לפני הטיסה. בנק/דואר זול יותר מנמל תעופה.',
+    details:'הכתר הצ׳כי (CZK) — המטבע הרשמי. לא מקבלים אירו בכל מקום. שע"ח ב-8/7/2026: ~1 ₪ = ~6.5 CZK. לחמישה ימים: 3,000–5,000 CZK לאדם לנוח. כפכף: המרה בנמל תעופה יקרה 10–15% ממה שאפשר לקבל בבנק.',
+    tips:'💡 הכי כדאי: למשוך CZK מכספומט בפראג עם כרטיס Visa/Mastercard. עמלת כספומט בד"כ ~30 CZK בלבד.',
+    duration:'⏱️ 10 דקות',
+    url:'', deadline:'2026-08-05', day:'לפני 8 אוגוסט', priority:'important' },
+
+  { id:'r12', emoji:'✈️', title:'צ\'ק-אין לטיסת הלוך', desc:'טיסת בוקר 8 אוגוסט המראה 06:00 — צ\'ק-אין פתח 7 אוגוסט 06:00.',
+    details:'Smart Wings QS1287 — תל אביב (TLV) → פראג (PRG). המראה 06:00, 8 אוגוסט. חלון צ׳ק-אין נפתח 24 שעות לפני ב-06:00 בבוקר ה-7. לעשות Online check-in ולהוריד כרטיס עלייה לטיסה. לוודא דרכונים, ביטוח ורשימת ציוד.',
+    tips:'💡 להגיע לנמל התעופה לפחות שעתיים לפני ב-04:00! מומלץ להזמין מונית/Gett לילה לפני. כבודה — לשקול מראש.',
+    duration:'⏱️ 5 דקות (Online)',
+    url:'', deadline:'2026-08-07', day:'7 אוגוסט', priority:'logistics' },
+
+  { id:'r13', emoji:'✈️', title:'צ\'ק-אין לטיסת חזור', desc:'QS1286 — המראה 15 אוגוסט 23:45. צ\'ק-אין פתח 14 אוגוסט 23:45.',
+    details:'Smart Wings QS1286 — פראג (PRG) → תל אביב (TLV). המראה 23:45, 15 אוגוסט (חצות). חלון צ׳ק-אין נפתח 24 שעות לפני. הערב האחרון בפראג — לתכנן את היום ולסיים חשבונות. לוודא שהכל ארוז לפני הערב.',
+    tips:'💡 נסיעה לשדה התעופה בסביבות 21:00. שדה התעופה Václav Havel — 30 דק׳ מהמרכז בטקסי.',
+    duration:'⏱️ 5 דקות (Online)',
+    url:'', deadline:'2026-08-14', day:'14 אוגוסט', priority:'logistics' },
+
+  { id:'r14', emoji:'🏨', title:'אישור הזמנת המלון', desc:'Comfort Hotel Prague City East — אשרו הזמנה וצרו קשר עם בקשות מיוחדות.',
+    details:'Comfort Hotel Prague City East — המלון שלנו ב-8–15 אוגוסט. לאשר ישירות עם המלון שההזמנה קיימת, לציין בקשות מיוחדות (קומה גבוהה, חדרים צמודים, early check-in אם אפשר). כדאי גם לשאול על חניה, WiFi ושעות ארוחת הבוקר.',
+    tips:'💡 לשלוח מייל למלון שבוע לפני. לוודא שהכתובת שמורה Offline ב-Google Maps.',
+    duration:'⏱️ 10 דקות',
+    url:'https://www.comforthotels.com/', deadline:'2026-07-25', day:'לפני הטיסה', priority:'logistics' },
+
+  { id:'r15', emoji:'📱', title:'הורדת אפליקציית Bolt', desc:'הרבה יותר זול מ-Uber. הגדירו כרטיס אשראי לפני הטיסה!',
+    details:'Bolt — אפליקציית נסיעות שיתופיות פופולרית מאוד בפראג. הרבה יותר זולה מ-Uber (לרוב 30–40% פחות) ויש הרבה נהגים. נסיעה מהשדה למלון: ~400–600 CZK. נסיעה בתוך העיר: ~80–150 CZK. חובה להגדיר כרטיס אשראי לפני הנחיתה.',
+    tips:'💡 גם להוריד Uber כגיבוי. בשעות עומס (17:00–19:00) מחירים עולים — לנסות לחכות 10 דק׳.',
+    duration:'⏱️ 5 דקות',
+    url:'https://bolt.eu/', deadline:'2026-08-07', day:'לפני הטיסה', priority:'logistics' },
+
+  { id:'r16', emoji:'🌐', title:'רומינג / SIM מקומי', desc:'הפעילו רומינג בינלאומי או קנו SIM בנמל התעופה בפראג.',
+    details:'צ׳כיה — רשת 4G/5G טובה. אפשרויות: (1) רומינג עם הסלולרי הישראלי — לבדוק מחיר עם הספק. (2) SIM צ׳כי בנמל התעופה (Vodafone/O2/T-Mobile) — ~300 CZK ל-10GB. (3) eSIM בינלאומי (Airalo, Holafly) — להגדיר לפני הטיסה. מומלץ לפחות SIM אחד לניווט.',
+    tips:'💡 לוודא שהטלפון פתוח לרשתות בינלאומיות לפני הטיסה. eSIM הכי נוח — להגדיר בבית בשקט.',
+    duration:'⏱️ 15 דקות',
+    url:'', deadline:'2026-08-05', day:'לפני הטיסה', priority:'logistics' },
 ];
 
 var remindersFilter = 'all';
@@ -1214,18 +1289,21 @@ function renderReminders() {
     else if (diffDays <= 5) { urgency = '🔴 ' + diffDays + ' ימים!'; urgencyColor = '#F87171'; urgencyBg = 'rgba(248,113,113,0.1)'; }
     else if (diffDays <= 14) { urgency = '🟡 ' + diffDays + ' ימים'; urgencyColor = '#FCD34D'; urgencyBg = 'rgba(252,211,77,0.08)'; }
     else { urgency = '🟢 ' + diffDays + ' ימים'; urgencyColor = '#34D399'; urgencyBg = 'rgba(52,211,153,0.06)'; }
+    var hasDetails = !!(r.details || r.tips || r.duration);
 
-    return '<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:16px;padding:15px;margin-bottom:10px;' + (done ? 'opacity:0.55;' : '') + '">' +
+    return '<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:16px;padding:15px;margin-bottom:10px;' + (done ? 'opacity:0.55;' : '') + (hasDetails ? 'cursor:pointer;' : '') + '" ' + (hasDetails ? 'onclick="showReminderDetail(\'' + r.id + '\')"' : '') + '>' +
       '<div style="display:flex;align-items:flex-start;gap:12px;">' +
         '<div style="font-size:28px;line-height:1;">' + r.emoji + '</div>' +
         '<div style="flex:1;min-width:0;">' +
           '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">' +
             '<span style="font-size:14px;font-weight:800;color:#F1F5F9;">' + r.title + '</span>' +
             '<span style="font-size:11px;font-weight:700;color:' + urgencyColor + ';background:' + urgencyBg + ';padding:2px 8px;border-radius:8px;">' + urgency + '</span>' +
+            (hasDetails ? '<span style="font-size:10px;color:rgba(241,245,249,0.35);margin-right:auto;">לחץ לפרטים ›</span>' : '') +
           '</div>' +
           '<div style="font-size:12px;color:rgba(241,245,249,0.6);margin-bottom:8px;">' + r.desc + '</div>' +
+          (r.duration ? '<div style="font-size:11px;color:#7DD3FC;margin-bottom:6px;">' + r.duration + '</div>' : '') +
           '<div style="font-size:11px;color:rgba(241,245,249,0.4);margin-bottom:10px;">📅 ' + r.day + ' · דדליין: ' + r.deadline.split('-').reverse().join('/') + '</div>' +
-          '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;" onclick="event.stopPropagation()">' +
             (r.url ? '<a href="' + r.url + '" target="_blank" style="background:rgba(99,102,241,0.2);color:#A5B4FC;border:1px solid rgba(99,102,241,0.3);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;font-family:Rubik,Arial,sans-serif;">🔗 לאתר ההזמנה</a>' : '') +
             (!done ? '<button onclick="markReminderDone(\'' + r.id + '\')" style="background:rgba(52,211,153,0.15);color:#34D399;border:1px solid rgba(52,211,153,0.3);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:Rubik,Arial,sans-serif;">✅ בוצע</button>' : '') +
             (done ? '<button onclick="markReminderUndone(\'' + r.id + '\')" style="background:rgba(255,255,255,0.05);color:rgba(241,245,249,0.4);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:Rubik,Arial,sans-serif;">↩️ בטל</button>' : '') +
@@ -1234,6 +1312,48 @@ function renderReminders() {
       '</div>' +
     '</div>';
   }).join('');
+}
+
+function showReminderDetail(id) {
+  var r = REMINDERS.find(function(x){ return x.id === id; });
+  if (!r) return;
+  var existing = document.getElementById('reminderDetailOverlay');
+  if (existing) existing.remove();
+
+  var overlay = document.createElement('div');
+  overlay.id = 'reminderDetailOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:9999;display:flex;align-items:flex-end;justify-content:center;';
+  var panel = document.createElement('div');
+  panel.style.cssText = 'background:#1E293B;border-radius:22px 22px 0 0;padding:22px 20px 32px;width:100%;max-width:480px;box-shadow:0 -4px 30px rgba(0,0,0,0.5);direction:rtl;font-family:Rubik,Arial,sans-serif;max-height:82vh;overflow-y:auto;';
+
+  var priorityColors = { critical:'#F87171', important:'#FCD34D', logistics:'#7DD3FC' };
+  var priorityLabels = { critical:'🔴 דחוף', important:'🟡 חשוב', logistics:'🔵 לוגיסטיקה' };
+  var pColor = priorityColors[r.priority] || '#94A3B8';
+  var done = remindersDone[r.id];
+
+  panel.innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
+      '<div style="font-size:28px;">' + r.emoji + '</div>' +
+      '<button onclick="document.getElementById(\'reminderDetailOverlay\').remove()" style="background:rgba(255,255,255,0.1);border:none;border-radius:50%;width:32px;height:32px;color:#94A3B8;font-size:18px;cursor:pointer;line-height:1;">✕</button>' +
+    '</div>' +
+    '<div style="font-size:17px;font-weight:900;color:#F1F5F9;margin-bottom:8px;">' + r.title + '</div>' +
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">' +
+      '<span style="font-size:11px;font-weight:700;color:' + pColor + ';background:rgba(0,0,0,0.2);border:1px solid ' + pColor + '44;border-radius:8px;padding:3px 9px;">' + (priorityLabels[r.priority]||r.priority) + '</span>' +
+      (r.duration ? '<span style="font-size:11px;font-weight:700;color:#7DD3FC;background:rgba(56,189,248,0.12);border:1px solid rgba(56,189,248,0.25);border-radius:8px;padding:3px 9px;">' + r.duration + '</span>' : '') +
+      '<span style="font-size:11px;font-weight:700;color:rgba(241,245,249,0.5);background:rgba(255,255,255,0.06);border-radius:8px;padding:3px 9px;">📅 ' + r.day + '</span>' +
+    '</div>' +
+    (r.details ? '<div style="font-size:13px;color:rgba(241,245,249,0.8);line-height:1.7;margin-bottom:14px;">' + r.details + '</div>' : '') +
+    (r.tips ? '<div style="padding:9px 12px;background:rgba(251,191,36,0.08);border-right:3px solid rgba(251,191,36,0.5);border-radius:0 8px 8px 0;font-size:12px;color:rgba(253,230,138,0.85);line-height:1.55;margin-bottom:14px;">' + r.tips + '</div>' : '') +
+    '<div style="font-size:11px;color:rgba(241,245,249,0.38);margin-bottom:16px;">⏰ דדליין: ' + r.deadline.split('-').reverse().join('/') + '</div>' +
+    '<div style="display:flex;gap:9px;">' +
+      (r.url ? '<a href="' + r.url + '" target="_blank" style="flex:1;text-align:center;padding:10px 0;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);border-radius:12px;font-size:13px;font-weight:700;color:#A5B4FC;text-decoration:none;">🔗 לאתר ההזמנה</a>' : '') +
+      (!done ? '<button onclick="markReminderDone(\'' + r.id + '\');document.getElementById(\'reminderDetailOverlay\').remove();" style="flex:1;padding:10px 0;background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.3);border-radius:12px;font-size:13px;font-weight:700;color:#34D399;cursor:pointer;font-family:Rubik,Arial,sans-serif;">✅ בוצע</button>' : '') +
+      (done ? '<button onclick="markReminderUndone(\'' + r.id + '\');document.getElementById(\'reminderDetailOverlay\').remove();" style="flex:1;padding:10px 0;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.4);cursor:pointer;font-family:Rubik,Arial,sans-serif;">↩️ בטל</button>' : '') +
+    '</div>';
+
+  overlay.appendChild(panel);
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
 }
 
 function markReminderDone(id) {
