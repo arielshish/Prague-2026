@@ -57,6 +57,7 @@ function dispatch_(action, args) {
     case 'loadSettings':        return loadSettings();
     case 'saveTotalBudget':     return saveTotalBudget(args[0]);
     case 'loadBudgetSettings':  return loadBudgetSettings();
+    case 'syncBudgetFromSheets':return loadBudgetSettings();
     case 'saveBudgetCategories':return saveBudgetCategories(args[0]);
     case 'syncChecklist':       return syncChecklist(args[0]);
     case 'loadChecklist':       return loadChecklist();
