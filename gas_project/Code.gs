@@ -974,7 +974,7 @@ var REMINDERS_DEF = [
     duration:'5 דקות' }
 ];
 
-var GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxbuSwh_YysA1cY_XraQDaxDK5Tudq9THc9pZw4ciRB3Dl_KShEmNP0C39yHreXKQDg/exec';
+var GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycby3K9gKoVwWZY7tUVf8hUDLnM6WAryzBwmBLxm82XzD8u_bn5URmg9Roixxf-vdrpn6/exec';
 
 function getReminderTitle_(id) {
   for (var i = 0; i < REMINDERS_DEF.length; i++) {
