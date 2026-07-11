@@ -87,14 +87,14 @@
     'saveDaysCustom','loadDaysFromSheets',
     'healthCheck','getSummary'
   ];
-  function jsonpCall(fn, args, sc, fc) {
+  function jsonpOnce(fn, args, sc, fc, timeout) {
     var cbName = '_gasCb' + Date.now() + Math.floor(Math.random() * 1e6);
     var script = document.createElement('script');
     var done = false;
     var timer = setTimeout(function() {
       if (done) return; done = true;
       cleanup(); if (fc) fc(new Error('timeout'));
-    }, 60000);
+    }, timeout || 60000);
     function cleanup() {
       clearTimeout(timer);
       delete window[cbName];
@@ -114,6 +114,20 @@
       '&callback=' + cbName;
     document.head.appendChild(script);
   }
+  function jsonpCall(fn, args, sc, fc) {
+    // try once; on failure retry once after 3s
+    jsonpOnce(fn, args, sc, function(err) {
+      setTimeout(function() {
+        jsonpOnce(fn, args, sc, fc);
+      }, 3000);
+    });
+  }
+  // warmup: fire a lightweight call on load to wake GAS before user interactions
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+      jsonpOnce('healthCheck', [], null, null, 90000);
+    }, 500);
+  });
   function makeRunner(sc, fc) {
     var runner = {
       withSuccessHandler: function(cb) { return makeRunner(cb, fc); },
