@@ -27,7 +27,8 @@ var ALLOWED_EMAILS = [
 
 function isAllowed_() {
   try {
-    var email = Session.getActiveUser().getEmail().toLowerCase();
+    var email = (Session.getEffectiveUser().getEmail() || '').toLowerCase();
+    if (!email) return false;
     for (var i = 0; i < ALLOWED_EMAILS.length; i++) {
       if (ALLOWED_EMAILS[i].toLowerCase() === email) return true;
     }
