@@ -34,12 +34,26 @@ function doApiGet_(e) {
     var args = [];
     try { args = JSON.parse(e.parameter.args || '[]'); } catch(ignore) {}
     var result = dispatchAction_(action, args);
+    var json = JSON.stringify(result);
+    var cb = e.parameter.callback;
+    if (cb) {
+      return ContentService
+        .createTextOutput(cb + '(' + json + ')')
+        .setMimeType(ContentService.MimeType.JAVASCRIPT);
+    }
     return ContentService
-      .createTextOutput(JSON.stringify(result))
+      .createTextOutput(json)
       .setMimeType(ContentService.MimeType.JSON);
   } catch (err) {
+    var errJson = JSON.stringify({ ok: false, error: err.message });
+    var cb2 = e.parameter.callback;
+    if (cb2) {
+      return ContentService
+        .createTextOutput(cb2 + '(' + errJson + ')')
+        .setMimeType(ContentService.MimeType.JAVASCRIPT);
+    }
     return ContentService
-      .createTextOutput(JSON.stringify({ ok: false, error: err.message }))
+      .createTextOutput(errJson)
       .setMimeType(ContentService.MimeType.JSON);
   }
 }

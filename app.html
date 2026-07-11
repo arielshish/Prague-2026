@@ -74,10 +74,9 @@
   .tip-pill{background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:7px 11px;font-size:11px;color:#FCD34D;}
 </style>
 <script>
-// GitHub Pages GAS mock — routes google.script.run calls via GET to GAS REST API
+// GitHub Pages GAS mock — uses JSONP to bypass CORS on GAS API calls
 (function() {
   var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbxbuSwh_YysA1cY_XraQDaxDK5Tudq9THc9pZw4ciRB3Dl_KShEmNP0C39yHreXKQDg/exec';
-  if (typeof google !== 'undefined' && google && google.script && google.script.run) return;
   var ALL_FNS = [
     'loadExpenses','addExpense','updateExpense','deleteExpense','clearExpenses','importExpenses',
     'saveSetting','loadSettings',
@@ -88,24 +87,46 @@
     'saveDaysCustom','loadDaysFromSheets',
     'healthCheck','getSummary'
   ];
+  function jsonpCall(fn, args, sc, fc) {
+    var cbName = '_gasCb' + Date.now() + Math.floor(Math.random() * 1e6);
+    var script = document.createElement('script');
+    var done = false;
+    var timer = setTimeout(function() {
+      if (done) return; done = true;
+      cleanup(); if (fc) fc(new Error('timeout'));
+    }, 30000);
+    function cleanup() {
+      clearTimeout(timer);
+      delete window[cbName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+    }
+    window[cbName] = function(data) {
+      if (done) return; done = true;
+      cleanup(); if (sc) sc(data);
+    };
+    script.onerror = function() {
+      if (done) return; done = true;
+      cleanup(); if (fc) fc(new Error('JSONP error'));
+    };
+    script.src = GAS_API_URL +
+      '?action=' + encodeURIComponent(fn) +
+      '&args=' + encodeURIComponent(JSON.stringify(args)) +
+      '&callback=' + cbName;
+    document.head.appendChild(script);
+  }
   function makeRunner(sc, fc) {
     var runner = {
       withSuccessHandler: function(cb) { return makeRunner(cb, fc); },
       withFailureHandler: function(cb) { return makeRunner(sc, cb); }
     };
     ALL_FNS.forEach(function(fn) {
-      runner[fn] = function() {
-        var args = Array.prototype.slice.call(arguments);
-        var url = GAS_API_URL + '?action=' + encodeURIComponent(fn) + '&args=' + encodeURIComponent(JSON.stringify(args));
-        fetch(url, { redirect: 'follow' })
-          .then(function(r) { return r.json(); })
-          .then(function(d) { if (sc) sc(d); })
-          .catch(function(e) { if (fc) fc(e); });
-      };
+      runner[fn] = function() { jsonpCall(fn, Array.prototype.slice.call(arguments), sc, fc); };
     });
     return runner;
   }
-  window.google = { script: { run: makeRunner(null, null) } };
+  if (typeof window.google === 'undefined') window.google = {};
+  if (!window.google.script) window.google.script = {};
+  if (!window.google.script.run) window.google.script.run = makeRunner(null, null);
 })();
 </script>
 </head>
