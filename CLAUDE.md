@@ -28,15 +28,15 @@
 - Sheets: `הוצאות`, `הגדרות`, `צ'קליסט`, `מסלול`
 
 ### Deployment:
-- Deployment ID: `AKfycbxbuSwh_YysA1cY_XraQDaxDK5Tudq9THc9pZw4ciRB3Dl_KShEmNP0C39yHreXKQDg`
-- clasp scriptId: `1QLerMZ-vrMLbDyMBYGpx9yKBsVUfsxUsUlKbmMRn2E0wf85t50E3QxYI`
-- גרסה פעילה: @231 (יולי 2026)
+- Deployment ID: `AKfycby3K9gKoVwWZY7tUVf8hUDLnM6WAryzBwmBLxm82XzD8u_bn5URmg9Roixxf-vdrpn6`
+- clasp scriptId: `1QwRZZlll_ZUcFjZZ5UJvnaoX0mdU2dD1AYMf9lwCSn_hqHd4nxscVud0`
+- גרסה פעילה: @2 (יולי 2026)
 
 ## Deploy — תמיד ככה:
 ```bash
 cd /home/user/Prague-2026/gas_project
 clasp push
-clasp deploy --deploymentId AKfycbxbuSwh_YysA1cY_XraQDaxDK5Tudq9THc9pZw4ciRB3Dl_KShEmNP0C39yHreXKQDg --description "תיאור"
+clasp deploy --deploymentId AKfycby3K9gKoVwWZY7tUVf8hUDLnM6WAryzBwmBLxm82XzD8u_bn5URmg9Roixxf-vdrpn6 --description "תיאור"
 ```
 
 ## כללים חשובים
