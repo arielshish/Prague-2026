@@ -23,6 +23,43 @@
   #app{width:min(430px,100%);min-height:100vh;margin:0 auto;background:linear-gradient(180deg,#040D18 0%,#071525 50%,#0A1A2E 100%);position:relative;overflow-x:hidden;padding-bottom:90px;}
   .tab{display:none;padding:14px 14px 0;animation:rise 0.25s ease both;}
   .tab.active{display:block;}
+
+  /* ═══ DESKTOP LAYOUT ≥768px ═══ */
+  @media(min-width:768px){
+    #app{max-width:900px;padding-bottom:80px;}
+    .tab{padding:20px 28px 0;}
+    .card{border-radius:18px;}
+    /* side-by-side nav + content */
+    #desktopLayout{display:flex;min-height:calc(100vh - 194px);}
+    #desktopSideNav{
+      width:180px;flex-shrink:0;
+      position:sticky;top:0;align-self:flex-start;
+      display:flex;flex-direction:column;gap:4px;padding:16px 10px;
+      border-left:1px solid rgba(255,255,255,0.07);
+    }
+    #desktopSideNav button{
+      display:flex;flex-direction:row;align-items:center;gap:10px;
+      padding:10px 12px;border-radius:11px;font-size:13px;font-weight:700;
+      border:0;cursor:pointer;font-family:'Rubik',Arial,sans-serif;
+      background:transparent;color:rgba(241,245,249,0.5);
+      width:100%;text-align:right;justify-content:flex-end;
+      transition:background 0.15s,color 0.15s;
+    }
+    #desktopSideNav button:hover{background:rgba(255,255,255,0.07);color:#F1F5F9;}
+    #desktopSideNav button.desk-active{background:rgba(244,99,74,0.15);color:#F4634A;}
+    #desktopSideNav button span{font-size:18px;}
+    #mainContent{flex:1;min-width:0;}
+    /* hide mobile nav on desktop */
+    nav.mobile-nav{display:none!important;}
+    /* 2-col cards on desktop */
+    .desk-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .desk-grid .card{margin-bottom:0;}
+  }
+  @media(max-width:767px){
+    #desktopLayout{display:contents;}
+    #desktopSideNav{display:none!important;}
+    #mainContent{display:contents;}
+  }
   #dayButtons::-webkit-scrollbar{display:none;}
   input::placeholder{color:rgba(241,245,249,0.28)!important;}
   input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
@@ -36,8 +73,14 @@
   .nav-map-btn{display:inline-block;background:rgba(255,255,255,0.10);color:rgba(241,245,249,0.78);border:1px solid rgba(255,255,255,0.15);border-radius:9px;padding:5px 12px;font-size:11px;font-weight:700;text-decoration:none;font-family:'Rubik',Arial,sans-serif;}
   .tip-pill{background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:7px 11px;font-size:11px;color:#FCD34D;}
 </style>
-</head>
-<body>
+  <div style="font-size:26px;font-weight:900;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;">פראג 2026</div>
+  <div style="font-size:14px;color:rgba(241,245,249,0.5);font-family:'Rubik',Arial,sans-serif;">משפחת שיש</div>
+  <div style="width:100%;max-width:280px;display:flex;flex-direction:column;gap:10px;">
+    <input id="passwordInput" type="password" placeholder="סיסמה" onkeydown="if(event.key==='Enter')doGoogleLogin()" style="width:100%;padding:14px 16px;border-radius:13px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.07);color:#F1F5F9;font-size:16px;font-family:'Rubik',Arial,sans-serif;text-align:right;outline:none;">
+    <button onclick="doGoogleLogin()" style="width:100%;background:#F4634A;color:white;border:0;border-radius:13px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Rubik',Arial,sans-serif;box-shadow:0 4px 14px rgba(244,99,74,0.3);">כניסה 🔑</button>
+  </div>
+  <div id="loginError" style="color:#F87171;font-size:13px;font-family:'Rubik',Arial,sans-serif;display:none;"></div>
+</div>
 <div id="app">
 
   <!-- ═══ HEADER ═══ -->
@@ -211,7 +254,7 @@
     <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:16px;margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
         <div style="font-size:13px;font-weight:800;color:#F1F5F9;">📊 תקציב מול בפועל</div>
-        <button id="btnEditBudget" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:4px 10px;font-size:11px;font-weight:700;color:rgba(241,245,249,0.7);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">✏️ ערוך</button>
+        <button id="btnEditBudget" onclick="openBudgetModal()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:4px 10px;font-size:11px;font-weight:700;color:rgba(241,245,249,0.7);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">✏️ ערוך</button>
       </div>
       <!-- כרטיס סיכום גדול -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
@@ -254,17 +297,23 @@
 
   <!-- מודל עריכת תקציב -->
   <div id="budgetModal" style="display:none;position:fixed;inset:0;z-index:80;align-items:flex-end;justify-content:center;">
-    <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);" id="budgetOverlay"></div>
+    <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);pointer-events:none;" id="budgetOverlay"></div>
     <div style="position:relative;background:linear-gradient(160deg,#1e293b,#0f172a);border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;z-index:1;max-height:85vh;overflow-y:auto;">
-      <h2 style="margin:0 0 14px;font-size:18px;font-weight:900;color:#F1F5F9;">✏️ עריכת תקציב</h2>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <h2 style="margin:0;font-size:18px;font-weight:900;color:#F1F5F9;">✏️ עריכת תקציב</h2>
+        <button onclick="closeBudgetModal()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:10px;padding:6px 13px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">ביטול</button>
+      </div>
       <div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);border-radius:14px;padding:14px;margin-bottom:16px;">
         <div style="font-size:11px;font-weight:700;color:#FCD34D;margin-bottom:8px;letter-spacing:0.5px;">💰 תקציב כולל לטיול (₪)</div>
         <input id="budgetTotalInput" type="number" placeholder="לדוג׳ 15000" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(245,158,11,0.35);border-radius:10px;padding:11px 13px;font-size:18px;font-weight:800;color:#FCD34D;font-family:'Rubik',Arial,sans-serif;box-sizing:border-box;text-align:center;">
       </div>
       <div style="font-size:11px;font-weight:700;color:rgba(241,245,249,0.5);margin-bottom:10px;letter-spacing:0.5px;">📊 פירוט לפי קטגוריה (₪)</div>
       <div id="budgetInputs" style="display:grid;gap:10px;margin-bottom:16px;"></div>
-      <button id="btnAddBudgetCat" style="width:100%;background:rgba(255,255,255,0.07);border:1px dashed rgba(255,255,255,0.2);border-radius:13px;padding:11px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;margin-bottom:14px;">➕ הוסף קטגוריה</button>
-      <button id="btnSaveBudget" onclick="saveBudgetFromModal()" class="btn-primary" style="width:100%;">💾 שמור</button>
+      <button id="btnAddBudgetCat" onclick="(function(){var b=loadBudget();b.push({cat:'קטגוריה חדשה',ils:0});saveBudget(b);openBudgetModal();})()" style="width:100%;background:rgba(255,255,255,0.07);border:1px dashed rgba(255,255,255,0.2);border-radius:13px;padding:11px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;margin-bottom:14px;">➕ הוסף קטגוריה</button>
+      <div style="display:flex;gap:10px;">
+        <button onclick="closeBudgetModal()" style="flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:13px;padding:14px;font-size:14px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">ביטול</button>
+        <button id="btnSaveBudget" onclick="saveBudgetFromModalAndInvalidate()" style="flex:2;background:#F4634A;color:white;border:0;border-radius:13px;padding:14px;font-size:15px;font-weight:900;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">💾 שמור</button>
+      </div>
     </div>
   </div>
 
@@ -910,25 +959,34 @@
     <div style="display:grid;gap:12px;">
 
       <!-- מתרגם קולי -->
-      <div style="background:linear-gradient(135deg,rgba(168,85,247,0.15),rgba(99,102,241,0.1));border:1px solid rgba(168,85,247,0.35);border-radius:18px;padding:18px;">
+      <div style="background:linear-gradient(135deg,rgba(168,85,247,0.15),rgba(99,102,241,0.1));border:1px solid rgba(168,85,247,0.35);border-radius:18px;padding:18px;text-align:center;">
+        <div style="font-size:36px;margin-bottom:8px;">🎤</div>
+        <div style="font-size:16px;font-weight:900;color:#C084FC;margin-bottom:6px;">מתרגם קולי מלא</div>
+        <div style="font-size:12px;color:rgba(241,245,249,0.5);margin-bottom:18px;line-height:1.6;">דיבור ישיר למיקרופון · תרגום אוטומטי · השמעה בקול<br>עובד ב-Safari/Chrome מחוץ לאפליקציה</div>
+        <a href="https://arielshish.github.io/Prague-2026/translator.html" target="_blank" rel="noopener" style="display:block;background:linear-gradient(135deg,rgba(168,85,247,0.4),rgba(99,102,241,0.35));border:1px solid rgba(168,85,247,0.6);border-radius:14px;padding:15px;font-size:15px;font-weight:900;color:#E9D5FF;text-decoration:none;margin-bottom:10px;">🎤 פתח מתרגם קולי</a>
+        <div style="font-size:11px;color:rgba(241,245,249,0.35);">נפתח בדפדפן — מאפשר גישה למיקרופון</div>
+      </div>
+
+      <!-- מתרגם טקסט -->
+      <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:18px;padding:16px;">
+        <div style="font-size:14px;font-weight:700;color:#C084FC;margin-bottom:4px;">⌨️ תרגום טקסט</div>
+        <div style="font-size:11px;color:rgba(241,245,249,0.4);margin-bottom:12px;">הקלידו — תרגום אוטומטי תוך שנייה</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
           <button id="voiceLangHe" onclick="setVoiceLang('he','cs')" style="padding:9px;border-radius:11px;border:2px solid rgba(168,85,247,0.6);background:rgba(168,85,247,0.2);font-size:12px;font-weight:800;color:#C084FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🇮🇱 עברית → צ'כית</button>
           <button id="voiceLangCs" onclick="setVoiceLang('cs','he')" style="padding:9px;border-radius:11px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);font-size:12px;font-weight:800;color:rgba(241,245,249,0.45);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🇨🇿 צ'כית → עברית</button>
         </div>
         <textarea id="voiceInputText" placeholder="הקלידו כאן — תרגום אוטומטי תוך שנייה..." style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(168,85,247,0.3);border-radius:13px;padding:12px 14px;font-size:14px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;resize:none;height:70px;margin-bottom:10px;"></textarea>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
-          <button id="btnMicInline" onclick="toggleVoiceMic()" style="background:linear-gradient(135deg,rgba(168,85,247,0.35),rgba(99,102,241,0.3));border:1px solid rgba(168,85,247,0.5);border-radius:13px;padding:12px 8px;font-size:22px;cursor:pointer;">🎤</button>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
           <button onclick="translateVoiceText()" style="background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.4);border-radius:13px;padding:12px 8px;font-size:12px;font-weight:800;color:#A5B4FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🌐 תרגם</button>
           <button onclick="clearVoiceTranslator()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:13px;padding:12px 8px;font-size:12px;font-weight:800;color:rgba(241,245,249,0.4);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🗑️ נקה</button>
         </div>
-        <div id="voiceTranslateResult" style="display:none;background:rgba(0,0,0,0.25);border:1px solid rgba(168,85,247,0.25);border-radius:13px;padding:14px;margin-bottom:10px;">
+        <div id="voiceTranslateResult" style="display:none;background:rgba(0,0,0,0.25);border:1px solid rgba(168,85,247,0.25);border-radius:13px;padding:14px;">
           <div style="font-size:10px;color:rgba(241,245,249,0.35);margin-bottom:6px;letter-spacing:1px;">תרגום</div>
           <div id="voiceTranslateText" style="font-size:16px;font-weight:700;color:#E9D5FF;line-height:1.5;margin-bottom:10px;"></div>
           <button onclick="speakTranslation()" style="width:100%;background:rgba(168,85,247,0.25);border:1px solid rgba(168,85,247,0.4);border-radius:10px;padding:10px;font-size:13px;font-weight:800;color:#C084FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🔊 השמע בקול</button>
         </div>
-        <div id="voiceStatus" style="font-size:11px;color:rgba(241,245,249,0.35);text-align:center;min-height:16px;"></div>
+        <div id="voiceStatus" style="font-size:11px;color:rgba(241,245,249,0.35);text-align:center;margin-top:8px;min-height:16px;"></div>
       </div>
-
 
       <!-- ביטויים מהירים -->
       <div style="background:rgba(168,85,247,0.09);border:1px solid rgba(168,85,247,0.2);border-radius:18px;padding:16px;">
@@ -952,14 +1010,46 @@
     </div>
   </section>
 
+  <!-- ═══ REMINDERS TAB ═══ -->
+  <div id="reminders" class="tab">
+    <!-- Header -->
+    <div style="margin-bottom:16px;">
+      <h2 style="font-size:20px;font-weight:900;">🔔 תזכורות חשובות</h2>
+      <p style="font-size:12px;color:rgba(241,245,249,0.5);margin-top:4px;">פראג 8–15 אוגוסט · עוד <span id="daysUntilTrip">?</span> ימים</p>
+    </div>
+
+    <!-- Send email buttons -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+      <button onclick="sendRemindersEmail()" style="background:linear-gradient(135deg,#F4634A,#E85D04);color:white;border:0;border-radius:13px;padding:13px 10px;font-weight:800;font-size:13px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;box-shadow:0 4px 14px rgba(244,99,74,0.3);">
+        📧 שלח מייל סיכום
+      </button>
+      <button onclick="triggerReminderEmail()" id="btnTriggerEmail" style="background:linear-gradient(135deg,#6366f1,#4f46e5);color:white;border:0;border-radius:13px;padding:13px 10px;font-weight:800;font-size:13px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;box-shadow:0 4px 14px rgba(99,102,241,0.3);">
+        🔔 שלח תזכורת עכשיו
+      </button>
+    </div>
+
+    <!-- Filter tabs -->
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+      <button onclick="filterReminders('all')" id="rf-all" class="cat-chip" style="border-color:#F4634A;color:#F4634A;">הכל</button>
+      <button onclick="filterReminders('critical')" id="rf-critical" class="cat-chip">🔴 דחוף</button>
+      <button onclick="filterReminders('important')" id="rf-important" class="cat-chip">🟡 חשוב</button>
+      <button onclick="filterReminders('logistics')" id="rf-logistics" class="cat-chip">📋 לוגיסטיקה</button>
+      <button onclick="filterReminders('done')" id="rf-done" class="cat-chip">✅ בוצע</button>
+    </div>
+
+    <!-- Reminders list -->
+    <div id="remindersList"></div>
+  </div>
+
   <!-- ═══ NAV ═══ -->
-  <nav style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);height:76px;background:rgba(2,7,14,0.97);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-top:1px solid rgba(255,255,255,0.08);z-index:50;display:grid;grid-template-columns:repeat(6,1fr);">
+  <nav style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);height:76px;background:rgba(2,7,14,0.97);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-top:1px solid rgba(255,255,255,0.08);z-index:50;display:grid;grid-template-columns:repeat(7,1fr);">
     <button id="nav-home" style="border:0;background:transparent;color:#F4634A;font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">🏠</span>ראשי</button>
     <button id="nav-days" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">📅</span>ימים</button>
     <button id="nav-shopping" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">🛍️</span>קניות</button>
     <button id="nav-expenses" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">💰</span>הוצאות</button>
     <button id="nav-flights" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">✈️</span>טיסות</button>
     <button id="nav-pack" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">🧳</span>ציוד</button>
+    <button onclick="openTab('reminders')" id="nav-reminders" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">🔔</span>תזכורות</button>
   </nav>
 </div>
 
@@ -1000,6 +1090,314 @@ var RATE = Number(localStorage.getItem('prague_rate_v10') || 6.4);
 var EXPENSES = [];
 var EDIT_ID = null;
 var currentDay = 1;
+
+// ═══════════════════════════════════════════
+//  REMINDERS DATA
+// ═══════════════════════════════════════════
+var REMINDERS = [
+  // CRITICAL — Book NOW (red, urgent)
+  { id:'r1', emoji:'🏰', title:'כרטיסים לטירת פראג', desc:'hrad.cz — 350/175 CZK. ביוגוסט מלא! הזמינו עכשיו.',
+    details:'מצודת פראג היא המצודה הגדולה בעולם לפי גינס — 70,000 מ"ר. כוללת: קתדרלת סנט ויטוס (גותית מרהיבה מהמאה ה-14), ארמון המלך הבוהמי, וסמטת הזהב עם בתי נפחים עתיקים. ביוגוסט אוגוסט תורים של שעה בכניסה — חובה לקנות Online! כרטיס Circuit B (בסיסי) מספיק לחלוטין.',
+    tips:'💡 להגיע לפני 9:00 לפני ההמון. טראם 22 לכניסה עליונה (Pražský hrad) חוסך עלייה רגלית. סטארבקס ממול — נוף פנורמי בחינם.',
+    duration:'⏱️ 2–4 שעות',
+    url:'https://www.hrad.cz/en/prague-castle-for-visitors/tickets', deadline:'2026-07-20', day:'11 אוגוסט', priority:'critical' },
+
+  { id:'r2', emoji:'✡️', title:'כרטיסים לרובע היהודי', desc:'jewishmuseum.cz — 500 CZK. מאוד פופולרי, נגמר מהר.',
+    details:'הרובע היהודי (Josefov) — אחד מהשמורים ביותר בעולם. כולל 6 בתי כנסת היסטוריים (מאה ה-13–17), בית עלמין עתיק עם 12 שכבות קבורה, ואולם הטקסים עם תצוגת ציורי ילדי טרזין. חוויה מרגשת ומשמעותית מאוד. הכרטיס המשותף כולל את כל האתרים.',
+    tips:'💡 להקצות לפחות 3 שעות — יש הרבה לראות. בית הכנסת הספרדי הכי מרהיב חזותית. בית הקברות — לא לפספס.',
+    duration:'⏱️ 2.5–4 שעות',
+    url:'https://www.jewishmuseum.cz/en/', deadline:'2026-07-20', day:'14 אוגוסט', priority:'critical' },
+
+  { id:'r3', emoji:'📚', title:'כרטיסים ל-Clementinum', desc:'klementinum.com — 300 CZK. סלוטים מוגבלים, נגמר שבועות מראש!',
+    details:'הספרייה הבארוקית של Clementinum — אחת מהיפות בעולם. אולם ספרים עתיק מהמאה ה-18 עם קימור מצויר, ספרים ישנים מהמאה ה-15, ומגדל תצפית עם נוף 360° על פראג. ה-Baroque Library Hall נחשב לאחת הספריות הכי יפות בעולם. כניסה בסיורים מודרכים בלבד — מוגבל ל-25 איש!',
+    tips:'💡 להזמין עוד היום — נגמר חודש מראש בקיץ. הסיור 50 דק׳. הנוף מהמגדל לא פחות מרהיב מהספרייה.',
+    duration:'⏱️ 50–70 דקות (סיור מודרך)',
+    url:'https://www.klementinum.com/en/', deadline:'2026-07-15', day:'גמיש', priority:'critical' },
+
+  { id:'r4', emoji:'🚂', title:'כרטיסים לממלכת הרכבות', desc:'kralovstvi-zeleznic.cz — 300/200 CZK. הילדים ישתגעו — הזמינו מראש.',
+    details:'ממלכת הרכבות (Království železnic) — דיורמה ענקית של 1:87 מ-צ\'כיה המיניאטורית. מסילות רכבת, כפרים, הרים, תחנות ותאורה אוטומטית. ילדים מטורפים על זה! ממוקם בלב העיר. לוקח בערך שעה-שעה וחצי להסתובב ולראות הכל.',
+    tips:'💡 הכי מרהיב כשמכבים האורות ורק התאורה המיניאטורית דולקת — לשאול מתי זה קורה.',
+    duration:'⏱️ 60–90 דקות',
+    url:'https://www.kralovstvi-zeleznic.cz/en/', deadline:'2026-07-25', day:'10 אוגוסט', priority:'critical' },
+
+  { id:'r5', emoji:'🌆', title:'הזמנת מקום ב-Oblaka', desc:'מסעדה על הגג — ארוחה אחרונה. חייבים הזמנה! חפשו ב-Google.',
+    details:'Oblaka — מסעדה על הגג של מגדל Žižkov (מגדל הטלוויזיה המפורסם). נוף פנורמי 360° על פראג בגובה 93 מטר. תפריט מסעדה עכשווית-צ׳כית איכותית. חוויה יוצאת דופן לסיום הטיול — ארוחת ערב אחרונה בפראג עם נוף שלא ישכח.',
+    tips:'💡 מיקרו ולצד הנוף — לבקש שולחן ליד החלון בהזמנה. ערב 15 אוגוסט — האחרון לפני הטיסה הלילית.',
+    duration:'⏱️ 90–120 דקות (ארוחת ערב)',
+    url:'https://www.google.com/search?q=Oblaka+restaurant+Prague+reservation', deadline:'2026-07-18', day:'15 אוגוסט', priority:'critical' },
+
+  { id:'r6', emoji:'🍷', title:'הזמנת שולחן ב-U Fleků', desc:'הפאב ההיסטורי מ-1499. ארוחת פרידה — הזמינו מקום מראש.',
+    details:'U Fleků — הפאב המבשל הכי ישן בפראג, פועל ברציפות מ-1499. מגישים בירה כהה אחת בלבד שמבשלים בית — Flekovský tmavý ležák. חצר גדולה עם 1,200 מקומות, מוזיקה חיה, ואוכל צ׳כי מסורתי. טיפוסי ומרתק — חוויה שאין כמותה.',
+    tips:'💡 לבקש מקום בחצר (Biergarten) — יפה יותר. לצפות לבירה כהה בלבד. תיירותי אבל אותנטי באווירה.',
+    duration:'⏱️ 90–120 דקות',
+    url:'https://www.ufleku.cz/', deadline:'2026-07-25', day:'14 אוגוסט', priority:'critical' },
+
+  { id:'r7', emoji:'🌊', title:'כרטיסים ל-Aquapalace', desc:'aquapalace.cz — 650/530 CZK. אפשר גם בכניסה אבל עדיף מראש בעונת קיץ.',
+    details:'פארק מים פנים מהגדולים באירופה המרכזית — 15,000 מ"ר. מגלשות, בריכת גלים, גקוזי, נהרות זרימה, בריכה חיצונית חמה, ואזור ילדים ייעודי. המחיר כולל גישה לכל האזורים. בסופי שבוע עמוס מאוד ביוגוסט.',
+    tips:'💡 להביא מגבת — השכרה יקרה מאוד. אוכל יקר בפנים — מותר להביא חטיפים. ארונות מחזירים מטבע.',
+    duration:'⏱️ 5–8 שעות (יום שלם)',
+    url:'https://www.aquapalace.cz/en/', deadline:'2026-07-30', day:'12 אוגוסט', priority:'important' },
+
+  { id:'r8', emoji:'🐘', title:'כרטיסים לגן חיות פראג', desc:'zoopraha.cz — 300/200 CZK. Top 5 בעולם — מומלץ להזמין.',
+    details:'גן החיות של פראג — מדורג Top 7 בעולם. 58 הקטאר, 5,000 בעלי חיים, 700 מינים. יש: ג׳ונגל אינדונזי, ערבות אפריקניות, יער גורילות, ורכבל כסאות פנורמי (40 CZK). ביוגוסט עמוס מאוד — כרטיסים Online חוסכים תור ארוך בכניסה.',
+    tips:'💡 לבדוק זמני האכלה באתר לפני הביקור — ג׳ירפות ב-11:30, פילים ב-15:00. רכבל כסאות חובה!',
+    duration:'⏱️ 4–6 שעות (יום שלם)',
+    url:'https://www.zoopraha.cz/en', deadline:'2026-07-30', day:'13 אוגוסט', priority:'important' },
+
+  { id:'r9', emoji:'⛵', title:'הזמנת שייט בנהר Vltava', desc:'prague-venice.cz — 350 CZK. שייט שקיעה ב-13 אוגוסט — מומלץ להזמין.',
+    details:'שייט על נהר הוולטאווה — הנהר שחוצה את פראג. נוף על גשר קרל, המצודה, הגגות האדומים, והאיים הקטנים. שייט שקיעה ב-20:00 הוא הכי מרהיב — השמש הזהובה על המצודה. חברת prague-venice מומלצת, כ-60–90 דק׳.',
+    tips:'💡 להביא שכבה חמה — על המים קריר גם בקיץ. לשלם באשראי ישירות ברציף. שייט 20:00 — הכי יפה.',
+    duration:'⏱️ 60–90 דקות',
+    url:'https://www.prague-venice.cz/', deadline:'2026-07-30', day:'13 אוגוסט', priority:'important' },
+
+  { id:'r10', emoji:'🩺', title:'ביטוח נסיעות', desc:'וודאו שיש לכולם ביטוח נסיעות תקף ל-8–16 אוגוסט.',
+    details:'ביטוח נסיעות חובה לכל אחד מהמשפחה. צ׳כיה היא חלק מהאיחוד האירופי — טיפול רפואי בסיסי מכוסה בכרטיס הביטוח הלאומי (טופס S1 או כרטיס EHIC). אבל ביטוח נסיעות פרטי מכסה: ביטול טיסה, אובדן מטען, פינוי רפואי, ואשפוז ממושך.',
+    tips:'💡 לבדוק שהפוליסה כוללת "ספורט אתגרי" אם מתכננים Aquapalace. לשמור את מסמכי הביטוח בטלפון.',
+    duration:'⏱️ 15 דקות (לרכוש Online)',
+    url:'', deadline:'2026-07-25', day:'לפני הטיסה', priority:'important' },
+
+  { id:'r11', emoji:'💱', title:'המרת מטבע — CZK', desc:'המירו לפחות 5,000 CZK לכל אחד לפני הטיסה. בנק/דואר זול יותר מנמל תעופה.',
+    details:'הכתר הצ׳כי (CZK) — המטבע הרשמי. לא מקבלים אירו בכל מקום. שע"ח ב-8/7/2026: ~1 ₪ = ~6.5 CZK. לחמישה ימים: 3,000–5,000 CZK לאדם לנוח. כפכף: המרה בנמל תעופה יקרה 10–15% ממה שאפשר לקבל בבנק.',
+    tips:'💡 הכי כדאי: למשוך CZK מכספומט בפראג עם כרטיס Visa/Mastercard. עמלת כספומט בד"כ ~30 CZK בלבד.',
+    duration:'⏱️ 10 דקות',
+    url:'', deadline:'2026-08-05', day:'לפני 8 אוגוסט', priority:'important' },
+
+  { id:'r12', emoji:'✈️', title:'צ\'ק-אין לטיסת הלוך', desc:'טיסת בוקר 8 אוגוסט המראה 06:00 — צ\'ק-אין פתח 7 אוגוסט 06:00.',
+    details:'Smart Wings QS1287 — תל אביב (TLV) → פראג (PRG). המראה 06:00, 8 אוגוסט. חלון צ׳ק-אין נפתח 24 שעות לפני ב-06:00 בבוקר ה-7. לעשות Online check-in ולהוריד כרטיס עלייה לטיסה. לוודא דרכונים, ביטוח ורשימת ציוד.',
+    tips:'💡 להגיע לנמל התעופה לפחות שעתיים לפני ב-04:00! מומלץ להזמין מונית/Gett לילה לפני. כבודה — לשקול מראש.',
+    duration:'⏱️ 5 דקות (Online)',
+    url:'', deadline:'2026-08-07', day:'7 אוגוסט', priority:'logistics' },
+
+  { id:'r13', emoji:'✈️', title:'צ\'ק-אין לטיסת חזור', desc:'QS1286 — המראה 15 אוגוסט 23:45. צ\'ק-אין פתח 14 אוגוסט 23:45.',
+    details:'Smart Wings QS1286 — פראג (PRG) → תל אביב (TLV). המראה 23:45, 15 אוגוסט (חצות). חלון צ׳ק-אין נפתח 24 שעות לפני. הערב האחרון בפראג — לתכנן את היום ולסיים חשבונות. לוודא שהכל ארוז לפני הערב.',
+    tips:'💡 נסיעה לשדה התעופה בסביבות 21:00. שדה התעופה Václav Havel — 30 דק׳ מהמרכז בטקסי.',
+    duration:'⏱️ 5 דקות (Online)',
+    url:'', deadline:'2026-08-14', day:'14 אוגוסט', priority:'logistics' },
+
+  { id:'r14', emoji:'🏨', title:'אישור הזמנת המלון', desc:'Comfort Hotel Prague City East — אשרו הזמנה וצרו קשר עם בקשות מיוחדות.',
+    details:'Comfort Hotel Prague City East — המלון שלנו ב-8–15 אוגוסט. לאשר ישירות עם המלון שההזמנה קיימת, לציין בקשות מיוחדות (קומה גבוהה, חדרים צמודים, early check-in אם אפשר). כדאי גם לשאול על חניה, WiFi ושעות ארוחת הבוקר.',
+    tips:'💡 לשלוח מייל למלון שבוע לפני. לוודא שהכתובת שמורה Offline ב-Google Maps.',
+    duration:'⏱️ 10 דקות',
+    url:'https://www.comforthotels.com/', deadline:'2026-07-25', day:'לפני הטיסה', priority:'logistics' },
+
+  { id:'r15', emoji:'📱', title:'הורדת אפליקציית Bolt', desc:'הרבה יותר זול מ-Uber. הגדירו כרטיס אשראי לפני הטיסה!',
+    details:'Bolt — אפליקציית נסיעות שיתופיות פופולרית מאוד בפראג. הרבה יותר זולה מ-Uber (לרוב 30–40% פחות) ויש הרבה נהגים. נסיעה מהשדה למלון: ~400–600 CZK. נסיעה בתוך העיר: ~80–150 CZK. חובה להגדיר כרטיס אשראי לפני הנחיתה.',
+    tips:'💡 גם להוריד Uber כגיבוי. בשעות עומס (17:00–19:00) מחירים עולים — לנסות לחכות 10 דק׳.',
+    duration:'⏱️ 5 דקות',
+    url:'https://bolt.eu/', deadline:'2026-08-07', day:'לפני הטיסה', priority:'logistics' },
+
+  { id:'r16', emoji:'🌐', title:'רומינג / SIM מקומי', desc:'הפעילו רומינג בינלאומי או קנו SIM בנמל התעופה בפראג.',
+    details:'צ׳כיה — רשת 4G/5G טובה. אפשרויות: (1) רומינג עם הסלולרי הישראלי — לבדוק מחיר עם הספק. (2) SIM צ׳כי בנמל התעופה (Vodafone/O2/T-Mobile) — ~300 CZK ל-10GB. (3) eSIM בינלאומי (Airalo, Holafly) — להגדיר לפני הטיסה. מומלץ לפחות SIM אחד לניווט.',
+    tips:'💡 לוודא שהטלפון פתוח לרשתות בינלאומיות לפני הטיסה. eSIM הכי נוח — להגדיר בבית בשקט.',
+    duration:'⏱️ 15 דקות',
+    url:'', deadline:'2026-08-05', day:'לפני הטיסה', priority:'logistics' },
+];
+
+var remindersFilter = 'all';
+var remindersDone = {};
+
+function initReminders() {
+  var tripDate = new Date('2026-08-08');
+  var today = new Date();
+  var days = Math.ceil((tripDate - today) / 86400000);
+  var el = document.getElementById('daysUntilTrip');
+  if (el) el.textContent = days > 0 ? days : 'הטיול כבר התחיל!';
+
+  google.script.run
+    .withSuccessHandler(function(data) {
+      if (data && data.ok && data.remindersDone) {
+        try { remindersDone = JSON.parse(data.remindersDone); } catch(e) {}
+      }
+      renderReminders();
+      checkOverdueReminders();
+    })
+    .withFailureHandler(function() { renderReminders(); checkOverdueReminders(); })
+    .loadRemindersDone();
+}
+
+function filterReminders(f) {
+  remindersFilter = f;
+  ['all','critical','important','logistics','done'].forEach(function(x) {
+    var btn = document.getElementById('rf-' + x);
+    if (btn) { btn.style.borderColor = x === f ? '#F4634A' : ''; btn.style.color = x === f ? '#F4634A' : ''; }
+  });
+  renderReminders();
+}
+
+function renderReminders() {
+  var container = document.getElementById('remindersList');
+  if (!container) return;
+  var today = new Date(); today.setHours(0,0,0,0);
+
+  var filtered = REMINDERS.filter(function(r) {
+    var done = remindersDone[r.id];
+    if (remindersFilter === 'done') return done;
+    if (remindersFilter !== 'all' && r.priority !== remindersFilter) return false;
+    if (remindersFilter === 'all' && done) return false;
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:32px;color:rgba(241,245,249,0.4);font-size:14px;">אין פריטים להצגה</div>';
+    return;
+  }
+
+  container.innerHTML = filtered.map(function(r) {
+    var done = remindersDone[r.id];
+    var deadline = new Date(r.deadline);
+    var diffDays = Math.ceil((deadline - today) / 86400000);
+    var urgency, urgencyColor, urgencyBg;
+    if (done) { urgency = '✅ בוצע'; urgencyColor = '#34D399'; urgencyBg = 'rgba(52,211,153,0.08)'; }
+    else if (diffDays < 0) { urgency = '⚠️ עבר המועד!'; urgencyColor = '#F87171'; urgencyBg = 'rgba(248,113,113,0.1)'; }
+    else if (diffDays <= 5) { urgency = '🔴 ' + diffDays + ' ימים!'; urgencyColor = '#F87171'; urgencyBg = 'rgba(248,113,113,0.1)'; }
+    else if (diffDays <= 14) { urgency = '🟡 ' + diffDays + ' ימים'; urgencyColor = '#FCD34D'; urgencyBg = 'rgba(252,211,77,0.08)'; }
+    else { urgency = '🟢 ' + diffDays + ' ימים'; urgencyColor = '#34D399'; urgencyBg = 'rgba(52,211,153,0.06)'; }
+    var hasDetails = !!(r.details || r.tips || r.duration);
+
+    return '<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:16px;padding:15px;margin-bottom:10px;' + (done ? 'opacity:0.55;' : '') + (hasDetails ? 'cursor:pointer;' : '') + '" ' + (hasDetails ? 'onclick="showReminderDetail(\'' + r.id + '\')"' : '') + '>' +
+      '<div style="display:flex;align-items:flex-start;gap:12px;">' +
+        '<div style="font-size:28px;line-height:1;">' + r.emoji + '</div>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">' +
+            '<span style="font-size:14px;font-weight:800;color:#F1F5F9;">' + r.title + '</span>' +
+            '<span style="font-size:11px;font-weight:700;color:' + urgencyColor + ';background:' + urgencyBg + ';padding:2px 8px;border-radius:8px;">' + urgency + '</span>' +
+            (hasDetails ? '<span style="font-size:10px;color:rgba(241,245,249,0.35);margin-right:auto;">לחץ לפרטים ›</span>' : '') +
+          '</div>' +
+          '<div style="font-size:12px;color:rgba(241,245,249,0.6);margin-bottom:8px;">' + r.desc + '</div>' +
+          (r.duration ? '<div style="font-size:11px;color:#7DD3FC;margin-bottom:6px;">' + r.duration + '</div>' : '') +
+          '<div style="font-size:11px;color:rgba(241,245,249,0.4);margin-bottom:10px;">📅 ' + r.day + ' · דדליין: ' + r.deadline.split('-').reverse().join('/') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;" onclick="event.stopPropagation()">' +
+            (r.url ? '<a href="' + r.url + '" target="_blank" style="background:rgba(99,102,241,0.2);color:#A5B4FC;border:1px solid rgba(99,102,241,0.3);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;font-family:Rubik,Arial,sans-serif;">🔗 לאתר ההזמנה</a>' : '') +
+            (!done ? '<button onclick="markReminderDone(\'' + r.id + '\')" style="background:rgba(52,211,153,0.15);color:#34D399;border:1px solid rgba(52,211,153,0.3);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:Rubik,Arial,sans-serif;">✅ בוצע</button>' : '') +
+            (done ? '<button onclick="markReminderUndone(\'' + r.id + '\')" style="background:rgba(255,255,255,0.05);color:rgba(241,245,249,0.4);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:Rubik,Arial,sans-serif;">↩️ בטל</button>' : '') +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function showReminderDetail(id) {
+  var r = REMINDERS.find(function(x){ return x.id === id; });
+  if (!r) return;
+  var existing = document.getElementById('reminderDetailOverlay');
+  if (existing) existing.remove();
+
+  var overlay = document.createElement('div');
+  overlay.id = 'reminderDetailOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:9999;display:flex;align-items:flex-end;justify-content:center;';
+  var panel = document.createElement('div');
+  panel.style.cssText = 'background:#1E293B;border-radius:22px 22px 0 0;padding:22px 20px 32px;width:100%;max-width:480px;box-shadow:0 -4px 30px rgba(0,0,0,0.5);direction:rtl;font-family:Rubik,Arial,sans-serif;max-height:82vh;overflow-y:auto;';
+
+  var priorityColors = { critical:'#F87171', important:'#FCD34D', logistics:'#7DD3FC' };
+  var priorityLabels = { critical:'🔴 דחוף', important:'🟡 חשוב', logistics:'🔵 לוגיסטיקה' };
+  var pColor = priorityColors[r.priority] || '#94A3B8';
+  var done = remindersDone[r.id];
+
+  panel.innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
+      '<div style="font-size:28px;">' + r.emoji + '</div>' +
+      '<button onclick="document.getElementById(\'reminderDetailOverlay\').remove()" style="background:rgba(255,255,255,0.1);border:none;border-radius:50%;width:32px;height:32px;color:#94A3B8;font-size:18px;cursor:pointer;line-height:1;">✕</button>' +
+    '</div>' +
+    '<div style="font-size:17px;font-weight:900;color:#F1F5F9;margin-bottom:8px;">' + r.title + '</div>' +
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">' +
+      '<span style="font-size:11px;font-weight:700;color:' + pColor + ';background:rgba(0,0,0,0.2);border:1px solid ' + pColor + '44;border-radius:8px;padding:3px 9px;">' + (priorityLabels[r.priority]||r.priority) + '</span>' +
+      (r.duration ? '<span style="font-size:11px;font-weight:700;color:#7DD3FC;background:rgba(56,189,248,0.12);border:1px solid rgba(56,189,248,0.25);border-radius:8px;padding:3px 9px;">' + r.duration + '</span>' : '') +
+      '<span style="font-size:11px;font-weight:700;color:rgba(241,245,249,0.5);background:rgba(255,255,255,0.06);border-radius:8px;padding:3px 9px;">📅 ' + r.day + '</span>' +
+    '</div>' +
+    (r.details ? '<div style="font-size:13px;color:rgba(241,245,249,0.8);line-height:1.7;margin-bottom:14px;">' + r.details + '</div>' : '') +
+    (r.tips ? '<div style="padding:9px 12px;background:rgba(251,191,36,0.08);border-right:3px solid rgba(251,191,36,0.5);border-radius:0 8px 8px 0;font-size:12px;color:rgba(253,230,138,0.85);line-height:1.55;margin-bottom:14px;">' + r.tips + '</div>' : '') +
+    '<div style="font-size:11px;color:rgba(241,245,249,0.38);margin-bottom:16px;">⏰ דדליין: ' + r.deadline.split('-').reverse().join('/') + '</div>' +
+    '<div style="display:flex;gap:9px;">' +
+      (r.url ? '<a href="' + r.url + '" target="_blank" style="flex:1;text-align:center;padding:10px 0;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);border-radius:12px;font-size:13px;font-weight:700;color:#A5B4FC;text-decoration:none;">🔗 לאתר ההזמנה</a>' : '') +
+      (!done ? '<button onclick="markReminderDone(\'' + r.id + '\');document.getElementById(\'reminderDetailOverlay\').remove();" style="flex:1;padding:10px 0;background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.3);border-radius:12px;font-size:13px;font-weight:700;color:#34D399;cursor:pointer;font-family:Rubik,Arial,sans-serif;">✅ בוצע</button>' : '') +
+      (done ? '<button onclick="markReminderUndone(\'' + r.id + '\');document.getElementById(\'reminderDetailOverlay\').remove();" style="flex:1;padding:10px 0;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.4);cursor:pointer;font-family:Rubik,Arial,sans-serif;">↩️ בטל</button>' : '') +
+    '</div>';
+
+  overlay.appendChild(panel);
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
+function markReminderDone(id) {
+  remindersDone[id] = true;
+  renderReminders();
+  showToast('⏳ שומר...', 1000);
+  google.script.run
+    .withSuccessHandler(function(r){ showToast(r&&r.ok ? '✅ סומן כבוצע ונשמר' : '⚠️ שגיאת שמירה', 2000); })
+    .withFailureHandler(function(e){ showToast('⚠️ שגיאת שמירה: ' + (e&&e.message||e), 3000); })
+    .saveRemindersDone(JSON.stringify(remindersDone));
+}
+
+function markReminderUndone(id) {
+  delete remindersDone[id];
+  renderReminders();
+  showToast('⏳ שומר...', 1000);
+  google.script.run
+    .withSuccessHandler(function(r){ showToast(r&&r.ok ? '↩️ בוטל ונשמר' : '⚠️ שגיאת שמירה', 2000); })
+    .withFailureHandler(function(e){ showToast('⚠️ שגיאת שמירה: ' + (e&&e.message||e), 3000); })
+    .saveRemindersDone(JSON.stringify(remindersDone));
+}
+
+function triggerReminderEmail() {
+  var btn = document.getElementById('btnTriggerEmail');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ שולח...'; }
+  google.script.run
+    .withSuccessHandler(function(result) {
+      if (btn) { btn.disabled = false; btn.textContent = '🔔 שלח תזכורת עכשיו'; }
+      if (result && result.ok) {
+        showToast('✅ מייל תזכורת נשלח לכל המשפחה!', 3000);
+      } else {
+        showToast('⚠️ שגיאה: ' + (result && result.error || 'נסה שוב'), 4000);
+      }
+    })
+    .withFailureHandler(function(e) {
+      if (btn) { btn.disabled = false; btn.textContent = '🔔 שלח תזכורת עכשיו'; }
+      showToast('⚠️ שגיאה: ' + (e && e.message || e), 4000);
+    })
+    .sendTestReminder();
+}
+
+function sendRemindersEmail() {
+  var today = new Date(); today.setHours(0,0,0,0);
+  var pending = REMINDERS.filter(function(r) { return !remindersDone[r.id]; });
+  var critical = pending.filter(function(r) { return r.priority === 'critical'; });
+  var important = pending.filter(function(r) { return r.priority === 'important'; });
+  var logistics = pending.filter(function(r) { return r.priority === 'logistics'; });
+
+  var body = 'שלום משפחת שיש! 🏰\n\nהנה סיכום מה שצריך לסדר לפני פראג (8–15 אוגוסט):\n\n';
+
+  if (critical.length) {
+    body += '🔴 דחוף — הזמינו עכשיו:\n';
+    critical.forEach(function(r) { body += '• ' + r.emoji + ' ' + r.title + ' (' + r.day + ')\n  ' + r.desc + '\n  ' + (r.url || '') + '\n\n'; });
+  }
+  if (important.length) {
+    body += '🟡 חשוב — תוך שבועיים:\n';
+    important.forEach(function(r) { body += '• ' + r.emoji + ' ' + r.title + ' (' + r.day + ')\n  ' + r.desc + '\n\n'; });
+  }
+  if (logistics.length) {
+    body += '📋 לוגיסטיקה:\n';
+    logistics.forEach(function(r) { body += '• ' + r.emoji + ' ' + r.title + '\n  ' + r.desc + '\n\n'; });
+  }
+
+  body += 'בהצלחה ובמסע נהדר! 🇨🇿\n\nנשלח מאפליקציית פראג 2026 — משפחת שיש';
+
+  var emails = 'arielshish@gmail.com,maridubi3@gmail.com,adiyasminshish@gmail.com,ariel.mariana.shish@gmail.com';
+  var subject = encodeURIComponent('🏰 פראג 2026 — תזכורות לפני הטיסה (' + pending.length + ' פריטים פתוחים)');
+  var bodyEnc = encodeURIComponent(body);
+  window.location.href = 'mailto:' + emails + '?subject=' + subject + '&body=' + bodyEnc;
+}
+
+function checkOverdueReminders() {
+  var today = new Date(); today.setHours(0,0,0,0);
+  var overdue = REMINDERS.filter(function(r) {
+    if (remindersDone[r.id]) return false;
+    return new Date(r.deadline) < today;
+  });
+  if (overdue.length > 0) {
+    toast('⚠️ יש ' + overdue.length + ' תזכורות שעבר מועדן! לחץ על 🔔');
+  }
+}
 
 var DAYS = [
   {id:1,emoji:'✈️',date:'8 באוגוסט',title:'הצעדים הראשונים בעיר האגדות',sub:'נחיתה, מלון, נשימה ראשונה של פראג',
@@ -1266,29 +1664,100 @@ var COMMUNITY = [
   {cat:'🍦 קינוחים', icon:'🥪', name:'כריך פסטו — שוק האיכרים', fb:'⭐⭐⭐⭐⭐', google:'4.5', desc:'הכריך המפורסם של שוק האיכרים. חובה! שימו לב — המיקום עשוי להשתנות.',
    how:'מטרו B → náměstí Republiky, בדקו מיקום עדכני של השוק', mapUrl:'https://www.google.com/maps/search/Prague+farmers+market+Naplavka'},
   // ── 🎟️ אטרקציות ──
-  {cat:'🎟️ אטרקציות', icon:'🐱', name:'פסל קפקא המסתובב', fb:'⭐⭐⭐⭐', google:'4.4', desc:'פסל מסתובב מרשים של קפקא. מרכז קניות צמוד פתוח בבוקר (Sephora, Pepco). כניסה חינם!',
+  {cat:'🎟️ אטרקציות', icon:'🐱', name:'פסל קפקא המסתובב', fb:'⭐⭐⭐⭐', google:'4.4',
+   desc:'פסל ברונזה ענק של 11 מטר מאת הפסל דוד černý (אומן הפרובוקציות הכי מפורסם בצ׳כיה). הפסל מורכב מ-42 שכבות מסתובבות באופן עצמאי — כל שנייה הוא נראה אחרת. ממוקם ברחבת מרכז הקניות Quadrio ב-Nové Město. עצירה של 10 דקות שאי אפשר לפספס — גם המרכז פתוח אם רוצים Sephora או Pepco.',
+   booking:'✅ אין צורך בהזמנה — חינם וזמין 24/7',
+   duration:'⏱️ 10–20 דקות',
+   tips:'📸 הכי יפה לצילום כשהפסל "מפורק" — פנים לא מזוהות. לחכות מחזור שלם (3–4 דק׳).',
+   who:'👨‍👩‍👧‍👦 כל הגילאים | ⚡ מהיר — נהדר בדרך לאטרקציה אחרת',
    how:'מטרו A/C → Václavské náměstí + 3 דק׳ הליכה', mapUrl:'https://www.google.com/maps/search/Kafka+rotating+head+Prague'},
-  {cat:'🎟️ אטרקציות', icon:'🎨', name:'גלרית Lumia — מוזיאון האורות', fb:'⭐⭐⭐⭐⭐', google:'4.5', desc:'מוזיאון אורות מרשים ומרתק. 20% הנחה על מוזיאון הפלדה הצמוד אחרי כניסה.',
+
+  {cat:'🎟️ אטרקציות', icon:'🎨', name:'גלרית Lumia — מוזיאון האורות', fb:'⭐⭐⭐⭐⭐', google:'4.5',
+   desc:'מוזיאון אמנות דיגיטלי אימרסיבי עם 10+ חדרים שלמים של הקרנות אורות ענקיות, מוזיקה ותנועה. לא סתם תמונות — אתה בתוך היצירה. ילדים יכולים לרוץ ולרקוד בתוך האמנות. ליד הכניסה יש מוזיאון פלדה (Steel Museum) שנותנים עליו 20% הנחה אחרי כניסה ל-Lumia.',
+   booking:'🎟️ מומלץ לקנות Online מראש — galerie-lumia.com | ~350–450 CZK לאדם | הנחה לילדים',
+   duration:'⏱️ 45–75 דקות',
+   tips:'📸 להביא בגדים לבנים — האורות הצבעוניים מתצלמים מדהים. שעות הצהריים פחות עמוסות.',
+   who:'👧🧒 ילדים מתים עליו | 🤳 צלמי אינסטגרם | 👨‍👩‍👧‍👦 מוצלח לכל המשפחה',
    how:'מטרו B → náměstí Republiky + 5 דק׳', mapUrl:'https://www.google.com/maps/search/Galerie+Lumia+Prague'},
-  {cat:'🎟️ אטרקציות', icon:'🌀', name:'מוזיאון האשליות', fb:'⭐⭐⭐⭐⭐', google:'4.4', desc:'מוזיאון קטן עם הרבה מפתיע. יש מדריכים שעוזרים לצלם — יתרון גדול!',
+
+  {cat:'🎟️ אטרקציות', icon:'🌀', name:'מוזיאון האשליות', fb:'⭐⭐⭐⭐⭐', google:'4.4',
+   desc:'מוזיאון קטן ומרוכז עם ~30 חדרים ומייצגים של אשליות אופטיות — חדר הולוגרמה, קיר כוח הכבידה, חדר לא סוקלידי שגורם לסחרחורת. מה שמייחד: יש מדריכים בכל חדר שעוזרים לצלם תמונות בפוזות מדהימות שנראות בלתי אפשריות. ממש לב העיר העתיקה.',
+   booking:'🎟️ לקנות Online — museumofillusions.cz | ~350 CZK מבוגר, ~250 ילד | בקיץ עמוס — להזמין!',
+   duration:'⏱️ 60–90 דקות',
+   tips:'📸 לבוא עם כוח סוללה מלא — תצלמו המון. לבקש מהמדריכים בכל חדר עזרה עם פוזות.',
+   who:'👧 ילדים מגיל 6+ | 🤳 מוצלח מאוד לתמונות | 👨‍👩‍👧‍👦 כיף משפחתי',
    how:'מטרו A → Staroměstská + 5 דק׳ בעיר העתיקה', mapUrl:'https://www.google.com/maps/search/Museum+of+Illusions+Prague'},
-  {cat:'🎟️ אטרקציות', icon:'🪄', name:'מוזיאון החושים', fb:'⭐⭐⭐⭐', google:'4.2', desc:'40–60 דק׳, מייצגים נחמדים. ממש ליד Primark. פחות צוות מהמוזיאון האשליות.',
+
+  {cat:'🎟️ אטרקציות', icon:'🪄', name:'מוזיאון החושים', fb:'⭐⭐⭐⭐', google:'4.2',
+   desc:'מוזיאון שמגרה את כל 5 החושים — תאי חשכה מלאה עם אפקטי מגע, מנהרות ריחות, חדרי קול ותדרים נסתרים. קצר יותר ממוזיאון האשליות (40–60 דק׳) אבל חוויה שונה לגמרי. ממוקם ממש ליד Primark — נוח לשלב ביום קניות.',
+   booking:'🎟️ אפשר לקנות במקום — ~350 CZK | אין חובה להזמין מראש',
+   duration:'⏱️ 40–60 דקות',
+   tips:'💡 פחות תמונות מהאשליות — יותר חוויה פנימית. מומלץ בנפרד, לא ביחד עם מוזיאון האשליות באותו יום.',
+   who:'👦👧 ילדים מגיל 8+ | 🧠 מסקרן לכל הגילאים',
    how:'מטרו A/C → Václavské náměstí, ליד Primark', mapUrl:'https://www.google.com/maps/search/Museum+of+Senses+Prague'},
-  {cat:'🎟️ אטרקציות', icon:'🦁', name:'גן החיות של פראג', fb:'⭐⭐⭐⭐⭐', google:'4.7', desc:'גן חיות עצום ומושקע! לקנות כרטיסים באתר מראש. לתכנן לפי זמני האכלה. רכבל כסאות 40 CZK.',
+
+  {cat:'🎟️ אטרקציות', icon:'🦁', name:'גן החיות של פראג', fb:'⭐⭐⭐⭐⭐', google:'4.7',
+   desc:'מדורג Top 7 בעולם — 58 הקטאר, 5,000 בעלי חיים, 700 מינים. אזורי נושא: ג׳ונגל אינדונזי, ערבות אפריקניות, יער גורילות. רכבל כסאות פנורמי (40 CZK) על הגן. ניתן לתכנן לפי זמני האכלה — ג׳ירפות, פילים, פינגווינים. כניסה: שער תחתון (מהאוטובוס) או שער עליון (מהרכבל).',
+   booking:'🎟️ חובה לקנות Online — zoopraha.cz | 300 CZK מבוגר, 200 ילד | ביוגוסט מאוד עמוס — לא לפספס!',
+   duration:'⏱️ 4–6 שעות (יום שלם מומלץ)',
+   tips:'🦒 לבדוק זמני האכלה באתר לפני הביקור. להביא נעלי הליכה — הגן בגבעה! רכבל כסאות חובה.',
+   who:'🧒 ילדים עד גיל 15 מתים עליו | 👨‍👩‍👧‍👦 יום משפחתי מושלם',
    how:'מטרו C → Nádraží Holešovice + אוטובוס 112 עד הכניסה', mapUrl:'https://www.google.com/maps/search/Prague+Zoo'},
-  {cat:'🎟️ אטרקציות', icon:'🏰', name:'מצודת פראג', fb:'⭐⭐⭐⭐', google:'4.5', desc:'כרטיס בסיסי מספיק. המבנים מרשימים יותר מבחוץ. סטארבקס בכניסה עליונה — נוף מקסים!',
+
+  {cat:'🎟️ אטרקציות', icon:'🏰', name:'מצודת פראג', fb:'⭐⭐⭐⭐', google:'4.5',
+   desc:'המצודה הגדולה בעולם לפי גינס — 70,000 מ"ר! מכילה: קתדרלת סנט ויטוס (גותית מרהיבה, 14ה מאה), ארמון המלך הבוהמי, הכנסייה הרומנסקית, וסמטת הזהב — רחוב קטן ומרתק עם בתי נפחים, שריוניות וחרבות. מה שמרשים הכי הרבה הוא הנוף מבחוץ — מגן ה-Royal Garden ומגשר קרל מתחת.',
+   booking:'🎟️ כרטיס Circuit B (מספיק) — 350 CZK מבוגר, 200 ילד | Online: hrad.cz | ביוגוסט תורים של שעה! לבוא לפני 9:00',
+   duration:'⏱️ 2–4 שעות',
+   tips:'🚃 טראם 22 לכניסה עליונה חוסך עלייה רגלית. סטארבקס ממול לכניסה העליונה — נוף פנורמי על העיר בחינם! לצאת דרך גן המלוכה.',
+   who:'👨‍👩‍👧‍👦 כל הגילאים | 📚 מעניין יותר עם הסבר היסטורי — מומלץ עם מדריך',
    how:'טראם 22 → Pražský hrad (כניסה עליונה) או Malostranské náměstí', mapUrl:'https://www.google.com/maps/search/Prague+Castle'},
-  {cat:'🎟️ אטרקציות', icon:'🚤', name:'שייט בוולטאווה', fb:'⭐⭐⭐⭐⭐', google:'4.6', desc:'שייט 20:00 מומלץ — שמש יורדת, נוף מהמם על העיר. לשלם באשראי במקום.',
+
+  {cat:'🎟️ אטרקציות', icon:'🚤', name:'שייט בוולטאווה', fb:'⭐⭐⭐⭐⭐', google:'4.6',
+   desc:'שייט על נהר הוולטאווה — הנהר שחוצה את פראג ועליו נמצאים גשר קרל, האי Střelecký, והנוף המפורסם על הגגות האדומים. אפשרויות: שייט יום (60 דק׳, אחהצ), שייט שקיעה (60–90 דק׳, 20:00) עם שמש זהובה על המצודה — הכי מרשים. חברת prague-venice.cz מומלצת.',
+   booking:'🎟️ מומלץ להזמין מראש — prague-venice.cz | ~350 CZK לאדם | שייט שקיעה עמוס יותר',
+   duration:'⏱️ 60–90 דקות',
+   tips:'🌅 שייט 20:00 — הכי יפה. להביא שכבה חמה — על המים קריר גם בקיץ. לשלם באשראי ישירות ברציף.',
+   who:'👨‍👩‍👧‍👦 כל הגילאים | 💑 רומנטי בשקיעה | 📸 נוף הכי טוב על העיר',
    how:'טראם לרציף 4 (Čechův most / Náměstí Jana Palacha)', mapUrl:'https://www.google.com/maps/search/Prague+boat+cruise+pier+4'},
-  {cat:'🎟️ אטרקציות', icon:'🏊', name:'Aquapalace Prague', fb:'⭐⭐⭐⭐⭐', google:'4.2', desc:'יום מים שלם! מגלשות, בריכת גלים, גקוזי, נהרות זרימה. אפשר בתחבורה ציבורית. בסופ"ש — הנחה באתר.',
+
+  {cat:'🎟️ אטרקציות', icon:'🏊', name:'Aquapalace Prague', fb:'⭐⭐⭐⭐⭐', google:'4.2',
+   desc:'פארק מים פנים מהגדולים באירופה המרכזית — 15,000 מ"ר של מים. כולל: 8 מגלשות מים (כולל ספירל וקמיקזה), בריכת גלים ענקית, גקוזי עם בועות, נהרות זרימה, בריכה חיצונית חמה, אזור ילדים עם מגלשות קטנות, ספא ועיסויים. לפחות יום שלם בקלות.',
+   booking:'🎟️ לקנות Online מראש — aquapalace.cz | ~700 CZK מבוגר, ~500 ילד | בסופ"ש הנחה 10% באתר',
+   duration:'⏱️ 5–8 שעות (יום שלם)',
+   tips:'🩱 להביא מגבת — השכרה יקרה. מזון יקר בפנים — להביא חטיפים. ארונות תמורת מטבע שחוזר.',
+   who:'🧒 גיל 4+ | 👨‍👩‍👧‍👦 יום משפחתי מושלם בחום | אין מגבלת גיל',
    how:'מטרו C → Opatov + אוטובוס 363 ישר לפתח הפארק', mapUrl:'https://www.google.com/maps/search/Aquapalace+Prague'},
-  {cat:'🎟️ אטרקציות', icon:'🏊', name:'בריכת Šutka', fb:'⭐⭐⭐⭐⭐', google:'4.3', desc:'3 בריכות: 50מ׳ עם מקפצות, בריכת ילדים, בריכה עם מגלשות. מתחם שלם ל-5 שעות. מחיר נמוך.',
+
+  {cat:'🎟️ אטרקציות', icon:'🏊', name:'בריכת Šutka', fb:'⭐⭐⭐⭐⭐', google:'4.3',
+   desc:'המתחם בריכות הפתוח הכי פופולרי בפראג בקיץ — שלוש בריכות חיצוניות: בריכת 50מ׳ עם 3 קרשי קפיצה (1מ׳/3מ׳/5מ׳), בריכת ילדים רדודה עם ממטרות, ובריכת מגלשות. מדשאות גדולות לשכיבה, מינ-גולף, ומסעדה. חוויה צ׳כית מקומית אמיתית — לא תיירותי!',
+   booking:'✅ אין הזמנה מראש — כניסה במקום ~150 CZK | פתוח יוני–אוגוסט, 10:00–20:00',
+   duration:'⏱️ 3–5 שעות',
+   tips:'☀️ לבוא בבוקר מוקדם — אחהצ עמוס. להביא מגבת, קרם שמש, ואוכל. מחיר נמוך פי 5 מ-Aquapalace!',
+   who:'🧒 ילדים מגיל 3+ | 🏊 לאוהבי שחייה אמיתיים | 💰 הכי משתלם',
    how:'מטרו C → Střížkov + אוטובוס 200 כמה תחנות', mapUrl:'https://www.google.com/maps/search/Sutka+pool+Prague'},
-  {cat:'🎟️ אטרקציות', icon:'🎮', name:'Level — משחקייה', fb:'⭐⭐⭐⭐⭐', google:'4.4', desc:'משחקייה אינטראקטיבית ענקית. כרטיס שעה — הילדים מתים עליה! מומלץ לערב.',
+
+  {cat:'🎟️ אטרקציות', icon:'🎮', name:'Level — משחקייה', fb:'⭐⭐⭐⭐⭐', google:'4.4',
+   desc:'משחקייה אינטראקטיבית ענקית על 3 קומות בלב העיר העתיקה — מאות משחקי ארקייד קלאסיים, מכונות VR, פינבול, איירהוקי, Dance Dance Revolution, ומשחקי ירי. מחיר לפי שעה — ילדים לא רוצים לצאת! נהדר לשעות ערב אחרי יום מלא.',
+   booking:'✅ אין הזמנה מראש — כרטיס שעה ~300 CZK לאדם | שעתיים ~500 CZK | פתוח עד 22:00',
+   duration:'⏱️ 1–3 שעות',
+   tips:'🎯 להגיע בין 18:00–20:00 — לא עמוס ויש יותר מכונות פנויות. כרטיס שעתיים שווה הרבה יותר.',
+   who:'👦👧 ילדים מגיל 6+ | 🧑 מתבגרים מתים עליו | 🌙 אידיאלי לערב',
    how:'מטרו B → náměstí Republiky, ממוקם בעיר העתיקה', mapUrl:'https://www.google.com/maps/search/Level+gaming+Prague'},
-  {cat:'🎟️ אטרקציות', icon:'🏔️', name:'שמורת Adršpach', fb:'⭐⭐⭐⭐⭐', google:'4.8', desc:'טיול יומי מהמם! טבע מרשים ויפה. להביא אוכל מפראג — האוכל באזור לא מזמין.',
+
+  {cat:'🎟️ אטרקציות', icon:'🏔️', name:'שמורת Adršpach', fb:'⭐⭐⭐⭐⭐', google:'4.8',
+   desc:'פארק לאומי של "עיר סלעים" — מגדלי אבן חולות ענקיים (עד 100מ׳ גובה), שבילים צרים בין מצוקים, מפלים, ואגם ירוק שקט שאפשר לשוט עליו בסירות קטנות (20 CZK). שני חלקים: Adršpach (יפה יותר) ו-Teplice (גדול יותר). טיול הליכה של 3–4 שעות בחלק הבסיסי.',
+   booking:'🚂 כרטיס רכבת: cd.cz | ~200–250 CZK הלוך-חזור | כניסה לשמורה ~200 CZK | להזמין רכבת מראש בעונת קיץ!',
+   duration:'⏱️ יום שלם (יציאה 7:00, חזרה 20:00)',
+   tips:'🥪 חובה להביא אוכל מפראג — אין מסעדות טובות. נעלי הליכה חובה. לבדוק לוח רכבות: cd.cz',
+   who:'🥾 אוהבי טבע והליכה | 👦 ילדים מגיל 8+ | 🌄 הנוף הכי מרהיב בסביבה',
    how:'רכבת מ-Praha hlavní nádraží → Adršpach ~3 שעות', mapUrl:'https://www.google.com/maps/search/Adrsbach+rock+city'},
-  {cat:'🎟️ אטרקציות', icon:'⛲', name:'מזרקת Křižík', fb:'⭐⭐⭐⭐⭐', google:'4.7', desc:'מזרקה מוזיקלית עם 50 מנורות צבעוניות ו-3,000 אפקטי מים. מופעים בכל ערב עם מוזיקה קלאסית, אופרה ופופ — אחת הראוות הכי מרהיבות בפראג! הוקמה ב-1891.',
+
+  {cat:'🎟️ אטרקציות', icon:'⛲', name:'מזרקת Křižík', fb:'⭐⭐⭐⭐⭐', google:'4.7',
+   desc:'מזרקה מוזיקלית היסטורית מ-1891 עם 50 מנורות צבעוניות ו-3,000 אפקטי מים — ספקטקל של 45 דק׳. מופעים כל ערב בין מאי לאוקטובר: תוכניות קלאסיות, אופרה, דובסטפ, ומוזיקת פופ. ממוקמת בשטח התערוכה Výstaviště. אפשר לשבת ביציע מקורה (כרטיס) או לצפות חינם מהחוץ.',
+   booking:'🎟️ מושבים ביציע ~150 CZK | כניסה חינם לצפייה מרחוק | krizikova-fontana.cz — ללוח מופעים',
+   duration:'⏱️ 45–60 דקות',
+   tips:'🌙 להגיע 15 דק׳ לפני המופע לתפוס מקום טוב. מופע 21:00 הכי טוב — כהה לגמרי ↔ אורות מרהיבים.',
+   who:'👨‍👩‍👧‍👦 כל הגילאים | 🌙 ערב | 💸 חינם מרחוק — אחת האטרקציות הכי משתלמות',
    how:'טראם 5/12/15 → Výstaviště (כ-15 דק׳ מהמרכז)', mapUrl:'https://www.google.com/maps/search/Krizikova+Fountain+Prague+Vystaviste'},
   // ── 🛍️ קניות ──
   {cat:'🛍️ קניות', icon:'🛍️', name:'Primark — וצסלב', fb:'⭐⭐⭐⭐⭐', google:'4.3', desc:'ביגוד, ילדים, בית, מזוודות. להגיע בבוקר לפני ההמון. ממש בלב הפרסטיז׳ה.',
@@ -1433,7 +1902,7 @@ function isGas() {
 // ═══════════════════════════════════════════
 //  NAVIGATION
 // ═══════════════════════════════════════════
-var ALL_TABS = ['home','days','shopping','expenses','flights','restaurants','pack','info','guides','community','history','photodiary','lang'];
+var ALL_TABS = ['home','days','shopping','expenses','flights','restaurants','pack','info','guides','community','history','photodiary','lang','reminders'];
 
 function openTab(id) {
   ALL_TABS.forEach(function(name) {
@@ -1446,6 +1915,7 @@ function openTab(id) {
   if (id === 'days') renderDays();
   if (id === 'pack') loadPack();
   if (id === 'restaurants') renderRestaurants();
+  if (id === 'reminders') initReminders();
 }
 
 // ═══════════════════════════════════════════
@@ -1577,6 +2047,54 @@ function findItemInDays(name) {
   return null;
 }
 
+function showAttrDetail(attr, iconKey, nameKey, descKey, howKey, existing) {
+  var name = attr[nameKey]||'';
+  var desc = attr[descKey]||'';
+  var how  = attr[howKey||'how']||'';
+  var booking = attr.booking||'';
+  var mapUrl  = attr.mapUrl||'';
+  var overlay = document.createElement('div');
+  overlay.id = 'attrDetailOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:9999;display:flex;align-items:flex-end;justify-content:center;';
+  var panel = document.createElement('div');
+  panel.style.cssText = 'background:#1E293B;border-radius:22px 22px 0 0;padding:22px 20px 32px;width:100%;max-width:480px;box-shadow:0 -4px 30px rgba(0,0,0,0.5);direction:rtl;font-family:Rubik,Arial,sans-serif;max-height:80vh;overflow-y:auto;';
+  var existingRow = existing
+    ? '<div style="margin-bottom:12px;padding:8px 12px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.4);border-radius:10px;font-size:13px;font-weight:700;color:#FCD34D;">📅 מוצב ביום ' + existing.dayNum + (existing.time ? ' · ' + existing.time : '') + ' — ' + existing.dayTitle + '</div>'
+    : '';
+  var bookingColor = booking.startsWith('✅') ? '#6EE7B7' : '#FCD34D';
+  var duration = attr.duration||'';
+  var tips = attr.tips||'';
+  var who = attr.who||'';
+  panel.innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
+      '<div style="font-size:28px;">' + (attr[iconKey]||'📍') + '</div>' +
+      '<button onclick="document.getElementById(\'attrDetailOverlay\').remove()" style="background:rgba(255,255,255,0.1);border:none;border-radius:50%;width:32px;height:32px;color:#94A3B8;font-size:18px;cursor:pointer;line-height:1;">✕</button>' +
+    '</div>' +
+    '<div style="font-size:17px;font-weight:900;color:#F1F5F9;margin-bottom:6px;">' + name + '</div>' +
+    (duration || who ? '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">' +
+      (duration ? '<span style="font-size:11px;font-weight:700;color:#7DD3FC;background:rgba(56,189,248,0.12);border:1px solid rgba(56,189,248,0.25);border-radius:8px;padding:3px 9px;">' + duration + '</span>' : '') +
+      (who ? '<span style="font-size:11px;font-weight:700;color:#C084FC;background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.25);border-radius:8px;padding:3px 9px;">' + who + '</span>' : '') +
+    '</div>' : '') +
+    existingRow +
+    (desc ? '<div style="font-size:13px;color:rgba(241,245,249,0.8);line-height:1.7;margin-bottom:14px;">' + desc + '</div>' : '') +
+    (booking ? '<div style="padding:10px 12px;background:rgba(0,0,0,0.25);border-right:3px solid ' + bookingColor + ';border-radius:0 8px 8px 0;font-size:12px;font-weight:700;color:' + bookingColor + ';line-height:1.55;margin-bottom:10px;">' + booking + '</div>' : '') +
+    (tips ? '<div style="padding:9px 12px;background:rgba(251,191,36,0.08);border-right:3px solid rgba(251,191,36,0.5);border-radius:0 8px 8px 0;font-size:12px;color:rgba(253,230,138,0.85);line-height:1.55;margin-bottom:10px;">' + tips + '</div>' : '') +
+    (how ? '<div style="font-size:11px;color:rgba(241,245,249,0.38);margin-bottom:14px;">🚇 ' + how + '</div>' : '') +
+    '<div style="display:flex;gap:9px;margin-top:4px;">' +
+      (mapUrl ? '<a href="' + mapUrl + '" target="_blank" style="flex:1;text-align:center;padding:10px 0;background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.3);border-radius:12px;font-size:13px;font-weight:700;color:#7DD3FC;text-decoration:none;">🗺️ מפה</a>' : '') +
+      '<button onclick="(function(){' +
+        'var e=document.getElementById(\'addStopEmoji\'); if(e) e.value=\'' + (attr[iconKey]||'📍').replace(/'/g,"\\'") + '\';' +
+        'var n=document.getElementById(\'addStopName\'); if(n) n.value=\'' + name.replace(/'/g,"\\'") + '\';' +
+        'var t=document.getElementById(\'addStopTime\'); if(t) t.value=\'\';' +
+        'var d=document.getElementById(\'addStopDesc\'); if(d) d.value=\'' + desc.substring(0,100).replace(/'/g,"\\'").replace(/\n/g,' ') + '\';' +
+        'document.getElementById(\'attrDetailOverlay\').remove();' +
+      '})()" style="flex:1;padding:10px 0;background:rgba(244,99,74,0.2);border:1px solid rgba(244,99,74,0.4);border-radius:12px;font-size:13px;font-weight:700;color:#F4634A;cursor:pointer;font-family:Rubik,Arial,sans-serif;">📅 הוסף למסלול</button>' +
+    '</div>';
+  overlay.appendChild(panel);
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
 function buildBankCards(items, iconKey, nameKey, descKey, howKey) {
   var bank = qs('attrBankRow');
   if (!bank) return;
@@ -1586,29 +2104,20 @@ function buildBankCards(items, iconKey, nameKey, descKey, howKey) {
     var existing = findItemInDays(name);
     var card = document.createElement('div');
     card.style.cssText = 'flex-shrink:0;width:138px;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.13);border-radius:14px;padding:10px 11px;cursor:pointer;transition:all .15s;position:relative;';
+    var bookingBadge = a.booking
+      ? '<div style="margin-top:5px;padding:2px 6px;background:' + (a.booking.startsWith('✅') ? 'rgba(52,211,153,0.15)' : 'rgba(245,158,11,0.15)') + ';border-radius:6px;font-size:9px;font-weight:700;color:' + (a.booking.startsWith('✅') ? '#6EE7B7' : '#FCD34D') + ';line-height:1.4;">' + a.booking.substring(0,2) + (a.booking.startsWith('✅') ? ' חינם' : ' להזמין') + '</div>'
+      : '';
     var existingBadge = existing
       ? '<div style="margin-top:5px;padding:3px 6px;background:rgba(245,158,11,0.18);border:1px solid rgba(245,158,11,0.4);border-radius:7px;font-size:9px;font-weight:700;color:#FCD34D;line-height:1.3;">📅 יום ' + existing.dayNum + (existing.time ? ' · ' + existing.time : '') + '</div>'
       : '';
     card.innerHTML =
       '<div style="font-size:22px;margin-bottom:4px;">' + (a[iconKey]||'📍') + '</div>' +
       '<div style="font-size:12px;font-weight:700;color:#F1F5F9;line-height:1.3;">' + name + '</div>' +
-      (a[howKey||'how'] ? '<div style="font-size:10px;color:rgba(241,245,249,0.38);margin-top:3px;line-height:1.3;">' + (a[howKey||'how']||'').substring(0,40) + '</div>' : '') +
+      bookingBadge +
       existingBadge;
     card.addEventListener('click', (function(attr, ex) {
       return function() {
-        if (ex) {
-          toast('📅 כבר מוצב ביום ' + ex.dayNum + (ex.time ? ' בשעה ' + ex.time : '') + ' — ' + ex.dayTitle);
-        }
-        var e = qs('addStopEmoji'); if (e) e.value = attr[iconKey]||'📍';
-        var n = qs('addStopName'); if (n) n.value = name;
-        var t = qs('addStopTime'); if (t) t.value = '';
-        var desc = attr[descKey]||'';
-        var how = attr[howKey||'how']||'';
-        var d = qs('addStopDesc'); if (d) d.value = desc.substring(0,120) + (how ? '\nהגעה: ' + how : '');
-        bank.querySelectorAll('div[style*="border-radius:14px"]').forEach(function(c){
-          c.style.background='rgba(255,255,255,0.06)'; c.style.border='1.5px solid rgba(255,255,255,0.13)';
-        });
-        card.style.background='rgba(244,99,74,0.22)'; card.style.border='1.5px solid #F4634A';
+        showAttrDetail(attr, iconKey, nameKey, descKey, howKey, ex);
       };
     })(a, existing));
     bank.appendChild(card);
@@ -2048,30 +2557,22 @@ function loadPackLocal() {
 function savePackLocal(state) { localStorage.setItem('prague_pack_v2', JSON.stringify(state)); }
 
 function loadPack() {
+  // תמיד מציג מקומי מיידית
+  PACK_STATE = loadPackLocal() || getDefaultPackCats();
+  renderPack();
   if (isGas()) {
     google.script.run
       .withSuccessHandler(function(r) {
         var raw = r && r.ok && r.data && r.data.packing_list;
-        // פורמט חדש = מערך של קטגוריות עם .items
         var isNewFormat = raw && Array.isArray(raw) && raw.length > 0 && raw[0].items;
         if (isNewFormat) {
           PACK_STATE = raw;
           savePackLocal(PACK_STATE);
-        } else {
-          // פורמט ישן מ-Sheets (או ריק) — מחזירים defaults ושומרים
-          PACK_STATE = loadPackLocal() || getDefaultPackCats();
-          savePack(); // שומר פורמט חדש ל-Sheets
+          renderPack();
         }
-        renderPack();
       })
-      .withFailureHandler(function() {
-        PACK_STATE = loadPackLocal() || getDefaultPackCats();
-        renderPack();
-      })
+      .withFailureHandler(function() {})
       .loadAppData();
-  } else {
-    PACK_STATE = loadPackLocal() || getDefaultPackCats();
-    renderPack();
   }
 }
 
@@ -2080,7 +2581,7 @@ function savePack() {
   if (isGas()) {
     google.script.run
       .withSuccessHandler(function(r) { if (r && r.ok) toast('☁️ צ\'ק-ליסט סונכרן!'); })
-      .withFailureHandler(function() { toast('⚠️ שמור מקומית בלבד'); })
+      .withFailureHandler(function() {})
       .savePackingList(PACK_STATE);
   }
 }
@@ -2164,22 +2665,21 @@ function closePackItemModal() { var m = qs('packItemModal'); if (m) m.style.disp
 // ═══════════════════════════════════════════
 function loadExpenses() {
   var badge = qs('syncBadge');
+  // תמיד טוען מקומי קודם לתגובה מיידית
+  loadLocal();
   if (isGas()) {
     if (badge) badge.textContent = '🔄 מסנכרן';
     google.script.run
       .withSuccessHandler(function(rows) {
         EXPENSES = rows || [];
+        saveLocal();
         if (badge) { badge.textContent = '✅ מסונכרן'; badge.style.color = '#6EE7B7'; badge.style.borderColor = 'rgba(16,185,129,0.3)'; badge.style.background = 'rgba(16,185,129,0.1)'; }
         renderExpenses();
       })
       .withFailureHandler(function() {
-        if (badge) badge.textContent = '⚠️ שגיאה';
-        toast('שגיאה בטעינה — מציג נתונים מקומיים');
-        loadLocal();
+        if (badge) { badge.textContent = '⚠️ מקומי'; badge.style.color = '#FCD34D'; }
       })
       .loadExpenses();
-  } else {
-    loadLocal();
   }
 }
 
@@ -2199,18 +2699,17 @@ var DEFAULT_BUDGET = [
   {cat:'כללי ושונות 💡', ils:1000}
 ];
 function loadBudget() {
-  try { return JSON.parse(localStorage.getItem('prague_budget_v1') || 'null') || JSON.parse(JSON.stringify(DEFAULT_BUDGET)); }
-  catch(e) { return JSON.parse(JSON.stringify(DEFAULT_BUDGET)); }
+  try { return JSON.parse(localStorage.getItem('prague_budget_v1') || 'null') || window._memBudget || JSON.parse(JSON.stringify(DEFAULT_BUDGET)); }
+  catch(e) { return window._memBudget || JSON.parse(JSON.stringify(DEFAULT_BUDGET)); }
 }
 function loadTotalBudget() {
-  return Number(localStorage.getItem('prague_total_budget') || '0') || 0;
+  try { return Number(localStorage.getItem('prague_total_budget') || '0') || 0; } catch(e) { return window._memTotalBudget || 0; }
 }
 function saveTotalBudget(val) {
   localStorage.setItem('prague_total_budget', String(val));
   if (isGas()) {
     google.script.run
-      .withSuccessHandler(function(r) { if (r && r.ok) toast('☁️ תקציב כולל סונכרן!'); })
-      .withFailureHandler(function() { toast('⚠️ שמור מקומית בלבד'); })
+      .withFailureHandler(function() {})
       .saveTotalBudget(val);
   }
 }
@@ -2218,26 +2717,27 @@ function saveBudget(b) {
   localStorage.setItem('prague_budget_v1', JSON.stringify(b));
   if (isGas()) {
     google.script.run
-      .withSuccessHandler(function(r) { if (r && r.ok) toast('☁️ תקציב סונכרן!'); })
-      .withFailureHandler(function() { toast('⚠️ שמור מקומית בלבד'); })
+      .withFailureHandler(function() {})
       .saveBudgetCategories(b);
   }
 }
-function syncBudgetFromSheets() {
-  if (!isGas()) return;
+function syncBudgetFromSheets(cb) {
+  if (!isGas()) { if (cb) cb(); return; }
   google.script.run
     .withSuccessHandler(function(r) {
       if (r && r.ok && r.data) {
         if (r.data.budget_categories) {
           localStorage.setItem('prague_budget_v1', JSON.stringify(r.data.budget_categories));
         }
-        if (r.data.total_budget) {
+        if (r.data.total_budget != null) {
           localStorage.setItem('prague_total_budget', String(r.data.total_budget));
         }
-        renderBudget();
       }
+      renderBudget();
+      if (cb) cb();
     })
-    .loadAppData();
+    .withFailureHandler(function() { renderBudget(); if (cb) cb(); })
+    .loadBudgetSettings();
 }
 
 function guessExpCat(name) {
@@ -2305,9 +2805,9 @@ function renderBudget() {
   if (pctEl) { pctEl.textContent = pct + '% נוצל'; pctEl.style.color = pct >= 90 ? '#FCA5A5' : pct >= 70 ? '#FCD34D' : 'rgba(241,245,249,0.6)'; }
 }
 
-function openBudgetModal() {
-  var budget = loadBudget();
-  var totalVal = loadTotalBudget();
+function populateBudgetModal(budget, totalVal) {
+  budget = budget || loadBudget();
+  totalVal = (totalVal != null) ? totalVal : loadTotalBudget();
   var ti = qs('budgetTotalInput'); if (ti) ti.value = totalVal || '';
   var inp = qs('budgetInputs');
   if (!inp) return;
@@ -2318,7 +2818,38 @@ function openBudgetModal() {
       '<button onclick="removeBudgetRow(' + i + ')" style="background:rgba(239,68,68,0.15);border:none;border-radius:8px;padding:8px 10px;color:#FCA5A5;font-size:14px;cursor:pointer;">🗑</button>' +
     '</div>';
   }).join('');
+}
+
+var _budgetModalOpenTime = 0;
+function openBudgetModal() {
   var m = qs('budgetModal'); if (m) m.style.display = 'flex';
+  var openTime = Date.now();
+  _budgetModalOpenTime = openTime;
+  populateBudgetModal();
+  if (isGas()) {
+    google.script.run
+      .withSuccessHandler(function(r) {
+        // רק אם המודל עדיין פתוח ולא בוצעה שמירה מאז הפתיחה
+        if (openTime !== _budgetModalOpenTime) return;
+        var m2 = qs('budgetModal');
+        if (!m2 || m2.style.display === 'none') return;
+        if (r && r.ok && r.data) {
+          var cats = r.data.budget_categories || loadBudget();
+          var total = r.data.total_budget != null ? r.data.total_budget : loadTotalBudget();
+          // עדכן localStorage ואת שדות המודל
+          localStorage.setItem('prague_budget_v1', JSON.stringify(cats));
+          localStorage.setItem('prague_total_budget', String(total));
+          populateBudgetModal(cats, total);
+        }
+      })
+      .withFailureHandler(function() {})
+      .loadBudgetSettings();
+  }
+}
+
+function saveBudgetFromModalAndInvalidate() {
+  _budgetModalOpenTime = 0; // בטל callback ממתין
+  saveBudgetFromModal();
 }
 
 function removeBudgetRow(i) {
@@ -2332,7 +2863,6 @@ function closeBudgetModal() { var m = qs('budgetModal'); if (m) m.style.display 
 
 function saveBudgetFromModal() {
   var totalVal = Number((qs('budgetTotalInput') || {}).value || 0) || 0;
-  if (totalVal) saveTotalBudget(totalVal);
   var inputs = document.querySelectorAll('#budgetInputs input');
   var map = {};
   inputs.forEach(function(inp) {
@@ -2344,10 +2874,29 @@ function saveBudgetFromModal() {
   var budget = Object.keys(map).sort(function(a,b){return a-b;}).map(function(i) {
     return {cat: map[i].cat || '', ils: Number(map[i].ils) || 0};
   });
-  saveBudget(budget);
+
+  // סגור קודם — לפני כל קוד שעלול לזרוק שגיאה
   closeBudgetModal();
+
+  // שמור בזיכרון ו-localStorage (try-catch למקרה ש-iframe חוסם storage)
+  window._memTotalBudget = totalVal;
+  window._memBudget = budget;
+  try { localStorage.setItem('prague_total_budget', String(totalVal)); } catch(e) {}
+  try { localStorage.setItem('prague_budget_v1', JSON.stringify(budget)); } catch(e) {}
+
   renderBudget();
   toast('✅ תקציב עודכן!');
+
+  // שמור לשיטס
+  if (isGas()) {
+    google.script.run
+      .withSuccessHandler(function() { toast('☁️ סונכרן לגיליון!'); })
+      .withFailureHandler(function() {})
+      .saveTotalBudget(totalVal);
+    google.script.run
+      .withFailureHandler(function() {})
+      .saveBudgetCategories(budget);
+  }
 }
 
 function renderExpenses() {
@@ -2593,49 +3142,13 @@ function speakText(text, lang) {
   window.speechSynthesis.speak(utt);
 }
 
-function toggleVoiceMic() {
-  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { setVoiceStatus('⚠️ הדפדפן לא תומך בזיהוי קול — הקלידו ידנית'); return; }
-  if (voiceListening) { voiceRecognition && voiceRecognition.stop(); return; }
-  var btn = qs('btnMicInline');
-  setVoiceStatus('🔐 מבקש הרשאת מיקרופון...');
-  navigator.mediaDevices && navigator.mediaDevices.getUserMedia({ audio: true })
-    .then(function(stream) {
-      stream.getTracks().forEach(function(t) { t.stop(); });
-      voiceRecognition = new SR();
-      voiceRecognition.lang = voiceSrcLang === 'he' ? 'he-IL' : 'cs-CZ';
-      voiceRecognition.interimResults = true;
-      voiceRecognition.continuous = false;
-      voiceListening = true;
-      if (btn) { btn.textContent = '⏹️'; btn.style.background = 'linear-gradient(135deg,rgba(239,68,68,0.4),rgba(220,38,38,0.3))'; }
-      setVoiceStatus('🎤 מאזין... דברו עכשיו');
-      voiceRecognition.onresult = function(e) {
-        var interim = '', final = '';
-        for (var i = e.resultIndex; i < e.results.length; i++) {
-          if (e.results[i].isFinal) final += e.results[i][0].transcript;
-          else interim += e.results[i][0].transcript;
-        }
-        var inp = qs('voiceInputText');
-        if (inp) inp.value = final || interim;
-        if (final) { setVoiceStatus('✅ זוהה — מתרגם...'); translateVoiceText(); }
-      };
-      voiceRecognition.onerror = function(ev) {
-        setVoiceStatus('⚠️ ' + (ev.error === 'not-allowed' ? 'הרשאה נדחתה' : ev.error));
-        resetVoiceMic();
-      };
-      voiceRecognition.onend = function() { resetVoiceMic(); };
-      voiceRecognition.start();
-    })
-    .catch(function() { setVoiceStatus('⚠️ הרשאת מיקרופון נדחתה'); });
+function startVoiceRecognition() {
+  // מיקרופון חסום ב-GAS iframe — השתמשו בהקלדה + תרגום אוטומטי
+  setVoiceStatus('💡 הקלידו בשדה למעלה — תרגום אוטומטי תוך שנייה');
+  var inp = qs('voiceInputText');
+  if (inp) inp.focus();
+  voiceRecognition.start();
 }
-
-function resetVoiceMic() {
-  voiceListening = false;
-  var btn = qs('btnMicInline');
-  if (btn) { btn.textContent = '🎤'; btn.style.background = 'linear-gradient(135deg,rgba(168,85,247,0.35),rgba(99,102,241,0.3))'; }
-}
-
-function startVoiceRecognition() { toggleVoiceMic(); }
 
 function clearVoiceTranslator() {
   var inp = qs('voiceInputText'), res = qs('voiceTranslateResult');
@@ -2806,6 +3319,7 @@ document.addEventListener('DOMContentLoaded', function() {
   renderDays();
   renderShopping();
   loadExpenses();
+  syncBudgetFromSheets();
 
   // CZK/ILS conversion
   var czkInput = qs('expCzk'), ilsInput = qs('expIls');
@@ -2830,9 +3344,9 @@ document.addEventListener('DOMContentLoaded', function() {
     'btnRefreshExp':      function() { loadExpenses(); },
     'btnExportCsv':       function() { exportCsv(); },
     'btnEditBudget':      function() { openBudgetModal(); },
-    'btnSaveBudget':      function() { saveBudgetFromModal(); },
+    'btnSaveBudget':      function() { saveBudgetFromModalAndInvalidate(); },
     'btnAddBudgetCat':    function() { var b=loadBudget(); b.push({cat:'קטגוריה חדשה',ils:0}); saveBudget(b); openBudgetModal(); },
-    'budgetOverlay':      function() { closeBudgetModal(); },
+    'budgetOverlay':      function(e) { if(e.target===this) closeBudgetModal(); },
     'btnSaveRate':        function() { saveRate(); },
     'btnLiveRate':        function() { fetchLiveRate(); },
     'btnSaveExpense':     function() { saveExpense(); },
@@ -2865,7 +3379,8 @@ document.addEventListener('DOMContentLoaded', function() {
     'btnBackLang':          function() { openTab('home'); },
     'btnNewPhoto':          function() { openPhotoModal(null); },
     'btnShareAll':          function() { shareAllPhotos(); },
-    'btnSavePhoto':         function() { savePhotoEntry(); }
+    'btnSavePhoto':         function() { savePhotoEntry(); },
+    'nav-reminders':        function() { openTab('reminders'); }
   };
 
   Object.keys(btnMap).forEach(function(id) {
@@ -2937,7 +3452,108 @@ document.addEventListener('DOMContentLoaded', function() {
     reader.readAsDataURL(file);
   });
   if (qs('photoTagOverlay')) qs('photoTagOverlay').addEventListener('click', closePhotoModal);
+
+  // Desktop sidebar
+  if (window.innerWidth >= 768) {
+    initDesktopLayout();
+  }
+  window.addEventListener('resize', function() {
+    var sidebar = document.getElementById('deskSidebar');
+    if (window.innerWidth >= 768 && !sidebar) initDesktopLayout();
+    if (window.innerWidth < 768 && sidebar) {
+      sidebar.parentNode.removeChild(sidebar);
+      var app = document.getElementById('app');
+      if (app) app.style.cssText = '';
+    }
+  });
 });
+
+function initDesktopLayout() {
+  var app = document.getElementById('app');
+  var nav = document.querySelector('nav');
+  if (!app || !nav) return;
+
+  // Hide mobile nav
+  nav.style.display = 'none';
+
+  // Widen app
+  app.style.maxWidth = '960px';
+  app.style.paddingBottom = '24px';
+  app.style.display = 'flex';
+  app.style.flexDirection = 'column';
+
+  // Create sidebar
+  var sidebar = document.createElement('div');
+  sidebar.id = 'deskSidebar';
+  sidebar.style.cssText = 'position:fixed;top:0;right:calc(50% + 470px - 960px/2 + 0px);width:190px;height:100vh;background:rgba(4,13,24,0.97);border-left:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;padding:24px 10px 16px;gap:4px;z-index:40;overflow-y:auto;direction:rtl;';
+
+  var navItems = [
+    { id:'home',       icon:'🏠', label:'ראשי' },
+    { id:'days',       icon:'📅', label:'ימים' },
+    { id:'shopping',   icon:'🛍️', label:'קניות' },
+    { id:'expenses',   icon:'💰', label:'הוצאות' },
+    { id:'flights',    icon:'✈️', label:'טיסות' },
+    { id:'pack',       icon:'🧳', label:'ציוד' },
+    { id:'restaurants',icon:'🍽️', label:'מסעדות' },
+    { id:'info',       icon:'ℹ️', label:'מידע' },
+    { id:'guides',     icon:'🗺️', label:'מדריכים' },
+    { id:'community',  icon:'👨‍👩‍👧', label:'קהילה' },
+    { id:'history',    icon:'📜', label:'היסטוריה' },
+    { id:'photodiary', icon:'📸', label:'יומן תמונות' },
+    { id:'lang',       icon:'🗣️', label:'שפה' },
+    { id:'reminders',  icon:'🔔', label:'תזכורות' },
+  ];
+
+  var logoDiv = document.createElement('div');
+  logoDiv.style.cssText = 'font-size:11px;font-weight:800;color:#FCD34D;letter-spacing:3px;text-align:center;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.08);';
+  logoDiv.textContent = 'PRAGUE 2026';
+  sidebar.appendChild(logoDiv);
+
+  navItems.forEach(function(item) {
+    var btn = document.createElement('button');
+    btn.id = 'deskNav-' + item.id;
+    btn.style.cssText = 'display:flex;flex-direction:row;align-items:center;gap:10px;padding:10px 12px;border-radius:11px;font-size:13px;font-weight:700;border:0;cursor:pointer;font-family:Rubik,Arial,sans-serif;background:transparent;color:rgba(241,245,249,0.5);width:100%;text-align:right;justify-content:flex-end;transition:background 0.15s,color 0.15s;';
+    btn.innerHTML = '<span style="font-size:11px;font-weight:700;">' + item.label + '</span><span style="font-size:18px;">' + item.icon + '</span>';
+    btn.addEventListener('click', function() {
+      openTab(item.id);
+      // special renders
+      if (item.id === 'community') renderCommunity();
+      if (item.id === 'history') renderHistory();
+      if (item.id === 'photodiary') renderPhotoDiary();
+    });
+    btn.addEventListener('mouseenter', function() { if (!btn.classList.contains('dk-act')) btn.style.background='rgba(255,255,255,0.07)'; btn.style.color='#F1F5F9'; });
+    btn.addEventListener('mouseleave', function() { if (!btn.classList.contains('dk-act')) { btn.style.background='transparent'; btn.style.color='rgba(241,245,249,0.5)'; } });
+    sidebar.appendChild(btn);
+  });
+
+  document.body.appendChild(sidebar);
+
+  // Add margin to app to make room for sidebar
+  app.style.marginRight = '190px';
+
+  // Override openTab to also update sidebar active state
+  var _origOpenTab = openTab;
+  window.openTab = function(id) {
+    _origOpenTab(id);
+    navItems.forEach(function(item) {
+      var b = document.getElementById('deskNav-' + item.id);
+      if (!b) return;
+      if (item.id === id) {
+        b.style.background = 'rgba(244,99,74,0.15)';
+        b.style.color = '#F4634A';
+        b.classList.add('dk-act');
+      } else {
+        b.style.background = 'transparent';
+        b.style.color = 'rgba(241,245,249,0.5)';
+        b.classList.remove('dk-act');
+      }
+    });
+  };
+
+  // Set initial active
+  var homeBtn = document.getElementById('deskNav-home');
+  if (homeBtn) { homeBtn.style.background='rgba(244,99,74,0.15)'; homeBtn.style.color='#F4634A'; homeBtn.classList.add('dk-act'); }
+}
 
 // ═══════════════════════════════════════════
 //  PHOTO DIARY — IndexedDB
