@@ -910,34 +910,25 @@
     <div style="display:grid;gap:12px;">
 
       <!-- מתרגם קולי -->
-      <div style="background:linear-gradient(135deg,rgba(168,85,247,0.15),rgba(99,102,241,0.1));border:1px solid rgba(168,85,247,0.35);border-radius:18px;padding:18px;text-align:center;">
-        <div style="font-size:36px;margin-bottom:8px;">🎤</div>
-        <div style="font-size:16px;font-weight:900;color:#C084FC;margin-bottom:6px;">מתרגם קולי מלא</div>
-        <div style="font-size:12px;color:rgba(241,245,249,0.5);margin-bottom:18px;line-height:1.6;">דיבור ישיר למיקרופון · תרגום אוטומטי · השמעה בקול<br>עובד ב-Safari/Chrome מחוץ לאפליקציה</div>
-        <a href="https://arielshish.github.io/Prague-2026/translator.html" target="_blank" rel="noopener" style="display:block;background:linear-gradient(135deg,rgba(168,85,247,0.4),rgba(99,102,241,0.35));border:1px solid rgba(168,85,247,0.6);border-radius:14px;padding:15px;font-size:15px;font-weight:900;color:#E9D5FF;text-decoration:none;margin-bottom:10px;">🎤 פתח מתרגם קולי</a>
-        <div style="font-size:11px;color:rgba(241,245,249,0.35);">נפתח בדפדפן — מאפשר גישה למיקרופון</div>
-      </div>
-
-      <!-- מתרגם טקסט -->
-      <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:18px;padding:16px;">
-        <div style="font-size:14px;font-weight:700;color:#C084FC;margin-bottom:4px;">⌨️ תרגום טקסט</div>
-        <div style="font-size:11px;color:rgba(241,245,249,0.4);margin-bottom:12px;">הקלידו — תרגום אוטומטי תוך שנייה</div>
+      <div style="background:linear-gradient(135deg,rgba(168,85,247,0.15),rgba(99,102,241,0.1));border:1px solid rgba(168,85,247,0.35);border-radius:18px;padding:18px;">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
           <button id="voiceLangHe" onclick="setVoiceLang('he','cs')" style="padding:9px;border-radius:11px;border:2px solid rgba(168,85,247,0.6);background:rgba(168,85,247,0.2);font-size:12px;font-weight:800;color:#C084FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🇮🇱 עברית → צ'כית</button>
           <button id="voiceLangCs" onclick="setVoiceLang('cs','he')" style="padding:9px;border-radius:11px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);font-size:12px;font-weight:800;color:rgba(241,245,249,0.45);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🇨🇿 צ'כית → עברית</button>
         </div>
         <textarea id="voiceInputText" placeholder="הקלידו כאן — תרגום אוטומטי תוך שנייה..." style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(168,85,247,0.3);border-radius:13px;padding:12px 14px;font-size:14px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;resize:none;height:70px;margin-bottom:10px;"></textarea>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
+          <button id="btnMicInline" onclick="toggleVoiceMic()" style="background:linear-gradient(135deg,rgba(168,85,247,0.35),rgba(99,102,241,0.3));border:1px solid rgba(168,85,247,0.5);border-radius:13px;padding:12px 8px;font-size:22px;cursor:pointer;">🎤</button>
           <button onclick="translateVoiceText()" style="background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.4);border-radius:13px;padding:12px 8px;font-size:12px;font-weight:800;color:#A5B4FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🌐 תרגם</button>
           <button onclick="clearVoiceTranslator()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:13px;padding:12px 8px;font-size:12px;font-weight:800;color:rgba(241,245,249,0.4);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🗑️ נקה</button>
         </div>
-        <div id="voiceTranslateResult" style="display:none;background:rgba(0,0,0,0.25);border:1px solid rgba(168,85,247,0.25);border-radius:13px;padding:14px;">
+        <div id="voiceTranslateResult" style="display:none;background:rgba(0,0,0,0.25);border:1px solid rgba(168,85,247,0.25);border-radius:13px;padding:14px;margin-bottom:10px;">
           <div style="font-size:10px;color:rgba(241,245,249,0.35);margin-bottom:6px;letter-spacing:1px;">תרגום</div>
           <div id="voiceTranslateText" style="font-size:16px;font-weight:700;color:#E9D5FF;line-height:1.5;margin-bottom:10px;"></div>
           <button onclick="speakTranslation()" style="width:100%;background:rgba(168,85,247,0.25);border:1px solid rgba(168,85,247,0.4);border-radius:10px;padding:10px;font-size:13px;font-weight:800;color:#C084FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🔊 השמע בקול</button>
         </div>
-        <div id="voiceStatus" style="font-size:11px;color:rgba(241,245,249,0.35);text-align:center;margin-top:8px;min-height:16px;"></div>
+        <div id="voiceStatus" style="font-size:11px;color:rgba(241,245,249,0.35);text-align:center;min-height:16px;"></div>
       </div>
+
 
       <!-- ביטויים מהירים -->
       <div style="background:rgba(168,85,247,0.09);border:1px solid rgba(168,85,247,0.2);border-radius:18px;padding:16px;">
@@ -2602,13 +2593,49 @@ function speakText(text, lang) {
   window.speechSynthesis.speak(utt);
 }
 
-function startVoiceRecognition() {
-  // מיקרופון חסום ב-GAS iframe — השתמשו בהקלדה + תרגום אוטומטי
-  setVoiceStatus('💡 הקלידו בשדה למעלה — תרגום אוטומטי תוך שנייה');
-  var inp = qs('voiceInputText');
-  if (inp) inp.focus();
-  voiceRecognition.start();
+function toggleVoiceMic() {
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { setVoiceStatus('⚠️ הדפדפן לא תומך בזיהוי קול — הקלידו ידנית'); return; }
+  if (voiceListening) { voiceRecognition && voiceRecognition.stop(); return; }
+  var btn = qs('btnMicInline');
+  setVoiceStatus('🔐 מבקש הרשאת מיקרופון...');
+  navigator.mediaDevices && navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(function(stream) {
+      stream.getTracks().forEach(function(t) { t.stop(); });
+      voiceRecognition = new SR();
+      voiceRecognition.lang = voiceSrcLang === 'he' ? 'he-IL' : 'cs-CZ';
+      voiceRecognition.interimResults = true;
+      voiceRecognition.continuous = false;
+      voiceListening = true;
+      if (btn) { btn.textContent = '⏹️'; btn.style.background = 'linear-gradient(135deg,rgba(239,68,68,0.4),rgba(220,38,38,0.3))'; }
+      setVoiceStatus('🎤 מאזין... דברו עכשיו');
+      voiceRecognition.onresult = function(e) {
+        var interim = '', final = '';
+        for (var i = e.resultIndex; i < e.results.length; i++) {
+          if (e.results[i].isFinal) final += e.results[i][0].transcript;
+          else interim += e.results[i][0].transcript;
+        }
+        var inp = qs('voiceInputText');
+        if (inp) inp.value = final || interim;
+        if (final) { setVoiceStatus('✅ זוהה — מתרגם...'); translateVoiceText(); }
+      };
+      voiceRecognition.onerror = function(ev) {
+        setVoiceStatus('⚠️ ' + (ev.error === 'not-allowed' ? 'הרשאה נדחתה' : ev.error));
+        resetVoiceMic();
+      };
+      voiceRecognition.onend = function() { resetVoiceMic(); };
+      voiceRecognition.start();
+    })
+    .catch(function() { setVoiceStatus('⚠️ הרשאת מיקרופון נדחתה'); });
 }
+
+function resetVoiceMic() {
+  voiceListening = false;
+  var btn = qs('btnMicInline');
+  if (btn) { btn.textContent = '🎤'; btn.style.background = 'linear-gradient(135deg,rgba(168,85,247,0.35),rgba(99,102,241,0.3))'; }
+}
+
+function startVoiceRecognition() { toggleVoiceMic(); }
 
 function clearVoiceTranslator() {
   var inp = qs('voiceInputText'), res = qs('voiceTranslateResult');
