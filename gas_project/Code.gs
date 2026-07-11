@@ -19,11 +19,52 @@ var STOP_CATALOG = {
 };
 
 function doGet() {
-  getOrCreateChecklistSheet(); // Ensure the sheet is created immediately
+  getOrCreateChecklistSheet();
   return HtmlService.createHtmlOutputFromFile('index')
     .setTitle('פראג 2026 - משפחת שיש')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+function doPost(e) {
+  try {
+    var body = JSON.parse(e.postData.contents);
+    var action = body.action;
+    var args = body.args || [];
+    var result;
+    switch (action) {
+      case 'loadExpenses':        result = loadExpenses(); break;
+      case 'addExpense':          result = addExpense(args[0], args[1], args[2], args[3]); break;
+      case 'updateExpense':       result = updateExpense(args[0], args[1], args[2], args[3], args[4]); break;
+      case 'deleteExpense':       result = deleteExpense(args[0]); break;
+      case 'clearExpenses':       result = clearExpenses(); break;
+      case 'importExpenses':      result = importExpenses(args[0]); break;
+      case 'saveSetting':         result = saveSetting(args[0], args[1]); break;
+      case 'loadSettings':        result = loadSettings(); break;
+      case 'saveTotalBudget':     result = saveTotalBudget(args[0]); break;
+      case 'loadBudgetSettings':  result = loadBudgetSettings(); break;
+      case 'saveBudgetCategories':result = saveBudgetCategories(args[0]); break;
+      case 'syncChecklist':       result = syncChecklist(args[0]); break;
+      case 'loadChecklist':       result = loadChecklist(); break;
+      case 'loadItinerary':       result = loadItinerary(); break;
+      case 'moveAttraction':      result = moveAttraction(args[0], args[1]); break;
+      case 'loadAppData':         result = loadAppData(); break;
+      case 'saveAppData':         result = saveAppData(args[0], args[1]); break;
+      case 'savePackingList':     result = savePackingList(args[0]); break;
+      case 'saveDaysCustom':      result = saveDaysCustom(args[0]); break;
+      case 'loadDaysFromSheets':  result = loadDaysFromSheets_(); break;
+      case 'healthCheck':         result = healthCheck(); break;
+      case 'getSummary':          result = getSummary(); break;
+      default: result = { ok: false, error: 'Unknown action: ' + action };
+    }
+    return ContentService
+      .createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    Logger.log('doPost error: ' + err.stack);
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: false, error: err.message }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
 }
 
 function getSpreadsheet_() {
@@ -263,6 +304,41 @@ function saveSetting(key, value) {
     return { ok: false, error: e.message };
   } finally {
     try { lock.releaseLock(); } catch (ignore) {}
+  }
+}
+
+function saveTotalBudget(val) {
+  return saveSetting('total_budget', String(Number(val) || 0));
+}
+
+function loadBudgetSettings() {
+  try {
+    var sheet = getOrCreateSettingsSheet();
+    var lastRow = sheet.getLastRow();
+    var result = {};
+    if (lastRow > 1) {
+      var data = sheet.getRange(2, 1, lastRow - 1, 2).getValues();
+      for (var i = 0; i < data.length; i++) {
+        var key = String(data[i][0]);
+        var val = data[i][1];
+        if (key === 'total_budget') result.total_budget = Number(val) || 0;
+        if (key === 'budget_categories') {
+          try { result.budget_categories = JSON.parse(val); } catch(e) {}
+        }
+      }
+    }
+    return { ok: true, data: result };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
+
+function saveBudgetCategories(categories) {
+  try {
+    var json = JSON.stringify(categories || []);
+    return saveSetting('budget_categories', json);
+  } catch (e) {
+    return { ok: false, error: e.message };
   }
 }
 
@@ -690,8 +766,10 @@ function loadAppData() {
     for (var i = 1; i < data.length; i++) {
       var key = data[i][0];
       var val = data[i][1];
-      if (key === 'budget') {
-         result.budget = Number(val);
+      if (key === 'budget' || key === 'total_budget') {
+         result.total_budget = Number(val);
+      } else if (key === 'budget_categories') {
+         try { result.budget_categories = JSON.parse(val); } catch(e) {}
       } else if (key === 'packing_list') {
          try {
            result.packing_list = JSON.parse(val);
@@ -703,6 +781,63 @@ function loadAppData() {
     return { ok: true, data: result };
   } catch (e) {
     Logger.log('loadAppData error: ' + e.stack);
+    return { ok: false, error: e.message };
+  }
+}
+
+function savePackingList(packingList) {
+  var lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(10000);
+    var ss = getSpreadsheet_();
+    var appDataSheet = ss.getSheetByName(APP_DATA_SHEET_NAME);
+    if (!appDataSheet) { initAppDataDB(); appDataSheet = ss.getSheetByName(APP_DATA_SHEET_NAME); }
+    var data = appDataSheet.getDataRange().getValues();
+    var found = false;
+    for (var i = 1; i < data.length; i++) {
+      if (data[i][0] === 'packing_list') {
+        appDataSheet.getRange(i + 1, 2).setValue(JSON.stringify(packingList));
+        found = true; break;
+      }
+    }
+    if (!found) {
+      appDataSheet.appendRow(['packing_list', JSON.stringify(packingList)]);
+    }
+    SpreadsheetApp.flush();
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  } finally {
+    try { lock.releaseLock(); } catch (ignore) {}
+  }
+}
+
+function saveDaysCustom(daysState) {
+  var lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(10000);
+    var result = saveSetting('days_custom', JSON.stringify(daysState));
+    return result;
+  } catch (e) {
+    return { ok: false, error: e.message };
+  } finally {
+    try { lock.releaseLock(); } catch (ignore) {}
+  }
+}
+
+function loadDaysFromSheets_() {
+  try {
+    var sheet = getOrCreateSettingsSheet();
+    var lastRow = sheet.getLastRow();
+    if (lastRow <= 1) return { ok: true, data: null };
+    var data = sheet.getRange(2, 1, lastRow - 1, 2).getValues();
+    for (var i = 0; i < data.length; i++) {
+      if (String(data[i][0]) === 'days_custom') {
+        try { return { ok: true, data: JSON.parse(data[i][1]) }; } catch(e) {}
+      }
+    }
+    return { ok: true, data: null };
+  } catch (e) {
     return { ok: false, error: e.message };
   }
 }
