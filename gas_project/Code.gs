@@ -21,6 +21,19 @@ var STOP_CATALOG = {
 function doGet(e) {
   // GitHub Pages API mode: ?action=fn&args=[]&callback=cb (JSONP)
   if (e && e.parameter && e.parameter.action) {
+    // Special case: markReminderDone via email link — returns a nice HTML confirmation page
+    if (e.parameter.action === 'markReminderDone' && e.parameter.id) {
+      var remId = e.parameter.id;
+      var res = markReminderDoneFirestore_(remId);
+      var reminderTitle = getReminderTitle_(remId);
+      var html = '<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{background:#040D18;color:#F1F5F9;font-family:Arial,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;direction:rtl;} .card{background:rgba(255,255,255,0.07);border-radius:20px;padding:32px;text-align:center;max-width:400px;}</style></head><body><div class="card">'
+        + '<div style="font-size:48px;margin-bottom:16px;">✅</div>'
+        + '<h2 style="margin:0 0 8px;">בוצע!</h2>'
+        + '<p style="color:rgba(241,245,249,0.6);margin:0 0 20px;">' + (reminderTitle || remId) + '</p>'
+        + '<p style="font-size:13px;color:rgba(241,245,249,0.4);">הסטטוס עודכן באפליקציה</p>'
+        + '</div></body></html>';
+      return HtmlService.createHtmlOutput(html).setTitle('בוצע!');
+    }
     try {
       var action = e.parameter.action;
       var args = [];
@@ -69,6 +82,7 @@ function dispatch_(action, args) {
     case 'saveDaysCustom':      return saveSetting('days_custom', JSON.stringify(args[0]));
     case 'loadDaysFromSheets':  return loadDaysFromSheets_();
     case 'healthCheck':         return healthCheck();
+    case 'markReminderDone':    return markReminderDoneFirestore_(args[0]);
     default:                    return {ok:false,error:'Unknown: '+action};
   }
 }
@@ -890,6 +904,38 @@ var REMINDERS_DEF = [
   { id:'r17', emoji:'🌤️', title:'בדיקת תחזית מזג אוויר לפראג', deadline:'2026-08-04', day:'4 ימים לפני', url:'', priority:'logistics' }
 ];
 
+var GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxbuSwh_YysA1cY_XraQDaxDK5Tudq9THc9pZw4ciRB3Dl_KShEmNP0C39yHreXKQDg/exec';
+
+function getReminderTitle_(id) {
+  for (var i = 0; i < REMINDERS_DEF.length; i++) {
+    if (REMINDERS_DEF[i].id === id) return REMINDERS_DEF[i].emoji + ' ' + REMINDERS_DEF[i].title;
+  }
+  return id;
+}
+
+function markReminderDoneFirestore_(remId) {
+  try {
+    var token = getFirestoreToken_();
+    // Read current remindersDone
+    var doc = getFirestoreDoc_('appdata', 'main');
+    var done = {};
+    if (doc && doc.fields && doc.fields['remindersDone']) {
+      try { done = JSON.parse(doc.fields['remindersDone'].stringValue || '{}'); } catch(e) {}
+    }
+    done[remId] = true;
+    // Write back
+    var url = FIRESTORE_API + 'appdata/main?updateMask.fieldPaths=remindersDone';
+    var body = { fields: { remindersDone: { stringValue: JSON.stringify(done) } } };
+    UrlFetchApp.fetch(url, {
+      method: 'PATCH',
+      headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      payload: JSON.stringify(body),
+      muteHttpExceptions: true
+    });
+    return { ok: true };
+  } catch(e) { return { ok: false, error: e.message }; }
+}
+
 function getFirestoreToken_() {
   return ScriptApp.getOAuthToken();
 }
@@ -942,10 +988,16 @@ function buildReminderEmailHtml_(today, pending, packingStats, daysLeft) {
       var dl = new Date(r.deadline);
       var diff = Math.ceil((dl - today) / 86400000);
       var urgencyText = diff < 0 ? '⚠️ עבר המועד!' : diff === 0 ? '⚠️ היום!' : diff + ' ימים';
-      return '<tr><td style="padding:10px 12px;border-bottom:1px solid #1e2a3a;">' +
+      var doneUrl = GAS_WEBAPP_URL + '?action=markReminderDone&id=' + r.id;
+      return '<tr><td style="padding:12px 14px;border-bottom:1px solid #1e2a3a;">' +
+        '<div style="display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap;">' +
+        '<div style="flex:1;">' +
         r.emoji + ' <strong>' + r.title + '</strong>' +
         '<br><span style="font-size:12px;color:#94a3b8;">📅 ' + r.day + ' · דדליין: ' + r.deadline.split('-').reverse().join('/') + ' · ' + urgencyText + '</span>' +
         (r.url ? '<br><a href="' + r.url + '" style="font-size:12px;color:#818cf8;">🔗 לינק להזמנה</a>' : '') +
+        '</div>' +
+        '<a href="' + doneUrl + '" style="display:inline-block;background:#16a34a;color:white;text-decoration:none;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:bold;white-space:nowrap;margin-top:2px;">✅ בוצע</a>' +
+        '</div>' +
         '</td></tr>';
     }).join('');
     return '<h3 style="color:' + color + ';margin:20px 0 8px;">' + title + '</h3>' +
