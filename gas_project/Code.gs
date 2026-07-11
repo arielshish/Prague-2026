@@ -1185,7 +1185,17 @@ function testMailOnly() {
 
 function sendTestReminderAction_() {
   try {
-    sendDailyReminders();
+    var today = new Date(); today.setHours(0,0,0,0);
+    var daysLeft = Math.ceil((TRIP_START - today) / 86400000);
+    var done = getRemindersDone_();
+    var pending = REMINDERS_DEF.filter(function(r) { return !done[r.id]; });
+    if (!pending.length) { return { ok: true, info: 'כל התזכורות בוצעו' }; }
+    var packingStats = getPackingStats_();
+    var html = buildReminderEmailHtml_(today, pending, packingStats, daysLeft);
+    var subject = '🔔 פראג 2026 — תזכורות (' + daysLeft + ' ימים לטיסה, ' + pending.length + ' פריטים)';
+    FAMILY_EMAILS.forEach(function(email) {
+      MailApp.sendEmail({ to: email, subject: subject, htmlBody: html });
+    });
     return { ok: true };
   } catch(e) { return { ok: false, error: e.message }; }
 }
