@@ -73,71 +73,227 @@
   .nav-map-btn{display:inline-block;background:rgba(255,255,255,0.10);color:rgba(241,245,249,0.78);border:1px solid rgba(255,255,255,0.15);border-radius:9px;padding:5px 12px;font-size:11px;font-weight:700;text-decoration:none;font-family:'Rubik',Arial,sans-serif;}
   .tip-pill{background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:7px 11px;font-size:11px;color:#FCD34D;}
 </style>
+<!-- Firebase SDK (compat mode) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
-// GitHub Pages GAS mock — uses JSONP to bypass CORS on GAS API calls
+// Firebase Firestore polyfill — replaces GAS/JSONP backend
 (function() {
-  var GAS_API_URL = 'https://script.google.com/macros/s/AKfycbxbuSwh_YysA1cY_XraQDaxDK5Tudq9THc9pZw4ciRB3Dl_KShEmNP0C39yHreXKQDg/exec';
-  var ALL_FNS = [
-    'loadExpenses','addExpense','updateExpense','deleteExpense','clearExpenses','importExpenses',
-    'saveSetting','loadSettings',
-    'saveTotalBudget','loadBudgetSettings','saveBudgetCategories',
-    'syncBudgetFromSheets','syncChecklist','loadChecklist',
-    'loadItinerary','moveAttraction',
-    'loadAppData','saveAppData','savePackingList',
-    'saveDaysCustom','loadDaysFromSheets',
-    'healthCheck','getSummary'
-  ];
-  function jsonpOnce(fn, args, sc, fc, timeout) {
-    var cbName = '_gasCb' + Date.now() + Math.floor(Math.random() * 1e6);
-    var script = document.createElement('script');
-    var done = false;
-    var timer = setTimeout(function() {
-      if (done) return; done = true;
-      cleanup(); if (fc) fc(new Error('timeout'));
-    }, timeout || 60000);
-    function cleanup() {
-      clearTimeout(timer);
-      delete window[cbName];
-      if (script.parentNode) script.parentNode.removeChild(script);
-    }
-    window[cbName] = function(data) {
-      if (done) return; done = true;
-      cleanup(); if (sc) sc(data);
-    };
-    script.onerror = function() {
-      if (done) return; done = true;
-      cleanup(); if (fc) fc(new Error('JSONP error'));
-    };
-    script.src = GAS_API_URL +
-      '?action=' + encodeURIComponent(fn) +
-      '&args=' + encodeURIComponent(JSON.stringify(args)) +
-      '&callback=' + cbName;
-    document.head.appendChild(script);
-  }
-  function jsonpCall(fn, args, sc, fc) {
-    // try once; on failure retry once after 3s
-    jsonpOnce(fn, args, sc, function(err) {
-      setTimeout(function() {
-        jsonpOnce(fn, args, sc, fc);
-      }, 3000);
-    });
-  }
-  // warmup: fire a lightweight call on load to wake GAS before user interactions
-  window.addEventListener('load', function() {
-    setTimeout(function() {
-      jsonpOnce('healthCheck', [], null, null, 90000);
-    }, 500);
-  });
+  var firebaseConfig = {
+    apiKey: "AIzaSyAF9QNVV5LZNNRlxS5MNT37_FhF6kh2nBY",
+    authDomain: "prague2026.firebaseapp.com",
+    projectId: "prague2026",
+    storageBucket: "prague2026.firebasestorage.app",
+    messagingSenderId: "818638622394",
+    appId: "1:818638622394:web:23e76e00310a301c863c83"
+  };
+  firebase.initializeApp(firebaseConfig);
+  var db = firebase.firestore();
+
   function makeRunner(sc, fc) {
     var runner = {
-      withSuccessHandler: function(cb) { return makeRunner(cb, fc); },
-      withFailureHandler: function(cb) { return makeRunner(sc, cb); }
+      _sc: sc,
+      _fc: fc,
+      withSuccessHandler: function(cb) { return makeRunner(cb, this._fc); },
+      withFailureHandler: function(cb) { return makeRunner(this._sc, cb); },
+
+      healthCheck: function() {
+        var _sc = this._sc, _fc = this._fc;
+        Promise.resolve({ok: true}).then(function(r){ if(_sc) _sc(r); }).catch(function(e){ if(_fc) _fc(e); });
+      },
+
+      loadExpenses: function() {
+        var _sc = this._sc, _fc = this._fc;
+        db.collection('expenses').orderBy('timestamp', 'desc').get()
+          .then(function(snap) {
+            var arr = [];
+            snap.forEach(function(d) { arr.push(Object.assign({id: d.id}, d.data())); });
+            if (_sc) _sc(arr);
+          }).catch(function(e){ if(_fc) _fc(e); });
+      },
+
+      addExpense: function(obj) {
+        var _sc = this._sc, _fc = this._fc;
+        if (!obj.timestamp) obj.timestamp = Date.now();
+        db.collection('expenses').add(obj)
+          .then(function(ref){ if(_sc) _sc({ok:true, id:ref.id}); })
+          .catch(function(e){ if(_fc) _fc(e); });
+      },
+
+      updateExpense: function(id, obj) {
+        var _sc = this._sc, _fc = this._fc;
+        db.collection('expenses').doc(id).update(obj)
+          .then(function(){ if(_sc) _sc({ok:true}); })
+          .catch(function(e){ if(_fc) _fc(e); });
+      },
+
+      deleteExpense: function(id) {
+        var _sc = this._sc, _fc = this._fc;
+        db.collection('expenses').doc(id).delete()
+          .then(function(){ if(_sc) _sc({ok:true}); })
+          .catch(function(e){ if(_fc) _fc(e); });
+      },
+
+      clearExpenses: function() {
+        var _sc = this._sc, _fc = this._fc;
+        db.collection('expenses').get().then(function(snap) {
+          var batch = db.batch();
+          snap.forEach(function(d){ batch.delete(d.ref); });
+          return batch.commit();
+        }).then(function(){ if(_sc) _sc({ok:true}); })
+          .catch(function(e){ if(_fc) _fc(e); });
+      },
+
+      importExpenses: function(arr) {
+        var _sc = this._sc, _fc = this._fc;
+        var batch = db.batch();
+        (arr || []).forEach(function(obj) {
+          if (!obj.timestamp) obj.timestamp = Date.now();
+          batch.set(db.collection('expenses').doc(), obj);
+        });
+        batch.commit()
+          .then(function(){ if(_sc) _sc({ok:true}); })
+          .catch(function(e){ if(_fc) _fc(e); });
+      },
+
+      saveSetting: function(key, val) {
+        var _sc = this._sc, _fc = this._fc;
+        var data = {};
+        data[key] = val;
+        db.collection('settings').doc('main').set(data, {merge: true})
+          .then(function(){ if(_sc) _sc({ok:true}); })
+          .catch(function(e){ if(_fc) _fc(e); });
+      },
+
+      loadSettings: function() {
+        var _sc = this._sc, _fc = this._fc;
+        db.collection('settings').doc('main').get()
+          .then(function(d){ if(_sc) _sc(d.exists ? d.data() : {}); })
+          .catch(function(e){ if(_fc) _fc(e); });
+      },
+
+      saveTotalBudget: function(val) {
+        var _sc = this._sc, _fc = this._fc;
+        db.collection('settings').doc('main').set({total_budget: String(val)}, {merge: true})
+          .then(function(){ if(_sc) _sc({ok:true}); })
+          .catch(function(e){ if(_fc) _fc(e); });
+      },
+
+      saveBudgetCategories: function(cats) {
+        var _sc = this._sc, _fc = this._fc;
+        db.collection('settings').doc('main').set({budget_categories: JSON.stringify(cats)}, {merge: true})
+          .then(function(){ if(_sc) _sc({ok:true}); })
+          .catch(function(e){ if(_fc) _fc(e); });
+      },
+
+      loadBudgetSettings: function() {
+        var _sc = this._sc, _fc = this._fc;
+        db.collection('settings').doc('main').get()
+          .then(function(d) {
+            var data = d.exists ? d.data() : {};
+            if (_sc) _sc({total_budget: data.total_budget || '', budget_categories: data.budget_categories || ''});
+          }).catch(function(e){ if(_fc) _fc(e); });
+      },
+
+      syncBudgetFromSheets: function() {
+        var _sc = this._sc, _fc = this._fc;
+        db.collection('settings').doc('main').get()
+          .then(function(d) {
+            var data = d.exists ? d.data() : {};
+            if (_sc) _sc({total_budget: data.total_budget || '', budget_categories: data.budget_categories || ''});
+          }).catch(function(e){ if(_fc) _fc(e); });
+      },
+
+      savePackingList: function(list) {
+        var _sc = this._sc, _fc = this._fc;
+        db.collection('packing').doc('list').set({items: list})
+          .then(function(){ if(_sc) _sc({ok:true}); })
+          .catch(function(e){ if(_fc) _fc(e); });
+      },
+
+      loadChecklist: function() {
+        var _sc = this._sc, _fc = this._fc;
+        db.collection('packing').doc('list').get()
+          .then(function(d){ if(_sc) _sc(d.exists ? d.data() : {items:[]}); })
+          .catch(function(e){ if(_fc) _fc(e); });
+      },
+
+      syncChecklist: function() {
+        var _sc = this._sc, _fc = this._fc;
+        db.collection('packing').doc('list').get()
+          .then(function(d){ if(_sc) _sc(d.exists ? d.data() : {items:[]}); })
+          .catch(function(e){ if(_fc) _fc(e); });
+      },
+
+      loadAppData: function(key) {
+        var _sc = this._sc, _fc = this._fc;
+        db.collection('appdata').doc('main').get()
+          .then(function(d) {
+            var data = d.exists ? d.data() : {};
+            if (_sc) _sc(key ? (data[key] !== undefined ? data[key] : null) : data);
+          }).catch(function(e){ if(_fc) _fc(e); });
+      },
+
+      saveAppData: function(key, val) {
+        var _sc = this._sc, _fc = this._fc;
+        var data = {};
+        data[key] = val;
+        db.collection('appdata').doc('main').set(data, {merge: true})
+          .then(function(){ if(_sc) _sc({ok:true}); })
+          .catch(function(e){ if(_fc) _fc(e); });
+      },
+
+      loadItinerary: function() {
+        var _sc = this._sc, _fc = this._fc;
+        db.collection('itinerary').doc('data').get()
+          .then(function(d){ if(_sc) _sc(d.exists ? d.data() : null); })
+          .catch(function(e){ if(_fc) _fc(e); });
+      },
+
+      loadDaysFromSheets: function() {
+        var _sc = this._sc, _fc = this._fc;
+        db.collection('itinerary').doc('data').get()
+          .then(function(d){ if(_sc) _sc(d.exists ? d.data() : null); })
+          .catch(function(e){ if(_fc) _fc(e); });
+      },
+
+      saveDaysCustom: function(data) {
+        var _sc = this._sc, _fc = this._fc;
+        db.collection('itinerary').doc('data').set(data)
+          .then(function(){ if(_sc) _sc({ok:true}); })
+          .catch(function(e){ if(_fc) _fc(e); });
+      },
+
+      moveAttraction: function(args) {
+        var _sc = this._sc, _fc = this._fc;
+        // args: {fromDay, toDay, attractionIndex, targetIndex}
+        db.collection('itinerary').doc('data').get()
+          .then(function(d) {
+            if (!d.exists) { if(_sc) _sc({ok:true}); return; }
+            var data = d.data();
+            // simple pass-through update — app will re-save full data via saveDaysCustom
+            if (_sc) _sc({ok:true, data: data});
+          }).catch(function(e){ if(_fc) _fc(e); });
+      },
+
+      getSummary: function() {
+        var _sc = this._sc, _fc = this._fc;
+        db.collection('expenses').get()
+          .then(function(snap) {
+            var totalCzk = 0, totalIls = 0, count = 0;
+            snap.forEach(function(d) {
+              var e = d.data();
+              totalCzk += Number(e.czk) || 0;
+              totalIls += Number(e.ils) || 0;
+              count++;
+            });
+            if (_sc) _sc({total_czk: totalCzk, total_ils: totalIls, count: count, ok: true});
+          }).catch(function(e){ if(_fc) _fc(e); });
+      }
     };
-    ALL_FNS.forEach(function(fn) {
-      runner[fn] = function() { jsonpCall(fn, Array.prototype.slice.call(arguments), sc, fc); };
-    });
     return runner;
   }
+
   if (typeof window.google === 'undefined') window.google = {};
   if (!window.google.script) window.google.script = {};
   if (!window.google.script.run) window.google.script.run = makeRunner(null, null);
