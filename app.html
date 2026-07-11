@@ -94,7 +94,7 @@
     var timer = setTimeout(function() {
       if (done) return; done = true;
       cleanup(); if (fc) fc(new Error('timeout'));
-    }, 30000);
+    }, 60000);
     function cleanup() {
       clearTimeout(timer);
       delete window[cbName];
@@ -2527,7 +2527,7 @@ function saveBudgetFromModal() {
   if (isGas()) {
     google.script.run
       .withSuccessHandler(function() { toast('☁️ סונכרן לגיליון!'); })
-      .withFailureHandler(function() { toast('⚠️ שגיאה בשמירה לגיליון'); })
+      .withFailureHandler(function() {})
       .saveTotalBudget(totalVal);
     google.script.run
       .withFailureHandler(function() {})
