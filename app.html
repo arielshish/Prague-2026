@@ -1057,10 +1057,15 @@ function showAuthError(msg) {
       <p style="font-size:12px;color:rgba(241,245,249,0.5);margin-top:4px;">פראג 8–15 אוגוסט · עוד <span id="daysUntilTrip">?</span> ימים</p>
     </div>
 
-    <!-- Send email button -->
-    <button onclick="sendRemindersEmail()" style="width:100%;background:linear-gradient(135deg,#F4634A,#E85D04);color:white;border:0;border-radius:13px;padding:14px;font-weight:800;font-size:14px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;margin-bottom:16px;box-shadow:0 4px 14px rgba(244,99,74,0.3);">
-      📧 שלח סיכום תזכורות במייל לכל המשפחה
-    </button>
+    <!-- Send email buttons -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+      <button onclick="sendRemindersEmail()" style="background:linear-gradient(135deg,#F4634A,#E85D04);color:white;border:0;border-radius:13px;padding:13px 10px;font-weight:800;font-size:13px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;box-shadow:0 4px 14px rgba(244,99,74,0.3);">
+        📧 שלח מייל סיכום
+      </button>
+      <button onclick="triggerReminderEmail()" id="btnTriggerEmail" style="background:linear-gradient(135deg,#6366f1,#4f46e5);color:white;border:0;border-radius:13px;padding:13px 10px;font-weight:800;font-size:13px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;box-shadow:0 4px 14px rgba(99,102,241,0.3);">
+        🔔 שלח תזכורת עכשיו
+      </button>
+    </div>
 
     <!-- Filter tabs -->
     <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
@@ -1243,6 +1248,34 @@ function markReminderUndone(id) {
   renderReminders();
   google.script.run.withSuccessHandler(function(){}).withFailureHandler(function(){})
     .saveAppData('remindersDone', JSON.stringify(remindersDone));
+}
+
+var GAS_URL = 'https://script.google.com/macros/s/AKfycbxbuSwh_YysA1cY_XraQDaxDK5Tudq9THc9pZw4ciRB3Dl_KShEmNP0C39yHreXKQDg/exec';
+
+function triggerReminderEmail() {
+  var btn = document.getElementById('btnTriggerEmail');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ שולח...'; }
+  var script = document.createElement('script');
+  var cb = '_triggerCb' + Date.now();
+  window[cb] = function(result) {
+    delete window[cb];
+    try { document.head.removeChild(script); } catch(e) {}
+    if (btn) { btn.disabled = false; btn.textContent = '🔔 שלח תזכורת עכשיו'; }
+    if (result && result.ok) {
+      showToast('✅ מייל תזכורת נשלח לכל המשפחה!', 3000);
+    } else {
+      showToast('⚠️ שגיאה: ' + (result && result.error || 'נסה שוב'), 4000);
+    }
+  };
+  setTimeout(function() {
+    if (window[cb]) {
+      delete window[cb];
+      if (btn) { btn.disabled = false; btn.textContent = '🔔 שלח תזכורת עכשיו'; }
+      showToast('⏱️ GAS איטי — נסה שוב', 3000);
+    }
+  }, 30000);
+  script.src = GAS_URL + '?action=sendTestReminder&callback=' + cb;
+  document.head.appendChild(script);
 }
 
 function sendRemindersEmail() {

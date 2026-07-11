@@ -83,6 +83,7 @@ function dispatch_(action, args) {
     case 'loadDaysFromSheets':  return loadDaysFromSheets_();
     case 'healthCheck':         return healthCheck();
     case 'markReminderDone':    return markReminderDoneFirestore_(args[0]);
+    case 'sendTestReminder':    return sendTestReminderAction_();
     default:                    return {ok:false,error:'Unknown: '+action};
   }
 }
@@ -1075,6 +1076,13 @@ function testMailOnly() {
     body: 'אם הגיע — MailApp עובד!'
   });
   Logger.log('testMailOnly done');
+}
+
+function sendTestReminderAction_() {
+  try {
+    sendDailyReminders();
+    return { ok: true };
+  } catch(e) { return { ok: false, error: e.message }; }
 }
 
 // Test function — run once to verify email looks correct
