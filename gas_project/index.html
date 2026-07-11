@@ -6,6 +6,15 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>פראג 2026 - משפחת שיש</title>
+<script>
+// iOS/mobile redirect: GAS shows tiny iframe on mobile — redirect to GitHub Pages
+(function(){
+  var mob = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (mob) {
+    window.location.replace('https://arielshish.github.io/Prague-2026/app.html');
+  }
+})();
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
   @keyframes shimmer{0%,100%{opacity:1}50%{opacity:0.6}}
