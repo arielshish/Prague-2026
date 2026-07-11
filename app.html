@@ -350,28 +350,33 @@ function doGoogleLogin() {
   }
 }
 
+function showAuthError(msg) {
+  var err = document.getElementById('loginError');
+  if (err) { err.textContent = msg; err.style.display = 'block'; }
+}
+
 // Handle redirect result on page load
-auth.getRedirectResult().catch(function(e) {
-  if (e && e.code !== 'auth/no-current-user') {
-    var err = document.getElementById('loginError');
-    if (err) { err.textContent = 'שגיאה: ' + e.message; err.style.display = 'block'; }
+auth.getRedirectResult().then(function(result) {
+  if (result && result.user) {
+    // onAuthStateChanged handles the rest
   }
+}).catch(function(e) {
+  showAuthError('שגיאת כניסה: ' + (e.code || '') + ' — ' + e.message);
 });
 
 auth.onAuthStateChanged(function(user) {
   var loginScreen = document.getElementById('loginScreen');
   var appDiv = document.getElementById('app');
   if (user) {
-    if (ALLOWED_EMAILS.indexOf(user.email) === -1) {
+    if (!ALLOWED_EMAILS || ALLOWED_EMAILS.indexOf(user.email) === -1) {
       auth.signOut();
-      var err = document.getElementById('loginError');
       if (loginScreen) loginScreen.style.display = 'flex';
       if (appDiv) appDiv.style.display = 'none';
-      if (err) { err.textContent = 'אין הרשאה לחשבון זה: ' + user.email; err.style.display = 'block'; }
+      showAuthError('אין הרשאה לחשבון: ' + user.email);
       return;
     }
     if (loginScreen) loginScreen.style.display = 'none';
-    if (appDiv) appDiv.style.display = 'block';
+    if (appDiv) { appDiv.style.display = 'block'; appDiv.style.visibility = 'visible'; }
   } else {
     if (loginScreen) loginScreen.style.display = 'flex';
     if (appDiv) appDiv.style.display = 'none';
