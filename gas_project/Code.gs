@@ -42,7 +42,8 @@ function doGet(e) {
   getOrCreateChecklistSheet();
   return HtmlService.createHtmlOutputFromFile('index')
     .setTitle('פראג 2026 - משפחת שיש')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 
 function dispatch_(action, args) {
