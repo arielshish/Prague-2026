@@ -1302,14 +1302,41 @@ auth.onAuthStateChanged(function(user) {
     </div>
   </section>
 
+  <!-- ═══ REMINDERS TAB ═══ -->
+  <div id="reminders" class="tab">
+    <!-- Header -->
+    <div style="margin-bottom:16px;">
+      <h2 style="font-size:20px;font-weight:900;">🔔 תזכורות חשובות</h2>
+      <p style="font-size:12px;color:rgba(241,245,249,0.5);margin-top:4px;">פראג 8–15 אוגוסט · עוד <span id="daysUntilTrip">?</span> ימים</p>
+    </div>
+
+    <!-- Send email button -->
+    <button onclick="sendRemindersEmail()" style="width:100%;background:linear-gradient(135deg,#F4634A,#E85D04);color:white;border:0;border-radius:13px;padding:14px;font-weight:800;font-size:14px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;margin-bottom:16px;box-shadow:0 4px 14px rgba(244,99,74,0.3);">
+      📧 שלח סיכום תזכורות במייל לכל המשפחה
+    </button>
+
+    <!-- Filter tabs -->
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+      <button onclick="filterReminders('all')" id="rf-all" class="cat-chip" style="border-color:#F4634A;color:#F4634A;">הכל</button>
+      <button onclick="filterReminders('critical')" id="rf-critical" class="cat-chip">🔴 דחוף</button>
+      <button onclick="filterReminders('important')" id="rf-important" class="cat-chip">🟡 חשוב</button>
+      <button onclick="filterReminders('logistics')" id="rf-logistics" class="cat-chip">📋 לוגיסטיקה</button>
+      <button onclick="filterReminders('done')" id="rf-done" class="cat-chip">✅ בוצע</button>
+    </div>
+
+    <!-- Reminders list -->
+    <div id="remindersList"></div>
+  </div>
+
   <!-- ═══ NAV ═══ -->
-  <nav style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);height:76px;background:rgba(2,7,14,0.97);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-top:1px solid rgba(255,255,255,0.08);z-index:50;display:grid;grid-template-columns:repeat(6,1fr);">
+  <nav style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);height:76px;background:rgba(2,7,14,0.97);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-top:1px solid rgba(255,255,255,0.08);z-index:50;display:grid;grid-template-columns:repeat(7,1fr);">
     <button id="nav-home" style="border:0;background:transparent;color:#F4634A;font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">🏠</span>ראשי</button>
     <button id="nav-days" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">📅</span>ימים</button>
     <button id="nav-shopping" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">🛍️</span>קניות</button>
     <button id="nav-expenses" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">💰</span>הוצאות</button>
     <button id="nav-flights" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">✈️</span>טיסות</button>
     <button id="nav-pack" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">🧳</span>ציוד</button>
+    <button onclick="openTab('reminders')" id="nav-reminders" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">🔔</span>תזכורות</button>
   </nav>
 </div>
 
@@ -1783,7 +1810,7 @@ function isGas() {
 // ═══════════════════════════════════════════
 //  NAVIGATION
 // ═══════════════════════════════════════════
-var ALL_TABS = ['home','days','shopping','expenses','flights','restaurants','pack','info','guides','community','history','photodiary','lang'];
+var ALL_TABS = ['home','days','shopping','expenses','flights','restaurants','pack','info','guides','community','history','photodiary','lang','reminders'];
 
 function openTab(id) {
   ALL_TABS.forEach(function(name) {
@@ -1796,6 +1823,7 @@ function openTab(id) {
   if (id === 'days') renderDays();
   if (id === 'pack') loadPack();
   if (id === 'restaurants') renderRestaurants();
+  if (id === 'reminders') initReminders();
 }
 
 // ═══════════════════════════════════════════
@@ -3341,6 +3369,7 @@ function initDesktopLayout() {
     { id:'history',    icon:'📜', label:'היסטוריה' },
     { id:'photodiary', icon:'📸', label:'יומן תמונות' },
     { id:'lang',       icon:'🗣️', label:'שפה' },
+    { id:'reminders',  icon:'🔔', label:'תזכורות' },
   ];
 
   var logoDiv = document.createElement('div');
