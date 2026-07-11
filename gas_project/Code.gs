@@ -83,6 +83,8 @@ function dispatch_(action, args) {
     case 'loadDaysFromSheets':  return loadDaysFromSheets_();
     case 'healthCheck':         return healthCheck();
     case 'markReminderDone':    return markReminderDoneFirestore_(args[0]);
+    case 'saveRemindersDone':   return saveRemindersDone_(args[0]);
+    case 'loadRemindersDone':   return loadRemindersDone_();
     case 'sendTestReminder':    return sendTestReminderAction_();
     default:                    return {ok:false,error:'Unknown: '+action};
   }
@@ -1002,6 +1004,32 @@ function markReminderDoneFirestore_(remId) {
     });
     return { ok: true };
   } catch(e) { return { ok: false, error: e.message }; }
+}
+
+function saveRemindersDone_(jsonStr) {
+  try {
+    var token = getFirestoreToken_();
+    var url = FIRESTORE_API + 'appdata/main?updateMask.fieldPaths=remindersDone';
+    var body = { fields: { remindersDone: { stringValue: jsonStr } } };
+    UrlFetchApp.fetch(url, {
+      method: 'PATCH',
+      headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      payload: JSON.stringify(body),
+      muteHttpExceptions: true
+    });
+    return { ok: true };
+  } catch(e) { return { ok: false, error: e.message }; }
+}
+
+function loadRemindersDone_() {
+  try {
+    var doc = getFirestoreDoc_('appdata', 'main');
+    var done = {};
+    if (doc && doc.fields && doc.fields['remindersDone']) {
+      try { done = JSON.parse(doc.fields['remindersDone'].stringValue || '{}'); } catch(e) {}
+    }
+    return { ok: true, remindersDone: JSON.stringify(done) };
+  } catch(e) { return { ok: true, remindersDone: '{}' }; }
 }
 
 function getFirestoreToken_() {

@@ -1244,12 +1244,14 @@ function initReminders() {
 
   google.script.run
     .withSuccessHandler(function(data) {
-      remindersDone = (data && data.remindersDone) ? JSON.parse(data.remindersDone || '{}') : {};
+      if (data && data.ok && data.remindersDone) {
+        try { remindersDone = JSON.parse(data.remindersDone); } catch(e) {}
+      }
       renderReminders();
       checkOverdueReminders();
     })
     .withFailureHandler(function() { renderReminders(); checkOverdueReminders(); })
-    .loadAppData('remindersDone');
+    .loadRemindersDone();
 }
 
 function filterReminders(f) {
@@ -1361,9 +1363,9 @@ function markReminderDone(id) {
   renderReminders();
   showToast('⏳ שומר...', 1000);
   google.script.run
-    .withSuccessHandler(function(){ showToast('✅ סומן כבוצע ונשמר', 2000); })
+    .withSuccessHandler(function(r){ showToast(r&&r.ok ? '✅ סומן כבוצע ונשמר' : '⚠️ שגיאת שמירה', 2000); })
     .withFailureHandler(function(e){ showToast('⚠️ שגיאת שמירה: ' + (e&&e.message||e), 3000); })
-    .saveAppData('remindersDone', JSON.stringify(remindersDone));
+    .saveRemindersDone(JSON.stringify(remindersDone));
 }
 
 function markReminderUndone(id) {
@@ -1371,9 +1373,9 @@ function markReminderUndone(id) {
   renderReminders();
   showToast('⏳ שומר...', 1000);
   google.script.run
-    .withSuccessHandler(function(){ showToast('↩️ בוטל ונשמר', 2000); })
+    .withSuccessHandler(function(r){ showToast(r&&r.ok ? '↩️ בוטל ונשמר' : '⚠️ שגיאת שמירה', 2000); })
     .withFailureHandler(function(e){ showToast('⚠️ שגיאת שמירה: ' + (e&&e.message||e), 3000); })
-    .saveAppData('remindersDone', JSON.stringify(remindersDone));
+    .saveRemindersDone(JSON.stringify(remindersDone));
 }
 
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbxbuSwh_YysA1cY_XraQDaxDK5Tudq9THc9pZw4ciRB3Dl_KShEmNP0C39yHreXKQDg/exec';
