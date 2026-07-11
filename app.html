@@ -2184,30 +2184,22 @@ function loadPackLocal() {
 function savePackLocal(state) { localStorage.setItem('prague_pack_v2', JSON.stringify(state)); }
 
 function loadPack() {
+  // תמיד מציג מקומי מיידית
+  PACK_STATE = loadPackLocal() || getDefaultPackCats();
+  renderPack();
   if (isGas()) {
     google.script.run
       .withSuccessHandler(function(r) {
         var raw = r && r.ok && r.data && r.data.packing_list;
-        // פורמט חדש = מערך של קטגוריות עם .items
         var isNewFormat = raw && Array.isArray(raw) && raw.length > 0 && raw[0].items;
         if (isNewFormat) {
           PACK_STATE = raw;
           savePackLocal(PACK_STATE);
-        } else {
-          // פורמט ישן מ-Sheets (או ריק) — מחזירים defaults ושומרים
-          PACK_STATE = loadPackLocal() || getDefaultPackCats();
-          savePack(); // שומר פורמט חדש ל-Sheets
+          renderPack();
         }
-        renderPack();
       })
-      .withFailureHandler(function() {
-        PACK_STATE = loadPackLocal() || getDefaultPackCats();
-        renderPack();
-      })
+      .withFailureHandler(function() {})
       .loadAppData();
-  } else {
-    PACK_STATE = loadPackLocal() || getDefaultPackCats();
-    renderPack();
   }
 }
 
@@ -2216,7 +2208,7 @@ function savePack() {
   if (isGas()) {
     google.script.run
       .withSuccessHandler(function(r) { if (r && r.ok) toast('☁️ צ\'ק-ליסט סונכרן!'); })
-      .withFailureHandler(function() { toast('⚠️ שמור מקומית בלבד'); })
+      .withFailureHandler(function() {})
       .savePackingList(PACK_STATE);
   }
 }
@@ -2300,22 +2292,21 @@ function closePackItemModal() { var m = qs('packItemModal'); if (m) m.style.disp
 // ═══════════════════════════════════════════
 function loadExpenses() {
   var badge = qs('syncBadge');
+  // תמיד טוען מקומי קודם לתגובה מיידית
+  loadLocal();
   if (isGas()) {
     if (badge) badge.textContent = '🔄 מסנכרן';
     google.script.run
       .withSuccessHandler(function(rows) {
         EXPENSES = rows || [];
+        saveLocal();
         if (badge) { badge.textContent = '✅ מסונכרן'; badge.style.color = '#6EE7B7'; badge.style.borderColor = 'rgba(16,185,129,0.3)'; badge.style.background = 'rgba(16,185,129,0.1)'; }
         renderExpenses();
       })
       .withFailureHandler(function() {
-        if (badge) badge.textContent = '⚠️ שגיאה';
-        toast('שגיאה בטעינה — מציג נתונים מקומיים');
-        loadLocal();
+        if (badge) { badge.textContent = '⚠️ מקומי'; badge.style.color = '#FCD34D'; }
       })
       .loadExpenses();
-  } else {
-    loadLocal();
   }
 }
 

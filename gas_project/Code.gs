@@ -63,6 +63,7 @@ function dispatch_(action, args) {
     case 'loadItinerary':       return loadItinerary();
     case 'moveAttraction':      return moveAttraction(args[0],args[1]);
     case 'loadAppData':         return loadAppData();
+    case 'saveAppData':         return saveAppData(args[0], args[1]);
     case 'savePackingList':     return savePackingList_(args[0]);
     case 'saveDaysCustom':      return saveSetting('days_custom', JSON.stringify(args[0]));
     case 'loadDaysFromSheets':  return loadDaysFromSheets_();
@@ -72,7 +73,29 @@ function dispatch_(action, args) {
 }
 
 function savePackingList_(list) {
-  return saveSetting('packing_list', JSON.stringify(list));
+  var lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(10000);
+    var ss = getSpreadsheet_();
+    var appDataSheet = ss.getSheetByName(APP_DATA_SHEET_NAME);
+    if (!appDataSheet) { initAppDataDB(); appDataSheet = ss.getSheetByName(APP_DATA_SHEET_NAME); }
+    var data = appDataSheet.getDataRange().getValues();
+    for (var i = 1; i < data.length; i++) {
+      if (String(data[i][0]) === 'packing_list') {
+        appDataSheet.getRange(i + 1, 2).setValue(JSON.stringify(list));
+        SpreadsheetApp.flush();
+        return { ok: true };
+      }
+    }
+    appDataSheet.appendRow(['packing_list', JSON.stringify(list)]);
+    SpreadsheetApp.flush();
+    return { ok: true };
+  } catch(e) {
+    Logger.log('savePackingList error: ' + e.stack);
+    return { ok: false, error: e.message };
+  } finally {
+    try { lock.releaseLock(); } catch(ignore) {}
+  }
 }
 
 function saveTotalBudget(val) {
