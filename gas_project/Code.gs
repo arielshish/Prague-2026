@@ -74,6 +74,25 @@ function savePackingList_(list) {
   return saveSetting('packing_list', JSON.stringify(list));
 }
 
+function saveTotalBudget(val) {
+  return saveSetting('total_budget', String(val));
+}
+
+function saveBudgetCategories(cats) {
+  return saveSetting('budget_categories', JSON.stringify(cats));
+}
+
+function loadBudgetSettings() {
+  try {
+    var s = loadSettings();
+    return {
+      ok: true,
+      total_budget: s.total_budget ? Number(s.total_budget) : null,
+      budget_categories: s.budget_categories ? JSON.parse(s.budget_categories) : null
+    };
+  } catch(e) { return {ok:false,error:e.message}; }
+}
+
 function loadDaysFromSheets_() {
   try {
     var sheet = getOrCreateSettingsSheet();
