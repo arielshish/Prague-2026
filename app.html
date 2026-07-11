@@ -79,6 +79,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script>
 // Firebase Firestore polyfill — replaces GAS/JSONP backend
+var auth, ALLOWED_EMAILS;
 (function() {
   var firebaseConfig = {
     apiKey: "AIzaSyAF9QNVV5LZNNRlxS5MNT37_FhF6kh2nBY",
@@ -90,8 +91,8 @@
   };
   firebase.initializeApp(firebaseConfig);
   var db = firebase.firestore();
-  var ALLOWED_EMAILS = ['arielshish@gmail.com','maridubi3@gmail.com','adiyasminshish@gmail.com','ariel.mariana.shish@gmail.com'];
-  var auth = firebase.auth();
+  ALLOWED_EMAILS = ['arielshish@gmail.com','maridubi3@gmail.com','adiyasminshish@gmail.com','ariel.mariana.shish@gmail.com'];
+  auth = firebase.auth();
 
   function makeRunner(sc, fc) {
     var runner = {
