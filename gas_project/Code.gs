@@ -18,87 +18,12 @@ var STOP_CATALOG = {
   'Palladium / מרכז העיר': { mapUrl: 'https://www.google.com/maps/place/Palladium+shopping+centre,+Prague', type: 'shopping' }
 };
 
-function doGet(e) {
-  if (e && e.parameter && e.parameter.action) {
-    return doApiGet_(e);
-  }
-  getOrCreateChecklistSheet();
+function doGet() {
+  getOrCreateChecklistSheet(); // Ensure the sheet is created immediately
   return HtmlService.createHtmlOutputFromFile('index')
     .setTitle('פראג 2026 - משפחת שיש')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-}
-
-function doApiGet_(e) {
-  try {
-    var action = e.parameter.action;
-    var args = [];
-    try { args = JSON.parse(e.parameter.args || '[]'); } catch(ignore) {}
-    var result = dispatchAction_(action, args);
-    var json = JSON.stringify(result);
-    var cb = e.parameter.callback;
-    if (cb) {
-      return ContentService
-        .createTextOutput(cb + '(' + json + ')')
-        .setMimeType(ContentService.MimeType.JAVASCRIPT);
-    }
-    return ContentService
-      .createTextOutput(json)
-      .setMimeType(ContentService.MimeType.JSON);
-  } catch (err) {
-    var errJson = JSON.stringify({ ok: false, error: err.message });
-    var cb2 = e.parameter.callback;
-    if (cb2) {
-      return ContentService
-        .createTextOutput(cb2 + '(' + errJson + ')')
-        .setMimeType(ContentService.MimeType.JAVASCRIPT);
-    }
-    return ContentService
-      .createTextOutput(errJson)
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-}
-
-function dispatchAction_(action, args) {
-  switch (action) {
-    case 'loadExpenses':        return loadExpenses();
-    case 'addExpense':          return addExpense(args[0], args[1], args[2], args[3]);
-    case 'updateExpense':       return updateExpense(args[0], args[1], args[2], args[3], args[4]);
-    case 'deleteExpense':       return deleteExpense(args[0]);
-    case 'clearExpenses':       return clearExpenses();
-    case 'importExpenses':      return importExpenses(args[0]);
-    case 'saveSetting':         return saveSetting(args[0], args[1]);
-    case 'loadSettings':        return loadSettings();
-    case 'saveTotalBudget':     return saveTotalBudget(args[0]);
-    case 'loadBudgetSettings':  return loadBudgetSettings();
-    case 'saveBudgetCategories':return saveBudgetCategories(args[0]);
-    case 'syncChecklist':       return syncChecklist(args[0]);
-    case 'loadChecklist':       return loadChecklist();
-    case 'loadItinerary':       return loadItinerary();
-    case 'moveAttraction':      return moveAttraction(args[0], args[1]);
-    case 'loadAppData':         return loadAppData();
-    case 'saveAppData':         return saveAppData(args[0], args[1]);
-    case 'savePackingList':     return savePackingList(args[0]);
-    case 'saveDaysCustom':      return saveDaysCustom(args[0]);
-    case 'loadDaysFromSheets':  return loadDaysFromSheets_();
-    case 'healthCheck':         return healthCheck();
-    case 'getSummary':          return getSummary();
-    default:                    return { ok: false, error: 'Unknown action: ' + action };
-  }
-}
-
-function doPost(e) {
-  try {
-    var body = JSON.parse(e.postData.contents);
-    var result = dispatchAction_(body.action, body.args || []);
-    return ContentService
-      .createTextOutput(JSON.stringify(result))
-      .setMimeType(ContentService.MimeType.JSON);
-  } catch (err) {
-    Logger.log('doPost error: ' + err.stack);
-    return ContentService
-      .createTextOutput(JSON.stringify({ ok: false, error: err.message }))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 
 function getSpreadsheet_() {
@@ -338,41 +263,6 @@ function saveSetting(key, value) {
     return { ok: false, error: e.message };
   } finally {
     try { lock.releaseLock(); } catch (ignore) {}
-  }
-}
-
-function saveTotalBudget(val) {
-  return saveSetting('total_budget', String(Number(val) || 0));
-}
-
-function loadBudgetSettings() {
-  try {
-    var sheet = getOrCreateSettingsSheet();
-    var lastRow = sheet.getLastRow();
-    var result = {};
-    if (lastRow > 1) {
-      var data = sheet.getRange(2, 1, lastRow - 1, 2).getValues();
-      for (var i = 0; i < data.length; i++) {
-        var key = String(data[i][0]);
-        var val = data[i][1];
-        if (key === 'total_budget') result.total_budget = Number(val) || 0;
-        if (key === 'budget_categories') {
-          try { result.budget_categories = JSON.parse(val); } catch(e) {}
-        }
-      }
-    }
-    return { ok: true, data: result };
-  } catch (e) {
-    return { ok: false, error: e.message };
-  }
-}
-
-function saveBudgetCategories(categories) {
-  try {
-    var json = JSON.stringify(categories || []);
-    return saveSetting('budget_categories', json);
-  } catch (e) {
-    return { ok: false, error: e.message };
   }
 }
 
@@ -800,10 +690,8 @@ function loadAppData() {
     for (var i = 1; i < data.length; i++) {
       var key = data[i][0];
       var val = data[i][1];
-      if (key === 'budget' || key === 'total_budget') {
-         result.total_budget = Number(val);
-      } else if (key === 'budget_categories') {
-         try { result.budget_categories = JSON.parse(val); } catch(e) {}
+      if (key === 'budget') {
+         result.budget = Number(val);
       } else if (key === 'packing_list') {
          try {
            result.packing_list = JSON.parse(val);
@@ -815,63 +703,6 @@ function loadAppData() {
     return { ok: true, data: result };
   } catch (e) {
     Logger.log('loadAppData error: ' + e.stack);
-    return { ok: false, error: e.message };
-  }
-}
-
-function savePackingList(packingList) {
-  var lock = LockService.getScriptLock();
-  try {
-    lock.waitLock(10000);
-    var ss = getSpreadsheet_();
-    var appDataSheet = ss.getSheetByName(APP_DATA_SHEET_NAME);
-    if (!appDataSheet) { initAppDataDB(); appDataSheet = ss.getSheetByName(APP_DATA_SHEET_NAME); }
-    var data = appDataSheet.getDataRange().getValues();
-    var found = false;
-    for (var i = 1; i < data.length; i++) {
-      if (data[i][0] === 'packing_list') {
-        appDataSheet.getRange(i + 1, 2).setValue(JSON.stringify(packingList));
-        found = true; break;
-      }
-    }
-    if (!found) {
-      appDataSheet.appendRow(['packing_list', JSON.stringify(packingList)]);
-    }
-    SpreadsheetApp.flush();
-    return { ok: true };
-  } catch (e) {
-    return { ok: false, error: e.message };
-  } finally {
-    try { lock.releaseLock(); } catch (ignore) {}
-  }
-}
-
-function saveDaysCustom(daysState) {
-  var lock = LockService.getScriptLock();
-  try {
-    lock.waitLock(10000);
-    var result = saveSetting('days_custom', JSON.stringify(daysState));
-    return result;
-  } catch (e) {
-    return { ok: false, error: e.message };
-  } finally {
-    try { lock.releaseLock(); } catch (ignore) {}
-  }
-}
-
-function loadDaysFromSheets_() {
-  try {
-    var sheet = getOrCreateSettingsSheet();
-    var lastRow = sheet.getLastRow();
-    if (lastRow <= 1) return { ok: true, data: null };
-    var data = sheet.getRange(2, 1, lastRow - 1, 2).getValues();
-    for (var i = 0; i < data.length; i++) {
-      if (String(data[i][0]) === 'days_custom') {
-        try { return { ok: true, data: JSON.parse(data[i][1]) }; } catch(e) {}
-      }
-    }
-    return { ok: true, data: null };
-  } catch (e) {
     return { ok: false, error: e.message };
   }
 }
