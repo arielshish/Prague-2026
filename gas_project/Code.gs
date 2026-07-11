@@ -18,12 +18,46 @@ var STOP_CATALOG = {
   'Palladium / מרכז העיר': { mapUrl: 'https://www.google.com/maps/place/Palladium+shopping+centre,+Prague', type: 'shopping' }
 };
 
+var ALLOWED_EMAILS = [
+  'arielshish@gmail.com',
+  'maridubi3@gmail.com',
+  'adiyasminshish@gmail.com',
+  'ariel.mariana.shish@gmail.com'
+];
+
+function isAllowed_() {
+  try {
+    var email = Session.getActiveUser().getEmail().toLowerCase();
+    for (var i = 0; i < ALLOWED_EMAILS.length; i++) {
+      if (ALLOWED_EMAILS[i].toLowerCase() === email) return true;
+    }
+    return false;
+  } catch (e) {
+    return false;
+  }
+}
+
 function doGet(e) {
-  getOrCreateChecklistSheet();
-  // API mode: ?action=functionName&args=JSON
+  // API mode: ?action=functionName&args=JSON (no auth check — GAS deployment handles it)
   if (e && e.parameter && e.parameter.action) {
     return doApiGet_(e);
   }
+
+  if (!isAllowed_()) {
+    var email = '';
+    try { email = Session.getActiveUser().getEmail(); } catch(ignore) {}
+    var html = '<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+      '<style>body{background:#040D18;color:#F1F5F9;font-family:Arial,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;text-align:center;}' +
+      '.box{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:40px 32px;max-width:340px;}' +
+      'h2{color:#F4634A;margin-bottom:12px;}p{color:rgba(241,245,249,0.6);font-size:14px;line-height:1.6;}</style></head>' +
+      '<body><div class="box"><div style="font-size:48px">🔒</div><h2>אין גישה</h2>' +
+      '<p>האפליקציה מוגבלת למשפחת שיש בלבד.</p>' +
+      (email ? '<p style="color:rgba(241,245,249,0.35);font-size:12px;">מחובר כ: ' + email + '</p>' : '') +
+      '</div></body></html>';
+    return HtmlService.createHtmlOutput(html).setTitle('אין גישה');
+  }
+
+  getOrCreateChecklistSheet();
   return HtmlService.createHtmlOutputFromFile('index')
     .setTitle('פראג 2026 - משפחת שיש')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
