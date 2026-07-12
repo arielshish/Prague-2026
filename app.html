@@ -1505,9 +1505,21 @@ var DAYS = [
    story:'היום הראשון לא נועד לכבוש את פראג. הוא נועד להיכנס אליה לאט — להגיע למלון, להוריד תיקים ולהרגיש את הקצב של העיר.',
    peak:'להגיע למלון ולסגור היום בארוחה רגועה בלי לחץ.',
    stops:[
-     {emoji:'🏨',name:'Comfort Hotel Prague City East',time:'60–90 דק׳',desc:"צ'ק אין, מקלחות, טעינת טלפונים",mapUrl:'https://www.google.com/maps/search/Comfort+Hotel+Prague+City+East'},
-     {emoji:'🚶',name:'סיבוב קצר באזור המלון',time:'30–45 דק׳',desc:'קניית מים, נשנושים, בדיקת תחנת מטרו',mapUrl:'https://www.google.com/maps/search/convenience+store+near+Comfort+Hotel+Prague'},
-     {emoji:'🍽️',name:'ארוחת ערב לפי כוח',time:'60–90 דק׳',desc:'Gran Fierro אם יש אנרגיה, קל ליד המלון אם עייפים',mapUrl:'https://www.google.com/maps/search/Gran+Fierro+Prague'}
+     {emoji:'🏨',name:'Comfort Hotel Prague City East',time:'60–90 דק׳',desc:"צ'ק אין, מקלחות, טעינת טלפונים",
+      details:"המלון ממוקם ברובע Žižkov, כ-10 דקות ממרכז פראג במטרו. מלון 4 כוכבים עם בריכה פנימית, מסעדה, בר וחדרים גדולים ונוחים. צ'ק אין מ-14:00, צ'ק אאוט עד 12:00.",
+      tips:['לבקש חדר גבוה לנוף עירוני','ניתן להשאיר מזוודות לפני צ׳ק אין','Wi-Fi חינם בכל החדרים','הבריכה פתוחה 07:00–22:00'],
+      booking:'לא נדרשת הזמנה מראש לכניסה — מספיק אישור ההזמנה הקיים.',
+      mapUrl:'https://www.google.com/maps/search/Comfort+Hotel+Prague+City+East'},
+     {emoji:'🚶',name:'סיבוב קצר באזור המלון',time:'30–45 דק׳',desc:'קניית מים, נשנושים, בדיקת תחנת מטרו',
+      details:'רחוב Seifertova ליד המלון — יש Albert Supermarket שקרוב, קיוסקים וקפה. שווה לאתר תחנת מטרו Žižkov ולהבין את הכיוונים לעיר.',
+      tips:['לקנות כרטיסי מטרו 24/48/72 שעות בתחנה — חוסך זמן','להוריד מפה אופליין (Google Maps) לפני יציאה','מים בסופר — 20–30 CZK, יקרים יותר בתיירות'],
+      booking:'ללא צורך.',
+      mapUrl:'https://www.google.com/maps/search/convenience+store+near+Comfort+Hotel+Prague'},
+     {emoji:'🍽️',name:'ארוחת ערב — Gran Fierro',time:'60–90 דק׳',desc:'Gran Fierro אם יש אנרגיה, קל ליד המלון אם עייפים',
+      details:'Gran Fierro — מסעדת בשרים ארגנטינאית מפורסמת. סטייקים מעולים, בשרים כשרים למהדרין. מחיר לאדם: 500–900 CZK. מיקום: ליד כיכר וינוהרדסקה.',
+      tips:['להזמין שולחן מראש — עמוס מאוד','אם עייפים מהנסיעה — אפשר לאכול בבית קפה ליד המלון','לשמור Gran Fierro לסוף הטיול אם אין כוח'],
+      booking:'מומלץ מאוד להזמין מראש — restaurants.granfierro.cz',
+      mapUrl:'https://www.google.com/maps/search/Gran+Fierro+Prague'}
    ],meals:{lunch:'כריך / פיצה / קפה ליד המלון',dinner:'Gran Fierro — בשרים, או ארוחה קלה'},
    tips:['לא לקבוע אטרקציה בתשלום ביום הגעה','להכין כתובת מלון Offline לפני הנחיתה','Bolt מהשדה: 400–700 CZK'],
    mapUrl:'https://www.google.com/maps/dir/Vaclav+Havel+Airport+Prague/Comfort+Hotel+Prague+City+East'},
@@ -1515,10 +1527,26 @@ var DAYS = [
    story:'זה היום שפראג מראה למה כולם מתאהבים בה. כיכר העיר, סמטאות האבן, השעון האסטרונומי, מוזיקאים ברחוב וגשר קארל.',
    peak:'לעמוד על גשר קארל לקראת שקיעה ולראות את הטירה נדלקת מעל העיר.',
    stops:[
-     {emoji:'⏰',name:'כיכר העיר העתיקה',time:'60–90 דק׳',desc:'השעון האסטרונומי, מופעי רחוב, צילום',mapUrl:'https://www.google.com/maps/place/Old+Town+Square,+Prague'},
-     {emoji:'🏘️',name:'סמטאות העיר העתיקה',time:'45–60 דק׳',desc:'הליכה רגועה בלי יעד קשיח',mapUrl:'https://www.google.com/maps/place/Celetná,+Prague'},
-     {emoji:'🌉',name:'גשר קארל',time:'45–60 דק׳',desc:'הגעה לפני שקיעה לצילומים ולנוף',mapUrl:'https://www.google.com/maps/place/Charles+Bridge,+Prague'},
-     {emoji:'🚤',name:'שייט בוולטאווה',time:'45–60 דק׳',desc:'אופציונלי — שייט ערב רגוע',mapUrl:'https://www.google.com/maps/search/Vltava+river+cruise+Prague'}
+     {emoji:'⏰',name:'כיכר העיר העתיקה והשעון האסטרונומי',time:'60–90 דק׳',desc:'השעון האסטרונומי, מופעי רחוב, צילום',
+      details:'כיכר העיר העתיקה (Staroměstské náměstí) היא לב פראג. השעון האסטרונומי (Orloj) — בנוי ב-1410, אחד מהיפים בעולם. בכל שעה עגולה פותחות הדלתות ו-12 השליחים מצעדים. יש גם כנסיית טין המרשימה ועמוד מריה.',
+      tips:['השעון מציג הצגה בכל שעה עגולה — לתכנן בהתאם','לעלות למגדל השעון לנוף (200 CZK)','כייסים רבים — תיק קדימה, ארנק בכיס קדמי','לאכול בכיכר עצמה — יקר. לצאת לסמטאות'],
+      booking:'עליה למגדל — כרטיס בקופה, ללא הזמנה.',
+      mapUrl:'https://www.google.com/maps/place/Old+Town+Square,+Prague'},
+     {emoji:'🏘️',name:'סמטאות העיר העתיקה',time:'45–60 דק׳',desc:'הליכה רגועה בלי יעד קשיח',
+      details:'רחוב Celetná הוא אחד הרחובות היפים — חנויות קריסטל, בוהמיה גלאס ומוזיקה. ממשיך לכיכר הרפובליקה. סמטאות הצדדיות — Dlouhá, Týnská — שקטות יותר ויפות.',
+      tips:['לא לקנות קריסטל בסמטאות הראשיות — יקר יותר','לחפש את בית Rott — בניין ציורי מהמאה ה-15','קפה טוב: Café Louvre או Café Imperial'],
+      booking:'ללא צורך.',
+      mapUrl:'https://www.google.com/maps/place/Celetná,+Prague'},
+     {emoji:'🌉',name:'גשר קארל',time:'45–60 דק׳',desc:'הגעה לפני שקיעה לצילומים ולנוף',
+      details:'גשר קארל (Karlův most) — 516 מטר, בנוי 1357. 30 פסלי קדושים בטריקים. חוצה את נהר הוולטאווה מהעיר העתיקה לצד מאלה סטרנה. בשקיעה — אחד הנופים הכי יפים בעולם.',
+      tips:['להגיע שעה לפני שקיעה לתצלומים הטובים ביותר','בבוקר מוקדם (07:00–09:00) — ריק יחסית','מוזיקאים רחוב נפלאים — להישאר ולהאזין','לצד מאלה סטרנה — מסעדות עם נוף לגשר'],
+      booking:'כניסה חינם.',
+      mapUrl:'https://www.google.com/maps/place/Charles+Bridge,+Prague'},
+     {emoji:'🚤',name:'שייט בוולטאווה',time:'45–60 דק׳',desc:'אופציונלי — שייט ערב רגוע',
+      details:'שייטי ערב בנהר הוולטאווה — 60–90 דקות, עם נוף לגשרים ולטירה. מספר חברות: Prague Venice Boats, Prague Boats. מחיר: 350–500 CZK לאדם. לעיתים כולל משקה.',
+      tips:['להזמין אונליין — זול יותר ומבטיח מקום','ערב — הנוף יפה יותר עם התאורה','להביא ג׳קט — קר על המים גם בקיץ'],
+      booking:'מומלץ להזמין מראש — prague-boats.cz',
+      mapUrl:'https://www.google.com/maps/search/Vltava+river+cruise+Prague'}
    ],meals:{lunch:"Kantýna או Lokál — בקר/עוף בלבד",dinner:"Mlýnec ליד הנהר או George Prime Steak"},
    tips:['לא להגיע לשעון בדיוק בדקה העגולה','להיזהר מכייסים באזור הצפוף','לשמור גשר קארל לשעת ערב'],
    mapUrl:'https://www.google.com/maps/dir/Comfort+Hotel+Prague+City+East/Old+Town+Square+Prague'},
@@ -1526,10 +1554,26 @@ var DAYS = [
    story:'היום נבנה סביב חיוך של ילדה. עולם מיניאטורי של רכבות, ערים קטנות וגשרים, ואחר כך מסעדה שבה הרכבת מגיעה לשולחן עם השתייה.',
    peak:'הרגע שהרכבת הקטנה מגיעה לשולחן עם השתייה ב-Výtopna.',
    stops:[
-     {emoji:'🚂',name:'ממלכת הרכבות — Království železnic',time:'2–3 שעות',desc:'דגמי רכבות ענקיים, ערים מיניאטוריות',mapUrl:'https://www.google.com/maps/place/Království+železnic,+Prague'},
-     {emoji:'🍔',name:'Výtopna',time:'60–90 דק׳',desc:'מסעדה שהמלצר מגיע ברכבת! להזמין מראש',mapUrl:'https://www.google.com/maps/place/Výtopna+Railway+Restaurant+Prague'},
-     {emoji:'🧸',name:'Hamleys Prague',time:'60–90 דק׳',desc:'חנות צעצועים ענקית עם הצגות חינמיות',mapUrl:'https://www.google.com/maps/place/Hamleys+Prague'},
-     {emoji:'🌀',name:'מוזיאון האשליות',time:'60 דק׳',desc:'אשליות אופטיות אינטראקטיביות',mapUrl:'https://www.google.com/maps/place/Museum+of+Illusions+Prague'}
+     {emoji:'🚂',name:'ממלכת הרכבות — Království železnic',time:'2–3 שעות',desc:'דגמי רכבות ענקיים, ערים מיניאטוריות',
+      details:'המוזיאון הגדול ביותר של רכבות מיניאטוריות במרכז אירופה. מעל 2,000 מ"ר של פסי רכבת, ערים מיניאטוריות, נמל תעופה, הרים, מנהרות וגשרים — הכל בקנה מידה 1:87. אורות יום/לילה משתנים. מרתק גם למבוגרים!',
+      tips:['להגיע בפתיחה (10:00) — פחות עמוס','לפחות 2 שעות — אל תקצרו','כרטיס מראש לחסוך תור','יש פינת תצפית גבוהה — לא לפספס'],
+      booking:'כרטיסים: kralovstvi-zeleznic.cz | ~350 CZK מבוגר, 250 CZK ילד',
+      mapUrl:'https://www.google.com/maps/place/Království+železnic,+Prague'},
+     {emoji:'🍔',name:'Výtopna — מסעדת הרכבות',time:'60–90 דק׳',desc:'מסעדה שהמלצר מגיע ברכבת! להזמין מראש',
+      details:'מסעדה ייחודית בעולם — המשקאות מגיעים לשולחן ברכבת על פסי הO מסביב לבר! תפריט: המבורגרים, בשרים, פסטה. מחיר: 300–500 CZK לאדם. ממוקמת ב-Wenceslas Square.',
+      tips:['חובה להזמין מראש — מלאה תמיד','לבקש שולחן ליד הפסים לחוויה מלאה','להזמין משקה ברכבת — כיף גדול לילדים','תפריט אנגלי זמין'],
+      booking:'הזמנה חובה — vytopna.cz',
+      mapUrl:'https://www.google.com/maps/place/Výtopna+Railway+Restaurant+Prague'},
+     {emoji:'🧸',name:'Hamleys Prague',time:'60–90 דק׳',desc:'חנות צעצועים ענקית עם הצגות חינמיות',
+      details:'חנות Hamleys הלונדונית המפורסמת — 5 קומות של צעצועים, לגו, בובות, משחקים. כל שעה יש הצגות ודמויות חיות ברחבי החנות. ממוקמת ב-Na Příkopě, לב אזור הקניות.',
+      tips:['כניסה חינם','ההצגות ברחבי החנות — לשאול על לוח זמנים','מחירים דומים לישראל — לא בהכרח זול','לבדוק אם יש מהדורות מוגבלות בלעדיות'],
+      booking:'כניסה חינם, ללא הזמנה.',
+      mapUrl:'https://www.google.com/maps/place/Hamleys+Prague'},
+     {emoji:'🌀',name:'מוזיאון האשליות',time:'60 דק׳',desc:'אשליות אופטיות אינטראקטיביות',
+      details:'Museum of Illusions Prague — חדרים עם אשליות אופטיות, חדר הולוגרמות, חדר האינסוף, מנהרת מסתובבת ועוד. אינטראקטיבי לחלוטין, מצוין לצילומים מטורפים.',
+      tips:['כ-60–75 דקות — מספיק','מתאים לכל הגילאים','להביא הרבה טעינה לטלפון — תצלמו הרבה','כרטיסים מראש — זול יותר ב-10–15%'],
+      booking:'כרטיסים: muzeumiluziprag.cz | ~350 CZK מבוגר',
+      mapUrl:'https://www.google.com/maps/place/Museum+of+Illusions+Prague'}
    ],meals:{lunch:'Výtopna — חוויה יותר ממסעדת גורמה',dinner:'Antricote או Gran Fierro — בקר בלבד'},
    tips:['להתחיל בממלכת הרכבות בבוקר','Výtopna — להזמין מראש!','אם עייפות — לוותר על מוזיאון האשליות'],
    mapUrl:'https://www.google.com/maps/dir/Comfort+Hotel+Prague+City+East/Kingdom+of+Railways+Prague'},
@@ -1537,10 +1581,27 @@ var DAYS = [
    story:'הבוקר מתחיל מעל העיר. אחר כך יורדים דרך סמטאות Mala Strana אל אי קמפה ותעלת Čertovka.',
    peak:"המעבר מהטירה הגבוהה אל התעלה השקטה של Čertovka.",
    stops:[
-     {emoji:'🏰',name:"טירת פראג וקתדרלת ויטוס",time:'2–3 שעות',desc:'חצרות, קתדרלה, נוף עוצר נשימה',mapUrl:'https://www.google.com/maps/place/Prague+Castle'},
-     {emoji:'🏘️',name:'Mala Strana',time:'45–60 דק׳',desc:'ירידה דרך סמטאות יפות',mapUrl:'https://www.google.com/maps/place/Malá+Strana,+Prague'},
-     {emoji:'🏝️',name:'אי קמפה',time:'45–60 דק׳',desc:'פארק רגוע, ברווזים, קפה',mapUrl:'https://www.google.com/maps/place/Kampa+Island,+Prague'},
-     {emoji:'🛶',name:"Čertovka — ונציה של פראג",time:'60–90 דק׳',desc:'תעלה, גלגל מים, הרחוב הצר עם הרמזור',mapUrl:'https://www.google.com/maps/place/Čertovka,+Prague'}
+     {emoji:'🏰',name:'טירת פראג וקתדרלת ויטוס',time:'2–3 שעות',desc:'חצרות, קתדרלה, נוף עוצר נשימה',
+      details:'טירת פראג (Pražský hrad) — הטירה הגדולה בעולם בשטחה! 70,000 מ"ר. כוללת קתדרלת סנט ויטוס, ארמון המלכות, כנסיית סנט ג׳ורג׳, סמטת הזהב ומגדלי שמירה. נוף של 360° לעיר כולה.',
+      details2:'כרטיס Circuit B (הנפוץ ביותר): קתדרלה + ארמון + כנסיית ג׳ורג׳. ~350 CZK מבוגר.',
+      tips:['להגיע לפני 09:00 — תורים ארוכים מאוחר יותר','לקנות כרטיס מראש אונליין','נעלי הליכה — הרבה אבן ועליות','חניכי פלאש בקתדרלה — אסורים'],
+      booking:'כרטיסים מראש: hrad.cz | מומלץ מאוד',
+      mapUrl:'https://www.google.com/maps/place/Prague+Castle'},
+     {emoji:'🏘️',name:'Mala Strana — שכונת הברוק',time:'45–60 דק׳',desc:'ירידה דרך סמטאות יפות',
+      details:'Malá Strana (השכונה הקטנה) — שכונה בארוקית מהמאה ה-17 שיורדת מהטירה לנהר. בתים צבעוניים, גינות נסתרות, כנסיות קטנות. כיכר Malostranské náměstí — נקודת מפגש עם קפה ומסעדות.',
+      tips:['לרדת ברגל מהטירה — השמיניה הכי יפה','לצאת מהשביל הראשי לסמטאות הצדדיות','Café Savoy בקרבת מקום — ארוחת צהריים מצוינת'],
+      booking:'ללא צורך.',
+      mapUrl:'https://www.google.com/maps/place/Malá+Strana,+Prague'},
+     {emoji:'🏝️',name:'אי קמפה',time:'45–60 דק׳',desc:'פארק רגוע, ברווזים, קפה',
+      details:'אי קמפה (Kampa Island) — אי שקט בתוך העיר, מופרד מהיבשה ע"י תעלת Čertovka. פארק ירוק, ספסלים, נוף לגשר קארל. יש מוזיאון קמפה לאמנות מודרנית צ׳כית. מקסים לפיקניק.',
+      tips:['כניסה לפארק חינם','מוזיאון קמפה — ~200 CZK, מומלץ לאוהבי אמנות','ברווזים ניתן להאכיל ליד המים','צד שקט ויפה מגשר קארל'],
+      booking:'פארק חינם. מוזיאון: muzeumkampa.cz',
+      mapUrl:'https://www.google.com/maps/place/Kampa+Island,+Prague'},
+     {emoji:'🛶',name:"Čertovka — ונציה של פראג",time:'60–90 דק׳',desc:'תעלה, גלגל מים, הרחוב הצר עם הרמזור',
+      details:"Čertovka — תעלה צרה שמפרידה בין אי קמפה ליבשת מאלה סטרנה. יש בה גלגל מים עתיק מהמאה ה-15. הרחוב הצר ביותר בפראג — U lužického semináře — עם רמזור לעוברים ושבים. קסום ורומנטי.",
+      tips:['הרחוב הצר — לצלם ולעבור בו','גלגל המים — ממש ליד אי קמפה','בערב — יש תאורה יפה על המים','קפה Cukrkávalimonáda — קרוב ומומלץ'],
+      booking:'ללא צורך — אזור ציבורי.',
+      mapUrl:'https://www.google.com/maps/place/Čertovka,+Prague'}
    ],meals:{lunch:"Kuchyň ליד הטירה או Café Savoy",dinner:"Mlýnec / Deer Restaurant — ללא חזיר"},
    tips:['להגיע לטירה לפני 09:00','נעלי הליכה חזקות — הרבה עלייה','מים ופלסטרים — יום ארוך'],
    mapUrl:'https://www.google.com/maps/dir/Comfort+Hotel+Prague+City+East/Prague+Castle'},
@@ -1548,20 +1609,48 @@ var DAYS = [
    story:'יום שמש, מים ומגלשות. Aquapalace — בריכות, גלישות ואטרקציות מים לכל הגילאים.',
    peak:'הגלישה הגדולה ביחד — צוחקים עד הבוקר.',
    stops:[
-     {emoji:'🚖',name:'יציאה בבוקר ל-Aquapalace',time:'בוקר',desc:'Bolt ישיר: 400–600 CZK | 35–50 דק׳',mapUrl:'https://www.google.com/maps/place/Aquapalace+Prague'},
-     {emoji:'🌊',name:'Aquapalace Prague',time:'כל היום',desc:'גלישות, בריכות | 690–890 CZK לאדם',mapUrl:'https://www.google.com/maps/place/Aquapalace+Prague'},
-     {emoji:'🏨',name:'חזרה למלון',time:'אחה״צ',desc:'Bolt חזרה, מקלחות, ארוחת ערב קלה',mapUrl:'https://www.google.com/maps/search/Comfort+Hotel+Prague+City+East'}
+     {emoji:'🚖',name:'יציאה ל-Aquapalace בבוקר',time:'בוקר',desc:'Bolt ישיר: 400–600 CZK | 35–50 דק׳',
+      details:'Aquapalace נמצא בפרבר Čestlice, כ-35–50 דקות מהמרכז בBolt. אין חיבור מטרו ישיר — Bolt המומלץ ביותר. לצאת עם כל הציוד: בגדי ים, מגבות, קרם הגנה, כפכפים, מזון.',
+      tips:['להזמין Bolt ב-08:30 — פחות עמוס','אין להסתמך על תחבורה ציבורית','לסיים שם ולחזור ב-Bolt'],
+      booking:'הזמנת Bolt דרך האפליקציה.',
+      mapUrl:'https://www.google.com/maps/place/Aquapalace+Prague'},
+     {emoji:'🌊',name:'Aquapalace Prague',time:'כל היום',desc:'גלישות, בריכות | 690–890 CZK לאדם',
+      details:'הפארק הגדול במרכז אירופה — 14 מגלשות, 5 בריכות (מקורות וחיצוניות), ג׳קוזי, ספא ובריכת גלים. אזורים שונים לגילאים שונים. אוכל בפנים זמין אך יקר.',
+      tips:['לקנות כרטיסים מראש אונליין — 50–100 CZK הנחה','כספות בתשלום — ~100 CZK ליום, שווה','אוכל מבחוץ אסור להכניס — לאכול בפנים או לפני','מגלשת הטורנדו — הכי מרגשת, תורים ארוכים'],
+      booking:'כרטיסים מראש: aquapalace.cz | מומלץ מאוד',
+      mapUrl:'https://www.google.com/maps/place/Aquapalace+Prague'},
+     {emoji:'🏨',name:'חזרה למלון ומנוחה',time:'אחה״צ',desc:'Bolt חזרה, מקלחות, ארוחת ערב קלה',
+      details:'לאחר יום שלם בפארק — Bolt חזרה למלון. ארוחת ערב קלה — ניתן להזמין פיצה, שווארמה, או לאכול במסעדת המלון.',
+      tips:['להזמין Bolt מהחניון של הפארק','ערב זה — לנוח ולא לתכנן אטרקציות'],
+      booking:'ללא צורך.',
+      mapUrl:'https://www.google.com/maps/search/Comfort+Hotel+Prague+City+East'}
    ],meals:{lunch:'אוכל בפארק (יקר — לשקול מחוץ)',dinner:'ארוחה קלה ליד המלון'},
    tips:['לקנות כרטיסים אונליין מראש','Bolt עדיף עם מגבות ותיקים','קרם הגנה + בגד ים יבש חלופי'],
    mapUrl:'https://www.google.com/maps/dir/Comfort+Hotel+Prague+City+East/Aquapalace+Prague'},
-  {id:6,emoji:'🦁',date:'13 באוגוסט',title:'גן החיות של פראג + שייט ערב',sub:'Prague Zoo + שייט ערב בוולטאבה',
+  {id:6,emoji:'🦁',date:'13 באוגוסט',title:'גן החיות של פראג + שייט ערב',sub:'Prague Zoo + שייט ערב בוולטאווה',
    story:'Prague Zoo ברמה עולמית — רכבל פנימי, אזור טרופי ענק. ואחרי כן שייט ערב שבו פראג נראית קסומה.',
    peak:'שייט הערב — הגשרים נדלקים ופראג קסומה מהמים.',
    stops:[
-     {emoji:'🦁',name:'גן החיות של פראג',time:'4–5 שעות',desc:'גן חיות ענק, רכבל פנימי | ~300 CZK לאדם',mapUrl:'https://www.google.com/maps/place/Prague+Zoo'},
-     {emoji:'😴',name:'חזרה ומנוחה במלון',time:'90 דק׳',desc:'מנוחה לפני שייט הערב',mapUrl:'https://www.google.com/maps/search/Comfort+Hotel+Prague+City+East'},
-     {emoji:'🌅',name:'שייט בוולטאווה',time:'90 דק׳',desc:'גשרים, אורות, נוף מהמים',mapUrl:'https://www.google.com/maps/search/Vltava+river+cruise+Prague+evening'},
-     {emoji:'🥩',name:'Gran Fierro',time:'90 דק׳',desc:'להזמין מראש! 400–700 CZK',mapUrl:'https://www.google.com/maps/search/Gran+Fierro+Prague'}
+     {emoji:'🦁',name:'גן החיות של פראג',time:'4–5 שעות',desc:'גן חיות ענק, רכבל פנימי | ~300 CZK לאדם',
+      details:"Prague Zoo — מדורג בעקביות ב-10 גני החיות הטובים בעולם. 58 הקטארים, 700 מינים, 5,000 בעלי חיים. האזור הטרופי (Tropický pavilon) מרשים במיוחד — גשם, לחות וחיות יער גשם. יש רכבל פנימי עם נוף מדהים.",
+      tips:['להגיע בפתיחה (09:00) — הבעלי חיים פעילים יותר','רכבל פנימי — שווה ממש, לא לפספס','אזור הקרקס ואזור הטרופיקה — עדיפות גבוהה','ארוחת צהריים בגן — יש כמה מסעדות בפנים'],
+      booking:'כרטיסים: zoopraha.cz | ~350 CZK מבוגר, 250 ילד',
+      mapUrl:'https://www.google.com/maps/place/Prague+Zoo'},
+     {emoji:'😴',name:'חזרה ומנוחה במלון',time:'90 דק׳',desc:'מנוחה לפני שייט הערב',
+      details:'אחרי 4–5 שעות בגן החיות — לחזור למלון ב-Bolt, להתקלח ולנוח. השייט מתחיל בדרך כלל ב-19:30–20:00, אז יש זמן להתאושש.',
+      tips:['לא לבטל את המנוחה — הגוף צריך אנרגיה לערב','להזמין Gran Fierro בזמן המנוחה'],
+      booking:'ללא צורך.',
+      mapUrl:'https://www.google.com/maps/search/Comfort+Hotel+Prague+City+East'},
+     {emoji:'🌅',name:'שייט ערב בוולטאווה',time:'90 דק׳',desc:'גשרים, אורות, נוף מהמים',
+      details:'שייט ערב בנהר הוולטאווה — אחת החוויות הכי יפות בפראג. הגשרים מואירים, הטירה זוהרת מלמעלה, אווירה רומנטית. חברת Prague Boats מציעה שייטים עם ארוחה או משקאות. ~60–90 דקות.',
+      tips:['להזמין מראש — שייטי ערב מלאים מהר','להביא ג׳קט — קר על המים אפילו בקיץ','שייט עם ארוחת ערב — אפשרות נהדרת'],
+      booking:'הזמנה: prague-boats.cz | ~400–600 CZK לאדם',
+      mapUrl:'https://www.google.com/maps/search/Vltava+river+cruise+Prague+evening'},
+     {emoji:'🥩',name:'Gran Fierro — ארוחת ערב',time:'90 דק׳',desc:'להזמין מראש! 400–700 CZK',
+      details:'Gran Fierro — מסעדת בשרים ארגנטינאית, אחת הטובות בפראג. סטייקים, אסאדו, כבש. מחיר: 500–900 CZK לאדם. ממוקמת ב-Náměstí Míru, כ-10 דקות ממרכז העיר.',
+      tips:['להזמין שולחן לפחות יום מראש','לבקש חתיכות בינוניות-גדולות — חלקות קטן מאוד','אין חזיר — בשרים כשרים למהדרין','פתוחה עד מאוחר'],
+      booking:'הזמנה: restaurants.granfierro.cz — חובה!',
+      mapUrl:'https://www.google.com/maps/search/Gran+Fierro+Prague'}
    ],meals:{lunch:'אוכל בגן החיות',dinner:'Gran Fierro — להזמין מראש!'},
    tips:['לא לנסות לראות הכל — אזור טרופיקה + קרקס','רכבל פנימי בגן — שווה!','4+ שעות — נעליים נוחות'],
    mapUrl:'https://www.google.com/maps/dir/Comfort+Hotel+Prague+City+East/Prague+Zoo'},
@@ -1569,11 +1658,31 @@ var DAYS = [
    story:'יום קניות מסודר במרכז פראג: מתחילים בפריימארק כשהוא פחות עמוס, ממשיכים לפלעדיום, ואז עצירת צעצועים לעדי.',
    peak:"שקיות, קפה, תמונה אחרונה בכיכר ואצלב — לסיים מתוק.",
    stops:[
-     {emoji:'🛍️',name:'Primark — וצסלב',time:'09:30–11:30',desc:'הגעה מוקדמת. 5 קומות. מטרו A → Můstek.',mapUrl:'https://www.google.com/maps/search/Primark+Wenceslas+Square+Prague'},
-     {emoji:'🚶',name:'הליכה דרך Na Příkopě',time:'20–30 דק׳',desc:'רחוב קניות נעים. קפה/גלידה בדרך.',mapUrl:'https://www.google.com/maps/dir/Primark+Wenceslas+Square+Prague/Palladium+Prague'},
-     {emoji:'🏬',name:'Palladium',time:'12:15–15:00',desc:'קניון מקורה, Albert, ~180 חנויות.',mapUrl:'https://www.google.com/maps/place/Palladium+shopping+centre,+Prague'},
-     {emoji:'🧸',name:'Hamleys / LEGO Museum',time:'60–90 דק׳',desc:'עצירה לעדי — Hamleys ענק, LEGO לפעילות.',mapUrl:'https://www.google.com/maps/search/Hamleys+Prague+LEGO+Museum+Prague'},
-     {emoji:'🥂',name:'קפה אחרון וארוחת סיום',time:'ערב',desc:"Café Savoy → Gran Fierro — לסיים חזק!",mapUrl:'https://www.google.com/maps/search/Gran+Fierro+Prague'}
+     {emoji:'🛍️',name:'Primark — כיכר וצסלב',time:'09:30–11:30',desc:'הגעה מוקדמת. 5 קומות. מטרו A → Můstek.',
+      details:"Primark Wenceslas Square — 5 קומות של בגדים, אביזרים, בית, ילדים ומזוודות. אחד מהפריימארקים הגדולים באירופה. מחירים נמוכים מאוד. ביגוד ילדים, תיקים, כרבולות — הכל בזול.",
+      tips:['להגיע בפתיחה (09:00) — תורים ענקיים אחרי 11:00','להביא שקיות גדולות — אין שקיות חינם','ביגוד ילדים — מהזולים בעולם, קנו הרבה','Tax Free מעל 2,000 CZK — לשמור קבלות'],
+      booking:'ללא צורך, כניסה חינם.',
+      mapUrl:'https://www.google.com/maps/search/Primark+Wenceslas+Square+Prague'},
+     {emoji:'🚶',name:'הליכה דרך Na Příkopě',time:'20–30 דק׳',desc:'רחוב קניות נעים. קפה/גלידה בדרך.',
+      details:"Na Příkopě — רחוב קניות עיקרי של פראג. 500 מטר של חנויות מותגים: Zara, H&M, Mango, Nike. מחבר את כיכר וצסלב לכיכר הרפובליקה. יש גם קפה, גלידריות ומסעדות לאורך הדרך.",
+      tips:['להסתכל גם על הבניינים — ארכיטקטורה מרשימה','גלידה: Angelato — מומלצת מאוד','חנות H&M — גדולה ומגוונת'],
+      booking:'ללא צורך.',
+      mapUrl:'https://www.google.com/maps/dir/Primark+Wenceslas+Square+Prague/Palladium+Prague'},
+     {emoji:'🏬',name:'Palladium',time:'12:15–15:00',desc:'קניון מקורה, Albert, ~180 חנויות.',
+      details:'Palladium — קניון 5 קומות עם כ-200 חנויות. בנוי בבניין היסטורי מהמאה ה-20. יש: Sephora, H&M, Mango, Reserved, Zara, ועוד. קומת מזון מצוינת בקומה -1 עם Albert סופרמרקט ענק.',
+      tips:['קומת מזון B1 — אוכל מהיר זול וטוב','Albert בקומה -1 — לקנות שוקולדים ומזכרות','Tax Free בשירות המחויבים בכניסה הראשית','חנות Reserved — בגדים איכותיים במחיר טוב'],
+      booking:'ללא צורך.',
+      mapUrl:'https://www.google.com/maps/place/Palladium+shopping+centre,+Prague'},
+     {emoji:'🧸',name:'Hamleys + LEGO Store',time:'60–90 דק׳',desc:'עצירה לעדי — Hamleys ענק, LEGO לפעילות.',
+      details:"Hamleys Prague — 5 קומות של צעצועים, עם הצגות ודמויות חיות. LEGO Store בקרבת מקום — ניתן לבנות LEGO מותאם אישית ולבחור לבנים בודדות. חוויה מדהימה לילדים.",
+      tips:['להגיע עם אנרגיה — הילדים יצטרכו זמן','LEGO Store — לאפשר בחירה חופשית','Hamleys יש עגלות ניסיון ברחבי החנות','לא לחפוז — זה יום של עדי'],
+      booking:'ללא צורך, כניסה חינם.',
+      mapUrl:'https://www.google.com/maps/search/Hamleys+Prague+LEGO+Museum+Prague'},
+     {emoji:'🥂',name:'קפה אחרון וארוחת סיום',time:'ערב',desc:"Café Savoy → Gran Fierro — לסיים חזק!",
+      details:"ארוחת ערב אחרונה בפראג — Gran Fierro לסיום ביג, או Café Savoy לאווירה אלגנטית. Café Savoy: ארוחות צ'כיות ב-Art Nouveau שיפוץ מהמאה ה-19. Gran Fierro: לסיים עם סטייק מנצח.",
+      tips:['להזמין שולחן מראש לשניהם','Café Savoy — מעולה לארוחה אחרונה עם אווירה','Gran Fierro — אם רוצים לסיים בגדול','לצלם את המשפחה בצאת — תמונה אחרונה בפראג'],
+      booking:'Gran Fierro: restaurants.granfierro.cz | Café Savoy: cafesavoy.ambi.cz',
+      mapUrl:'https://www.google.com/maps/search/Gran+Fierro+Prague'}
    ],meals:{lunch:'מתחם האוכל ב-Palladium או קפה ליד Na Příkopě',dinner:'Gran Fierro / George Prime Steak — לסיים ביג!'},
    tips:['להגיע ל-Primark בבוקר — פחות תורים','Tax Free — לשמור קבלות ודרכונים','לארוז מזוודות בלילה!'],
    mapUrl:'https://www.google.com/maps/dir/Comfort+Hotel+Prague+City+East/Primark+Wenceslas+Square+Prague/Palladium+Prague/Hamleys+Prague'},
@@ -1581,8 +1690,16 @@ var DAYS = [
    story:"יום חזרה — מלא זיכרונות, תמונות ומשהו מפראג בתיק. ארוחת בוקר אחרונה, צ'ק-אאוט, ולהמריא עם חיוך.",
    peak:"לחבק, לצחוק ולהגיד — היה שווה כל רגע.",
    stops:[
-     {emoji:'🌅',name:"ארוחת בוקר אחרונה במלון",time:'בוקר',desc:"ארוחת בוקר אחרונה",mapUrl:'https://www.google.com/maps/search/Comfort+Hotel+Prague+City+East'},
-     {emoji:'🚖',name:"צ'ק-אאוט ויציאה לשדה",time:'לפי טיסה',desc:'Bolt מהמלון לשדה: 500–900 CZK | 30–50 דק׳',mapUrl:'https://www.google.com/maps/dir/Comfort+Hotel+Prague+City+East/Vaclav+Havel+Airport+Prague'}
+     {emoji:'🌅',name:'ארוחת בוקר אחרונה במלון',time:'בוקר',desc:'ארוחת בוקר אחרונה',
+      details:"ארוחת הבוקר הבופה של Comfort Hotel — מרשימה ומגוונת. לאכול לאט ולהנות מהבוקר האחרון. צ'ק-אאוט עד 12:00 — אפשר להשאיר מזוודות בלובי ולצאת לטיול קצר של שעה-שעתיים.",
+      tips:["לא לאכול יותר מדי — יש עוד כל היום","לצלם את הבוקר האחרון","אם יש זמן — סיבוב קצר שעה אחרונה בעיר"],
+      booking:'ללא צורך.',
+      mapUrl:'https://www.google.com/maps/search/Comfort+Hotel+Prague+City+East'},
+     {emoji:'🚖',name:"צ'ק-אאוט ויציאה לשדה",time:'לפי טיסה',desc:'Bolt מהמלון לשדה: 500–900 CZK | 30–50 דק׳',
+      details:"הטיסה QS1286 ממריאה ב-23:45. לצאת מהמלון 2.5–3 שעות לפני המראה — כלומר ב-21:00 לכל המאוחר. Bolt מהמלון לשדה: ~500–900 CZK, ~30–50 דקות. שדה התעופה Václav Havel — Terminal 2 לרוב לטיסות צ'רטר.",
+      tips:["לצאת ב-21:00 לכל המאוחר","להדפיס כרטיסי עלייה לטיסה מראש","לשמור 200–300 CZK לנשנוש בשדה","לא לשכוח דרכונים, כרטיסי עלייה ומזוודות מהלובי"],
+      booking:'Bolt דרך האפליקציה — להזמין 15 דקות לפני.',
+      mapUrl:'https://www.google.com/maps/dir/Comfort+Hotel+Prague+City+East/Vaclav+Havel+Airport+Prague'}
    ],meals:{lunch:'ארוחה בשדה',dinner:'בארץ! 🏠'},
    tips:["לצאת 2.5–3 שעות לפני המראה","לא להשאיר אריזה לבוקר הטיסה","לשמור כמה CZK לכיבוד בשדה"],
    mapUrl:'https://www.google.com/maps/dir/Comfort+Hotel+Prague+City+East/Vaclav+Havel+Airport+Prague'}
@@ -2082,7 +2199,9 @@ function renderDays() {
   var card = qs('dayCard');
   if (!card) return;
   var stopsHtml = (d.stops || []).map(function(s, si) {
-    return '<div style="position:relative;margin-bottom:10px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.13);border-radius:14px;padding:13px;margin-right:16px;">' +
+    var hasDetails = !!(s.details || s.tips);
+    var dayIdx = i - 1;
+    return '<div onclick="showStopDetail(' + dayIdx + ',' + si + ')" style="position:relative;margin-bottom:10px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.13);border-radius:14px;padding:13px;margin-right:16px;cursor:pointer;">' +
       '<div style="position:absolute;right:-20px;top:16px;width:8px;height:8px;border-radius:50%;background:#F4634A;box-shadow:0 0 7px rgba(244,99,74,0.55);"></div>' +
       '<div style="display:flex;align-items:flex-start;gap:10px;">' +
       '<div style="font-size:22px;line-height:1;margin-top:1px;flex-shrink:0;">' + (s.emoji||'📍') + '</div>' +
@@ -2090,13 +2209,14 @@ function renderDays() {
         '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:2px;">' +
           '<div style="font-size:13px;font-weight:800;color:#F1F5F9;">' + esc(s.name) + '</div>' +
           '<div style="display:flex;gap:4px;flex-shrink:0;">' +
-            '<button onclick="openMoveStop(' + (i-1) + ',' + si + ')" style="background:rgba(59,130,246,0.18);border:none;border-radius:7px;padding:3px 7px;font-size:10px;color:#93C5FD;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">↔</button>' +
-            '<button onclick="deleteStop(' + (i-1) + ',' + si + ')" style="background:rgba(239,68,68,0.15);border:none;border-radius:7px;padding:3px 7px;font-size:10px;color:#FCA5A5;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">✕</button>' +
+            (hasDetails ? '<span style="font-size:10px;color:rgba(241,245,249,0.35);align-self:center;">פרטים ›</span>' : '') +
+            '<button onclick="event.stopPropagation();openMoveStop(' + dayIdx + ',' + si + ')" style="background:rgba(59,130,246,0.18);border:none;border-radius:7px;padding:3px 7px;font-size:10px;color:#93C5FD;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">↔</button>' +
+            '<button onclick="event.stopPropagation();deleteStop(' + dayIdx + ',' + si + ')" style="background:rgba(239,68,68,0.15);border:none;border-radius:7px;padding:3px 7px;font-size:10px;color:#FCA5A5;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">✕</button>' +
           '</div>' +
         '</div>' +
         '<div style="font-size:11px;color:rgba(241,245,249,0.42);margin-bottom:6px;">⏱️ ' + esc(s.time||'') + '</div>' +
         '<div style="font-size:12px;color:rgba(241,245,249,0.6);margin-bottom:8px;">' + esc(s.desc||'') + '</div>' +
-        (s.mapUrl ? '<a href="' + s.mapUrl + '" target="_blank" rel="noopener" class="nav-map-btn">🗺️ נווט</a>' : '') +
+        (s.mapUrl ? '<a href="' + s.mapUrl + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="nav-map-btn">🗺️ נווט</a>' : '') +
       '</div></div></div>';
   }).join('');
   var tipsHtml = (d.tips || []).map(function(t) {
@@ -2117,6 +2237,40 @@ function renderDays() {
     '<div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.7;"><strong style="color:rgba(241,245,249,0.82);">צהריים:</strong> ' + esc(d.meals.lunch||'') + '<br><strong style="color:rgba(241,245,249,0.82);">ערב:</strong> ' + esc(d.meals.dinner||'') + '</div></div>' : '') +
     (tipsHtml ? '<div style="margin-top:10px;"><div style="font-size:11px;font-weight:800;color:#6EE7B7;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">💡 טיפים</div>' + tipsHtml + '</div>' : '') +
     (d.mapUrl ? '<a href="' + d.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:12px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;margin-top:14px;">🗺️ מסלול מלא במפה</a>' : '');
+}
+
+function showStopDetail(dayIdx, stopIdx) {
+  var s = (getDaysState()[dayIdx] || {stops:[]}).stops[stopIdx];
+  if (!s) return;
+  var existing = document.getElementById('stopDetailOverlay');
+  if (existing) existing.remove();
+  var tipsHtml = (s.tips || []).map(function(t) {
+    return '<div style="display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.06);">' +
+      '<span style="color:#FCD34D;flex-shrink:0;">💡</span>' +
+      '<span style="font-size:13px;color:rgba(241,245,249,0.8);">' + esc(t) + '</span></div>';
+  }).join('');
+  var overlay = document.createElement('div');
+  overlay.id = 'stopDetailOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:3000;display:flex;align-items:flex-end;justify-content:center;';
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+  overlay.innerHTML =
+    '<div style="background:linear-gradient(180deg,#0C1F38,#071525);border-radius:24px 24px 0 0;padding:24px 20px 36px;width:min(430px,100%);max-height:88vh;overflow-y:auto;animation:sheetUp 0.28s ease both;">' +
+    '<div style="width:40px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin:0 auto 18px;"></div>' +
+    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">' +
+      '<div style="font-size:36px;">' + (s.emoji||'📍') + '</div>' +
+      '<div><div style="font-size:17px;font-weight:900;color:#F1F5F9;line-height:1.2;">' + esc(s.name) + '</div>' +
+      '<div style="font-size:12px;color:rgba(241,245,249,0.45);margin-top:3px;">⏱️ ' + esc(s.time||'') + '</div></div>' +
+    '</div>' +
+    (s.details ? '<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:14px;margin-bottom:14px;font-size:13px;color:rgba(241,245,249,0.82);line-height:1.65;">' + esc(s.details) + '</div>' : '') +
+    (s.details2 ? '<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.18);border-radius:14px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:#FCD34D;line-height:1.6;">📋 ' + esc(s.details2) + '</div>' : '') +
+    (s.booking ? '<div style="background:rgba(99,102,241,0.10);border:1px solid rgba(99,102,241,0.25);border-radius:14px;padding:12px 14px;margin-bottom:14px;">' +
+      '<div style="font-size:11px;font-weight:800;color:#A5B4FC;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">🎟️ הזמנה</div>' +
+      '<div style="font-size:13px;color:rgba(241,245,249,0.8);">' + esc(s.booking) + '</div>' +
+    '</div>' : '') +
+    (tipsHtml ? '<div style="margin-bottom:14px;"><div style="font-size:11px;font-weight:800;color:#6EE7B7;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">💡 טיפים</div>' + tipsHtml + '</div>' : '') +
+    (s.mapUrl ? '<a href="' + s.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:13px;font-weight:800;font-size:13px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;">🗺️ נווט למפה</a>' : '') +
+    '</div>';
+  document.body.appendChild(overlay);
 }
 
 function deleteStop(dayIdx, stopIdx) {
