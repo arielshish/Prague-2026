@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - 'app.html'
+      - '.github/workflows/check-links.yml'
 
 jobs:
   check-links:
