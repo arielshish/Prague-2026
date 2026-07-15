@@ -1,0 +1,51 @@
+name: Check Links
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'app.html'
+
+jobs:
+  check-links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract and check URLs
+        run: |
+          echo "## Link Check Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Extract all http/https URLs from app.html (non-Google, non-Firebase, non-GAS)
+          grep -oP "https?://[^\s'\"<>)]+(?=[\s'\"<>)])" app.html \
+            | grep -v 'google\.\|gstatic\.\|googleapis\.\|firebase\|script\.google\.\|github\.io\|wa\.me\|fonts\.' \
+            | sort -u > urls.txt
+
+          echo "Found $(wc -l < urls.txt) unique URLs to check"
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Status | URL |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-----|" >> $GITHUB_STEP_SUMMARY
+
+          FAIL=0
+          while IFS= read -r url; do
+            STATUS=$(curl -o /dev/null -s -w "%{http_code}" --max-time 10 -L \
+              -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
+              "$url" 2>/dev/null || echo "ERR")
+
+            if [[ "$STATUS" =~ ^(200|201|301|302|303|307|308)$ ]]; then
+              echo "| ✅ $STATUS | $url |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| ❌ $STATUS | $url |" >> $GITHUB_STEP_SUMMARY
+              FAIL=1
+            fi
+          done < urls.txt
+
+          if [ $FAIL -eq 1 ]; then
+            echo ""
+            echo "⚠️ Some links are broken — check the summary above"
+            exit 1
+          else
+            echo ""
+            echo "✅ All links OK"
+          fi
