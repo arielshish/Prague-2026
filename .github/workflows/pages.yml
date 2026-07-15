@@ -31,6 +31,7 @@ jobs:
         run: |
           mkdir -p _site
           cp app.html _site/index.html
+          cp app.html _site/app.html
           cp translator.html _site/translator.html
           cp robots.txt _site/robots.txt
           touch _site/.nojekyll
