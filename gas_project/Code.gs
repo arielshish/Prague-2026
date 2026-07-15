@@ -1006,6 +1006,9 @@ function markReminderDoneFirestore_(remId) {
   } catch(e) { return { ok: false, error: e.message }; }
 }
 
+function saveRemindersDone(jsonStr) { return saveRemindersDone_(jsonStr); }
+function loadRemindersDone() { return loadRemindersDone_(); }
+
 function saveRemindersDone_(jsonStr) {
   try {
     var token = getFirestoreToken_();
