@@ -27,10 +27,17 @@ jobs:
         uses: actions/configure-pages@v5
         with:
           enablement: true
+      - name: Stage public site (only files meant to be served)
+        run: |
+          mkdir -p _site
+          cp app.html _site/index.html
+          cp translator.html _site/translator.html
+          cp robots.txt _site/robots.txt
+          touch _site/.nojekyll
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: '_site'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
