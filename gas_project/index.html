@@ -2,7 +2,6 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -74,81 +73,7 @@
   .nav-map-btn{display:inline-block;background:rgba(255,255,255,0.10);color:rgba(241,245,249,0.78);border:1px solid rgba(255,255,255,0.15);border-radius:9px;padding:5px 12px;font-size:11px;font-weight:700;text-decoration:none;font-family:'Rubik',Arial,sans-serif;}
   .tip-pill{background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:7px 11px;font-size:11px;color:#FCD34D;}
 </style>
-<!-- Firebase SDK (compat mode) -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script>
-// Firebase init for GitHub Pages (non-GAS) persistence
-var _fbApp = null;
-var _fbDb = null;
-var _authReadyPromise = null;
-function getFirestoreDb() {
-  if (_fbDb) return _fbDb;
-  if (!_fbApp) {
-    _fbApp = firebase.initializeApp({
-      apiKey: 'AIzaSyAF9QNVV5LZNNRlxS5MNT37_FhF6kh2nBY',
-      authDomain: 'prague2026.firebaseapp.com',
-      projectId: 'prague2026'
-    });
-  }
-  _fbDb = firebase.firestore(_fbApp);
-  return _fbDb;
-}
-// Anonymous auth so Firestore rules can require request.auth != null instead of open access
-function ensureFirebaseAuth() {
-  if (_authReadyPromise) return _authReadyPromise;
-  getFirestoreDb();
-  _authReadyPromise = firebase.auth(_fbApp).signInAnonymously()
-    .then(function() { return true; })
-    .catch(function(err) { console.warn('Firebase anonymous auth failed', err); return false; });
-  return _authReadyPromise;
-}
-
-// Firebase Firestore polyfill — replaces GAS/JSONP backend
-var APP_PASSWORD = 'Shish2026';
-var SESSION_KEY = 'prague_auth_ok';
-
-function doGoogleLogin() {
-  var input = document.getElementById('passwordInput');
-  var val = input ? input.value : '';
-  if (val === APP_PASSWORD) {
-    sessionStorage.setItem(SESSION_KEY, '1');
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-  } else {
-    showAuthError('סיסמה שגויה');
-  }
-}
-
-function showAuthError(msg) {
-  var err = document.getElementById('loginError');
-  if (err) { err.textContent = msg; err.style.display = 'block'; }
-}
-
-// Check session on load
-(function() {
-  if (sessionStorage.getItem(SESSION_KEY) === '1') {
-    document.addEventListener('DOMContentLoaded', function() {
-      var ls = document.getElementById('loginScreen');
-      var app = document.getElementById('app');
-      if (ls) ls.style.display = 'none';
-      if (app) app.style.display = 'block';
-    });
-  }
-})();
-</script>
-<div id="loginScreen" style="position:fixed;inset:0;background:#040D18;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:32px;">
-  <div style="font-size:56px;">🏰</div>
-  <div style="font-size:26px;font-weight:900;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;">פראג 2026</div>
-  <div style="font-size:14px;color:rgba(241,245,249,0.5);font-family:'Rubik',Arial,sans-serif;">משפחת שיש</div>
-  <div style="width:100%;max-width:280px;display:flex;flex-direction:column;gap:10px;">
-    <input id="passwordInput" type="password" placeholder="סיסמה" onkeydown="if(event.key==='Enter')doGoogleLogin()" style="width:100%;padding:14px 16px;border-radius:13px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.07);color:#F1F5F9;font-size:16px;font-family:'Rubik',Arial,sans-serif;text-align:right;outline:none;">
-    <button onclick="doGoogleLogin()" style="width:100%;background:#F4634A;color:white;border:0;border-radius:13px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Rubik',Arial,sans-serif;box-shadow:0 4px 14px rgba(244,99,74,0.3);">כניסה 🔑</button>
-  </div>
-  <div id="loginError" style="color:#F87171;font-size:13px;font-family:'Rubik',Arial,sans-serif;display:none;"></div>
-</div>
-<div id="app" style="display:none">
+<div id="app">
 
   <!-- ═══ HEADER ═══ -->
   <header style="height:194px;background:linear-gradient(160deg,#020912 0%,#0C1F38 55%,#060F1F 100%);position:relative;overflow:hidden;">
@@ -1289,9 +1214,7 @@ function initReminders() {
       .loadRemindersDone();
   } else {
     try {
-      ensureFirebaseAuth().then(function() {
-        return getFirestoreDb().collection('appdata').doc('main').get();
-      }).then(function(doc) {
+      getFirestoreDb().collection('appdata').doc('main').get().then(function(doc) {
         if (doc.exists && doc.data().remindersDone) {
           try { remindersDone = JSON.parse(doc.data().remindersDone); } catch(e) {}
         }
@@ -1417,9 +1340,7 @@ function saveRemindersDoneLocal() {
   var json = JSON.stringify(remindersDone);
   localStorage.setItem('prague_remindersDone', json);
   try {
-    ensureFirebaseAuth().then(function() {
-      getFirestoreDb().collection('appdata').doc('main').set({ remindersDone: json }, { merge: true });
-    });
+    getFirestoreDb().collection('appdata').doc('main').set({ remindersDone: json }, { merge: true });
   } catch(e) {}
 }
 
@@ -1453,32 +1374,23 @@ function markReminderUndone(id) {
   }
 }
 
-var GAS_URL = 'https://script.google.com/macros/s/AKfycby3K9gKoVwWZY7tUVf8hUDLnM6WAryzBwmBLxm82XzD8u_bn5URmg9Roixxf-vdrpn6/exec';
-
 function triggerReminderEmail() {
   var btn = document.getElementById('btnTriggerEmail');
   if (btn) { btn.disabled = true; btn.textContent = '⏳ שולח...'; }
-  var script = document.createElement('script');
-  var cb = '_triggerCb' + Date.now();
-  window[cb] = function(result) {
-    delete window[cb];
-    try { document.head.removeChild(script); } catch(e) {}
-    if (btn) { btn.disabled = false; btn.textContent = '🔔 שלח תזכורת עכשיו'; }
-    if (result && result.ok) {
-      showToast('✅ מייל תזכורת נשלח לכל המשפחה!', 3000);
-    } else {
-      showToast('⚠️ שגיאה: ' + (result && result.error || 'נסה שוב'), 4000);
-    }
-  };
-  setTimeout(function() {
-    if (window[cb]) {
-      delete window[cb];
+  google.script.run
+    .withSuccessHandler(function(result) {
       if (btn) { btn.disabled = false; btn.textContent = '🔔 שלח תזכורת עכשיו'; }
-      showToast('⏱️ GAS איטי — נסה שוב', 3000);
-    }
-  }, 30000);
-  script.src = GAS_URL + '?action=sendTestReminder&callback=' + cb;
-  document.head.appendChild(script);
+      if (result && result.ok) {
+        showToast('✅ מייל תזכורת נשלח לכל המשפחה!', 3000);
+      } else {
+        showToast('⚠️ שגיאה: ' + (result && result.error || 'נסה שוב'), 4000);
+      }
+    })
+    .withFailureHandler(function(e) {
+      if (btn) { btn.disabled = false; btn.textContent = '🔔 שלח תזכורת עכשיו'; }
+      showToast('⚠️ שגיאה: ' + (e && e.message || e), 4000);
+    })
+    .sendTestReminder();
 }
 
 function sendRemindersEmail() {
