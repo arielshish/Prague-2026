@@ -15,7 +15,7 @@
 - Deployment ID: `AKfycby3K9gKoVwWZY7tUVf8hUDLnM6WAryzBwmBLxm82XzD8u_bn5URmg9Roixxf-vdrpn6`
 
 > clasp scriptId (ב-`gas_project/.clasp.json`): `1QwRZZlll_ZUcFjZZ5UJvnaoX0mdU2dD1AYMf9lwCSn_hqHd4nxscVud0`.
-> ה-`.clasp.json` שבשורש הריפו מצביע על scriptId **ישן** שפגע במגבלת 200 הגרסאות — לא להשתמש בו.
+> בעבר היה גם `.clasp.json` בשורש הריפו שהצביע על scriptId ישן (שפגע במגבלת 200 הגרסאות) — הוסר. תמיד להריץ clasp מתוך `gas_project/` בלבד.
 
 ## קבצים עיקריים
 
