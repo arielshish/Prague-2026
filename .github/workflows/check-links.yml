@@ -13,6 +13,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Find Klementinum URL
+        run: |
+          for url in \
+            "https://www.klementinum.com/" \
+            "https://www.klementinum.com/en" \
+            "https://www.nkp.cz/en/visit-us/klementinum" \
+            "https://www.nkp.cz/en/visitor-information/klementinum" \
+            "https://www.nkp.cz/en" \
+            "https://goout.net/en/klementinum/szgpr/" \
+            "https://www.prague.eu/en/object/places/3541/klementinum" ; do
+            STATUS=$(curl -o /dev/null -s -w "%{http_code}" --max-time 10 -L \
+              -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
+              "$url" 2>/dev/null || echo "ERR")
+            echo "$STATUS — $url"
+          done
+
       - name: Extract and check URLs
         run: |
           echo "## Link Check Results" >> $GITHUB_STEP_SUMMARY
