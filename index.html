@@ -2,6 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1208,7 +1209,9 @@ function initReminders() {
       .loadRemindersDone();
   } else {
     try {
-      getFirestoreDb().collection('appdata').doc('main').get().then(function(doc) {
+      ensureFirebaseAuth().then(function() {
+        return getFirestoreDb().collection('appdata').doc('main').get();
+      }).then(function(doc) {
         if (doc.exists && doc.data().remindersDone) {
           try { remindersDone = JSON.parse(doc.data().remindersDone); } catch(e) {}
         }
@@ -1334,7 +1337,9 @@ function saveRemindersDoneLocal() {
   var json = JSON.stringify(remindersDone);
   localStorage.setItem('prague_remindersDone', json);
   try {
-    getFirestoreDb().collection('appdata').doc('main').set({ remindersDone: json }, { merge: true });
+    ensureFirebaseAuth().then(function() {
+      getFirestoreDb().collection('appdata').doc('main').set({ remindersDone: json }, { merge: true });
+    });
   } catch(e) {}
 }
 

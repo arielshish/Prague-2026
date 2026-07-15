@@ -2,6 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -76,10 +77,12 @@
 <!-- Firebase SDK (compat mode) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script>
 // Firebase init for GitHub Pages (non-GAS) persistence
 var _fbApp = null;
 var _fbDb = null;
+var _authReadyPromise = null;
 function getFirestoreDb() {
   if (_fbDb) return _fbDb;
   if (!_fbApp) {
@@ -91,6 +94,15 @@ function getFirestoreDb() {
   }
   _fbDb = firebase.firestore(_fbApp);
   return _fbDb;
+}
+// Anonymous auth so Firestore rules can require request.auth != null instead of open access
+function ensureFirebaseAuth() {
+  if (_authReadyPromise) return _authReadyPromise;
+  getFirestoreDb();
+  _authReadyPromise = firebase.auth(_fbApp).signInAnonymously()
+    .then(function() { return true; })
+    .catch(function(err) { console.warn('Firebase anonymous auth failed', err); return false; });
+  return _authReadyPromise;
 }
 
 // Firebase Firestore polyfill — replaces GAS/JSONP backend
@@ -1271,7 +1283,9 @@ function initReminders() {
       .loadRemindersDone();
   } else {
     try {
-      getFirestoreDb().collection('appdata').doc('main').get().then(function(doc) {
+      ensureFirebaseAuth().then(function() {
+        return getFirestoreDb().collection('appdata').doc('main').get();
+      }).then(function(doc) {
         if (doc.exists && doc.data().remindersDone) {
           try { remindersDone = JSON.parse(doc.data().remindersDone); } catch(e) {}
         }
@@ -1397,7 +1411,9 @@ function saveRemindersDoneLocal() {
   var json = JSON.stringify(remindersDone);
   localStorage.setItem('prague_remindersDone', json);
   try {
-    getFirestoreDb().collection('appdata').doc('main').set({ remindersDone: json }, { merge: true });
+    ensureFirebaseAuth().then(function() {
+      getFirestoreDb().collection('appdata').doc('main').set({ remindersDone: json }, { merge: true });
+    });
   } catch(e) {}
 }
 
