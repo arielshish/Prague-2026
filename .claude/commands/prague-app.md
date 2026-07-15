@@ -1,163 +1,93 @@
 # Prague 2026 — Family Trip App Skill
 
-אפליקציית ווב לניהול טיול משפחתי מבוססת Google Apps Script.
-פותחה עבור משפחת שיש — פראג, 8–15 אוגוסט 2026.
+אפליקציית טיול משפחתית לפראג 2026 — משפחת שיש. Single-page app בעברית.
+טיסות: Smart Wings QS1287/QS1286, 8–15 אוגוסט 2026. מלון: Comfort Hotel Prague City East.
 
-## זהות הפרויקט
+## שני מצבי הפעלה
 
-- **Deployment URL:** `https://script.google.com/macros/s/AKfycbyR8p3GbMaOnJ5_47acO_Ejo4-rkL_r_Iw-n2PY5mNWnOTZZmhlaukzXuJyDe2QQjMC/exec`
-- **Deployment ID:** `AKfycbyR8p3GbMaOnJ5_47acO_Ejo4-rkL_r_Iw-n2PY5mNWnOTZZmhlaukzXuJyDe2QQjMC`
-- **Spreadsheet ID:** `10YqbLWnbwlVWtl_czqlIk4T_ksi9HcY4kIiLASKGBFE`
-- **GitHub repo:** `arielshish/prague-2026`
-- **Branch:** `claude/unknown-session-xpa0pr`
-- **Current version:** @158
+1. **GAS** — `gas_project/`, מוגש דרך script.google.com. `google.script.run` נטיבי. **אין** login screen.
+2. **GitHub Pages** — `app.html`, ב-`arielshish.github.io/Prague-2026/app.html`. login screen (סיסמה `Shish2026`), שומר ל-Firestore ישירות דרך Firebase SDK.
 
-## Deploy — תמיד כך
+## 3 הקישורים של הפרויקט
+
+- GitHub Pages: `https://arielshish.github.io/Prague-2026/app.html`
+- GAS (deployment נוכחי): `https://script.google.com/macros/s/AKfycby3K9gKoVwWZY7tUVf8hUDLnM6WAryzBwmBLxm82XzD8u_bn5URmg9Roixxf-vdrpn6/exec`
+- Deployment ID: `AKfycby3K9gKoVwWZY7tUVf8hUDLnM6WAryzBwmBLxm82XzD8u_bn5URmg9Roixxf-vdrpn6`
+
+> clasp scriptId (ב-`gas_project/.clasp.json`): `1QwRZZlll_ZUcFjZZ5UJvnaoX0mdU2dD1AYMf9lwCSn_hqHd4nxscVud0`.
+> ה-`.clasp.json` שבשורש הריפו מצביע על scriptId **ישן** שפגע במגבלת 200 הגרסאות — לא להשתמש בו.
+
+## קבצים עיקריים
+
+| קובץ | תפקיד |
+|------|--------|
+| `gas_project/Code.gs` | Backend של GAS — כל פונקציות השרת |
+| `gas_project/index.html` | HTML שמוגש ע"י GAS — זהה ל-`index.html` בשורש |
+| `gas_project/appsscript.json` | הגדרות GAS (timezone, webapp, scopes) |
+| `index.html` | עותק של `gas_project/index.html` (לsync) |
+| `app.html` | גרסת GitHub Pages — Firebase SDK, login screen, JSONP |
+| `sync_gas.py` | מסנכרן app.html → index.html + gas_project/index.html |
+| `translator.html` | מתרגם קולי עצמאי (GitHub Pages), עברית↔צ'כית |
+
+## סנכרון index.html ← app.html
+
+**אף פעם לא עורכים index.html ישירות.** עורכים `app.html`, מריצים `python3 sync_gas.py`,
+ומוודאים `diff index.html gas_project/index.html` ריק.
+הסקריפט מסיר: Firebase SDK tags, Firebase init, loginScreen div, GAS_URL+JSONP.
+מחליף: `<div id="app" style="display:none">` → `<div id="app">`, JSONP → `google.script.run`.
+
+## Google Spreadsheet
+
+- ID: `10YqbLWnbwlVWtl_czqlIk4T_ksi9HcY4kIiLASKGBFE`
+- Sheets: `הוצאות`, `הגדרות`, `צ'קליסט`, `מסלול`
+
+## Firebase / Firestore (רק ל-app.html)
+
+- Project: `prague2026`
+- Document ראשי: `appdata/main`
+- שדות: `remindersDone` (JSON string), `packingList`, `budget`, `daysCustom`
+
+## Deploy
 
 ```bash
-git add .
-git commit -m "תיאור"
-git push -u origin claude/unknown-session-xpa0pr
-clasp push --force
-clasp deploy -i AKfycbyR8p3GbMaOnJ5_47acO_Ejo4-rkL_r_Iw-n2PY5mNWnOTZZmhlaukzXuJyDe2QQjMC
+cd /home/user/Prague-2026/gas_project
+clasp push
+clasp deploy --deploymentId AKfycby3K9gKoVwWZY7tUVf8hUDLnM6WAryzBwmBLxm82XzD8u_bn5URmg9Roixxf-vdrpn6 --description "תיאור"
 ```
 
-איפוס נתוני Sheets: פתח URL + `?reset=1`
+> שים לב: clasp לא בהכרח זמין/מחובר בכל סביבת ריצה (למשל בסביבות remote מסוימות אין clasp מותקן וגם הרשת חוסמת script.google.com) — לבדוק לפני שמניחים שה-deploy בוצע בפועל.
 
-## Stack
+## isGas() — חובה סביב כל google.script.run
 
-| שכבה | טכנולוגיה |
-|------|-----------|
-| Frontend | HTML5 + Vanilla JS (SPA, ~2,600 שורות) |
-| Backend | Google Apps Script (קוד.js) |
-| Database | Google Sheets (6 טאבים) |
-| Photo Storage | IndexedDB — "PraguePhotosDiary" |
-| Fonts | Google Fonts — Rubik (RTL) |
-
-## קבצים
-
-- `קוד.js` — כל ה-backend (GAS functions)
-- `index.html` — כל ה-frontend (SPA)
-- `translator.html` — מתרגם קולי עצמאי (GitHub Pages), עברית↔צ׳כית
-- `appsscript.json` — הגדרות OAuth + webapp
-
-## appsscript.json — חשוב
-
-```json
-{
-  "timeZone": "Asia/Jerusalem",
-  "oauthScopes": [
-    "https://www.googleapis.com/auth/spreadsheets",
-    "https://www.googleapis.com/auth/drive",
-    "https://www.googleapis.com/auth/script.external_request"
-  ],
-  "webapp": {
-    "executeAs": "USER_DEPLOYING",
-    "access": "ANYONE"
-  }
+```javascript
+function isGas() {
+  return typeof google !== 'undefined' && google.script && google.script.run;
 }
 ```
+כל קריאה ל-`google.script.run` חייבת להיות בתוך `if (isGas()) { ... } else { /* fallback */ }`.
 
-> `executeAs: USER_DEPLOYING` = אין prompt OAuth למשתמשים אחרים.
+## פונקציות תזכורות (Code.gs ↔ app.html)
 
-## Google Sheets — מבנה
+- `saveRemindersDone(jsonStr)` → PATCH Firestore `appdata/main.remindersDone`
+- `loadRemindersDone()` → GET Firestore → `{ ok, remindersDone }`
+- `sendTestReminder` → שולח מייל תמיד (ללא תנאי) לכל FAMILY_EMAILS
+- `sendDailyReminders()` → שולח רק אם urgent או dayOfYear%3===0 (אוטומטי)
 
-| טאב | עמודות |
-|-----|--------|
-| הוצאות | תאריך, שם, CZK, ₪, הערה |
-| הגדרות | מפתח, ערך, עדכון אחרון |
-| Checklist | ID, Category, Item, Done |
-| Days | DayIndex, Icon, Title, Description, HeroImage, DBVersion |
-| PlacesBank | ID, DayIndex, Type, Title, Desc, Link, Priority, Hours, Price, Duration, Tip |
-| AppData | Key, Value |
+`REMINDERS_DEF` ב-Code.gs חייב להיות מסונכרן עם `REMINDERS` ב-app.html.
 
-## פונקציות GAS עיקריות
+## אימיילים מורשים (FAMILY_EMAILS)
 
-```
-loadExpenses() / addExpense() / updateExpense() / deleteExpense()
-importExpenses(rows) / getSummary()
-saveSetting(key,val) / loadSettings()
-loadItinerary() / moveAttraction(id, dayIndex) / resetAndInitItineraryDB()
-loadChecklist() / syncChecklist(items)
-loadAppData() / saveAppData(budget, packingList)
-doGet(e) — ?reset=1 לאיפוס, ?test=1 לדיאגנוסטיקה
-healthCheck()
-```
+- arielshish@gmail.com, maridubi3@gmail.com, adiyasminshish@gmail.com, ariel.mariana.shish@gmail.com
 
-## טאבים ב-Frontend
+## בעיות ידועות
 
-`#home` · `#days` · `#shopping` · `#expenses` · `#flights`
-`#restaurants` · `#pack` · `#info` · `#history` · `#photodiary` · `#lang`
+| בעיה | פתרון |
+|------|--------|
+| iOS GAS "מלבן קטן" (iframe warning banner) | לא ניתן לתיקון מקוד — הפתרון הוא app.html ב-GitHub Pages |
+| CORS מ-GitHub Pages ל-GAS | JSONP (dynamic `<script>` tag) |
+| `Session.getActiveUser().getEmail()` | תמיד `""` תחת `executeAs: USER_DEPLOYING` |
+| מגבלת 200 גרסאות GAS | פרויקט חדש (`1QwRZZlll...`) הוקם אחרי שהישן (`1QLerMZ...`) נתקע — לא לחזור לישן |
 
-## יומן תמונות — Photo Diary
+## עדכון אחרון בתחזוקת הריפו
 
-**Storage:** IndexedDB — objectStore "photos"
-
-**GPS flow:**
-1. משתמש בוחר תמונה (camera/gallery)
-2. `navigator.geolocation.getCurrentPosition()` נקרא (אחרי בחירה, לא לפני!)
-3. Fallback: EXIF extraction
-4. Reverse geocoding: Nominatim `zoom=18&addressdetails=1&Accept-Language=he,en`
-5. מציג: POI → רחוב → שכונה → עיר → מדינה + קישור מפות
-
-**5 עיצובי מסגרת פראגאיים (אקראי) — `drawPragueSkyline()` helper:**
-- `0` GOLDEN PRAGUE — שקיעה זהובה + קו רקיע פראגאי (גשר קארל + טירה + אורלוי)
-- `1` POLAROID PRAGUE — פס לבן תחתון + מיני גשר קארל + "Charles Bridge · Prague · 2026"
-- `2` NIGHT PRAGUE — שמיים כחולים + ירח + כוכבים + קו רקיע זוהר
-- `3` STAMP ORLOJ — חותמת עגולה עם שעון אסטרונומי + "✦ ORLOJ · PRAGUE · 2026 ✦"
-- `4` VLTAVA — גרדיאנט אדום + גלי הוולטאווה + "על גדות הוולטאווה · פראג 2026"
-
-המסגרת נשרפת לתוך dataUrl לפני שמירה ל-IndexedDB.
-
-**Share:** `navigator.share({ files: [...] })` — Web Share API נייטיב
-
-## שער המרה
-
-```js
-fetch('https://open.er-api.com/v6/latest/ILS')  // תומך ב-ILS (frankfurter.app לא תומך!)
-// data.rates.CZK → RATE
-// Auto-fetch 1.5s אחרי load
-// Cache: localStorage['prague_rate_v10']
-```
-
-- כפתור "🔄 שער חי" — מושך שער בזמן אמת
-- כפתור "💾 שמור ידני" — שומר את הערך שהוקלד ידנית
-
-## מחשבון המרה דו-כיווני
-
-פונקציה: `initCalc()` — נקראת ב-DOMContentLoaded
-
-- שדה `#calcIls` — הקלד שקלים → מחשב קרונות אוטומטית
-- שדה `#calcCzk` — הקלד קרונות → מחשב שקלים אוטומטית
-- שני הכיוונים עובדים בזמן אמת לפי `RATE`
-- `#calcHint` — מציג תרגום טקסטואלי (לדוג׳ "₪100 = 640 Kč")
-
-## Lessons Learned — בעיות שנפתרו
-
-| בעיה | סיבה | פתרון |
-|------|------|--------|
-| Drive backup נכשל | drive.file חוסם createFolder; REST API דורש Cloud Console | הוחלף ב-navigator.share() |
-| Auth prompt לכל משתמש | USER_ACCESSING | שינוי ל-USER_DEPLOYING |
-| Camera לא נפתחת | geolocation לפני camera חסמה iOS | geolocation רק ב-onChange אחרי בחירה |
-| GPS "מקום לא ידוע" | iOS מוחק EXIF GPS | navigator.geolocation + Nominatim zoom=18 |
-| שער המרה לא מתעדכן | frankfurter.app לא תומך ב-ILS (ECB rates בלבד) | הוחלף ב-open.er-api.com |
-| מיקרופון בתוך GAS iframe | iframe חוסם getUserMedia | translator.html עצמאי ב-GitHub Pages |
-| TTS לא עובד iOS | Silent Mode פעיל + Google TTS חסום CORS | SpeechSynthesis + לוודא שקט כבוי |
-| GitHub Pages 404 | Pages לא מופעל + workflow ללא enablement:true | configure-pages@v5 עם enablement:true |
-
-## כיצד להרחיב ליעד חדש
-
-1. שנה `SPREADSHEET_ID` ב-`קוד.js`
-2. עדכן `STOP_CATALOG` ביעד החדש
-3. עדכן `initItineraryDB()` עם ימים ואטרקציות של היעד
-4. עדכן ב-`index.html`: שמות, תאריכים, פרטי טיסות, מסעדות, מידע שימושי
-5. Deploy חדש → `clasp deploy` (ללא `-i` ליצירת deployment חדש)
-
-## רעיונות למוצר עתידי
-
-- Admin panel להגדרת יעד ללא קוד
-- Multi-tenant (יעדים מרובים, משתמשים שונים)
-- Google Photos integration
-- PWA מלא עם Service Worker
-- Push notifications
-- תשלום / onboarding flow
+הקובץ `.claude/commands/_archive/prague-app-old-v158.md` הוא ארכיון של גרסה קודמת (מלפני המעבר ל-`gas_project/`+Firebase) — אינו רלוונטי יותר.
