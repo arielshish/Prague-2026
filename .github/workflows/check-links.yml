@@ -35,8 +35,10 @@ jobs:
               "$url" 2>/dev/null || echo "ERR")
 
             if [[ "$STATUS" =~ ^(200|201|301|302|303|307|308)$ ]]; then
+              echo "✅ $STATUS — $url"
               echo "| ✅ $STATUS | $url |" >> $GITHUB_STEP_SUMMARY
             else
+              echo "❌ $STATUS — $url"
               echo "| ❌ $STATUS | $url |" >> $GITHUB_STEP_SUMMARY
               FAIL=1
             fi
