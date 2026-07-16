@@ -2210,7 +2210,13 @@ function renderDays() {
   var stopsHtml = (d.stops || []).map(function(s, si) {
     var hasDetails = !!(s.details || s.tips);
     var dayIdx = i - 1;
-    return '<div onclick="showStopDetail(' + dayIdx + ',' + si + ')" style="position:relative;margin-bottom:10px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.13);border-radius:14px;padding:13px;margin-right:16px;cursor:pointer;">' +
+    return '<div onclick="showStopDetail(' + dayIdx + ',' + si + ')" ' +
+      'draggable="true" ' +
+      'ondragstart="stopDragStart(event,' + dayIdx + ',' + si + ')" ' +
+      'ondragover="stopDragOver(event, this)" ' +
+      'ondragleave="stopDragLeave(this)" ' +
+      'ondrop="stopDrop(event,' + dayIdx + ',' + si + ', this)" ' +
+      'style="position:relative;margin-bottom:10px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.13);border-radius:14px;padding:13px;margin-right:16px;cursor:grab;transition:all 0.2s ease;">' +
       '<div style="position:absolute;right:-20px;top:16px;width:8px;height:8px;border-radius:50%;background:#F4634A;box-shadow:0 0 7px rgba(244,99,74,0.55);"></div>' +
       '<div style="display:flex;align-items:flex-start;gap:10px;">' +
       '<div style="font-size:22px;line-height:1;margin-top:1px;flex-shrink:0;">' + (s.emoji||'📍') + '</div>' +
@@ -2219,6 +2225,8 @@ function renderDays() {
           '<div style="font-size:13px;font-weight:800;color:#F1F5F9;">' + esc(s.name) + '</div>' +
           '<div style="display:flex;gap:4px;flex-shrink:0;">' +
             (hasDetails ? '<span style="font-size:10px;color:rgba(241,245,249,0.35);align-self:center;">פרטים ›</span>' : '') +
+            '<button onclick="event.stopPropagation();moveStopUpDown(' + dayIdx + ',' + si + ',-1)" style="background:rgba(255,255,255,0.08);border:none;border-radius:7px;padding:3px 5px;font-size:10px;color:#F1F5F9;cursor:pointer;">🔼</button>' +
+            '<button onclick="event.stopPropagation();moveStopUpDown(' + dayIdx + ',' + si + ',1)" style="background:rgba(255,255,255,0.08);border:none;border-radius:7px;padding:3px 5px;font-size:10px;color:#F1F5F9;cursor:pointer;">🔽</button>' +
             '<button onclick="event.stopPropagation();openMoveStop(' + dayIdx + ',' + si + ')" style="background:rgba(59,130,246,0.18);border:none;border-radius:7px;padding:3px 7px;font-size:10px;color:#93C5FD;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">↔</button>' +
             '<button onclick="event.stopPropagation();deleteStop(' + dayIdx + ',' + si + ')" style="background:rgba(239,68,68,0.15);border:none;border-radius:7px;padding:3px 7px;font-size:10px;color:#FCA5A5;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">✕</button>' +
           '</div>' +
@@ -4855,4 +4863,58 @@ function rebalanceMoveStop(fromDayIdx, stopIdx, selectEl) {
   
   // Rerender the rebalance overlay
   showRebalanceDayModal(fromDayIdx);
+}
+
+// ─── Drag and Drop Timeline Sorting (Dark Mode) ───
+function stopDragStart(ev, dayIdx, stopIdx) {
+  ev.dataTransfer.setData("text/plain", JSON.stringify({dayIdx: dayIdx, stopIdx: stopIdx}));
+  ev.dataTransfer.effectAllowed = "move";
+  ev.currentTarget.style.opacity = "0.5";
+}
+function stopDragOver(ev, el) {
+  ev.preventDefault();
+  ev.dataTransfer.dropEffect = "move";
+  el.style.borderTop = "3px solid #F4634A";
+  el.style.paddingTop = "10px";
+}
+function stopDragLeave(el) {
+  el.style.borderTop = "1px solid rgba(255,255,255,0.13)";
+  el.style.paddingTop = "13px";
+}
+function stopDrop(ev, targetDayIdx, targetStopIdx, el) {
+  ev.preventDefault();
+  el.style.borderTop = "1px solid rgba(255,255,255,0.13)";
+  el.style.paddingTop = "13px";
+  try {
+    var data = JSON.parse(ev.dataTransfer.getData("text/plain"));
+    var fromDayIdx = data.dayIdx;
+    var fromStopIdx = data.stopIdx;
+    if (fromDayIdx !== targetDayIdx) return;
+    if (fromStopIdx === targetStopIdx) return;
+    
+    var state = getDaysState();
+    var stops = state[targetDayIdx].stops;
+    var movedStop = stops.splice(fromStopIdx, 1)[0];
+    stops.splice(targetStopIdx, 0, movedStop);
+    
+    saveDaysState();
+    renderDays();
+    toast("✅ סדר התחנות עודכן!");
+  } catch (err) {
+    console.error(err);
+  }
+}
+function moveStopUpDown(dayIdx, stopIdx, direction) {
+  var state = getDaysState();
+  var stops = state[dayIdx].stops;
+  var targetIdx = stopIdx + direction;
+  if (targetIdx < 0 || targetIdx >= stops.length) return;
+  
+  var temp = stops[stopIdx];
+  stops[stopIdx] = stops[targetIdx];
+  stops[targetIdx] = temp;
+  
+  saveDaysState();
+  renderDays();
+  toast("✅ סדר התחנות עודכן!");
 }
