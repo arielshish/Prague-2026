@@ -17,7 +17,7 @@
   @keyframes riverDrift{0%,100%{transform:translateX(0)}50%{transform:translateX(-6px)}}
   @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
   *{box-sizing:border-box;margin:0;padding:0;}
-  body{background:#F5EFE6;direction:rtl;text-align:right;font-family:'Rubik',Arial,sans-serif;color:#F1F5F9;overflow-x:hidden;-webkit-text-size-adjust:100%;}
+  body{background:#F5EFE6;direction:rtl;text-align:right;font-family:'Rubik',Arial,sans-serif;color:#1E293B;overflow-x:hidden;-webkit-text-size-adjust:100%;}
   html{overflow-x:hidden;background:#F5EFE6;}
   input,textarea,select{font-size:16px!important;}
   button{touch-action:manipulation;}
@@ -27,16 +27,16 @@
 
   /* ═══ DESKTOP LAYOUT ≥768px ═══ */
   @media(min-width:768px){
-    #app{max-width:900px;padding-bottom:80px;}
-    .tab{padding:20px 28px 0;}
+    #app{max-width:1280px;padding-bottom:80px;}
+    .tab{padding:20px 32px 0;}
     .card{border-radius:18px;}
     /* side-by-side nav + content */
     #desktopLayout{display:flex;min-height:calc(100vh - 194px);}
     #desktopSideNav{
-      width:180px;flex-shrink:0;
+      width:210px;flex-shrink:0;
       position:sticky;top:0;align-self:flex-start;
-      display:flex;flex-direction:column;gap:4px;padding:16px 10px;
-      border-left:1px solid rgba(255,255,255,0.07);
+      display:flex;flex-direction:column;gap:4px;padding:16px 12px;
+      border-left:1px solid rgba(0,0,0,0.08);
     }
     #desktopSideNav button{
       display:flex;flex-direction:row;align-items:center;gap:10px;
@@ -140,10 +140,10 @@ function showAuthError(msg) {
 </script>
 <div id="loginScreen" style="position:fixed;inset:0;background:#EDE4D8;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:32px;">
   <div style="font-size:56px;">🏰</div>
-  <div style="font-size:26px;font-weight:900;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;">פראג 2026</div>
-  <div style="font-size:14px;color:rgba(241,245,249,0.5);font-family:'Rubik',Arial,sans-serif;">משפחת שיש</div>
+  <div style="font-size:26px;font-weight:900;color:#1E293B;font-family:'Rubik',Arial,sans-serif;">פראג 2026</div>
+  <div style="font-size:14px;color:rgba(30,41,59,0.55);font-family:'Rubik',Arial,sans-serif;">משפחת שיש</div>
   <div style="width:100%;max-width:280px;display:flex;flex-direction:column;gap:10px;">
-    <input id="passwordInput" type="password" placeholder="סיסמה" onkeydown="if(event.key==='Enter')doGoogleLogin()" style="width:100%;padding:14px 16px;border-radius:13px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.07);color:#F1F5F9;font-size:16px;font-family:'Rubik',Arial,sans-serif;text-align:right;outline:none;">
+    <input id="passwordInput" type="password" placeholder="סיסמה" onkeydown="if(event.key==='Enter')doGoogleLogin()" style="width:100%;padding:14px 16px;border-radius:13px;border:1px solid rgba(255,255,255,0.2);background:#ffffff;color:#1E293B;font-size:16px;font-family:'Rubik',Arial,sans-serif;text-align:right;outline:none;">
     <button onclick="doGoogleLogin()" style="width:100%;background:#F4634A;color:white;border:0;border-radius:13px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Rubik',Arial,sans-serif;box-shadow:0 4px 14px rgba(244,99,74,0.3);">כניסה 🔑</button>
   </div>
   <div id="loginError" style="color:#F87171;font-size:13px;font-family:'Rubik',Arial,sans-serif;display:none;"></div>
@@ -185,7 +185,7 @@ function showAuthError(msg) {
     <div style="position:relative;z-index:3;padding:22px 18px 0;display:flex;align-items:flex-start;justify-content:space-between;">
       <div>
         <div style="font-size:9px;letter-spacing:5px;color:rgba(214,165,74,0.88);font-weight:600;text-transform:uppercase;margin-bottom:8px;">PRAGUE 2026</div>
-        <h1 style="margin:0 0 5px;font-size:22px;font-weight:900;color:#F1F5F9;line-height:1.2;">🏠 משפחת שיש</h1>
+        <h1 style="margin:0 0 5px;font-size:22px;font-weight:900;color:#1E293B;line-height:1.2;">🏠 משפחת שיש</h1>
         <p style="margin:0;font-size:12px;color:rgba(241,245,249,0.48);">8–15 אוגוסט · Comfort Hotel Prague City East</p>
       </div>
       <div id="syncBadge" style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.28);border-radius:999px;padding:6px 12px;font-size:11px;font-weight:600;color:#FCD34D;white-space:nowrap;margin-top:2px;flex-shrink:0;">📱 מקומי</div>
@@ -197,17 +197,17 @@ function showAuthError(msg) {
   <section id="home" class="tab active">
     <div class="card" style="position:relative;overflow:hidden;">
       <div style="position:absolute;left:10px;bottom:-16px;font-size:72px;opacity:0.06;pointer-events:none;">🏰</div>
-      <h2 style="font-size:18px;font-weight:900;color:#F1F5F9;margin-bottom:7px;position:relative;">ברוכים הבאים לפראג ✈️</h2>
-      <p style="font-size:12px;color:rgba(241,245,249,0.55);line-height:1.65;position:relative;">Smart Wings QS1287/QS1286 · Comfort Hotel Prague City East · 8 ימים</p>
+      <h2 style="font-size:18px;font-weight:900;color:#1E293B;margin-bottom:7px;position:relative;">ברוכים הבאים לפראג ✈️</h2>
+      <p style="font-size:12px;color:rgba(30,41,59,0.6);line-height:1.65;position:relative;">Smart Wings QS1287/QS1286 · Comfort Hotel Prague City East · 8 ימים</p>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
       <div style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.25);border-radius:20px;padding:16px 12px;text-align:center;">
         <div id="daysLeft" style="font-size:32px;font-weight:900;color:#F59E0B;line-height:1;animation:shimmer 2.6s ease-in-out infinite;">--</div>
-        <div style="font-size:10px;color:rgba(241,245,249,0.5);margin-top:5px;font-weight:600;text-transform:uppercase;">ימים לטיסה</div>
+        <div style="font-size:10px;color:rgba(30,41,59,0.55);margin-top:5px;font-weight:600;text-transform:uppercase;">ימים לטיסה</div>
       </div>
       <div style="background:rgba(244,99,74,0.12);border:1px solid rgba(244,99,74,0.25);border-radius:20px;padding:16px 12px;text-align:center;">
         <div id="totalIls" style="font-size:32px;font-weight:900;color:#F4634A;line-height:1;">₪0</div>
-        <div style="font-size:10px;color:rgba(241,245,249,0.5);margin-top:5px;font-weight:600;text-transform:uppercase;">סה״כ הוצאות</div>
+        <div style="font-size:10px;color:rgba(30,41,59,0.55);margin-top:5px;font-weight:600;text-transform:uppercase;">סה״כ הוצאות</div>
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
@@ -222,8 +222,8 @@ function showAuthError(msg) {
       <button id="btnHomeLang" style="background:rgba(168,85,247,0.10);border:1px solid rgba(168,85,247,0.22);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#C084FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;grid-column:1 / -1;">🌐<br><span style="font-size:10px;font-weight:700;">שפה ותרגום</span></button>
     </div>
     <div style="background:linear-gradient(135deg,rgba(244,99,74,0.13),rgba(244,99,74,0.055));border:1px solid rgba(244,99,74,0.24);border-radius:20px;padding:16px;margin-bottom:10px;">
-      <div style="font-size:14px;font-weight:800;color:#F1F5F9;margin-bottom:7px;">🛍️ יום 7 — יום קניות</div>
-      <p style="font-size:12px;color:rgba(241,245,249,0.6);line-height:1.55;margin-bottom:12px;">Primark → Na Příkopě → Palladium → Hamleys/LEGO</p>
+      <div style="font-size:14px;font-weight:800;color:#1E293B;margin-bottom:7px;">🛍️ יום 7 — יום קניות</div>
+      <p style="font-size:12px;color:rgba(30,41,59,0.65);line-height:1.55;margin-bottom:12px;">Primark → Na Příkopě → Palladium → Hamleys/LEGO</p>
       <div style="display:flex;gap:8px;">
         <button id="btnOpenShopping" class="btn-primary">פתח קניות</button>
         <button id="btnShoppingDay" class="btn-ghost">יום 7 →</button>
@@ -231,7 +231,7 @@ function showAuthError(msg) {
     </div>
     <div style="background:rgba(59,130,246,0.09);border:1px solid rgba(59,130,246,0.2);border-radius:18px;padding:15px;">
       <div style="font-size:13px;font-weight:700;color:#93C5FD;margin-bottom:5px;">🚇 מהמלון למרכז</div>
-      <div style="font-size:12px;color:rgba(241,245,249,0.55);line-height:1.65;">מטרו A מ-Strašnická · Primark → <strong style="color:#F1F5F9;">Můstek</strong> · Palladium → <strong style="color:#F1F5F9;">Náměstí Republiky</strong></div>
+      <div style="font-size:12px;color:rgba(30,41,59,0.6);line-height:1.65;">מטרו A מ-Strašnická · Primark → <strong style="color:#1E293B;">Můstek</strong> · Palladium → <strong style="color:#1E293B;">Náměstí Republiky</strong></div>
     </div>
 
     <!-- מזג אוויר -->
@@ -241,16 +241,16 @@ function showAuthError(msg) {
         <button onclick="fetchWeather(true)" style="background:none;border:none;font-size:11px;color:rgba(125,211,252,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;font-weight:700;">🔄 רענן</button>
       </div>
       <div id="weatherRow" style="display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:4px;">
-        <div style="color:rgba(241,245,249,0.3);font-size:12px;padding:8px 0;">טוען...</div>
+        <div style="color:rgba(30,41,59,0.35);font-size:12px;padding:8px 0;">טוען...</div>
       </div>
-      <div id="weatherUpdated" style="font-size:10px;color:rgba(241,245,249,0.25);margin-top:8px;text-align:left;"></div>
+      <div id="weatherUpdated" style="font-size:10px;color:rgba(30,41,59,0.3);margin-top:8px;text-align:left;"></div>
     </div>
   </section>
 
   <!-- ═══ DAYS ═══ -->
   <section id="days" class="tab">
     <div class="card card-hdr">
-      <div><h2 style="font-size:18px;font-weight:900;">📅 מסלול ימים</h2><p style="font-size:12px;color:rgba(241,245,249,0.5);margin-top:3px;">8–15 אוגוסט 2026</p></div>
+      <div><h2 style="font-size:18px;font-weight:900;">📅 מסלול ימים</h2><p style="font-size:12px;color:rgba(30,41,59,0.55);margin-top:3px;">8–15 אוגוסט 2026</p></div>
       <div style="display:flex;gap:6px;">
         <button class="back-btn" id="btnSyncDays">☁️</button>
         <button class="back-btn" id="btnBackDays">← ראשי</button>
@@ -264,29 +264,29 @@ function showAuthError(msg) {
   <div id="addStopModal" style="display:none;position:fixed;inset:0;z-index:80;align-items:flex-end;justify-content:center;">
     <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);" id="addStopOverlay"></div>
     <div style="position:relative;background:linear-gradient(160deg,#1e293b,#0f172a);border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;z-index:1;">
-      <h2 id="addStopTitle" style="margin:0 0 12px;font-size:17px;font-weight:900;color:#F1F5F9;">➕ הוסף תחנה</h2>
+      <h2 id="addStopTitle" style="margin:0 0 12px;font-size:17px;font-weight:900;color:#1E293B;">➕ הוסף תחנה</h2>
       <div style="display:flex;gap:6px;margin-bottom:10px;">
         <button id="bankTabAttr" onclick="switchBankTab('attr')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(244,99,74,0.25);color:#F4634A;font-weight:700;font-size:11px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🎟️ אטרקציות</button>
-        <button id="bankTabRest" onclick="switchBankTab('rest')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(255,255,255,0.06);color:rgba(241,245,249,0.45);font-weight:700;font-size:11px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🍽️ אוכל</button>
-        <button id="bankTabShop" onclick="switchBankTab('shop')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(255,255,255,0.06);color:rgba(241,245,249,0.45);font-weight:700;font-size:11px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🛍️ קניות</button>
+        <button id="bankTabRest" onclick="switchBankTab('rest')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(0,0,0,0.04);color:rgba(30,41,59,0.5);font-weight:700;font-size:11px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🍽️ אוכל</button>
+        <button id="bankTabShop" onclick="switchBankTab('shop')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(0,0,0,0.04);color:rgba(30,41,59,0.5);font-weight:700;font-size:11px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🛍️ קניות</button>
       </div>
       <div id="attrBankRow" style="display:flex;gap:9px;overflow-x:auto;padding-bottom:10px;margin-bottom:14px;scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
-      <div style="font-size:11px;font-weight:700;color:rgba(241,245,249,0.4);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;">✏️ או הקלד ידנית</div>
-      <input id="addStopEmoji" type="text" maxlength="4" placeholder="😀" style="width:56px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:11px 10px;font-size:22px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;text-align:center;box-sizing:border-box;margin-bottom:10px;">
-      <input id="addStopName" type="text" placeholder="שם המקום" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:12px 14px;font-size:14px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:10px;">
+      <div style="font-size:11px;font-weight:700;color:rgba(30,41,59,0.45);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;">✏️ או הקלד ידנית</div>
+      <input id="addStopEmoji" type="text" maxlength="4" placeholder="😀" style="width:56px;background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:13px;padding:11px 10px;font-size:22px;color:#1E293B;font-family:'Rubik',Arial,sans-serif;text-align:center;box-sizing:border-box;margin-bottom:10px;">
+      <input id="addStopName" type="text" placeholder="שם המקום" style="width:100%;background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:13px;padding:12px 14px;font-size:14px;color:#1E293B;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:10px;">
       <div style="margin-bottom:10px;">
-        <div style="font-size:11px;font-weight:700;color:rgba(241,245,249,0.4);letter-spacing:0.5px;margin-bottom:7px;">⏰ מתי ביום?</div>
+        <div style="font-size:11px;font-weight:700;color:rgba(30,41,59,0.45);letter-spacing:0.5px;margin-bottom:7px;">⏰ מתי ביום?</div>
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px;">
-          <button type="button" class="daypart-btn" data-val="🌅 בוקר" onclick="selectDayPart(this)" style="padding:8px 4px;border-radius:11px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.07);color:rgba(241,245,249,0.75);font-size:11px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🌅<br>בוקר</button>
-          <button type="button" class="daypart-btn" data-val="☀️ צהריים" onclick="selectDayPart(this)" style="padding:8px 4px;border-radius:11px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.07);color:rgba(241,245,249,0.75);font-size:11px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">☀️<br>צהריים</button>
-          <button type="button" class="daypart-btn" data-val="🌇 אחה״צ" onclick="selectDayPart(this)" style="padding:8px 4px;border-radius:11px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.07);color:rgba(241,245,249,0.75);font-size:11px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🌇<br>אחה״צ</button>
-          <button type="button" class="daypart-btn" data-val="🌙 ערב" onclick="selectDayPart(this)" style="padding:8px 4px;border-radius:11px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.07);color:rgba(241,245,249,0.75);font-size:11px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🌙<br>ערב</button>
+          <button type="button" class="daypart-btn" data-val="🌅 בוקר" onclick="selectDayPart(this)" style="padding:8px 4px;border-radius:11px;border:1px solid rgba(255,255,255,0.15);background:#ffffff;color:rgba(241,245,249,0.75);font-size:11px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🌅<br>בוקר</button>
+          <button type="button" class="daypart-btn" data-val="☀️ צהריים" onclick="selectDayPart(this)" style="padding:8px 4px;border-radius:11px;border:1px solid rgba(255,255,255,0.15);background:#ffffff;color:rgba(241,245,249,0.75);font-size:11px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">☀️<br>צהריים</button>
+          <button type="button" class="daypart-btn" data-val="🌇 אחה״צ" onclick="selectDayPart(this)" style="padding:8px 4px;border-radius:11px;border:1px solid rgba(255,255,255,0.15);background:#ffffff;color:rgba(241,245,249,0.75);font-size:11px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🌇<br>אחה״צ</button>
+          <button type="button" class="daypart-btn" data-val="🌙 ערב" onclick="selectDayPart(this)" style="padding:8px 4px;border-radius:11px;border:1px solid rgba(255,255,255,0.15);background:#ffffff;color:rgba(241,245,249,0.75);font-size:11px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🌙<br>ערב</button>
         </div>
-        <input id="addStopTime" type="text" placeholder="⏱ או שעה מדויקת (לדוג׳ 10:00)" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:11px 14px;font-size:13px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;">
+        <input id="addStopTime" type="text" placeholder="⏱ או שעה מדויקת (לדוג׳ 10:00)" style="width:100%;background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:13px;padding:11px 14px;font-size:13px;color:#1E293B;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;">
       </div>
-      <textarea id="addStopDesc" placeholder="תיאור קצר..." style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:12px 14px;font-size:13px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;resize:none;height:70px;margin-bottom:14px;"></textarea>
+      <textarea id="addStopDesc" placeholder="תיאור קצר..." style="width:100%;background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:13px;padding:12px 14px;font-size:13px;color:#1E293B;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;resize:none;height:70px;margin-bottom:14px;"></textarea>
       <div style="display:flex;gap:8px;">
-        <button onclick="closeAddStopModal()" style="flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:13px;padding:13px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.55);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">ביטול</button>
+        <button onclick="closeAddStopModal()" style="flex:1;background:#ffffff;border:1px solid rgba(255,255,255,0.15);border-radius:13px;padding:13px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">ביטול</button>
         <button id="btnSaveAddStop" class="btn-primary" style="flex:2;">✅ הוסף</button>
       </div>
     </div>
@@ -296,7 +296,7 @@ function showAuthError(msg) {
   <div id="moveStopModal" style="display:none;position:fixed;inset:0;z-index:80;align-items:flex-end;justify-content:center;">
     <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);" id="moveStopOverlay"></div>
     <div style="position:relative;background:linear-gradient(160deg,#1e293b,#0f172a);border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;z-index:1;">
-      <h2 style="margin:0 0 14px;font-size:17px;font-weight:900;color:#F1F5F9;">↔️ העבר לאיזה יום?</h2>
+      <h2 style="margin:0 0 14px;font-size:17px;font-weight:900;color:#1E293B;">↔️ העבר לאיזה יום?</h2>
       <div id="moveDayPicker" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;"></div>
     </div>
   </div>
@@ -304,7 +304,7 @@ function showAuthError(msg) {
   <!-- ═══ SHOPPING ═══ -->
   <section id="shopping" class="tab">
     <div class="card card-hdr">
-      <div><h2 style="font-size:18px;font-weight:900;">🛍️ קניות בפראג</h2><p style="font-size:12px;color:rgba(241,245,249,0.5);margin-top:3px;">מרכזי קניות ואאוטלטים</p></div>
+      <div><h2 style="font-size:18px;font-weight:900;">🛍️ קניות בפראג</h2><p style="font-size:12px;color:rgba(30,41,59,0.55);margin-top:3px;">מרכזי קניות ואאוטלטים</p></div>
       <button class="back-btn" id="btnBackShopping">← ראשי</button>
     </div>
     <div id="shoppingGrid" style="display:grid;gap:12px;"></div>
@@ -313,24 +313,24 @@ function showAuthError(msg) {
   <!-- ═══ EXPENSES ═══ -->
   <section id="expenses" class="tab">
     <div class="card card-hdr">
-      <div><h2 style="font-size:18px;font-weight:900;">💰 הוצאות</h2><p style="font-size:12px;color:rgba(241,245,249,0.5);margin-top:3px;">Google Sheets sync</p></div>
+      <div><h2 style="font-size:18px;font-weight:900;">💰 הוצאות</h2><p style="font-size:12px;color:rgba(30,41,59,0.55);margin-top:3px;">Google Sheets sync</p></div>
       <button class="back-btn" id="btnBackExpenses">← ראשי</button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
       <div style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.25);border-radius:18px;padding:15px;text-align:center;">
         <div id="sumCzk" style="font-size:26px;font-weight:900;color:#F59E0B;line-height:1;">0</div>
-        <div style="font-size:10px;color:rgba(241,245,249,0.45);margin-top:4px;font-weight:600;letter-spacing:1px;">CZK</div>
+        <div style="font-size:10px;color:rgba(30,41,59,0.5);margin-top:4px;font-weight:600;letter-spacing:1px;">CZK</div>
       </div>
       <div style="background:rgba(244,99,74,0.12);border:1px solid rgba(244,99,74,0.25);border-radius:18px;padding:15px;text-align:center;">
         <div id="sumIls" style="font-size:26px;font-weight:900;color:#F4634A;line-height:1;">₪0</div>
-        <div style="font-size:10px;color:rgba(241,245,249,0.45);margin-top:4px;font-weight:600;letter-spacing:1px;">שקלים</div>
+        <div style="font-size:10px;color:rgba(30,41,59,0.5);margin-top:4px;font-weight:600;letter-spacing:1px;">שקלים</div>
       </div>
     </div>
     <!-- תקציב מול בפועל -->
-    <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:16px;margin-bottom:14px;">
+    <div style="background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.09);border-radius:20px;padding:16px;margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-        <div style="font-size:13px;font-weight:800;color:#F1F5F9;">📊 תקציב מול בפועל</div>
-        <button id="btnEditBudget" onclick="openBudgetModal()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:4px 10px;font-size:11px;font-weight:700;color:rgba(241,245,249,0.7);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">✏️ ערוך</button>
+        <div style="font-size:13px;font-weight:800;color:#1E293B;">📊 תקציב מול בפועל</div>
+        <button id="btnEditBudget" onclick="openBudgetModal()" style="background:#ffffff;border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:4px 10px;font-size:11px;font-weight:700;color:rgba(30,41,59,0.75);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">✏️ ערוך</button>
       </div>
       <!-- כרטיס סיכום גדול -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
@@ -344,18 +344,18 @@ function showAuthError(msg) {
         </div>
       </div>
       <!-- נותר - שורה רחבה -->
-      <div id="budgetRemainBar" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-        <div style="font-size:12px;font-weight:700;color:rgba(241,245,249,0.6);">נותר לטיול</div>
+      <div id="budgetRemainBar" style="background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.09);border-radius:14px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <div style="font-size:12px;font-weight:700;color:rgba(30,41,59,0.65);">נותר לטיול</div>
         <div id="budgetRemain" style="font-size:20px;font-weight:900;color:#6EE7B7;">₪0</div>
       </div>
       <!-- פס התקדמות -->
       <div style="margin-bottom:14px;">
         <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
-          <div style="font-size:10px;color:rgba(241,245,249,0.4);">0%</div>
-          <div id="budgetPct" style="font-size:10px;font-weight:700;color:rgba(241,245,249,0.6);">0% נוצל</div>
-          <div style="font-size:10px;color:rgba(241,245,249,0.4);">100%</div>
+          <div style="font-size:10px;color:rgba(30,41,59,0.45);">0%</div>
+          <div id="budgetPct" style="font-size:10px;font-weight:700;color:rgba(30,41,59,0.65);">0% נוצל</div>
+          <div style="font-size:10px;color:rgba(30,41,59,0.45);">100%</div>
         </div>
-        <div style="background:rgba(255,255,255,0.08);border-radius:8px;height:10px;overflow:hidden;">
+        <div style="background:#ffffff;border-radius:8px;height:10px;overflow:hidden;">
           <div id="budgetProgressBar" style="width:0%;height:100%;background:linear-gradient(90deg,#6EE7B7,#34D399);border-radius:8px;transition:width 0.5s;"></div>
         </div>
       </div>
@@ -368,7 +368,7 @@ function showAuthError(msg) {
       <button id="btnRefreshExp" class="btn-ghost">🔄</button>
       <button id="btnExportCsv" class="btn-ghost">CSV</button>
     </div>
-    <div id="expenseList" style="display:grid;gap:10px;"><p style="color:rgba(241,245,249,0.3);text-align:center;padding:28px 0;font-size:13px;">טוען...</p></div>
+    <div id="expenseList" style="display:grid;gap:10px;"><p style="color:rgba(30,41,59,0.35);text-align:center;padding:28px 0;font-size:13px;">טוען...</p></div>
   </section>
 
   <!-- מודל עריכת תקציב -->
@@ -376,18 +376,18 @@ function showAuthError(msg) {
     <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);pointer-events:none;" id="budgetOverlay"></div>
     <div style="position:relative;background:linear-gradient(160deg,#1e293b,#0f172a);border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;z-index:1;max-height:85vh;overflow-y:auto;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-        <h2 style="margin:0;font-size:18px;font-weight:900;color:#F1F5F9;">✏️ עריכת תקציב</h2>
-        <button onclick="closeBudgetModal()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:10px;padding:6px 13px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">ביטול</button>
+        <h2 style="margin:0;font-size:18px;font-weight:900;color:#1E293B;">✏️ עריכת תקציב</h2>
+        <button onclick="closeBudgetModal()" style="background:#ffffff;border:1px solid rgba(255,255,255,0.14);border-radius:10px;padding:6px 13px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.65);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">ביטול</button>
       </div>
       <div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);border-radius:14px;padding:14px;margin-bottom:16px;">
         <div style="font-size:11px;font-weight:700;color:#FCD34D;margin-bottom:8px;letter-spacing:0.5px;">💰 תקציב כולל לטיול (₪)</div>
-        <input id="budgetTotalInput" type="number" placeholder="לדוג׳ 15000" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(245,158,11,0.35);border-radius:10px;padding:11px 13px;font-size:18px;font-weight:800;color:#FCD34D;font-family:'Rubik',Arial,sans-serif;box-sizing:border-box;text-align:center;">
+        <input id="budgetTotalInput" type="number" placeholder="לדוג׳ 15000" style="width:100%;background:#ffffff;border:1px solid rgba(245,158,11,0.35);border-radius:10px;padding:11px 13px;font-size:18px;font-weight:800;color:#FCD34D;font-family:'Rubik',Arial,sans-serif;box-sizing:border-box;text-align:center;">
       </div>
-      <div style="font-size:11px;font-weight:700;color:rgba(241,245,249,0.5);margin-bottom:10px;letter-spacing:0.5px;">📊 פירוט לפי קטגוריה (₪)</div>
+      <div style="font-size:11px;font-weight:700;color:rgba(30,41,59,0.55);margin-bottom:10px;letter-spacing:0.5px;">📊 פירוט לפי קטגוריה (₪)</div>
       <div id="budgetInputs" style="display:grid;gap:10px;margin-bottom:16px;"></div>
-      <button id="btnAddBudgetCat" onclick="(function(){var b=loadBudget();b.push({cat:'קטגוריה חדשה',ils:0});saveBudget(b);openBudgetModal();})()" style="width:100%;background:rgba(255,255,255,0.07);border:1px dashed rgba(255,255,255,0.2);border-radius:13px;padding:11px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;margin-bottom:14px;">➕ הוסף קטגוריה</button>
+      <button id="btnAddBudgetCat" onclick="(function(){var b=loadBudget();b.push({cat:'קטגוריה חדשה',ils:0});saveBudget(b);openBudgetModal();})()" style="width:100%;background:#ffffff;border:1px dashed rgba(255,255,255,0.2);border-radius:13px;padding:11px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.65);cursor:pointer;font-family:'Rubik',Arial,sans-serif;margin-bottom:14px;">➕ הוסף קטגוריה</button>
       <div style="display:flex;gap:10px;">
-        <button onclick="closeBudgetModal()" style="flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:13px;padding:14px;font-size:14px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">ביטול</button>
+        <button onclick="closeBudgetModal()" style="flex:1;background:#ffffff;border:1px solid rgba(255,255,255,0.14);border-radius:13px;padding:14px;font-size:14px;font-weight:700;color:rgba(30,41,59,0.65);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">ביטול</button>
         <button id="btnSaveBudget" onclick="saveBudgetFromModalAndInvalidate()" style="flex:2;background:#F4634A;color:white;border:0;border-radius:13px;padding:14px;font-size:15px;font-weight:900;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">💾 שמור</button>
       </div>
     </div>
@@ -396,16 +396,16 @@ function showAuthError(msg) {
   <!-- ═══ FLIGHTS ═══ -->
   <section id="flights" class="tab">
     <div class="card card-hdr">
-      <div><h2 style="font-size:18px;font-weight:900;">✈️ טיסות</h2><p style="font-size:12px;color:rgba(241,245,249,0.5);margin-top:3px;">Smart Wings · Ariel, Mariana, Adi Yasmin</p></div>
+      <div><h2 style="font-size:18px;font-weight:900;">✈️ טיסות</h2><p style="font-size:12px;color:rgba(30,41,59,0.55);margin-top:3px;">Smart Wings · Ariel, Mariana, Adi Yasmin</p></div>
       <button class="back-btn" id="btnBackFlights">← ראשי</button>
     </div>
     <div style="background:rgba(244,99,74,0.10);border:1px solid rgba(244,99,74,0.22);border-radius:16px;padding:15px;margin-bottom:14px;">
       <div style="font-size:13px;font-weight:800;color:#F4634A;margin-bottom:5px;">🧳 כבודה — 8 ק"ג בלבד לנוסע</div>
-      <div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.7;"><strong style="color:#F1F5F9;">טרולי תא נוסעים בלבד</strong> · 45×55×25 ס"מ · פריט אחד, ללא תיק נוסף.</div>
+      <div style="font-size:12px;color:rgba(30,41,59,0.7);line-height:1.7;"><strong style="color:#1E293B;">טרולי תא נוסעים בלבד</strong> · 45×55×25 ס"מ · פריט אחד, ללא תיק נוסף.</div>
     </div>
     <div style="background:rgba(220,38,38,0.12);border:1px solid rgba(220,38,38,0.3);border-radius:16px;padding:15px;margin-bottom:14px;">
       <div style="font-size:13px;font-weight:800;color:#FCA5A5;margin-bottom:8px;">⚠️ טיפים מניסיון אמיתי — Smart Wings</div>
-      <div style="font-size:12px;color:rgba(241,245,249,0.7);line-height:1.85;">
+      <div style="font-size:12px;color:rgba(30,41,59,0.75);line-height:1.85;">
         ⏱️ הלוך: עיכוב של ~שעה וחצי — לתכנן בהתאם<br>
         ⏱️ חזור: עיכוב של ~שעתיים — לקחת בחשבון<br>
         ⚖️ <strong style="color:#FCA5A5;">בחזור מקפידים מאוד על משקל!</strong> בודקים את כל המזוודות<br>
@@ -420,13 +420,13 @@ function showAuthError(msg) {
       </div>
       <div style="padding:18px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-          <div style="text-align:center;"><div style="font-size:28px;font-weight:900;color:#F1F5F9;line-height:1;">TLV</div><div style="font-size:17px;font-weight:700;color:#F4634A;margin-top:3px;">05:35</div><div style="font-size:11px;color:rgba(241,245,249,0.45);">נתב"ג</div></div>
-          <div style="flex:1;text-align:center;padding:0 8px;"><div style="border-top:2px dashed rgba(255,255,255,0.18);margin-bottom:4px;"></div><span style="font-size:18px;">✈️</span><div style="font-size:10px;color:rgba(241,245,249,0.4);">4h 10m</div></div>
-          <div style="text-align:center;"><div style="font-size:28px;font-weight:900;color:#F1F5F9;line-height:1;">PRG</div><div style="font-size:17px;font-weight:700;color:#F59E0B;margin-top:3px;">08:45</div><div style="font-size:11px;color:rgba(241,245,249,0.45);">רוזינה</div></div>
+          <div style="text-align:center;"><div style="font-size:28px;font-weight:900;color:#1E293B;line-height:1;">TLV</div><div style="font-size:17px;font-weight:700;color:#F4634A;margin-top:3px;">05:35</div><div style="font-size:11px;color:rgba(30,41,59,0.5);">נתב"ג</div></div>
+          <div style="flex:1;text-align:center;padding:0 8px;"><div style="border-top:2px dashed rgba(255,255,255,0.18);margin-bottom:4px;"></div><span style="font-size:18px;">✈️</span><div style="font-size:10px;color:rgba(30,41,59,0.45);">4h 10m</div></div>
+          <div style="text-align:center;"><div style="font-size:28px;font-weight:900;color:#1E293B;line-height:1;">PRG</div><div style="font-size:17px;font-weight:700;color:#F59E0B;margin-top:3px;">08:45</div><div style="font-size:11px;color:rgba(30,41,59,0.5);">רוזינה</div></div>
         </div>
         <div style="border-top:1px dashed rgba(255,255,255,0.14);padding-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-          <div><div style="font-size:10px;color:rgba(30,41,59,0.5);text-transform:uppercase;margin-bottom:3px;">תאריך</div><div style="font-size:12px;font-weight:600;color:#F1F5F9;">8 אוגוסט 2026 (שבת)</div></div>
-          <div><div style="font-size:10px;color:rgba(30,41,59,0.5);text-transform:uppercase;margin-bottom:3px;">מחלקה</div><div style="font-size:12px;font-weight:600;color:#F1F5F9;">Economy</div></div>
+          <div><div style="font-size:10px;color:rgba(30,41,59,0.5);text-transform:uppercase;margin-bottom:3px;">תאריך</div><div style="font-size:12px;font-weight:600;color:#1E293B;">8 אוגוסט 2026 (שבת)</div></div>
+          <div><div style="font-size:10px;color:rgba(30,41,59,0.5);text-transform:uppercase;margin-bottom:3px;">מחלקה</div><div style="font-size:12px;font-weight:600;color:#1E293B;">Economy</div></div>
         </div>
         <div style="border-top:1px dashed rgba(255,255,255,0.14);padding-top:10px;display:grid;gap:4px;">
           <div style="font-size:10px;color:rgba(30,41,59,0.5);text-transform:uppercase;margin-bottom:4px;">נוסעים</div>
@@ -435,7 +435,7 @@ function showAuthError(msg) {
           <div style="font-size:12px;font-weight:600;color:rgba(241,245,249,0.82);">👧 Adi Yasmin Shish <span style="color:rgba(30,41,59,0.5);font-weight:400;">(ילדה)</span></div>
         </div>
       </div>
-      <div style="background:rgba(0,0,0,0.22);padding:11px 18px;border-top:1px dashed rgba(255,255,255,0.10);font-size:12px;font-weight:600;color:rgba(241,245,249,0.55);">⚠️ לוודא טרמינל בנתב"ג לפני ההגעה</div>
+      <div style="background:rgba(0,0,0,0.22);padding:11px 18px;border-top:1px dashed rgba(255,255,255,0.10);font-size:12px;font-weight:600;color:rgba(30,41,59,0.6);">⚠️ לוודא טרמינל בנתב"ג לפני ההגעה</div>
     </div>
     <div style="background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.16);border-radius:20px;overflow:hidden;margin-bottom:14px;">
       <div style="background:linear-gradient(135deg,#173554,#244b70);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;">
@@ -444,30 +444,30 @@ function showAuthError(msg) {
       </div>
       <div style="padding:18px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-          <div style="text-align:center;"><div style="font-size:28px;font-weight:900;color:#F1F5F9;line-height:1;">PRG</div><div style="font-size:17px;font-weight:700;color:#F4634A;margin-top:3px;">23:45</div><div style="font-size:11px;color:rgba(241,245,249,0.45);">רוזינה</div></div>
-          <div style="flex:1;text-align:center;padding:0 8px;"><div style="border-top:2px dashed rgba(255,255,255,0.18);margin-bottom:4px;"></div><span style="font-size:18px;">✈️</span><div style="font-size:10px;color:rgba(241,245,249,0.4);">3h 50m</div></div>
-          <div style="text-align:center;"><div style="font-size:28px;font-weight:900;color:#F1F5F9;line-height:1;">TLV</div><div style="font-size:17px;font-weight:700;color:#F59E0B;margin-top:3px;">04:35<sup style="font-size:10px;">+1</sup></div><div style="font-size:11px;color:rgba(241,245,249,0.45);">נתב"ג</div></div>
+          <div style="text-align:center;"><div style="font-size:28px;font-weight:900;color:#1E293B;line-height:1;">PRG</div><div style="font-size:17px;font-weight:700;color:#F4634A;margin-top:3px;">23:45</div><div style="font-size:11px;color:rgba(30,41,59,0.5);">רוזינה</div></div>
+          <div style="flex:1;text-align:center;padding:0 8px;"><div style="border-top:2px dashed rgba(255,255,255,0.18);margin-bottom:4px;"></div><span style="font-size:18px;">✈️</span><div style="font-size:10px;color:rgba(30,41,59,0.45);">3h 50m</div></div>
+          <div style="text-align:center;"><div style="font-size:28px;font-weight:900;color:#1E293B;line-height:1;">TLV</div><div style="font-size:17px;font-weight:700;color:#F59E0B;margin-top:3px;">04:35<sup style="font-size:10px;">+1</sup></div><div style="font-size:11px;color:rgba(30,41,59,0.5);">נתב"ג</div></div>
         </div>
         <div style="border-top:1px dashed rgba(255,255,255,0.14);padding-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          <div><div style="font-size:10px;color:rgba(30,41,59,0.5);text-transform:uppercase;margin-bottom:3px;">המראה</div><div style="font-size:12px;font-weight:600;color:#F1F5F9;">15 אוגוסט (שבת)</div></div>
+          <div><div style="font-size:10px;color:rgba(30,41,59,0.5);text-transform:uppercase;margin-bottom:3px;">המראה</div><div style="font-size:12px;font-weight:600;color:#1E293B;">15 אוגוסט (שבת)</div></div>
           <div><div style="font-size:10px;color:rgba(30,41,59,0.5);text-transform:uppercase;margin-bottom:3px;">נחיתה</div><div style="font-size:12px;font-weight:600;color:#F59E0B;">16 אוגוסט (ראשון)</div></div>
         </div>
       </div>
-      <div style="background:rgba(0,0,0,0.22);padding:11px 18px;border-top:1px dashed rgba(255,255,255,0.10);font-size:12px;font-weight:600;color:rgba(241,245,249,0.55);">💡 הגעה לארץ לפנות בוקר (16 אוגוסט)</div>
+      <div style="background:rgba(0,0,0,0.22);padding:11px 18px;border-top:1px dashed rgba(255,255,255,0.10);font-size:12px;font-weight:600;color:rgba(30,41,59,0.6);">💡 הגעה לארץ לפנות בוקר (16 אוגוסט)</div>
     </div>
   </section>
 
   <!-- ═══ RESTAURANTS ═══ -->
   <section id="restaurants" class="tab">
     <div class="card card-hdr">
-      <div><h2 style="font-size:18px;font-weight:900;">🍽️ אוכל ומקומות</h2><p style="font-size:12px;color:rgba(241,245,249,0.5);margin-top:3px;">ללא חזיר · בקר בלבד · מסודר מזול ליקר</p></div>
+      <div><h2 style="font-size:18px;font-weight:900;">🍽️ אוכל ומקומות</h2><p style="font-size:12px;color:rgba(30,41,59,0.55);margin-top:3px;">ללא חזיר · בקר בלבד · מסודר מזול ליקר</p></div>
       <button class="back-btn" id="btnBackRestaurants">← ראשי</button>
     </div>
     <!-- טאבים פנימיים -->
     <div style="display:flex;gap:8px;margin-bottom:16px;">
       <button id="tabResBtn" onclick="switchFoodTab('restaurants')" style="flex:1;padding:9px;border-radius:12px;border:none;font-size:12px;font-weight:800;font-family:'Rubik',Arial,sans-serif;cursor:pointer;background:rgba(244,99,74,0.25);color:#F4634A;">🍽️ מסעדות</button>
-      <button id="tabDesBtn" onclick="switchFoodTab('desserts')" style="flex:1;padding:9px;border-radius:12px;border:none;font-size:12px;font-weight:800;font-family:'Rubik',Arial,sans-serif;cursor:pointer;background:rgba(255,255,255,0.07);color:rgba(241,245,249,0.5);">🍦 קינוחים</button>
-      <button id="tabPhotoBtn" onclick="switchFoodTab('photo')" style="flex:1;padding:9px;border-radius:12px;border:none;font-size:12px;font-weight:800;font-family:'Rubik',Arial,sans-serif;cursor:pointer;background:rgba(255,255,255,0.07);color:rgba(241,245,249,0.5);">📸 לצלם</button>
+      <button id="tabDesBtn" onclick="switchFoodTab('desserts')" style="flex:1;padding:9px;border-radius:12px;border:none;font-size:12px;font-weight:800;font-family:'Rubik',Arial,sans-serif;cursor:pointer;background:#ffffff;color:rgba(30,41,59,0.55);">🍦 קינוחים</button>
+      <button id="tabPhotoBtn" onclick="switchFoodTab('photo')" style="flex:1;padding:9px;border-radius:12px;border:none;font-size:12px;font-weight:800;font-family:'Rubik',Arial,sans-serif;cursor:pointer;background:#ffffff;color:rgba(30,41,59,0.55);">📸 לצלם</button>
     </div>
     <div id="restaurantsList" style="display:grid;gap:12px;"></div>
     <div id="dessertsList" style="display:none;grid-template-columns:1fr;gap:12px;"></div>
@@ -477,7 +477,7 @@ function showAuthError(msg) {
   <!-- ═══ PACK ═══ -->
   <section id="pack" class="tab">
     <div class="card card-hdr">
-      <div><h2 style="font-size:18px;font-weight:900;">🧳 צ'ק-ליסט ציוד</h2><p style="font-size:12px;color:rgba(241,245,249,0.5);margin-top:3px;">לפני הטיסה — 8 אוגוסט</p></div>
+      <div><h2 style="font-size:18px;font-weight:900;">🧳 צ'ק-ליסט ציוד</h2><p style="font-size:12px;color:rgba(30,41,59,0.55);margin-top:3px;">לפני הטיסה — 8 אוגוסט</p></div>
       <div style="display:flex;gap:6px;">
         <button class="back-btn" id="btnBackPack">← ראשי</button>
         <button class="back-btn" id="btnResetPack">איפוס</button>
@@ -486,20 +486,20 @@ function showAuthError(msg) {
     <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:16px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
       <div style="font-size:13px;font-weight:700;color:#6EE7B7;">התקדמות</div>
       <div style="display:flex;align-items:center;gap:10px;">
-        <div id="packProgress" style="font-size:13px;font-weight:800;color:#F1F5F9;">0 / 0</div>
+        <div id="packProgress" style="font-size:13px;font-weight:800;color:#1E293B;">0 / 0</div>
         <button id="btnSyncPack" style="background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:4px 9px;font-size:11px;font-weight:700;color:#6EE7B7;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">☁️ סנכרן</button>
       </div>
     </div>
     <div id="packList" style="display:grid;gap:8px;"></div>
-    <button id="btnAddPackCat" style="width:100%;background:rgba(255,255,255,0.05);border:1px dashed rgba(255,255,255,0.2);border-radius:14px;padding:12px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.5);cursor:pointer;font-family:'Rubik',Arial,sans-serif;margin-top:8px;">➕ הוסף קטגוריה</button>
+    <button id="btnAddPackCat" style="width:100%;background:rgba(0,0,0,0.04);border:1px dashed rgba(255,255,255,0.2);border-radius:14px;padding:12px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.55);cursor:pointer;font-family:'Rubik',Arial,sans-serif;margin-top:8px;">➕ הוסף קטגוריה</button>
   </section>
 
   <!-- מודל הוספת פריט/קטגוריה לצ'ק-ליסט -->
   <div id="packItemModal" style="display:none;position:fixed;inset:0;z-index:80;align-items:flex-end;justify-content:center;">
     <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);" id="packItemOverlay"></div>
     <div style="position:relative;background:linear-gradient(160deg,#1e293b,#0f172a);border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;z-index:1;">
-      <h2 id="packItemTitle" style="margin:0 0 16px;font-size:17px;font-weight:900;color:#F1F5F9;">➕ הוסף פריט</h2>
-      <input id="packItemText" type="text" placeholder="שם הפריט..." style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:13px 14px;font-size:15px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:12px;">
+      <h2 id="packItemTitle" style="margin:0 0 16px;font-size:17px;font-weight:900;color:#1E293B;">➕ הוסף פריט</h2>
+      <input id="packItemText" type="text" placeholder="שם הפריט..." style="width:100%;background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:13px;padding:13px 14px;font-size:15px;color:#1E293B;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:12px;">
       <button id="btnSavePackItem" class="btn-primary" style="width:100%;">✅ הוסף</button>
     </div>
   </div>
@@ -507,7 +507,7 @@ function showAuthError(msg) {
   <!-- ═══ INFO ═══ -->
   <section id="info" class="tab">
     <div class="card card-hdr">
-      <div><h2 style="font-size:18px;font-weight:900;">📘 מידע שימושי</h2><p style="font-size:12px;color:rgba(241,245,249,0.5);margin-top:3px;">תחבורה, כסף, שפה</p></div>
+      <div><h2 style="font-size:18px;font-weight:900;">📘 מידע שימושי</h2><p style="font-size:12px;color:rgba(30,41,59,0.55);margin-top:3px;">תחבורה, כסף, שפה</p></div>
       <button class="back-btn" id="btnBackInfo">← ראשי</button>
     </div>
     <div style="display:grid;gap:12px;">
@@ -515,18 +515,18 @@ function showAuthError(msg) {
       <!-- טיסות -->
       <div style="background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);border-radius:18px;padding:16px;">
         <div style="font-size:14px;font-weight:700;color:#A5B4FC;margin-bottom:10px;">✈️ פרטי הטיסות</div>
-        <div style="display:grid;gap:8px;font-size:12px;color:rgba(241,245,249,0.7);line-height:1.8;">
+        <div style="display:grid;gap:8px;font-size:12px;color:rgba(30,41,59,0.75);line-height:1.8;">
           <div style="background:rgba(99,102,241,0.1);border-radius:10px;padding:10px;">
-            <div style="font-weight:800;color:#F1F5F9;margin-bottom:2px;">🛫 הלוך — LY2521</div>
+            <div style="font-weight:800;color:#1E293B;margin-bottom:2px;">🛫 הלוך — LY2521</div>
             <div>ת"א (TLV) → פראג (PRG)</div>
             <div>8 באוגוסט · המראה <strong style="color:#A5B4FC;">06:00</strong> · נחיתה <strong style="color:#A5B4FC;">08:45</strong></div>
-            <div style="font-size:11px;color:rgba(241,245,249,0.4);">⚠️ להגיע לשדה ב-04:00 לפחות!</div>
+            <div style="font-size:11px;color:rgba(30,41,59,0.45);">⚠️ להגיע לשדה ב-04:00 לפחות!</div>
           </div>
           <div style="background:rgba(99,102,241,0.1);border-radius:10px;padding:10px;">
-            <div style="font-weight:800;color:#F1F5F9;margin-bottom:2px;">🛬 חזור — QS1286</div>
+            <div style="font-weight:800;color:#1E293B;margin-bottom:2px;">🛬 חזור — QS1286</div>
             <div>פראג (PRG) → ת"א (TLV)</div>
             <div>15 באוגוסט · המראה <strong style="color:#A5B4FC;">23:45</strong> · נחיתה <strong style="color:#A5B4FC;">04:35+1</strong></div>
-            <div style="font-size:11px;color:rgba(241,245,249,0.4);">⚠️ לצאת מהמלון לא יאוחר מ-20:30!</div>
+            <div style="font-size:11px;color:rgba(30,41,59,0.45);">⚠️ לצאת מהמלון לא יאוחר מ-20:30!</div>
           </div>
         </div>
       </div>
@@ -535,29 +535,29 @@ function showAuthError(msg) {
       <div style="background:rgba(59,130,246,0.09);border:1px solid rgba(59,130,246,0.2);border-radius:18px;padding:16px;">
         <div style="font-size:14px;font-weight:700;color:#93C5FD;margin-bottom:10px;">🚇 תחבורה ציבורית</div>
         <div style="font-size:12px;color:rgba(241,245,249,0.62);line-height:1.9;">
-          <div style="font-weight:700;color:#F1F5F9;margin-bottom:4px;">מהמלון (Comfort Hotel Prague City East):</div>
+          <div style="font-weight:700;color:#1E293B;margin-bottom:4px;">מהמלון (Comfort Hotel Prague City East):</div>
           מטרו A מ-<strong style="color:#93C5FD;">Strašnická</strong> או <strong style="color:#93C5FD;">Skalka</strong><br>
           <strong style="color:#93C5FD;">Můstek</strong> ← Primark · <strong style="color:#93C5FD;">Náměstí Republiky</strong> ← Palladium<br>
           <strong style="color:#93C5FD;">Malostranská</strong> ← טירת פראג<br><br>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
             <div style="background:rgba(59,130,246,0.1);border-radius:8px;padding:8px;text-align:center;">
-              <div style="font-size:11px;color:rgba(241,245,249,0.5);">כרטיס 30 דקות</div>
-              <div style="font-size:16px;font-weight:900;color:#F1F5F9;">30 CZK</div>
+              <div style="font-size:11px;color:rgba(30,41,59,0.55);">כרטיס 30 דקות</div>
+              <div style="font-size:16px;font-weight:900;color:#1E293B;">30 CZK</div>
             </div>
             <div style="background:rgba(59,130,246,0.1);border-radius:8px;padding:8px;text-align:center;">
-              <div style="font-size:11px;color:rgba(241,245,249,0.5);">כרטיס יומי</div>
-              <div style="font-size:16px;font-weight:900;color:#F1F5F9;">110 CZK</div>
+              <div style="font-size:11px;color:rgba(30,41,59,0.55);">כרטיס יומי</div>
+              <div style="font-size:16px;font-weight:900;color:#1E293B;">110 CZK</div>
             </div>
             <div style="background:rgba(59,130,246,0.1);border-radius:8px;padding:8px;text-align:center;">
-              <div style="font-size:11px;color:rgba(241,245,249,0.5);">3 ימים</div>
-              <div style="font-size:16px;font-weight:900;color:#F1F5F9;">310 CZK</div>
+              <div style="font-size:11px;color:rgba(30,41,59,0.55);">3 ימים</div>
+              <div style="font-size:16px;font-weight:900;color:#1E293B;">310 CZK</div>
             </div>
             <div style="background:rgba(59,130,246,0.1);border-radius:8px;padding:8px;text-align:center;">
-              <div style="font-size:11px;color:rgba(241,245,249,0.5);">ילד עד 15</div>
+              <div style="font-size:11px;color:rgba(30,41,59,0.55);">ילד עד 15</div>
               <div style="font-size:16px;font-weight:900;color:#6EE7B7;">חינם!</div>
             </div>
           </div>
-          <div style="margin-top:8px;font-size:11px;color:rgba(241,245,249,0.45);">📱 אפליקציה: <strong style="color:#93C5FD;">PID Lítačka</strong> — כרטיסים דיגיטליים</div>
+          <div style="margin-top:8px;font-size:11px;color:rgba(30,41,59,0.5);">📱 אפליקציה: <strong style="color:#93C5FD;">PID Lítačka</strong> — כרטיסים דיגיטליים</div>
         </div>
       </div>
 
@@ -566,29 +566,29 @@ function showAuthError(msg) {
         <div style="font-size:14px;font-weight:700;color:#FCD34D;margin-bottom:10px;">🚖 Bolt — מחירי אומדן</div>
         <div style="display:grid;gap:6px;font-size:12px;">
           <div style="display:flex;justify-content:space-between;padding:7px 10px;background:rgba(245,158,11,0.08);border-radius:8px;">
-            <span style="color:rgba(241,245,249,0.6);">שדה תעופה ↔ מלון</span>
+            <span style="color:rgba(30,41,59,0.65);">שדה תעופה ↔ מלון</span>
             <strong style="color:#FCD34D;">400–700 CZK</strong>
           </div>
           <div style="display:flex;justify-content:space-between;padding:7px 10px;background:rgba(245,158,11,0.08);border-radius:8px;">
-            <span style="color:rgba(241,245,249,0.6);">מלון ↔ מרכז העיר</span>
+            <span style="color:rgba(30,41,59,0.65);">מלון ↔ מרכז העיר</span>
             <strong style="color:#FCD34D;">150–280 CZK</strong>
           </div>
           <div style="display:flex;justify-content:space-between;padding:7px 10px;background:rgba(245,158,11,0.08);border-radius:8px;">
-            <span style="color:rgba(241,245,249,0.6);">מלון ↔ Prague Zoo</span>
+            <span style="color:rgba(30,41,59,0.65);">מלון ↔ Prague Zoo</span>
             <strong style="color:#FCD34D;">250–400 CZK</strong>
           </div>
           <div style="display:flex;justify-content:space-between;padding:7px 10px;background:rgba(245,158,11,0.08);border-radius:8px;">
-            <span style="color:rgba(241,245,249,0.6);">מלון ↔ Aquapalace</span>
+            <span style="color:rgba(30,41,59,0.65);">מלון ↔ Aquapalace</span>
             <strong style="color:#FCD34D;">450–700 CZK</strong>
           </div>
         </div>
-        <div style="margin-top:8px;font-size:11px;color:rgba(241,245,249,0.45);">⚠️ תמיד לשלם <strong style="color:#FCD34D;">בכרטיס דרך האפליקציה</strong> — לא במזומן לנהג</div>
+        <div style="margin-top:8px;font-size:11px;color:rgba(30,41,59,0.5);">⚠️ תמיד לשלם <strong style="color:#FCD34D;">בכרטיס דרך האפליקציה</strong> — לא במזומן לנהג</div>
       </div>
 
       <!-- כסף -->
       <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.18);border-radius:18px;padding:16px;">
         <div style="font-size:14px;font-weight:700;color:#6EE7B7;margin-bottom:10px;">💳 כסף, כרטיס וכספומטים</div>
-        <div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.9;">
+        <div style="font-size:12px;color:rgba(30,41,59,0.7);line-height:1.9;">
           ✅ תמיד לשלם <strong style="color:#6EE7B7;">בכרטיס</strong> — אין עמלת המרה<br>
           ✅ אם המסוף שואל שפה — בחרו <strong style="color:#6EE7B7;">CZK</strong> (לא ILS!)<br>
           ✅ כספומט: <strong style="color:#6EE7B7;">Raiffeisenbank / Moneta</strong> — ללא עמלה<br>
@@ -602,38 +602,38 @@ function showAuthError(msg) {
       </div>
 
       <!-- שער המרה -->
-      <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:18px;padding:16px;">
-        <div style="font-size:14px;font-weight:700;color:#F1F5F9;margin-bottom:7px;">⚙️ מחשבון שער המרה</div>
+      <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:18px;padding:16px;">
+        <div style="font-size:14px;font-weight:700;color:#1E293B;margin-bottom:7px;">⚙️ מחשבון שער המרה</div>
         <div style="font-size:12px;color:rgba(241,245,249,0.42);margin-bottom:10px;">כמה קרונות בשקל אחד</div>
-        <input id="rate" type="number" step="0.01" value="6.4" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:12px 14px;font-size:14px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:ltr;box-sizing:border-box;margin-bottom:6px;">
-        <div id="rateStatus" style="font-size:11px;color:rgba(241,245,249,0.4);margin-bottom:10px;min-height:16px;"></div>
+        <input id="rate" type="number" step="0.01" value="6.4" style="width:100%;background:#ffffff;border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:12px 14px;font-size:14px;color:#1E293B;font-family:'Rubik',Arial,sans-serif;direction:ltr;box-sizing:border-box;margin-bottom:6px;">
+        <div id="rateStatus" style="font-size:11px;color:rgba(30,41,59,0.45);margin-bottom:10px;min-height:16px;"></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
           <button id="btnSaveRate" class="btn-ghost" style="font-size:12px;padding:10px;">💾 שמור ידני</button>
           <button id="btnLiveRate" class="btn-primary" style="font-size:12px;padding:10px;">🔄 שער חי</button>
         </div>
         <!-- מחשבון המרה -->
         <div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:14px;">
-          <div style="font-size:12px;font-weight:700;color:rgba(241,245,249,0.6);margin-bottom:10px;">🔁 המרה מהירה</div>
+          <div style="font-size:12px;font-weight:700;color:rgba(30,41,59,0.65);margin-bottom:10px;">🔁 המרה מהירה</div>
           <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:8px;">
             <div>
-              <div style="font-size:10px;color:rgba(241,245,249,0.4);margin-bottom:4px;text-align:center;">₪ שקלים</div>
-              <input id="calcIls" type="number" inputmode="decimal" placeholder="0" style="width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(245,158,11,0.35);border-radius:11px;padding:11px 10px;font-size:18px;font-weight:800;color:#FCD34D;font-family:'Rubik',Arial,sans-serif;text-align:center;box-sizing:border-box;">
+              <div style="font-size:10px;color:rgba(30,41,59,0.45);margin-bottom:4px;text-align:center;">₪ שקלים</div>
+              <input id="calcIls" type="number" inputmode="decimal" placeholder="0" style="width:100%;background:#ffffff;border:1px solid rgba(245,158,11,0.35);border-radius:11px;padding:11px 10px;font-size:18px;font-weight:800;color:#FCD34D;font-family:'Rubik',Arial,sans-serif;text-align:center;box-sizing:border-box;">
             </div>
-            <div style="font-size:18px;color:rgba(241,245,249,0.3);text-align:center;padding-bottom:2px;">=</div>
+            <div style="font-size:18px;color:rgba(30,41,59,0.35);text-align:center;padding-bottom:2px;">=</div>
             <div>
-              <div style="font-size:10px;color:rgba(241,245,249,0.4);margin-bottom:4px;text-align:center;">Kč קרונות</div>
-              <input id="calcCzk" type="number" inputmode="decimal" placeholder="0" style="width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(99,102,241,0.35);border-radius:11px;padding:11px 10px;font-size:18px;font-weight:800;color:#A5B4FC;font-family:'Rubik',Arial,sans-serif;text-align:center;box-sizing:border-box;">
+              <div style="font-size:10px;color:rgba(30,41,59,0.45);margin-bottom:4px;text-align:center;">Kč קרונות</div>
+              <input id="calcCzk" type="number" inputmode="decimal" placeholder="0" style="width:100%;background:#ffffff;border:1px solid rgba(99,102,241,0.35);border-radius:11px;padding:11px 10px;font-size:18px;font-weight:800;color:#A5B4FC;font-family:'Rubik',Arial,sans-serif;text-align:center;box-sizing:border-box;">
             </div>
           </div>
-          <div id="calcHint" style="font-size:11px;color:rgba(241,245,249,0.3);text-align:center;">הקלד בכל אחד מהשדות</div>
+          <div id="calcHint" style="font-size:11px;color:rgba(30,41,59,0.35);text-align:center;">הקלד בכל אחד מהשדות</div>
         </div>
       </div>
 
       <!-- SIM ואינטרנט -->
       <div style="background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.2);border-radius:18px;padding:16px;">
         <div style="font-size:14px;font-weight:700;color:#67E8F9;margin-bottom:10px;">📱 SIM ואינטרנט</div>
-        <div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.9;">
-          <strong style="color:#F1F5F9;">Vodafone / T-Mobile</strong> — שניהם בשדה<br>
+        <div style="font-size:12px;color:rgba(30,41,59,0.7);line-height:1.9;">
+          <strong style="color:#1E293B;">Vodafone / T-Mobile</strong> — שניהם בשדה<br>
           ~<strong style="color:#67E8F9;">300–500 CZK</strong> ל-SIM עם 10GB לחודש<br>
           📶 <strong style="color:#67E8F9;">Roaming ישראלי</strong> — לבדוק עם הספק לפני הטיסה<br>
           🏨 WiFi במלון — מהיר ובחינם בכל החדרים<br>
@@ -646,19 +646,19 @@ function showAuthError(msg) {
         <div style="font-size:14px;font-weight:700;color:#FDE68A;margin-bottom:10px;">🌤️ מזג אוויר — אוגוסט בפראג</div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;">
           <div style="background:rgba(251,191,36,0.1);border-radius:10px;padding:8px;text-align:center;">
-            <div style="font-size:10px;color:rgba(241,245,249,0.5);">ממוצע יום</div>
+            <div style="font-size:10px;color:rgba(30,41,59,0.55);">ממוצע יום</div>
             <div style="font-size:20px;font-weight:900;color:#FDE68A;">25°</div>
           </div>
           <div style="background:rgba(251,191,36,0.1);border-radius:10px;padding:8px;text-align:center;">
-            <div style="font-size:10px;color:rgba(241,245,249,0.5);">שיא</div>
+            <div style="font-size:10px;color:rgba(30,41,59,0.55);">שיא</div>
             <div style="font-size:20px;font-weight:900;color:#F97316;">32°</div>
           </div>
           <div style="background:rgba(251,191,36,0.1);border-radius:10px;padding:8px;text-align:center;">
-            <div style="font-size:10px;color:rgba(241,245,249,0.5);">לילה</div>
+            <div style="font-size:10px;color:rgba(30,41,59,0.55);">לילה</div>
             <div style="font-size:20px;font-weight:900;color:#93C5FD;">15°</div>
           </div>
         </div>
-        <div style="font-size:12px;color:rgba(241,245,249,0.6);line-height:1.8;">
+        <div style="font-size:12px;color:rgba(30,41,59,0.65);line-height:1.8;">
           ☀️ ימים חמים וארוכים — שמש עד 20:30<br>
           🌧️ גשמי קיץ קצרים — מומלץ מטרייה קטנה<br>
           👕 לבוש: קל ביום, שכבה לערב (15°)<br>
@@ -669,7 +669,7 @@ function showAuthError(msg) {
       <!-- חשמל ומתאמים -->
       <div style="background:rgba(139,92,246,0.09);border:1px solid rgba(139,92,246,0.2);border-radius:18px;padding:16px;">
         <div style="font-size:14px;font-weight:700;color:#C4B5FD;margin-bottom:10px;">🔌 חשמל ומטענים</div>
-        <div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.9;">
+        <div style="font-size:12px;color:rgba(30,41,59,0.7);line-height:1.9;">
           🇨🇿 שקעים: <strong style="color:#C4B5FD;">Type E / F</strong> — אירופאי עגול<br>
           ⚡ מתח: <strong style="color:#C4B5FD;">230V / 50Hz</strong> — זהה לישראל ✅<br>
           🔌 מתאם: נדרש מתאם ישראל→אירופה<br>
@@ -683,31 +683,31 @@ function showAuthError(msg) {
         <div style="font-size:14px;font-weight:700;color:#FCA5A5;margin-bottom:10px;">🆘 מספרי חירום</div>
         <div style="display:grid;gap:6px;font-size:13px;">
           <div style="display:flex;justify-content:space-between;padding:8px 11px;background:rgba(239,68,68,0.08);border-radius:9px;">
-            <span style="color:rgba(241,245,249,0.65);">🚨 חירום כללי</span>
+            <span style="color:rgba(30,41,59,0.7);">🚨 חירום כללי</span>
             <a href="tel:112" style="color:#FCA5A5;font-weight:900;text-decoration:none;">112</a>
           </div>
           <div style="display:flex;justify-content:space-between;padding:8px 11px;background:rgba(239,68,68,0.08);border-radius:9px;">
-            <span style="color:rgba(241,245,249,0.65);">🚑 אמבולנס</span>
+            <span style="color:rgba(30,41,59,0.7);">🚑 אמבולנס</span>
             <a href="tel:155" style="color:#FCA5A5;font-weight:900;text-decoration:none;">155</a>
           </div>
           <div style="display:flex;justify-content:space-between;padding:8px 11px;background:rgba(239,68,68,0.08);border-radius:9px;">
-            <span style="color:rgba(241,245,249,0.65);">🚒 כיבוי אש</span>
+            <span style="color:rgba(30,41,59,0.7);">🚒 כיבוי אש</span>
             <a href="tel:150" style="color:#FCA5A5;font-weight:900;text-decoration:none;">150</a>
           </div>
           <div style="display:flex;justify-content:space-between;padding:8px 11px;background:rgba(239,68,68,0.08);border-radius:9px;">
-            <span style="color:rgba(241,245,249,0.65);">👮 משטרה</span>
+            <span style="color:rgba(30,41,59,0.7);">👮 משטרה</span>
             <a href="tel:158" style="color:#FCA5A5;font-weight:900;text-decoration:none;">158</a>
           </div>
           <div style="display:flex;justify-content:space-between;padding:8px 11px;background:rgba(239,68,68,0.08);border-radius:9px;">
-            <span style="color:rgba(241,245,249,0.65);">🏥 בית חולים Na Homolce</span>
+            <span style="color:rgba(30,41,59,0.7);">🏥 בית חולים Na Homolce</span>
             <a href="tel:+420257271111" style="color:#FCA5A5;font-weight:800;text-decoration:none;font-size:12px;">+420 257 271 111</a>
           </div>
           <div style="display:flex;justify-content:space-between;padding:8px 11px;background:rgba(239,68,68,0.08);border-radius:9px;">
-            <span style="color:rgba(241,245,249,0.65);">🇮🇱 שגרירות ישראל</span>
+            <span style="color:rgba(30,41,59,0.7);">🇮🇱 שגרירות ישראל</span>
             <a href="tel:+420233097500" style="color:#FCA5A5;font-weight:800;text-decoration:none;font-size:12px;">+420 233 097 500</a>
           </div>
           <div style="display:flex;justify-content:space-between;padding:8px 11px;background:rgba(239,68,68,0.08);border-radius:9px;">
-            <span style="color:rgba(241,245,249,0.65);">🏨 המלון</span>
+            <span style="color:rgba(30,41,59,0.7);">🏨 המלון</span>
             <a href="tel:+420272101111" style="color:#FCA5A5;font-weight:800;text-decoration:none;font-size:12px;">+420 272 101 111</a>
           </div>
         </div>
@@ -716,7 +716,7 @@ function showAuthError(msg) {
       <!-- בריאות ובטיחות -->
       <div style="background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.17);border-radius:18px;padding:16px;">
         <div style="font-size:14px;font-weight:700;color:#6EE7B7;margin-bottom:10px;">💊 בריאות ובטיחות</div>
-        <div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.9;">
+        <div style="font-size:12px;color:rgba(30,41,59,0.7);line-height:1.9;">
           🏥 ביטוח נסיעות — לוודא שפעיל לפני הטיסה<br>
           💊 בית מרקחת (Lékárna): פתוח עד 22:00 במרכז<br>
           <strong style="color:#6EE7B7;">Palladium Pharmacy</strong> — קומת מרתף<br>
@@ -731,7 +731,7 @@ function showAuthError(msg) {
       <!-- אוכל וכשרות -->
       <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:18px;padding:16px;">
         <div style="font-size:14px;font-weight:700;color:#FDBA74;margin-bottom:10px;">🍽️ אוכל — טיפים חשובים</div>
-        <div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.9;">
+        <div style="font-size:12px;color:rgba(30,41,59,0.7);line-height:1.9;">
           🐷 אוכל צ'כי מסורתי = הרבה חזיר — לשאול תמיד!<br>
           🥩 בשר בקר / עוף — זמין בכל מסעדה<br>
           🐟 דגים — מצוינים בפראג (טרי מהנהר)<br>
@@ -748,23 +748,23 @@ function showAuthError(msg) {
         <div style="display:grid;gap:7px;font-size:12px;">
           <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(59,130,246,0.08);border-radius:9px;">
             <span style="font-size:20px;">🚖</span>
-            <div><div style="font-weight:700;color:#F1F5F9;">Bolt</div><div style="color:rgba(241,245,249,0.5);">נסיעות — זול ובטוח</div></div>
+            <div><div style="font-weight:700;color:#1E293B;">Bolt</div><div style="color:rgba(30,41,59,0.55);">נסיעות — זול ובטוח</div></div>
           </div>
           <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(59,130,246,0.08);border-radius:9px;">
             <span style="font-size:20px;">🗺️</span>
-            <div><div style="font-weight:700;color:#F1F5F9;">Google Maps</div><div style="color:rgba(241,245,249,0.5);">ניווט — להוריד מפת פראג Offline!</div></div>
+            <div><div style="font-weight:700;color:#1E293B;">Google Maps</div><div style="color:rgba(30,41,59,0.55);">ניווט — להוריד מפת פראג Offline!</div></div>
           </div>
           <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(59,130,246,0.08);border-radius:9px;">
             <span style="font-size:20px;">🚇</span>
-            <div><div style="font-weight:700;color:#F1F5F9;">PID Lítačka</div><div style="color:rgba(241,245,249,0.5);">כרטיסי תחבורה ציבורית</div></div>
+            <div><div style="font-weight:700;color:#1E293B;">PID Lítačka</div><div style="color:rgba(30,41,59,0.55);">כרטיסי תחבורה ציבורית</div></div>
           </div>
           <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(59,130,246,0.08);border-radius:9px;">
             <span style="font-size:20px;">💱</span>
-            <div><div style="font-weight:700;color:#F1F5F9;">XE Currency</div><div style="color:rgba(241,245,249,0.5);">המרת מטבעות בזמן אמת</div></div>
+            <div><div style="font-weight:700;color:#1E293B;">XE Currency</div><div style="color:rgba(30,41,59,0.55);">המרת מטבעות בזמן אמת</div></div>
           </div>
           <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(59,130,246,0.08);border-radius:9px;">
             <span style="font-size:20px;">🌤️</span>
-            <div><div style="font-weight:700;color:#F1F5F9;">Windy / AccuWeather</div><div style="color:rgba(241,245,249,0.5);">תחזית מדויקת לפראג</div></div>
+            <div><div style="font-weight:700;color:#1E293B;">Windy / AccuWeather</div><div style="color:rgba(30,41,59,0.55);">תחזית מדויקת לפראג</div></div>
           </div>
         </div>
       </div>
@@ -773,14 +773,14 @@ function showAuthError(msg) {
       <div style="background:linear-gradient(135deg,rgba(168,85,247,0.13),rgba(99,102,241,0.1));border:1px solid rgba(168,85,247,0.3);border-radius:18px;padding:16px;text-align:center;">
         <div style="font-size:22px;margin-bottom:6px;">🌐</div>
         <div style="font-size:14px;font-weight:800;color:#C084FC;margin-bottom:4px;">שפה ותרגום</div>
-        <div style="font-size:12px;color:rgba(241,245,249,0.45);margin-bottom:14px;">מתרגם קולי עברית ↔ צ'כית + ביטויים שימושיים</div>
+        <div style="font-size:12px;color:rgba(30,41,59,0.5);margin-bottom:14px;">מתרגם קולי עברית ↔ צ'כית + ביטויים שימושיים</div>
         <button onclick="openTab('lang')" style="width:100%;background:rgba(168,85,247,0.25);border:1px solid rgba(168,85,247,0.45);border-radius:13px;padding:12px;font-size:14px;font-weight:800;color:#C084FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">פתח שפה ותרגום →</button>
       </div>
 
       <!-- טיפים מהשטח -->
       <div style="background:rgba(52,211,153,0.07);border:1px solid rgba(52,211,153,0.18);border-radius:18px;padding:16px;">
         <div style="font-size:14px;font-weight:700;color:#6EE7B7;margin-bottom:10px;">💡 טיפים מהשטח</div>
-        <div style="display:grid;gap:6px;font-size:12px;color:rgba(241,245,249,0.65);">
+        <div style="display:grid;gap:6px;font-size:12px;color:rgba(30,41,59,0.7);">
           <div style="padding:7px 10px;background:rgba(52,211,153,0.07);border-radius:8px;border-right:3px solid #6EE7B7;">🕐 אטרקציות — להגיע מוקדם (לפני 9:00) לפני ההמון</div>
           <div style="padding:7px 10px;background:rgba(52,211,153,0.07);border-radius:8px;border-right:3px solid #6EE7B7;">🍽️ מסעדות בכיכר העיר — יקרות פי 3! ללכת לרחובות הצדדיים</div>
           <div style="padding:7px 10px;background:rgba(52,211,153,0.07);border-radius:8px;border-right:3px solid #6EE7B7;">💶 Exchange בשדה — להחליף רק מינימום. שאר — כרטיס אשראי</div>
@@ -820,7 +820,7 @@ function showAuthError(msg) {
   <!-- ═══ GUIDES ═══ -->
   <section id="guides" class="tab">
     <div class="card card-hdr">
-      <div><h2 style="font-size:18px;font-weight:900;">🎙️ מדריכים בעברית בפראג</h2><p style="font-size:12px;color:rgba(241,245,249,0.5);margin-top:3px;">סיורים מודרכים מישראלים שגרים בפראג</p></div>
+      <div><h2 style="font-size:18px;font-weight:900;">🎙️ מדריכים בעברית בפראג</h2><p style="font-size:12px;color:rgba(30,41,59,0.55);margin-top:3px;">סיורים מודרכים מישראלים שגרים בפראג</p></div>
       <button class="back-btn" id="btnBackGuides">← ראשי</button>
     </div>
 
@@ -829,23 +829,23 @@ function showAuthError(msg) {
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
         <div style="font-size:28px;">🟡</div>
         <div>
-          <div style="font-weight:900;font-size:15px;color:#F1F5F9;">אנופראג — AnoPrague</div>
-          <div style="font-size:11px;color:rgba(241,245,249,0.5);">הכי פופולרי • פועל כל יום</div>
+          <div style="font-weight:900;font-size:15px;color:#1E293B;">אנופראג — AnoPrague</div>
+          <div style="font-size:11px;color:rgba(30,41,59,0.55);">הכי פופולרי • פועל כל יום</div>
         </div>
       </div>
       <div style="display:grid;gap:8px;">
-        <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:10px;">
+        <div style="background:rgba(0,0,0,0.04);border-radius:12px;padding:10px;">
           <div style="font-weight:800;font-size:13px;color:#FED7AA;">🏛️ סיור עיר בסיסי</div>
-          <div style="font-size:12px;color:rgba(241,245,249,0.7);margin-top:3px;">מגדל האבק, גשר קרלוב, השכונה היהודית, כיכר העיר העתיקה</div>
+          <div style="font-size:12px;color:rgba(30,41,59,0.75);margin-top:3px;">מגדל האבק, גשר קרלוב, השכונה היהודית, כיכר העיר העתיקה</div>
           <div style="display:flex;justify-content:space-between;margin-top:6px;">
-            <span style="font-size:11px;color:rgba(241,245,249,0.45);">⏱ כ-2.5 שעות • כל בוקר ואחה"צ</span>
+            <span style="font-size:11px;color:rgba(30,41,59,0.5);">⏱ כ-2.5 שעות • כל בוקר ואחה"צ</span>
             <span style="font-size:13px;font-weight:900;color:#6EE7B7;">€75 לאדם</span>
           </div>
         </div>
-        <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:10px;">
+        <div style="background:rgba(0,0,0,0.04);border-radius:12px;padding:10px;">
           <div style="font-weight:800;font-size:13px;color:#FED7AA;">🗺️ סיורים נוספים</div>
-          <div style="font-size:12px;color:rgba(241,245,249,0.7);margin-top:3px;">5 סוגי סיורים שונים לפי נושא — לפי הזמנה מראש</div>
-          <div style="font-size:11px;color:rgba(241,245,249,0.45);margin-top:4px;">ילדים עד גיל 6 — חינם</div>
+          <div style="font-size:12px;color:rgba(30,41,59,0.75);margin-top:3px;">5 סוגי סיורים שונים לפי נושא — לפי הזמנה מראש</div>
+          <div style="font-size:11px;color:rgba(30,41,59,0.5);margin-top:4px;">ילדים עד גיל 6 — חינם</div>
         </div>
       </div>
       <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
@@ -858,32 +858,32 @@ function showAuthError(msg) {
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
         <div style="font-size:28px;">🚌</div>
         <div>
-          <div style="font-weight:900;font-size:15px;color:#F1F5F9;">Prague2go</div>
-          <div style="font-size:11px;color:rgba(241,245,249,0.5);">25+ שנות ניסיון • גם טיולי יום מחוץ לפראג</div>
+          <div style="font-weight:900;font-size:15px;color:#1E293B;">Prague2go</div>
+          <div style="font-size:11px;color:rgba(30,41,59,0.55);">25+ שנות ניסיון • גם טיולי יום מחוץ לפראג</div>
         </div>
       </div>
       <div style="display:grid;gap:8px;">
-        <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:10px;">
+        <div style="background:rgba(0,0,0,0.04);border-radius:12px;padding:10px;">
           <div style="font-weight:800;font-size:13px;color:#FED7AA;">🏛️ סיור עיר פראג</div>
-          <div style="font-size:12px;color:rgba(241,245,249,0.7);margin-top:3px;">כולל איסוף מהמלון • ב׳, ג׳, ה׳, ו׳</div>
+          <div style="font-size:12px;color:rgba(30,41,59,0.75);margin-top:3px;">כולל איסוף מהמלון • ב׳, ג׳, ה׳, ו׳</div>
           <div style="display:flex;justify-content:space-between;margin-top:6px;">
-            <span style="font-size:11px;color:rgba(241,245,249,0.45);">⏱ חצי יום</span>
+            <span style="font-size:11px;color:rgba(30,41,59,0.5);">⏱ חצי יום</span>
             <span style="font-size:13px;font-weight:900;color:#6EE7B7;">€30 לאדם</span>
           </div>
         </div>
-        <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:10px;">
+        <div style="background:rgba(0,0,0,0.04);border-radius:12px;padding:10px;">
           <div style="font-weight:800;font-size:13px;color:#FED7AA;">⛵ פראג + שייט בוולטאווה</div>
-          <div style="font-size:12px;color:rgba(241,245,249,0.7);margin-top:3px;">כולל איסוף + שייט בנהר • 09:00–14:30</div>
+          <div style="font-size:12px;color:rgba(30,41,59,0.75);margin-top:3px;">כולל איסוף + שייט בנהר • 09:00–14:30</div>
           <div style="display:flex;justify-content:space-between;margin-top:6px;">
-            <span style="font-size:11px;color:rgba(241,245,249,0.45);">⏱ כ-5.5 שעות</span>
+            <span style="font-size:11px;color:rgba(30,41,59,0.5);">⏱ כ-5.5 שעות</span>
             <span style="font-size:13px;font-weight:900;color:#6EE7B7;">€45–50 לאדם</span>
           </div>
         </div>
-        <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:10px;">
+        <div style="background:rgba(0,0,0,0.04);border-radius:12px;padding:10px;">
           <div style="font-weight:800;font-size:13px;color:#FED7AA;">🏰 טיולי יום מחוץ לפראג</div>
-          <div style="font-size:12px;color:rgba(241,245,249,0.7);margin-top:3px;">קרלובי וארי • צ'סקי קרומלוב • דרזדן • טרזין</div>
+          <div style="font-size:12px;color:rgba(30,41,59,0.75);margin-top:3px;">קרלובי וארי • צ'סקי קרומלוב • דרזדן • טרזין</div>
           <div style="display:flex;justify-content:space-between;margin-top:6px;">
-            <span style="font-size:11px;color:rgba(241,245,249,0.45);">⏱ יום שלם</span>
+            <span style="font-size:11px;color:rgba(30,41,59,0.5);">⏱ יום שלם</span>
             <span style="font-size:13px;font-weight:900;color:#6EE7B7;">מ-€30 לאדם</span>
           </div>
         </div>
@@ -898,12 +898,12 @@ function showAuthError(msg) {
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
         <div style="font-size:28px;">🌈</div>
         <div>
-          <div style="font-weight:900;font-size:15px;color:#F1F5F9;">פראג עם דור</div>
-          <div style="font-size:11px;color:rgba(241,245,249,0.5);">היסטוריון • קבוצות קטנות • אישי מאוד</div>
+          <div style="font-weight:900;font-size:15px;color:#1E293B;">פראג עם דור</div>
+          <div style="font-size:11px;color:rgba(30,41,59,0.55);">היסטוריון • קבוצות קטנות • אישי מאוד</div>
         </div>
       </div>
-      <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:10px;margin-bottom:10px;">
-        <div style="font-size:12px;color:rgba(241,245,249,0.7);">סיורים בקבוצות קטנות, עמוקים וסיפורתיים. דור גר בפראג מעל 10 שנים, מוסמך כהיסטוריון. לא "טיולי עדר" — חוויה אישית.</div>
+      <div style="background:rgba(0,0,0,0.04);border-radius:12px;padding:10px;margin-bottom:10px;">
+        <div style="font-size:12px;color:rgba(30,41,59,0.75);">סיורים בקבוצות קטנות, עמוקים וסיפורתיים. דור גר בפראג מעל 10 שנים, מוסמך כהיסטוריון. לא "טיולי עדר" — חוויה אישית.</div>
         <div style="font-size:12px;color:#FCD34D;font-weight:700;margin-top:6px;">💰 מחיר: לפי פנייה אישית</div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -917,12 +917,12 @@ function showAuthError(msg) {
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
         <div style="font-size:28px;">🔵</div>
         <div>
-          <div style="font-weight:900;font-size:15px;color:#F1F5F9;">Prague4You</div>
-          <div style="font-size:11px;color:rgba(241,245,249,0.5);">סיורים פרטיים ומאורגנים • מותאם אישית</div>
+          <div style="font-weight:900;font-size:15px;color:#1E293B;">Prague4You</div>
+          <div style="font-size:11px;color:rgba(30,41,59,0.55);">סיורים פרטיים ומאורגנים • מותאם אישית</div>
         </div>
       </div>
-      <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:10px;margin-bottom:10px;">
-        <div style="font-size:12px;color:rgba(241,245,249,0.7);">סיורים פרטיים מותאמים לצרכי המשפחה/קבוצה. לרוב זולים יותר מסיורים קבוצתיים מסחריים.</div>
+      <div style="background:rgba(0,0,0,0.04);border-radius:12px;padding:10px;margin-bottom:10px;">
+        <div style="font-size:12px;color:rgba(30,41,59,0.75);">סיורים פרטיים מותאמים לצרכי המשפחה/קבוצה. לרוב זולים יותר מסיורים קבוצתיים מסחריים.</div>
         <div style="font-size:12px;color:#FCD34D;font-weight:700;margin-top:6px;">💰 מחיר: לפי פנייה</div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -936,12 +936,12 @@ function showAuthError(msg) {
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
         <div style="font-size:28px;">⚔️</div>
         <div>
-          <div style="font-weight:900;font-size:15px;color:#F1F5F9;">הסיירת של פראג — תמיר כרמל</div>
-          <div style="font-size:11px;color:rgba(241,245,249,0.5);">מורשה ממשרד התיירות הצ'כי • סיורים היסטוריים</div>
+          <div style="font-weight:900;font-size:15px;color:#1E293B;">הסיירת של פראג — תמיר כרמל</div>
+          <div style="font-size:11px;color:rgba(30,41,59,0.55);">מורשה ממשרד התיירות הצ'כי • סיורים היסטוריים</div>
         </div>
       </div>
-      <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:10px;margin-bottom:10px;">
-        <div style="font-size:12px;color:rgba(241,245,249,0.7);">מדריך מקצועי עם רישיון ממשרד התיירות הצ'כי. מתמחה בסיורים היסטוריים מעמיקים בעברית.</div>
+      <div style="background:rgba(0,0,0,0.04);border-radius:12px;padding:10px;margin-bottom:10px;">
+        <div style="font-size:12px;color:rgba(30,41,59,0.75);">מדריך מקצועי עם רישיון ממשרד התיירות הצ'כי. מתמחה בסיורים היסטוריים מעמיקים בעברית.</div>
         <div style="font-size:12px;color:#FCD34D;font-weight:700;margin-top:6px;">💰 מחיר: לפי פנייה</div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -953,11 +953,11 @@ function showAuthError(msg) {
     <div style="background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);border-radius:16px;padding:14px;margin-bottom:12px;">
       <div style="font-weight:800;font-size:13px;color:#7DD3FC;margin-bottom:8px;">💡 איך לבחור?</div>
       <div style="display:grid;gap:6px;font-size:12px;">
-        <div style="color:rgba(241,245,249,0.8);">👨‍👩‍👧‍👦 <strong>משפחה עם ילדים</strong> → Prague2go (€30, איסוף מהמלון)</div>
-        <div style="color:rgba(241,245,249,0.8);">🎓 <strong>חוויה עמוקה/היסטורית</strong> → פראג עם דור / הסיירת</div>
-        <div style="color:rgba(241,245,249,0.8);">📅 <strong>כל יום, ספונטני</strong> → אנופראג</div>
-        <div style="color:rgba(241,245,249,0.8);">🏰 <strong>טיולי יום מחוץ לפראג</strong> → Prague2go</div>
-        <div style="color:rgba(241,245,249,0.8);">🔒 <strong>פרטי לחלוטין</strong> → Prague4You</div>
+        <div style="color:rgba(30,41,59,0.85);">👨‍👩‍👧‍👦 <strong>משפחה עם ילדים</strong> → Prague2go (€30, איסוף מהמלון)</div>
+        <div style="color:rgba(30,41,59,0.85);">🎓 <strong>חוויה עמוקה/היסטורית</strong> → פראג עם דור / הסיירת</div>
+        <div style="color:rgba(30,41,59,0.85);">📅 <strong>כל יום, ספונטני</strong> → אנופראג</div>
+        <div style="color:rgba(30,41,59,0.85);">🏰 <strong>טיולי יום מחוץ לפראג</strong> → Prague2go</div>
+        <div style="color:rgba(30,41,59,0.85);">🔒 <strong>פרטי לחלוטין</strong> → Prague4You</div>
       </div>
     </div>
   </section>
@@ -965,7 +965,7 @@ function showAuthError(msg) {
   <!-- ═══ COMMUNITY ═══ -->
   <section id="community" class="tab">
     <div class="card card-hdr">
-      <div><h2 style="font-size:18px;font-weight:900;">👥 המלצות קהילה</h2><p style="font-size:12px;color:rgba(241,245,249,0.5);margin-top:3px;">ממטיילים ישראלים שחזרו מפראג</p></div>
+      <div><h2 style="font-size:18px;font-weight:900;">👥 המלצות קהילה</h2><p style="font-size:12px;color:rgba(30,41,59,0.55);margin-top:3px;">ממטיילים ישראלים שחזרו מפראג</p></div>
       <button class="back-btn" id="btnBackCommunity">← ראשי</button>
     </div>
     <!-- פילטר קטגוריה -->
@@ -976,7 +976,7 @@ function showAuthError(msg) {
   <!-- ═══ HISTORY & PHOTO ═══ -->
   <section id="history" class="tab">
     <div class="card card-hdr">
-      <div><h2 style="font-size:18px;font-weight:900;">🏛️ היסטוריה ותמונות</h2><p style="font-size:12px;color:rgba(241,245,249,0.5);margin-top:3px;">מדריך תיירים — מה לצלם ולמה זה מיוחד</p></div>
+      <div><h2 style="font-size:18px;font-weight:900;">🏛️ היסטוריה ותמונות</h2><p style="font-size:12px;color:rgba(30,41,59,0.55);margin-top:3px;">מדריך תיירים — מה לצלם ולמה זה מיוחד</p></div>
       <button class="back-btn" id="btnBackHistory">← ראשי</button>
     </div>
     <div style="display:grid;gap:14px;" id="historyList"></div>
@@ -985,7 +985,7 @@ function showAuthError(msg) {
   <!-- ═══ PHOTO DIARY ═══ -->
   <section id="photodiary" class="tab">
     <div class="card card-hdr">
-      <div><h2 style="font-size:18px;font-weight:900;">📷 יומן תמונות</h2><p style="font-size:12px;color:rgba(241,245,249,0.5);margin-top:3px;">תמונות מהטיול עם תיוג מקום</p></div>
+      <div><h2 style="font-size:18px;font-weight:900;">📷 יומן תמונות</h2><p style="font-size:12px;color:rgba(30,41,59,0.55);margin-top:3px;">תמונות מהטיול עם תיוג מקום</p></div>
       <button class="back-btn" id="btnBackPhotoDiary">← ראשי</button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
@@ -993,7 +993,7 @@ function showAuthError(msg) {
       <button id="btnShareAll" style="background:linear-gradient(135deg,rgba(37,211,102,0.2),rgba(59,130,246,0.2));border:1px solid rgba(37,211,102,0.35);border-radius:16px;padding:14px 8px;font-size:12px;font-weight:800;color:#86EFAC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">📤 שתף תמונות</button>
     </div>
     <div id="driveBackupStatus" style="display:none;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:12px;padding:10px 14px;font-size:12px;color:#6EE7B7;margin-bottom:12px;text-align:center;white-space:pre-wrap;"></div>
-    <div id="photoDiaryEmpty" style="text-align:center;padding:40px 20px;color:rgba(241,245,249,0.3);font-size:13px;">עדיין אין תמונות — לחצו על הכפתור למעלה להתחיל!</div>
+    <div id="photoDiaryEmpty" style="text-align:center;padding:40px 20px;color:rgba(30,41,59,0.35);font-size:13px;">עדיין אין תמונות — לחצו על הכפתור למעלה להתחיל!</div>
     <div id="photoDiaryGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div>
   </section>
 
@@ -1001,11 +1001,11 @@ function showAuthError(msg) {
   <div id="photoTagModal" style="display:none;position:fixed;inset:0;z-index:90;align-items:flex-end;justify-content:center;">
     <div style="position:absolute;inset:0;background:rgba(0,0,0,0.7);" id="photoTagOverlay"></div>
     <div style="position:relative;background:linear-gradient(160deg,#1e293b,#0f172a);border-radius:28px 28px 0 0;padding:22px 20px 36px;width:100%;max-width:480px;z-index:1;max-height:90vh;overflow-y:auto;">
-      <h2 style="margin:0 0 14px;font-size:17px;font-weight:900;color:#F1F5F9;">📷 תמונה חדשה</h2>
+      <h2 style="margin:0 0 14px;font-size:17px;font-weight:900;color:#1E293B;">📷 תמונה חדשה</h2>
       <!-- תצוגה מקדימה -->
-      <div id="photoPreviewWrap" style="background:rgba(255,255,255,0.05);border:1px dashed rgba(255,255,255,0.2);border-radius:16px;height:200px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;overflow:hidden;cursor:pointer;" onclick="qs('photoFileInput').click()">
+      <div id="photoPreviewWrap" style="background:rgba(0,0,0,0.04);border:1px dashed rgba(255,255,255,0.2);border-radius:16px;height:200px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;overflow:hidden;cursor:pointer;" onclick="qs('photoFileInput').click()">
         <img id="photoPreviewImg" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:16px;">
-        <div id="photoPreviewPlaceholder" style="text-align:center;color:rgba(241,245,249,0.4);">
+        <div id="photoPreviewPlaceholder" style="text-align:center;color:rgba(30,41,59,0.45);">
           <div style="font-size:40px;margin-bottom:8px;">📷</div>
           <div style="font-size:12px;">לחצו לפתוח מצלמה</div>
         </div>
@@ -1013,14 +1013,14 @@ function showAuthError(msg) {
       <input id="photoFileInput" type="file" accept="image/*" capture="environment" style="display:none;">
       <div id="photoGpsDisplay" style="display:none;font-size:11px;font-weight:600;color:#6EE7B7;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:7px 11px;margin-bottom:10px;"></div>
       <!-- שם המקום -->
-      <div style="font-size:11px;font-weight:700;color:rgba(241,245,249,0.5);margin-bottom:6px;letter-spacing:0.5px;">📍 מקום</div>
+      <div style="font-size:11px;font-weight:700;color:rgba(30,41,59,0.55);margin-bottom:6px;letter-spacing:0.5px;">📍 מקום</div>
       <div id="photoPlaceChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div>
-      <input id="photoPlaceCustom" type="text" placeholder="או כתבו מקום חופשי..." style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:12px;padding:10px 13px;font-size:13px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:12px;">
+      <input id="photoPlaceCustom" type="text" placeholder="או כתבו מקום חופשי..." style="width:100%;background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:12px;padding:10px 13px;font-size:13px;color:#1E293B;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:12px;">
       <!-- הערה -->
-      <div style="font-size:11px;font-weight:700;color:rgba(241,245,249,0.5);margin-bottom:6px;letter-spacing:0.5px;">✏️ הערה אישית (אופציונלי)</div>
-      <textarea id="photoNote" placeholder="מה הרגשתם? מה ראיתם?" rows="2" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:12px;padding:10px 13px;font-size:13px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;resize:none;margin-bottom:14px;"></textarea>
+      <div style="font-size:11px;font-weight:700;color:rgba(30,41,59,0.55);margin-bottom:6px;letter-spacing:0.5px;">✏️ הערה אישית (אופציונלי)</div>
+      <textarea id="photoNote" placeholder="מה הרגשתם? מה ראיתם?" rows="2" style="width:100%;background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:12px;padding:10px 13px;font-size:13px;color:#1E293B;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;resize:none;margin-bottom:14px;"></textarea>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-        <button onclick="closePhotoModal()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:12px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">ביטול</button>
+        <button onclick="closePhotoModal()" style="background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:13px;padding:12px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.65);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">ביטול</button>
         <button id="btnSavePhoto" style="background:linear-gradient(135deg,#ec4899,#8b5cf6);border:none;border-radius:13px;padding:12px;font-size:13px;font-weight:800;color:white;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">💾 שמור תמונה</button>
       </div>
     </div>
@@ -1029,7 +1029,7 @@ function showAuthError(msg) {
   <!-- ═══ LANG ═══ -->
   <section id="lang" class="tab">
     <div class="card card-hdr">
-      <div><h2 style="font-size:18px;font-weight:900;">🌐 שפה ותרגום</h2><p style="font-size:12px;color:rgba(241,245,249,0.5);margin-top:3px;">עברית ↔ צ'כית · מתרגם קולי + ביטויים</p></div>
+      <div><h2 style="font-size:18px;font-weight:900;">🌐 שפה ותרגום</h2><p style="font-size:12px;color:rgba(30,41,59,0.55);margin-top:3px;">עברית ↔ צ'כית · מתרגם קולי + ביטויים</p></div>
       <button class="back-btn" id="btnBackLang">← ראשי</button>
     </div>
     <div style="display:grid;gap:12px;">
@@ -1038,48 +1038,48 @@ function showAuthError(msg) {
       <div style="background:linear-gradient(135deg,rgba(168,85,247,0.15),rgba(99,102,241,0.1));border:1px solid rgba(168,85,247,0.35);border-radius:18px;padding:18px;text-align:center;">
         <div style="font-size:36px;margin-bottom:8px;">🎤</div>
         <div style="font-size:16px;font-weight:900;color:#C084FC;margin-bottom:6px;">מתרגם קולי מלא</div>
-        <div style="font-size:12px;color:rgba(241,245,249,0.5);margin-bottom:18px;line-height:1.6;">דיבור ישיר למיקרופון · תרגום אוטומטי · השמעה בקול<br>עובד ב-Safari/Chrome מחוץ לאפליקציה</div>
+        <div style="font-size:12px;color:rgba(30,41,59,0.55);margin-bottom:18px;line-height:1.6;">דיבור ישיר למיקרופון · תרגום אוטומטי · השמעה בקול<br>עובד ב-Safari/Chrome מחוץ לאפליקציה</div>
         <a href="https://arielshish.github.io/Prague-2026/translator.html" target="_blank" rel="noopener" style="display:block;background:linear-gradient(135deg,rgba(168,85,247,0.4),rgba(99,102,241,0.35));border:1px solid rgba(168,85,247,0.6);border-radius:14px;padding:15px;font-size:15px;font-weight:900;color:#E9D5FF;text-decoration:none;margin-bottom:10px;">🎤 פתח מתרגם קולי</a>
-        <div style="font-size:11px;color:rgba(241,245,249,0.35);">נפתח בדפדפן — מאפשר גישה למיקרופון</div>
+        <div style="font-size:11px;color:rgba(30,41,59,0.4);">נפתח בדפדפן — מאפשר גישה למיקרופון</div>
       </div>
 
       <!-- מתרגם טקסט -->
-      <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:18px;padding:16px;">
+      <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:18px;padding:16px;">
         <div style="font-size:14px;font-weight:700;color:#C084FC;margin-bottom:4px;">⌨️ תרגום טקסט</div>
-        <div style="font-size:11px;color:rgba(241,245,249,0.4);margin-bottom:12px;">הקלידו — תרגום אוטומטי תוך שנייה</div>
+        <div style="font-size:11px;color:rgba(30,41,59,0.45);margin-bottom:12px;">הקלידו — תרגום אוטומטי תוך שנייה</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
           <button id="voiceLangHe" onclick="setVoiceLang('he','cs')" style="padding:9px;border-radius:11px;border:2px solid rgba(168,85,247,0.6);background:rgba(168,85,247,0.2);font-size:12px;font-weight:800;color:#C084FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🇮🇱 עברית → צ'כית</button>
-          <button id="voiceLangCs" onclick="setVoiceLang('cs','he')" style="padding:9px;border-radius:11px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);font-size:12px;font-weight:800;color:rgba(241,245,249,0.45);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🇨🇿 צ'כית → עברית</button>
+          <button id="voiceLangCs" onclick="setVoiceLang('cs','he')" style="padding:9px;border-radius:11px;border:1px solid rgba(0,0,0,0.09);background:rgba(0,0,0,0.04);font-size:12px;font-weight:800;color:rgba(30,41,59,0.5);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🇨🇿 צ'כית → עברית</button>
         </div>
-        <textarea id="voiceInputText" placeholder="הקלידו כאן — תרגום אוטומטי תוך שנייה..." style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(168,85,247,0.3);border-radius:13px;padding:12px 14px;font-size:14px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;resize:none;height:70px;margin-bottom:10px;"></textarea>
+        <textarea id="voiceInputText" placeholder="הקלידו כאן — תרגום אוטומטי תוך שנייה..." style="width:100%;background:#ffffff;border:1px solid rgba(168,85,247,0.3);border-radius:13px;padding:12px 14px;font-size:14px;color:#1E293B;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;resize:none;height:70px;margin-bottom:10px;"></textarea>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
           <button onclick="translateVoiceText()" style="background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.4);border-radius:13px;padding:12px 8px;font-size:12px;font-weight:800;color:#A5B4FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🌐 תרגם</button>
-          <button onclick="clearVoiceTranslator()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:13px;padding:12px 8px;font-size:12px;font-weight:800;color:rgba(241,245,249,0.4);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🗑️ נקה</button>
+          <button onclick="clearVoiceTranslator()" style="background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.09);border-radius:13px;padding:12px 8px;font-size:12px;font-weight:800;color:rgba(30,41,59,0.45);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🗑️ נקה</button>
         </div>
         <div id="voiceTranslateResult" style="display:none;background:rgba(0,0,0,0.25);border:1px solid rgba(168,85,247,0.25);border-radius:13px;padding:14px;">
-          <div style="font-size:10px;color:rgba(241,245,249,0.35);margin-bottom:6px;letter-spacing:1px;">תרגום</div>
+          <div style="font-size:10px;color:rgba(30,41,59,0.4);margin-bottom:6px;letter-spacing:1px;">תרגום</div>
           <div id="voiceTranslateText" style="font-size:16px;font-weight:700;color:#E9D5FF;line-height:1.5;margin-bottom:10px;"></div>
           <button onclick="speakTranslation()" style="width:100%;background:rgba(168,85,247,0.25);border:1px solid rgba(168,85,247,0.4);border-radius:10px;padding:10px;font-size:13px;font-weight:800;color:#C084FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🔊 השמע בקול</button>
         </div>
-        <div id="voiceStatus" style="font-size:11px;color:rgba(241,245,249,0.35);text-align:center;margin-top:8px;min-height:16px;"></div>
+        <div id="voiceStatus" style="font-size:11px;color:rgba(30,41,59,0.4);text-align:center;margin-top:8px;min-height:16px;"></div>
       </div>
 
       <!-- ביטויים מהירים -->
       <div style="background:rgba(168,85,247,0.09);border:1px solid rgba(168,85,247,0.2);border-radius:18px;padding:16px;">
         <div style="font-size:14px;font-weight:700;color:#C084FC;margin-bottom:10px;">🗣️ ביטויים מהירים — לחץ להשמעה</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;font-size:12px;">
-          <div onclick="speakCzech('Děkuji')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Děkuji</strong> <span style="color:rgba(241,245,249,0.45);">תודה</span></span><span style="font-size:14px;">🔊</span></div>
-          <div onclick="speakCzech('Prosím')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Prosím</strong> <span style="color:rgba(241,245,249,0.45);">בבקשה</span></span><span style="font-size:14px;">🔊</span></div>
-          <div onclick="speakCzech('Ahoj')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Ahoj</strong> <span style="color:rgba(241,245,249,0.45);">שלום</span></span><span style="font-size:14px;">🔊</span></div>
-          <div onclick="speakCzech('Na shledanou')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Na shledanou</strong> <span style="color:rgba(241,245,249,0.45);">להתראות</span></span><span style="font-size:14px;">🔊</span></div>
-          <div onclick="speakCzech('Kolik?')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Kolik?</strong> <span style="color:rgba(241,245,249,0.45);">כמה עולה?</span></span><span style="font-size:14px;">🔊</span></div>
-          <div onclick="speakCzech('Kde je?')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Kde je?</strong> <span style="color:rgba(241,245,249,0.45);">איפה?</span></span><span style="font-size:14px;">🔊</span></div>
-          <div onclick="speakCzech('Nádraží')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Nádraží</strong> <span style="color:rgba(241,245,249,0.45);">תחנת רכבת</span></span><span style="font-size:14px;">🔊</span></div>
-          <div onclick="speakCzech('Nemocnice')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Nemocnice</strong> <span style="color:rgba(241,245,249,0.45);">בית חולים</span></span><span style="font-size:14px;">🔊</span></div>
-          <div onclick="speakCzech('Záchod')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Záchod</strong> <span style="color:rgba(241,245,249,0.45);">שירותים</span></span><span style="font-size:14px;">🔊</span></div>
-          <div onclick="speakCzech('Pomoc!')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Pomoc!</strong> <span style="color:rgba(241,245,249,0.45);">עזרה!</span></span><span style="font-size:14px;">🔊</span></div>
-          <div onclick="speakCzech('Bez vepřového')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Bez vepřového</strong> <span style="color:rgba(241,245,249,0.45);">ללא חזיר</span></span><span style="font-size:14px;">🔊</span></div>
-          <div onclick="speakCzech('Účet prosím')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#F1F5F9;">Účet prosím</strong> <span style="color:rgba(241,245,249,0.45);">חשבון בבקשה</span></span><span style="font-size:14px;">🔊</span></div>
+          <div onclick="speakCzech('Děkuji')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#1E293B;">Děkuji</strong> <span style="color:rgba(30,41,59,0.5);">תודה</span></span><span style="font-size:14px;">🔊</span></div>
+          <div onclick="speakCzech('Prosím')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#1E293B;">Prosím</strong> <span style="color:rgba(30,41,59,0.5);">בבקשה</span></span><span style="font-size:14px;">🔊</span></div>
+          <div onclick="speakCzech('Ahoj')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#1E293B;">Ahoj</strong> <span style="color:rgba(30,41,59,0.5);">שלום</span></span><span style="font-size:14px;">🔊</span></div>
+          <div onclick="speakCzech('Na shledanou')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#1E293B;">Na shledanou</strong> <span style="color:rgba(30,41,59,0.5);">להתראות</span></span><span style="font-size:14px;">🔊</span></div>
+          <div onclick="speakCzech('Kolik?')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#1E293B;">Kolik?</strong> <span style="color:rgba(30,41,59,0.5);">כמה עולה?</span></span><span style="font-size:14px;">🔊</span></div>
+          <div onclick="speakCzech('Kde je?')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#1E293B;">Kde je?</strong> <span style="color:rgba(30,41,59,0.5);">איפה?</span></span><span style="font-size:14px;">🔊</span></div>
+          <div onclick="speakCzech('Nádraží')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#1E293B;">Nádraží</strong> <span style="color:rgba(30,41,59,0.5);">תחנת רכבת</span></span><span style="font-size:14px;">🔊</span></div>
+          <div onclick="speakCzech('Nemocnice')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#1E293B;">Nemocnice</strong> <span style="color:rgba(30,41,59,0.5);">בית חולים</span></span><span style="font-size:14px;">🔊</span></div>
+          <div onclick="speakCzech('Záchod')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#1E293B;">Záchod</strong> <span style="color:rgba(30,41,59,0.5);">שירותים</span></span><span style="font-size:14px;">🔊</span></div>
+          <div onclick="speakCzech('Pomoc!')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#1E293B;">Pomoc!</strong> <span style="color:rgba(30,41,59,0.5);">עזרה!</span></span><span style="font-size:14px;">🔊</span></div>
+          <div onclick="speakCzech('Bez vepřového')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#1E293B;">Bez vepřového</strong> <span style="color:rgba(30,41,59,0.5);">ללא חזיר</span></span><span style="font-size:14px;">🔊</span></div>
+          <div onclick="speakCzech('Účet prosím')" style="padding:6px 8px;background:rgba(168,85,247,0.08);border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span><strong style="color:#1E293B;">Účet prosím</strong> <span style="color:rgba(30,41,59,0.5);">חשבון בבקשה</span></span><span style="font-size:14px;">🔊</span></div>
         </div>
       </div>
 
@@ -1091,7 +1091,7 @@ function showAuthError(msg) {
     <!-- Header -->
     <div style="margin-bottom:16px;">
       <h2 style="font-size:20px;font-weight:900;">🔔 תזכורות חשובות</h2>
-      <p style="font-size:12px;color:rgba(241,245,249,0.5);margin-top:4px;">פראג 8–15 אוגוסט · עוד <span id="daysUntilTrip">?</span> ימים</p>
+      <p style="font-size:12px;color:rgba(30,41,59,0.55);margin-top:4px;">פראג 8–15 אוגוסט · עוד <span id="daysUntilTrip">?</span> ימים</p>
     </div>
 
     <!-- Send email buttons -->
@@ -1132,14 +1132,14 @@ function showAuthError(msg) {
 <!-- ═══ EXPENSE MODAL ═══ -->
 <div id="expenseModal" style="display:none;position:fixed;inset:0;z-index:80;align-items:flex-end;justify-content:center;">
   <div id="expModalBg" style="position:absolute;inset:0;background:rgba(2,7,14,0.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);"></div>
-  <div style="position:relative;width:min(430px,100%);background:#071220;border:1px solid rgba(255,255,255,0.13);border-top:1px solid rgba(255,255,255,0.22);border-radius:26px 26px 0 0;padding:22px 18px 36px;box-shadow:0 -24px 64px rgba(0,0,0,0.65);animation:sheetUp 0.3s ease both;direction:rtl;text-align:right;">
+  <div style="position:relative;width:min(430px,100%);background:#071220;border:1px solid rgba(0,0,0,0.09);border-top:1px solid rgba(255,255,255,0.22);border-radius:26px 26px 0 0;padding:22px 18px 36px;box-shadow:0 -24px 64px rgba(0,0,0,0.65);animation:sheetUp 0.3s ease both;direction:rtl;text-align:right;">
     <div style="width:34px;height:4px;background:rgba(255,255,255,0.18);border-radius:2px;margin:0 auto 14px;"></div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-      <h2 id="expenseTitle" style="margin:0;font-size:18px;font-weight:900;color:#F1F5F9;">➕ הוסף הוצאה</h2>
-      <button onclick="closeExpense()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:10px;padding:6px 13px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">ביטול</button>
+      <h2 id="expenseTitle" style="margin:0;font-size:18px;font-weight:900;color:#1E293B;">➕ הוסף הוצאה</h2>
+      <button onclick="closeExpense()" style="background:#ffffff;border:1px solid rgba(255,255,255,0.14);border-radius:10px;padding:6px 13px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.65);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">ביטול</button>
     </div>
     <!-- שם -->
-    <input id="expName" type="text" placeholder="🔍 חפש או הקלד חופשי..." oninput="filterExpNameList(this.value)" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:13px 14px;font-size:15px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:8px;">
+    <input id="expName" type="text" placeholder="🔍 חפש או הקלד חופשי..." oninput="filterExpNameList(this.value)" style="width:100%;background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:13px;padding:13px 14px;font-size:15px;color:#1E293B;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:8px;">
     <!-- קטגוריה לתקציב -->
     <div id="expCatChips" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;"></div>
     <input type="hidden" id="expCat" value="">
@@ -1149,14 +1149,14 @@ function showAuthError(msg) {
       <input id="expCzk" type="number" inputmode="decimal" placeholder="CZK" style="background:rgba(245,158,11,0.09);border:1px solid rgba(245,158,11,0.3);border-radius:13px;padding:13px 12px;font-size:15px;color:#F59E0B;font-family:'Rubik',Arial,sans-serif;direction:ltr;font-weight:700;box-sizing:border-box;width:100%;">
       <input id="expIls" type="number" inputmode="decimal" placeholder="₪" style="background:rgba(244,99,74,0.09);border:1px solid rgba(244,99,74,0.3);border-radius:13px;padding:13px 12px;font-size:15px;color:#F4634A;font-family:'Rubik',Arial,sans-serif;direction:ltr;font-weight:700;box-sizing:border-box;width:100%;">
     </div>
-    <input id="expNote" type="text" placeholder="הערה (אופציונלי)" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:13px 14px;font-size:14px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:14px;">
+    <input id="expNote" type="text" placeholder="הערה (אופציונלי)" style="width:100%;background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:13px;padding:13px 14px;font-size:14px;color:#1E293B;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:14px;">
     <button id="btnSaveExpense" style="width:100%;background:linear-gradient(135deg,#F4634A,#e8522e);color:white;border:0;border-radius:15px;padding:16px;font-size:15px;font-weight:900;cursor:pointer;font-family:'Rubik',Arial,sans-serif;box-shadow:0 8px 22px rgba(244,99,74,0.38);">שמור הוצאה 💸</button>
   </div>
 </div>
 
 
 <!-- TOAST -->
-<div id="toast" style="display:none;position:fixed;top:54px;left:50%;transform:translateX(-50%);background:rgba(2,7,14,0.96);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,0.15);color:#F1F5F9;padding:11px 20px;border-radius:14px;z-index:100;font-weight:600;font-size:13px;white-space:nowrap;box-shadow:0 6px 22px rgba(0,0,0,0.45);font-family:'Rubik',Arial,sans-serif;"></div>
+<div id="toast" style="display:none;position:fixed;top:54px;left:50%;transform:translateX(-50%);background:rgba(2,7,14,0.96);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,0.15);color:#1E293B;padding:11px 20px;border-radius:14px;z-index:100;font-weight:600;font-size:13px;white-space:nowrap;box-shadow:0 6px 22px rgba(0,0,0,0.45);font-family:'Rubik',Arial,sans-serif;"></div>
 
 <script>
 // ═══════════════════════════════════════════
@@ -1277,6 +1277,8 @@ var REMINDERS = [
 
 var remindersFilter = 'all';
 var remindersDone = {};
+var remindersSchedule = {}; // { [id]: { day, time } }
+var restaurantsSchedule = {}; // { [name]: { day, time } }
 
 function initReminders() {
   var tripDate = new Date('2026-08-08');
@@ -1304,10 +1306,18 @@ function initReminders() {
         if (doc.exists && doc.data().remindersDone) {
           try { remindersDone = JSON.parse(doc.data().remindersDone); } catch(e) {}
         }
+        if (doc.exists && doc.data().remindersSchedule) {
+          try { remindersSchedule = JSON.parse(doc.data().remindersSchedule); } catch(e) {}
+        }
+        if (doc.exists && doc.data().restaurantsSchedule) {
+          try { restaurantsSchedule = JSON.parse(doc.data().restaurantsSchedule); } catch(e) {}
+        }
         renderReminders();
         checkOverdueReminders();
       }).catch(function() {
         try { remindersDone = JSON.parse(localStorage.getItem('prague_remindersDone') || '{}'); } catch(e) {}
+        try { remindersSchedule = JSON.parse(localStorage.getItem('prague_remindersSchedule') || '{}'); } catch(e) {}
+        try { restaurantsSchedule = JSON.parse(localStorage.getItem('prague_restaurantsSchedule') || '{}'); } catch(e) {}
         renderReminders();
         checkOverdueReminders();
       });
@@ -1341,38 +1351,41 @@ function renderReminders() {
   });
 
   if (filtered.length === 0) {
-    container.innerHTML = '<div style="text-align:center;padding:32px;color:rgba(241,245,249,0.4);font-size:14px;">אין פריטים להצגה</div>';
+    container.innerHTML = '<div style="text-align:center;padding:32px;color:rgba(30,41,59,0.4);font-size:14px;">אין פריטים להצגה</div>';
     return;
   }
 
   container.innerHTML = filtered.map(function(r) {
     var done = remindersDone[r.id];
+    var sched = remindersSchedule[r.id] || {};
     var deadline = new Date(r.deadline);
     var diffDays = Math.ceil((deadline - today) / 86400000);
     var urgency, urgencyColor, urgencyBg;
-    if (done) { urgency = '✅ בוצע'; urgencyColor = '#34D399'; urgencyBg = 'rgba(52,211,153,0.08)'; }
-    else if (diffDays < 0) { urgency = '⚠️ עבר המועד!'; urgencyColor = '#F87171'; urgencyBg = 'rgba(248,113,113,0.1)'; }
-    else if (diffDays <= 5) { urgency = '🔴 ' + diffDays + ' ימים!'; urgencyColor = '#F87171'; urgencyBg = 'rgba(248,113,113,0.1)'; }
-    else if (diffDays <= 14) { urgency = '🟡 ' + diffDays + ' ימים'; urgencyColor = '#FCD34D'; urgencyBg = 'rgba(252,211,77,0.08)'; }
-    else { urgency = '🟢 ' + diffDays + ' ימים'; urgencyColor = '#34D399'; urgencyBg = 'rgba(52,211,153,0.06)'; }
+    if (done) { urgency = '✅ בוצע'; urgencyColor = '#059669'; urgencyBg = 'rgba(5,150,105,0.10)'; }
+    else if (diffDays < 0) { urgency = '⚠️ עבר המועד!'; urgencyColor = '#DC2626'; urgencyBg = 'rgba(220,38,38,0.10)'; }
+    else if (diffDays <= 5) { urgency = '🔴 ' + diffDays + ' ימים!'; urgencyColor = '#DC2626'; urgencyBg = 'rgba(220,38,38,0.10)'; }
+    else if (diffDays <= 14) { urgency = '🟡 ' + diffDays + ' ימים'; urgencyColor = '#B45309'; urgencyBg = 'rgba(180,83,9,0.10)'; }
+    else { urgency = '🟢 ' + diffDays + ' ימים'; urgencyColor = '#059669'; urgencyBg = 'rgba(5,150,105,0.08)'; }
     var hasDetails = !!(r.details || r.tips || r.duration);
+    var schedInfo = (sched.day ? '📅 ' + sched.day : '📅 ' + r.day) + (sched.time ? ' · ⏰ ' + sched.time : '');
 
-    return '<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:16px;padding:15px;margin-bottom:10px;' + (done ? 'opacity:0.55;' : '') + (hasDetails ? 'cursor:pointer;' : '') + '" ' + (hasDetails ? 'onclick="showReminderDetail(\'' + r.id + '\')"' : '') + '>' +
+    return '<div style="background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:16px;padding:15px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.07);' + (done ? 'opacity:0.55;' : '') + (hasDetails ? 'cursor:pointer;' : '') + '" ' + (hasDetails ? 'onclick="showReminderDetail(\'' + r.id + '\')"' : '') + '>' +
       '<div style="display:flex;align-items:flex-start;gap:12px;">' +
         '<div style="font-size:28px;line-height:1;">' + r.emoji + '</div>' +
         '<div style="flex:1;min-width:0;">' +
           '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">' +
-            '<span style="font-size:14px;font-weight:800;color:#F1F5F9;">' + r.title + '</span>' +
+            '<span style="font-size:14px;font-weight:800;color:#1E293B;">' + r.title + '</span>' +
             '<span style="font-size:11px;font-weight:700;color:' + urgencyColor + ';background:' + urgencyBg + ';padding:2px 8px;border-radius:8px;">' + urgency + '</span>' +
-            (hasDetails ? '<span style="font-size:10px;color:rgba(241,245,249,0.35);margin-right:auto;">לחץ לפרטים ›</span>' : '') +
+            (hasDetails ? '<span style="font-size:10px;color:rgba(30,41,59,0.35);margin-right:auto;">לחץ לפרטים ›</span>' : '') +
           '</div>' +
-          '<div style="font-size:12px;color:rgba(241,245,249,0.6);margin-bottom:8px;">' + r.desc + '</div>' +
-          (r.duration ? '<div style="font-size:11px;color:#7DD3FC;margin-bottom:6px;">' + r.duration + '</div>' : '') +
-          '<div style="font-size:11px;color:rgba(241,245,249,0.4);margin-bottom:10px;">📅 ' + r.day + ' · דדליין: ' + r.deadline.split('-').reverse().join('/') + '</div>' +
+          '<div style="font-size:12px;color:rgba(30,41,59,0.6);margin-bottom:8px;">' + r.desc + '</div>' +
+          (r.duration ? '<div style="font-size:11px;color:#0369A1;margin-bottom:6px;">' + r.duration + '</div>' : '') +
+          '<div style="font-size:11px;color:rgba(30,41,59,0.45);margin-bottom:10px;">' + schedInfo + ' · דדליין: ' + r.deadline.split('-').reverse().join('/') + '</div>' +
           '<div style="display:flex;gap:8px;flex-wrap:wrap;" onclick="event.stopPropagation()">' +
-            (r.url ? '<a href="' + r.url + '" target="_blank" style="background:rgba(99,102,241,0.2);color:#A5B4FC;border:1px solid rgba(99,102,241,0.3);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;font-family:Rubik,Arial,sans-serif;">🔗 לאתר ההזמנה</a>' : '') +
-            (!done ? '<button onclick="markReminderDone(\'' + r.id + '\')" style="background:rgba(52,211,153,0.15);color:#34D399;border:1px solid rgba(52,211,153,0.3);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:Rubik,Arial,sans-serif;">✅ בוצע</button>' : '') +
-            (done ? '<button onclick="markReminderUndone(\'' + r.id + '\')" style="background:rgba(255,255,255,0.05);color:rgba(241,245,249,0.4);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:Rubik,Arial,sans-serif;">↩️ בטל</button>' : '') +
+            '<button onclick="openEditReminderSchedule(\'' + r.id + '\')" style="background:rgba(16,185,129,0.10);color:#065F46;border:1px solid rgba(16,185,129,0.25);border-radius:8px;padding:4px 9px;font-size:11px;font-weight:700;cursor:pointer;font-family:Rubik,Arial,sans-serif;">⏰ עדכן זמן/יום</button>' +
+            (r.url ? '<a href="' + r.url + '" target="_blank" style="background:rgba(99,102,241,0.10);color:#4338CA;border:1px solid rgba(99,102,241,0.25);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;font-family:Rubik,Arial,sans-serif;">🔗 לאתר ההזמנה</a>' : '') +
+            (!done ? '<button onclick="markReminderDone(\'' + r.id + '\')" style="background:rgba(16,185,129,0.12);color:#065F46;border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:Rubik,Arial,sans-serif;">✅ בוצע</button>' : '') +
+            (done ? '<button onclick="markReminderUndone(\'' + r.id + '\')" style="background:rgba(0,0,0,0.05);color:rgba(30,41,59,0.45);border:1px solid rgba(0,0,0,0.12);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:Rubik,Arial,sans-serif;">↩️ בטל</button>' : '') +
           '</div>' +
         '</div>' +
       '</div>' +
@@ -1390,7 +1403,7 @@ function showReminderDetail(id) {
   overlay.id = 'reminderDetailOverlay';
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:9999;display:flex;align-items:flex-end;justify-content:center;';
   var panel = document.createElement('div');
-  panel.style.cssText = 'background:#1E293B;border-radius:22px 22px 0 0;padding:22px 20px 32px;width:100%;max-width:480px;box-shadow:0 -4px 30px rgba(0,0,0,0.5);direction:rtl;font-family:Rubik,Arial,sans-serif;max-height:82vh;overflow-y:auto;';
+  panel.style.cssText = 'background:#F5EFE6;border-radius:22px 22px 0 0;padding:22px 20px 32px;width:100%;max-width:480px;box-shadow:0 -4px 30px rgba(0,0,0,0.5);direction:rtl;font-family:Rubik,Arial,sans-serif;max-height:82vh;overflow-y:auto;';
 
   var priorityColors = { critical:'#F87171', important:'#FCD34D', logistics:'#7DD3FC' };
   var priorityLabels = { critical:'🔴 דחוף', important:'🟡 חשוב', logistics:'🔵 לוגיסטיקה' };
@@ -1400,21 +1413,21 @@ function showReminderDetail(id) {
   panel.innerHTML =
     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
       '<div style="font-size:28px;">' + r.emoji + '</div>' +
-      '<button onclick="document.getElementById(\'reminderDetailOverlay\').remove()" style="background:rgba(255,255,255,0.1);border:none;border-radius:50%;width:32px;height:32px;color:#94A3B8;font-size:18px;cursor:pointer;line-height:1;">✕</button>' +
+      '<button onclick="document.getElementById(\'reminderDetailOverlay\').remove()" style="background:rgba(0,0,0,0.08);border:none;border-radius:50%;width:32px;height:32px;color:#94A3B8;font-size:18px;cursor:pointer;line-height:1;">✕</button>' +
     '</div>' +
-    '<div style="font-size:17px;font-weight:900;color:#F1F5F9;margin-bottom:8px;">' + r.title + '</div>' +
+    '<div style="font-size:17px;font-weight:900;color:#1E293B;margin-bottom:8px;">' + r.title + '</div>' +
     '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">' +
       '<span style="font-size:11px;font-weight:700;color:' + pColor + ';background:rgba(0,0,0,0.2);border:1px solid ' + pColor + '44;border-radius:8px;padding:3px 9px;">' + (priorityLabels[r.priority]||r.priority) + '</span>' +
       (r.duration ? '<span style="font-size:11px;font-weight:700;color:#7DD3FC;background:rgba(56,189,248,0.12);border:1px solid rgba(56,189,248,0.25);border-radius:8px;padding:3px 9px;">' + r.duration + '</span>' : '') +
-      '<span style="font-size:11px;font-weight:700;color:rgba(241,245,249,0.5);background:rgba(255,255,255,0.06);border-radius:8px;padding:3px 9px;">📅 ' + r.day + '</span>' +
+      '<span style="font-size:11px;font-weight:700;color:rgba(30,41,59,0.55);background:rgba(0,0,0,0.04);border-radius:8px;padding:3px 9px;">📅 ' + r.day + '</span>' +
     '</div>' +
-    (r.details ? '<div style="font-size:13px;color:rgba(241,245,249,0.8);line-height:1.7;margin-bottom:14px;">' + r.details + '</div>' : '') +
+    (r.details ? '<div style="font-size:13px;color:rgba(30,41,59,0.85);line-height:1.7;margin-bottom:14px;">' + r.details + '</div>' : '') +
     (r.tips ? '<div style="padding:9px 12px;background:rgba(251,191,36,0.08);border-right:3px solid rgba(251,191,36,0.5);border-radius:0 8px 8px 0;font-size:12px;color:rgba(253,230,138,0.85);line-height:1.55;margin-bottom:14px;">' + r.tips + '</div>' : '') +
     '<div style="font-size:11px;color:rgba(30,41,59,0.5);margin-bottom:16px;">⏰ דדליין: ' + r.deadline.split('-').reverse().join('/') + '</div>' +
     '<div style="display:flex;gap:9px;">' +
       (r.url ? '<a href="' + r.url + '" target="_blank" style="flex:1;text-align:center;padding:10px 0;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);border-radius:12px;font-size:13px;font-weight:700;color:#A5B4FC;text-decoration:none;">🔗 לאתר ההזמנה</a>' : '') +
       (!done ? '<button onclick="markReminderDone(\'' + r.id + '\');document.getElementById(\'reminderDetailOverlay\').remove();" style="flex:1;padding:10px 0;background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.3);border-radius:12px;font-size:13px;font-weight:700;color:#34D399;cursor:pointer;font-family:Rubik,Arial,sans-serif;">✅ בוצע</button>' : '') +
-      (done ? '<button onclick="markReminderUndone(\'' + r.id + '\');document.getElementById(\'reminderDetailOverlay\').remove();" style="flex:1;padding:10px 0;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.4);cursor:pointer;font-family:Rubik,Arial,sans-serif;">↩️ בטל</button>' : '') +
+      (done ? '<button onclick="markReminderUndone(\'' + r.id + '\');document.getElementById(\'reminderDetailOverlay\').remove();" style="flex:1;padding:10px 0;background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.09);border-radius:12px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.45);cursor:pointer;font-family:Rubik,Arial,sans-serif;">↩️ בטל</button>' : '') +
     '</div>';
 
   overlay.appendChild(panel);
@@ -1430,6 +1443,106 @@ function saveRemindersDoneLocal() {
       getFirestoreDb().collection('appdata').doc('main').set({ remindersDone: json }, { merge: true });
     });
   } catch(e) {}
+}
+
+function saveSchedules() {
+  var rj = JSON.stringify(remindersSchedule);
+  var rsj = JSON.stringify(restaurantsSchedule);
+  localStorage.setItem('prague_remindersSchedule', rj);
+  localStorage.setItem('prague_restaurantsSchedule', rsj);
+  try {
+    ensureFirebaseAuth().then(function() {
+      getFirestoreDb().collection('appdata').doc('main').set({ remindersSchedule: rj, restaurantsSchedule: rsj }, { merge: true });
+    });
+  } catch(e) {}
+}
+
+var TRIP_DAYS = ['8 אוגוסט','9 אוגוסט','10 אוגוסט','11 אוגוסט','12 אוגוסט','13 אוגוסט','14 אוגוסט','15 אוגוסט'];
+
+function openEditReminderSchedule(id) {
+  var r = REMINDERS.find(function(x){ return x.id === id; });
+  if (!r) return;
+  var sched = remindersSchedule[id] || { day: r.day, time: '' };
+  _openScheduleModal('reminder', id, r.title, sched);
+}
+
+function openEditRestaurantSchedule(name) {
+  var sched = restaurantsSchedule[name] || { day: '', time: '' };
+  _openScheduleModal('restaurant', name, name, sched);
+}
+
+function _openScheduleModal(type, key, title, sched) {
+  var existing = document.getElementById('scheduleEditOverlay');
+  if (existing) existing.remove();
+
+  var overlay = document.createElement('div');
+  overlay.id = 'scheduleEditOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:flex-end;justify-content:center;';
+
+  var dayBtns = TRIP_DAYS.map(function(d) {
+    var sel = d === sched.day;
+    return '<button type="button" onclick="_schedSelectDay(this,\'' + d.replace(/'/g,"\\'") + '\')" style="padding:6px 10px;border-radius:10px;font-size:12px;font-weight:700;border:1px solid ' + (sel ? '#F4634A' : 'rgba(0,0,0,0.15)') + ';background:' + (sel ? 'rgba(244,99,74,0.12)' : '#fff') + ';color:' + (sel ? '#F4634A' : '#1E293B') + ';cursor:pointer;font-family:Rubik,Arial,sans-serif;">' + d + '</button>';
+  }).join('');
+
+  var parts = [['🌅','בוקר'],['☀️','צהריים'],['🌇','אחה״צ'],['🌙','ערב']];
+  var partBtns = parts.map(function(p) {
+    var val = p[0] + ' ' + p[1];
+    var sel = sched.time === val;
+    return '<button type="button" onclick="_schedSelectPart(this,\'' + val + '\')" style="padding:8px 4px;border-radius:10px;font-size:12px;border:1px solid ' + (sel ? '#F4634A' : 'rgba(0,0,0,0.15)') + ';background:' + (sel ? 'rgba(244,99,74,0.12)' : '#f8f5f0') + ';color:' + (sel ? '#F4634A' : '#1E293B') + ';cursor:pointer;font-family:Rubik,Arial,sans-serif;flex:1;text-align:center;">' + p[0] + '<br><span style="font-size:10px;">' + p[1] + '</span></button>';
+  }).join('');
+
+  overlay.innerHTML =
+    '<div style="background:#F5EFE6;border-radius:22px 22px 0 0;padding:22px 18px 36px;width:100%;max-width:480px;direction:rtl;font-family:Rubik,Arial,sans-serif;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">' +
+        '<div style="font-size:15px;font-weight:900;color:#1E293B;">⏰ זמן ויום — ' + title + '</div>' +
+        '<button onclick="document.getElementById(\'scheduleEditOverlay\').remove()" style="background:rgba(0,0,0,0.06);border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;color:#64748B;">✕</button>' +
+      '</div>' +
+      '<div style="font-size:11px;font-weight:700;color:rgba(30,41,59,0.5);margin-bottom:8px;">📅 יום בטיול</div>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;" id="schedDayBtns">' + dayBtns + '</div>' +
+      '<div style="font-size:11px;font-weight:700;color:rgba(30,41,59,0.5);margin-bottom:8px;">⏱ חלק מהיום</div>' +
+      '<div style="display:flex;gap:6px;margin-bottom:10px;" id="schedPartBtns">' + partBtns + '</div>' +
+      '<input id="schedTimeInput" type="text" placeholder="⏱ שעה מדויקת (לדוג׳ 10:00)" value="' + (sched.time && !sched.time.includes(' ') ? sched.time : '') + '" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(0,0,0,0.15);font-size:14px;font-family:Rubik,Arial,sans-serif;color:#1E293B;background:#fff;margin-bottom:14px;">' +
+      '<input type="hidden" id="schedDayVal" value="' + (sched.day || '') + '">' +
+      '<button onclick="_saveScheduleEdit(\'' + type + '\',\'' + key.replace(/'/g,"\\'") + '\')" class="btn-primary" style="width:100%;">💾 שמור</button>' +
+    '</div>';
+
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
+function _schedSelectDay(btn, day) {
+  document.getElementById('schedDayVal').value = day;
+  btn.parentElement.querySelectorAll('button').forEach(function(b) {
+    b.style.background = '#fff'; b.style.color = '#1E293B'; b.style.borderColor = 'rgba(0,0,0,0.15)';
+  });
+  btn.style.background = 'rgba(244,99,74,0.12)'; btn.style.color = '#F4634A'; btn.style.borderColor = '#F4634A';
+}
+
+function _schedSelectPart(btn, val) {
+  document.getElementById('schedTimeInput').value = '';
+  document.getElementById('schedTimeInput').placeholder = '⏱ שעה מדויקת (לדוג׳ 10:00)';
+  btn.parentElement.querySelectorAll('button').forEach(function(b) {
+    b.style.background = '#f8f5f0'; b.style.color = '#1E293B'; b.style.borderColor = 'rgba(0,0,0,0.15)';
+  });
+  btn.style.background = 'rgba(244,99,74,0.12)'; btn.style.color = '#F4634A'; btn.style.borderColor = '#F4634A';
+  document.getElementById('schedTimeInput').dataset.partVal = val;
+}
+
+function _saveScheduleEdit(type, key) {
+  var day = document.getElementById('schedDayVal').value;
+  var timeInput = document.getElementById('schedTimeInput');
+  var time = timeInput.value.trim() || timeInput.dataset.partVal || '';
+  var sched = { day: day, time: time };
+  if (type === 'reminder') {
+    remindersSchedule[key] = sched;
+    renderReminders();
+  } else {
+    restaurantsSchedule[key] = sched;
+    renderRestaurants();
+  }
+  saveSchedules();
+  document.getElementById('scheduleEditOverlay').remove();
+  showToast('✅ נשמר!', 1800);
 }
 
 function markReminderDone(id) {
@@ -2303,7 +2416,7 @@ function showStopDetail(dayIdx, stopIdx) {
   var tipsHtml = (s.tips || []).map(function(t) {
     return '<div style="display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.06);">' +
       '<span style="color:#FCD34D;flex-shrink:0;">💡</span>' +
-      '<span style="font-size:13px;color:rgba(241,245,249,0.8);">' + esc(t) + '</span></div>';
+      '<span style="font-size:13px;color:rgba(30,41,59,0.85);">' + esc(t) + '</span></div>';
   }).join('');
   var overlay = document.createElement('div');
   overlay.id = 'stopDetailOverlay';
@@ -2312,17 +2425,17 @@ function showStopDetail(dayIdx, stopIdx) {
   overlay.innerHTML =
     '<div style="position:relative;background:linear-gradient(180deg,#0C1F38,#071525);border-radius:24px 24px 0 0;padding:24px 20px 36px;width:min(430px,100%);max-height:88vh;overflow-y:auto;animation:sheetUp 0.28s ease both;">' +
     '<div style="width:40px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin:0 auto 18px;"></div>' +
-    '<button onclick="document.getElementById(\'stopDetailOverlay\').remove();" style="position:absolute;top:16px;left:16px;background:rgba(255,255,255,0.1);border:none;color:rgba(241,245,249,0.7);font-size:18px;width:34px;height:34px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;line-height:1;">✕</button>' +
+    '<button onclick="document.getElementById(\'stopDetailOverlay\').remove();" style="position:absolute;top:16px;left:16px;background:rgba(0,0,0,0.08);border:none;color:rgba(30,41,59,0.75);font-size:18px;width:34px;height:34px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;line-height:1;">✕</button>' +
     '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">' +
       '<div style="font-size:36px;">' + (s.emoji||'📍') + '</div>' +
-      '<div><div style="font-size:17px;font-weight:900;color:#F1F5F9;line-height:1.2;">' + esc(s.name) + '</div>' +
-      '<div style="font-size:12px;color:rgba(241,245,249,0.45);margin-top:3px;">⏱️ ' + esc(s.time||'') + '</div></div>' +
+      '<div><div style="font-size:17px;font-weight:900;color:#1E293B;line-height:1.2;">' + esc(s.name) + '</div>' +
+      '<div style="font-size:12px;color:rgba(30,41,59,0.5);margin-top:3px;">⏱️ ' + esc(s.time||'') + '</div></div>' +
     '</div>' +
-    (s.details ? '<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:14px;margin-bottom:14px;font-size:13px;color:rgba(241,245,249,0.82);line-height:1.65;">' + esc(s.details) + '</div>' : '') +
+    (s.details ? '<div style="background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:14px;padding:14px;margin-bottom:14px;font-size:13px;color:rgba(241,245,249,0.82);line-height:1.65;">' + esc(s.details) + '</div>' : '') +
     (s.details2 ? '<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.18);border-radius:14px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:#FCD34D;line-height:1.6;">📋 ' + esc(s.details2) + '</div>' : '') +
     (s.booking ? '<div style="background:rgba(99,102,241,0.10);border:1px solid rgba(99,102,241,0.25);border-radius:14px;padding:12px 14px;margin-bottom:14px;">' +
       '<div style="font-size:11px;font-weight:800;color:#A5B4FC;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">🎟️ הזמנה</div>' +
-      '<div style="font-size:13px;color:rgba(241,245,249,0.8);">' + esc(s.booking) + '</div>' +
+      '<div style="font-size:13px;color:rgba(30,41,59,0.85);">' + esc(s.booking) + '</div>' +
     '</div>' : '') +
     (tipsHtml ? '<div style="margin-bottom:14px;"><div style="font-size:11px;font-weight:800;color:#6EE7B7;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">💡 טיפים</div>' + tipsHtml + '</div>' : '') +
     (s.mapUrl ? '<a href="' + s.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:13px;font-weight:800;font-size:13px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;">🗺️ נווט למפה</a>' : '') +
@@ -2369,7 +2482,7 @@ function showAttrDetail(attr, iconKey, nameKey, descKey, howKey, existing) {
   overlay.id = 'attrDetailOverlay';
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:9999;display:flex;align-items:flex-end;justify-content:center;';
   var panel = document.createElement('div');
-  panel.style.cssText = 'background:#1E293B;border-radius:22px 22px 0 0;padding:22px 20px 32px;width:100%;max-width:480px;box-shadow:0 -4px 30px rgba(0,0,0,0.5);direction:rtl;font-family:Rubik,Arial,sans-serif;max-height:80vh;overflow-y:auto;';
+  panel.style.cssText = 'background:#F5EFE6;border-radius:22px 22px 0 0;padding:22px 20px 32px;width:100%;max-width:480px;box-shadow:0 -4px 30px rgba(0,0,0,0.5);direction:rtl;font-family:Rubik,Arial,sans-serif;max-height:80vh;overflow-y:auto;';
   var existingRow = existing
     ? '<div style="margin-bottom:12px;padding:8px 12px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.4);border-radius:10px;font-size:13px;font-weight:700;color:#FCD34D;">📅 מוצב ביום ' + existing.dayNum + (existing.time ? ' · ' + existing.time : '') + ' — ' + existing.dayTitle + '</div>'
     : '';
@@ -2380,15 +2493,15 @@ function showAttrDetail(attr, iconKey, nameKey, descKey, howKey, existing) {
   panel.innerHTML =
     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
       '<div style="font-size:28px;">' + (attr[iconKey]||'📍') + '</div>' +
-      '<button onclick="document.getElementById(\'attrDetailOverlay\').remove()" style="background:rgba(255,255,255,0.1);border:none;border-radius:50%;width:32px;height:32px;color:#94A3B8;font-size:18px;cursor:pointer;line-height:1;">✕</button>' +
+      '<button onclick="document.getElementById(\'attrDetailOverlay\').remove()" style="background:rgba(0,0,0,0.08);border:none;border-radius:50%;width:32px;height:32px;color:#94A3B8;font-size:18px;cursor:pointer;line-height:1;">✕</button>' +
     '</div>' +
-    '<div style="font-size:17px;font-weight:900;color:#F1F5F9;margin-bottom:6px;">' + name + '</div>' +
+    '<div style="font-size:17px;font-weight:900;color:#1E293B;margin-bottom:6px;">' + name + '</div>' +
     (duration || who ? '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">' +
       (duration ? '<span style="font-size:11px;font-weight:700;color:#7DD3FC;background:rgba(56,189,248,0.12);border:1px solid rgba(56,189,248,0.25);border-radius:8px;padding:3px 9px;">' + duration + '</span>' : '') +
       (who ? '<span style="font-size:11px;font-weight:700;color:#C084FC;background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.25);border-radius:8px;padding:3px 9px;">' + who + '</span>' : '') +
     '</div>' : '') +
     existingRow +
-    (desc ? '<div style="font-size:13px;color:rgba(241,245,249,0.8);line-height:1.7;margin-bottom:14px;">' + desc + '</div>' : '') +
+    (desc ? '<div style="font-size:13px;color:rgba(30,41,59,0.85);line-height:1.7;margin-bottom:14px;">' + desc + '</div>' : '') +
     (booking ? '<div style="padding:10px 12px;background:rgba(0,0,0,0.25);border-right:3px solid ' + bookingColor + ';border-radius:0 8px 8px 0;font-size:12px;font-weight:700;color:' + bookingColor + ';line-height:1.55;margin-bottom:10px;">' + booking + '</div>' : '') +
     (tips ? '<div style="padding:9px 12px;background:rgba(251,191,36,0.08);border-right:3px solid rgba(251,191,36,0.5);border-radius:0 8px 8px 0;font-size:12px;color:rgba(253,230,138,0.85);line-height:1.55;margin-bottom:10px;">' + tips + '</div>' : '') +
     (how ? '<div style="font-size:11px;color:rgba(30,41,59,0.5);margin-bottom:14px;">🚇 ' + how + '</div>' : '') +
@@ -2415,7 +2528,7 @@ function buildBankCards(items, iconKey, nameKey, descKey, howKey) {
     var name = a[nameKey] || '';
     var existing = findItemInDays(name);
     var card = document.createElement('div');
-    card.style.cssText = 'flex-shrink:0;width:138px;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.13);border-radius:14px;padding:10px 11px;cursor:pointer;transition:all .15s;position:relative;';
+    card.style.cssText = 'flex-shrink:0;width:138px;background:rgba(0,0,0,0.04);border:1.5px solid rgba(255,255,255,0.13);border-radius:14px;padding:10px 11px;cursor:pointer;transition:all .15s;position:relative;';
     var bookingBadge = a.booking
       ? '<div style="margin-top:5px;padding:2px 6px;background:' + (a.booking.startsWith('✅') ? 'rgba(52,211,153,0.15)' : 'rgba(245,158,11,0.15)') + ';border-radius:6px;font-size:9px;font-weight:700;color:' + (a.booking.startsWith('✅') ? '#6EE7B7' : '#FCD34D') + ';line-height:1.4;">' + a.booking.substring(0,2) + (a.booking.startsWith('✅') ? ' חינם' : ' להזמין') + '</div>'
       : '';
@@ -2424,7 +2537,7 @@ function buildBankCards(items, iconKey, nameKey, descKey, howKey) {
       : '';
     card.innerHTML =
       '<div style="font-size:22px;margin-bottom:4px;">' + (a[iconKey]||'📍') + '</div>' +
-      '<div style="font-size:12px;font-weight:700;color:#F1F5F9;line-height:1.3;">' + name + '</div>' +
+      '<div style="font-size:12px;font-weight:700;color:#1E293B;line-height:1.3;">' + name + '</div>' +
       bookingBadge +
       existingBadge;
     card.addEventListener('click', (function(attr, ex) {
@@ -2485,17 +2598,17 @@ function openEditStopTime(dayIdx, stopIdx) {
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200;display:flex;align-items:flex-end;justify-content:center;';
   overlay.innerHTML =
     '<div style="position:relative;background:linear-gradient(160deg,#1e293b,#0f172a);border-radius:24px 24px 0 0;padding:22px 20px 36px;width:min(430px,100%);z-index:1;">' +
-    '<div style="font-size:15px;font-weight:900;color:#F1F5F9;margin-bottom:14px;">⏰ ' + (s.emoji||'📍') + ' ' + s.name + '</div>' +
-    '<div style="font-size:11px;font-weight:700;color:rgba(241,245,249,0.4);margin-bottom:8px;">בחר מתי ביום</div>' +
+    '<div style="font-size:15px;font-weight:900;color:#1E293B;margin-bottom:14px;">⏰ ' + (s.emoji||'📍') + ' ' + s.name + '</div>' +
+    '<div style="font-size:11px;font-weight:700;color:rgba(30,41,59,0.45);margin-bottom:8px;">בחר מתי ביום</div>' +
     '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;" id="editTimeParts">' +
     ['🌅 בוקר','☀️ צהריים','🌇 אחה״צ','🌙 ערב'].map(function(v) {
       var active = (s.time||'') === v;
       return '<button type="button" onclick="setEditTimePart(this,\'' + v.replace(/'/g,"\\'") + '\')" style="padding:8px 4px;border-radius:11px;border:1px solid ' + (active ? 'rgba(244,99,74,0.45)' : 'rgba(255,255,255,0.15)') + ';background:' + (active ? 'rgba(244,99,74,0.25)' : 'rgba(255,255,255,0.07)') + ';color:' + (active ? '#F4634A' : 'rgba(241,245,249,0.75)') + ';font-size:11px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">' + v.split(' ')[0] + '<br>' + v.split(' ').slice(1).join(' ') + '</button>';
     }).join('') +
     '</div>' +
-    '<input id="editTimeInput" type="text" value="' + (s.time||'') + '" placeholder="שעה מדויקת (לדוג׳ 10:00)" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:11px 14px;font-size:13px;color:#F1F5F9;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:14px;">' +
+    '<input id="editTimeInput" type="text" value="' + (s.time||'') + '" placeholder="שעה מדויקת (לדוג׳ 10:00)" style="width:100%;background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:13px;padding:11px 14px;font-size:13px;color:#1E293B;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:14px;">' +
     '<div style="display:flex;gap:8px;">' +
-    '<button onclick="document.getElementById(\'editTimeOverlay\').remove()" style="flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:13px;padding:12px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.55);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">ביטול</button>' +
+    '<button onclick="document.getElementById(\'editTimeOverlay\').remove()" style="flex:1;background:#ffffff;border:1px solid rgba(255,255,255,0.15);border-radius:13px;padding:12px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.6);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">ביטול</button>' +
     '<button onclick="saveEditStopTime(' + dayIdx + ',' + stopIdx + ')" style="flex:2;background:#F4634A;color:white;border:0;border-radius:13px;padding:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">✅ שמור</button>' +
     '</div></div>';
   overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
@@ -2680,13 +2793,13 @@ function renderHistory() {
   var list = qs('historyList');
   if (!list || list.children.length > 0) return;
   list.innerHTML = HISTORY_SPOTS.map(function(s) {
-    return '<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:20px;overflow:hidden;">' +
+    return '<div style="background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:20px;overflow:hidden;">' +
       '<div style="background:linear-gradient(135deg,rgba(251,191,36,0.18),rgba(251,191,36,0.06));padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.08);">' +
         '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">' +
           '<div style="display:flex;align-items:center;gap:10px;">' +
             '<span style="font-size:26px;">' + s.emoji + '</span>' +
-            '<div><div style="font-size:14px;font-weight:900;color:#F1F5F9;line-height:1.2;">' + s.name + '</div>' +
-            '<div style="font-size:10px;color:rgba(241,245,249,0.45);margin-top:3px;">🏛️ ' + s.year + '</div></div>' +
+            '<div><div style="font-size:14px;font-weight:900;color:#1E293B;line-height:1.2;">' + s.name + '</div>' +
+            '<div style="font-size:10px;color:rgba(30,41,59,0.5);margin-top:3px;">🏛️ ' + s.year + '</div></div>' +
           '</div>' +
           '<span style="background:rgba(251,191,36,0.18);border:1px solid rgba(251,191,36,0.3);border-radius:999px;padding:3px 9px;font-size:10px;font-weight:700;color:#FDE68A;white-space:nowrap;">' + s.tag + '</span>' +
         '</div>' +
@@ -2694,14 +2807,14 @@ function renderHistory() {
       '<div style="padding:14px 16px;display:grid;gap:10px;">' +
         '<div>' +
           '<div style="font-size:10px;font-weight:700;color:#93C5FD;letter-spacing:0.5px;margin-bottom:5px;">📖 הסיפור</div>' +
-          '<div style="font-size:12px;color:rgba(241,245,249,0.7);line-height:1.65;">' + s.history + '</div>' +
+          '<div style="font-size:12px;color:rgba(30,41,59,0.75);line-height:1.65;">' + s.history + '</div>' +
         '</div>' +
         '<div style="background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.18);border-radius:12px;padding:10px 12px;">' +
           '<div style="font-size:10px;font-weight:700;color:#FDE68A;letter-spacing:0.5px;margin-bottom:5px;">📸 איך לצלם</div>' +
           '<div style="font-size:12px;color:rgba(241,245,249,0.75);line-height:1.65;">' + s.photo + '</div>' +
         '</div>' +
         '<div style="background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.18);border-radius:12px;padding:10px 12px;">' +
-          '<div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.55;">' + s.tip + '</div>' +
+          '<div style="font-size:12px;color:rgba(30,41,59,0.7);line-height:1.55;">' + s.tip + '</div>' +
         '</div>' +
         '<button onclick="openPhotoModal(' + JSON.stringify(s.name) + ')" style="width:100%;background:linear-gradient(135deg,rgba(236,72,153,0.18),rgba(168,85,247,0.18));border:1px solid rgba(236,72,153,0.3);border-radius:13px;padding:11px;font-size:12px;font-weight:800;color:#F9A8D4;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">📷 צלם כאן — שמור ביומן</button>' +
       '</div>' +
@@ -2733,17 +2846,17 @@ function renderCommunity() {
         '<div style="flex:1;">' +
           '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">' +
             '<span style="font-size:20px;">' + p.icon + '</span>' +
-            '<div style="font-size:14px;font-weight:900;color:#F1F5F9;">' + p.name + '</div>' +
+            '<div style="font-size:14px;font-weight:900;color:#1E293B;">' + p.name + '</div>' +
           '</div>' +
           '<div style="font-size:10px;color:rgba(52,211,153,0.8);font-weight:700;margin-bottom:6px;">' + p.cat + '</div>' +
-          '<div style="font-size:12px;color:rgba(241,245,249,0.6);line-height:1.55;margin-bottom:8px;">' + p.desc + '</div>' +
+          '<div style="font-size:12px;color:rgba(30,41,59,0.65);line-height:1.55;margin-bottom:8px;">' + p.desc + '</div>' +
           '<div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.18);border-radius:10px;padding:8px 10px;margin-bottom:8px;">' +
             '<div style="font-size:10px;font-weight:800;color:#93C5FD;margin-bottom:3px;">🚇 איך להגיע</div>' +
-            '<div style="font-size:11px;color:rgba(241,245,249,0.65);line-height:1.5;">' + p.how + '</div>' +
+            '<div style="font-size:11px;color:rgba(30,41,59,0.7);line-height:1.5;">' + p.how + '</div>' +
           '</div>' +
           '<div style="display:flex;align-items:center;gap:12px;">' +
-            '<div style="font-size:11px;color:rgba(241,245,249,0.5);">👥 ' + (p.fb||'—') + '</div>' +
-            '<div style="font-size:11px;color:rgba(241,245,249,0.5);">🌐 Google ' + starBar + ' ' + (p.google||'') + '</div>' +
+            '<div style="font-size:11px;color:rgba(30,41,59,0.55);">👥 ' + (p.fb||'—') + '</div>' +
+            '<div style="font-size:11px;color:rgba(30,41,59,0.55);">🌐 Google ' + starBar + ' ' + (p.google||'') + '</div>' +
           '</div>' +
         '</div>' +
         (p.mapUrl ? '<a href="'+p.mapUrl+'" target="_blank" rel="noopener" style="flex-shrink:0;background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.25);border-radius:12px;padding:10px 12px;font-size:11px;font-weight:700;color:#6EE7B7;text-decoration:none;text-align:center;line-height:1.3;">🗺️<br>נווט</a>' : '') +
@@ -2761,9 +2874,9 @@ function renderShopping() {
   grid.innerHTML = SHOPS.map(function(s) {
     return '<div style="background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.16);border-radius:20px;padding:18px;box-shadow:0 8px 26px rgba(0,0,0,0.32);overflow:hidden;">' +
       '<div style="height:78px;border-radius:14px;background:linear-gradient(135deg,#0A1E38,#14305A);display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:14px;">' + s.e + '</div>' +
-      '<div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:10px;"><div style="font-size:15px;font-weight:800;color:#F1F5F9;">' + esc(s.n) + '</div><div style="color:#F59E0B;font-size:11px;white-space:nowrap;">' + s.stars + '</div></div>' +
-      '<div style="font-size:12px;color:rgba(241,245,249,0.55);line-height:1.75;margin-bottom:10px;">⏰ ' + s.hours + '<br>🚇 ' + esc(s.metro) + '<br>⏱️ ' + esc(s.time) + '</div>' +
-      '<div style="font-size:11px;color:rgba(241,245,249,0.4);margin-bottom:10px;">📦 ' + esc(s.brands) + '</div>' +
+      '<div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:10px;"><div style="font-size:15px;font-weight:800;color:#1E293B;">' + esc(s.n) + '</div><div style="color:#F59E0B;font-size:11px;white-space:nowrap;">' + s.stars + '</div></div>' +
+      '<div style="font-size:12px;color:rgba(30,41,59,0.6);line-height:1.75;margin-bottom:10px;">⏰ ' + s.hours + '<br>🚇 ' + esc(s.metro) + '<br>⏱️ ' + esc(s.time) + '</div>' +
+      '<div style="font-size:11px;color:rgba(30,41,59,0.45);margin-bottom:10px;">📦 ' + esc(s.brands) + '</div>' +
       '<div class="tip-pill" style="margin-bottom:12px;">💡 ' + esc(s.tip) + '</div>' +
       '<a href="' + s.map + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:12px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;">🗺️ ניווט למפה</a>' +
       '</div>';
@@ -2775,39 +2888,45 @@ function renderShopping() {
 // ═══════════════════════════════════════════
 function renderRestaurants() {
   var list = qs('restaurantsList');
-  if (!list || list.children.length > 0) return;
+  if (!list) return;
   var LEVEL_LABELS = ['','💰 זול','💰💰 בינוני','💰💰💰 יקר','💰💰💰💰 יוקרה'];
-  var LEVEL_COLORS = ['','rgba(5,150,105,0.18)','rgba(245,158,11,0.14)','rgba(239,68,68,0.14)','rgba(124,58,237,0.18)'];
-  var LEVEL_BORDER = ['','rgba(5,150,105,0.4)','rgba(245,158,11,0.35)','rgba(239,68,68,0.35)','rgba(124,58,237,0.4)'];
-  var LEVEL_TXT   = ['','#6EE7B7','#FCD34D','#FCA5A5','#C084FC'];
+  var LEVEL_COLORS = ['','rgba(5,150,105,0.12)','rgba(245,158,11,0.10)','rgba(239,68,68,0.10)','rgba(124,58,237,0.12)'];
+  var LEVEL_BORDER = ['','rgba(5,150,105,0.3)','rgba(245,158,11,0.3)','rgba(239,68,68,0.3)','rgba(124,58,237,0.3)'];
+  var LEVEL_TXT   = ['','#065F46','#92400E','#991B1B','#5B21B6'];
   var lastLevel = 0;
   var html = '';
   RESTAURANTS.forEach(function(r) {
     var lv = r.level || 1;
     if (lv !== lastLevel) {
       html += '<div style="display:flex;align-items:center;gap:10px;margin:' + (lastLevel ? '20px' : '4px') + ' 0 10px;">' +
-        '<div style="flex:1;height:1px;background:rgba(255,255,255,0.1);"></div>' +
+        '<div style="flex:1;height:1px;background:rgba(0,0,0,0.08);"></div>' +
         '<div style="font-size:11px;font-weight:800;color:' + LEVEL_TXT[lv] + ';background:' + LEVEL_COLORS[lv] + ';border:1px solid ' + LEVEL_BORDER[lv] + ';border-radius:999px;padding:3px 12px;white-space:nowrap;">' + LEVEL_LABELS[lv] + ' למשפחה</div>' +
-        '<div style="flex:1;height:1px;background:rgba(255,255,255,0.1);"></div>' +
+        '<div style="flex:1;height:1px;background:rgba(0,0,0,0.08);"></div>' +
       '</div>';
       lastLevel = lv;
     }
-    html += '<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:20px;padding:18px;margin-bottom:10px;box-shadow:0 6px 20px rgba(0,0,0,0.25);">' +
+    var sched = restaurantsSchedule[r.name] || {};
+    var schedBadge = sched.day ? ('📅 ' + sched.day + (sched.time ? ' · ⏰ ' + sched.time : '')) : '';
+    html += '<div style="background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:20px;padding:18px;margin-bottom:10px;box-shadow:0 3px 10px rgba(0,0,0,0.08);">' +
       '<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">' +
       '<span style="font-size:30px;line-height:1;flex-shrink:0;margin-top:3px;">' + r.icon + '</span>' +
       '<div style="flex:1;">' +
         '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:3px;">' +
-          '<div style="font-size:15px;font-weight:800;color:#F1F5F9;">' + esc(r.name) + '</div>' +
+          '<div style="font-size:15px;font-weight:800;color:#1E293B;">' + esc(r.name) + '</div>' +
           '<div style="background:' + r.badgeClr + ';color:' + r.badgeTxt + ';border-radius:999px;padding:3px 9px;font-size:10px;font-weight:800;white-space:nowrap;">' + esc(r.badge) + '</div>' +
         '</div>' +
-        '<div style="font-size:11px;color:rgba(241,245,249,0.45);">' + esc(r.sub) + '</div>' +
+        '<div style="font-size:11px;color:rgba(30,41,59,0.5);">' + esc(r.sub) + '</div>' +
       '</div></div>' +
-      '<div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.7;margin-bottom:10px;">' + esc(r.desc) + '</div>' +
-      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">' +
+      '<div style="font-size:12px;color:rgba(30,41,59,0.65);line-height:1.7;margin-bottom:10px;">' + esc(r.desc) + '</div>' +
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">' +
         '<div style="background:' + LEVEL_COLORS[lv] + ';border:1px solid ' + LEVEL_BORDER[lv] + ';border-radius:10px;padding:6px 12px;font-size:12px;font-weight:700;color:' + LEVEL_TXT[lv] + ';">' + LEVEL_LABELS[lv] + '</div>' +
-        '<div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:6px 12px;font-size:12px;font-weight:600;color:rgba(241,245,249,0.6);">🧾 ' + esc(r.price) + ' CZK</div>' +
+        '<div style="background:rgba(0,0,0,0.05);border-radius:10px;padding:6px 12px;font-size:12px;font-weight:600;color:rgba(30,41,59,0.6);">🧾 ' + esc(r.price) + ' CZK</div>' +
+        (schedBadge ? '<div style="font-size:11px;color:#065F46;background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.25);border-radius:9px;padding:4px 9px;">' + schedBadge + '</div>' : '') +
       '</div>' +
-      '<a href="' + r.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:11px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;">🗺️ ניווט למסעדה</a>' +
+      '<div style="display:flex;gap:8px;">' +
+        '<button onclick="openEditRestaurantSchedule(\'' + r.name.replace(/'/g,"\\'") + '\')" style="background:rgba(16,185,129,0.10);color:#065F46;border:1px solid rgba(16,185,129,0.25);border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:Rubik,Arial,sans-serif;">⏰ קבע זמן</button>' +
+        '<a href="' + r.mapUrl + '" target="_blank" rel="noopener" style="flex:1;display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:11px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;">🗺️ ניווט למסעדה</a>' +
+      '</div>' +
     '</div>';
   });
   list.innerHTML = html;
@@ -2818,7 +2937,7 @@ function switchFoodTab(tab) {
   qs('dessertsList').style.display     = tab === 'desserts'    ? 'grid' : 'none';
   qs('photoSpotsList').style.display   = tab === 'photo'       ? 'grid' : 'none';
   var active = 'background:rgba(244,99,74,0.25);color:#F4634A;';
-  var idle   = 'background:rgba(255,255,255,0.07);color:rgba(241,245,249,0.5);';
+  var idle   = 'background:#ffffff;color:rgba(30,41,59,0.55);';
   qs('tabResBtn').style.cssText   += tab==='restaurants' ? active : idle;
   qs('tabDesBtn').style.cssText   += tab==='desserts'    ? active : idle;
   qs('tabPhotoBtn').style.cssText += tab==='photo'       ? active : idle;
@@ -2838,28 +2957,28 @@ function renderDesserts() {
     var lv = d.level || 1;
     if (lv !== lastLevel) {
       html += '<div style="display:flex;align-items:center;gap:10px;margin:' + (lastLevel?'18px':'4px') + ' 0 10px;">' +
-        '<div style="flex:1;height:1px;background:rgba(255,255,255,0.1);"></div>' +
+        '<div style="flex:1;height:1px;background:rgba(0,0,0,0.08);"></div>' +
         '<div style="font-size:11px;font-weight:800;color:' + LEVEL_TXT[lv] + ';background:' + LEVEL_COLORS[lv] + ';border:1px solid ' + LEVEL_BORDER[lv] + ';border-radius:999px;padding:3px 12px;white-space:nowrap;">' + LEVEL_LABELS[lv] + '</div>' +
-        '<div style="flex:1;height:1px;background:rgba(255,255,255,0.1);"></div></div>';
+        '<div style="flex:1;height:1px;background:rgba(0,0,0,0.08);"></div></div>';
       lastLevel = lv;
     }
-    html += '<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:20px;padding:16px;margin-bottom:10px;">' +
+    html += '<div style="background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:20px;padding:16px;margin-bottom:10px;">' +
       '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;">' +
         '<span style="font-size:28px;line-height:1;flex-shrink:0;">' + d.icon + '</span>' +
         '<div style="flex:1;">' +
           '<div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:2px;">' +
-            '<div style="font-size:14px;font-weight:800;color:#F1F5F9;">' + esc(d.name) + '</div>' +
-            '<div style="background:rgba(255,255,255,0.08);border-radius:999px;padding:2px 9px;font-size:10px;font-weight:800;color:' + d.tagClr + ';white-space:nowrap;">' + esc(d.tag) + '</div>' +
+            '<div style="font-size:14px;font-weight:800;color:#1E293B;">' + esc(d.name) + '</div>' +
+            '<div style="background:#ffffff;border-radius:999px;padding:2px 9px;font-size:10px;font-weight:800;color:' + d.tagClr + ';white-space:nowrap;">' + esc(d.tag) + '</div>' +
           '</div>' +
-          '<div style="font-size:11px;color:rgba(241,245,249,0.45);">' + esc(d.sub) + '</div>' +
+          '<div style="font-size:11px;color:rgba(30,41,59,0.5);">' + esc(d.sub) + '</div>' +
         '</div>' +
       '</div>' +
-      '<div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.7;margin-bottom:8px;">' + esc(d.desc) + '</div>' +
+      '<div style="font-size:12px;color:rgba(30,41,59,0.7);line-height:1.7;margin-bottom:8px;">' + esc(d.desc) + '</div>' +
       '<div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">' +
         '<div style="font-size:13px;">' + d.rating + '</div>' +
         '<div style="background:' + LEVEL_COLORS[lv] + ';border:1px solid ' + LEVEL_BORDER[lv] + ';border-radius:10px;padding:4px 10px;font-size:11px;font-weight:700;color:' + LEVEL_TXT[lv] + ';">' + esc(d.price) + '</div>' +
       '</div>' +
-      '<div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:7px 11px;font-size:11px;color:rgba(241,245,249,0.45);margin-bottom:10px;">📍 ' + esc(d.where) + '</div>' +
+      '<div style="background:rgba(0,0,0,0.04);border-radius:10px;padding:7px 11px;font-size:11px;color:rgba(30,41,59,0.5);margin-bottom:10px;">📍 ' + esc(d.where) + '</div>' +
       '<a href="' + d.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:linear-gradient(90deg,#ec4899,#f97316);color:white;text-decoration:none;border-radius:12px;padding:10px;font-weight:800;font-size:12px;font-family:\'Rubik\',Arial,sans-serif;">🗺️ ניווט</a>' +
     '</div>';
   });
@@ -2878,26 +2997,26 @@ function renderPhotoSpots() {
       var lbl = isFree ? '📸 חינם לחלוטין' : '🎟️ כניסה בתשלום';
       var clr = isFree ? '#6EE7B7' : '#FCD34D';
       html += '<div style="display:flex;align-items:center;gap:10px;margin:' + (lastFree!==null?'18px':'4px') + ' 0 10px;">' +
-        '<div style="flex:1;height:1px;background:rgba(255,255,255,0.1);"></div>' +
-        '<div style="font-size:11px;font-weight:800;color:' + clr + ';background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:999px;padding:3px 12px;white-space:nowrap;">' + lbl + '</div>' +
-        '<div style="flex:1;height:1px;background:rgba(255,255,255,0.1);"></div></div>';
+        '<div style="flex:1;height:1px;background:rgba(0,0,0,0.08);"></div>' +
+        '<div style="font-size:11px;font-weight:800;color:' + clr + ';background:rgba(0,0,0,0.04);border:1px solid rgba(255,255,255,0.15);border-radius:999px;padding:3px 12px;white-space:nowrap;">' + lbl + '</div>' +
+        '<div style="flex:1;height:1px;background:rgba(0,0,0,0.08);"></div></div>';
       lastFree = isFree;
     }
-    html += '<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:20px;padding:16px;margin-bottom:10px;">' +
+    html += '<div style="background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:20px;padding:16px;margin-bottom:10px;">' +
       '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;">' +
         '<span style="font-size:28px;line-height:1;flex-shrink:0;">' + s.icon + '</span>' +
         '<div style="flex:1;">' +
           '<div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:2px;">' +
-            '<div style="font-size:14px;font-weight:800;color:#F1F5F9;">' + esc(s.name) + '</div>' +
+            '<div style="font-size:14px;font-weight:800;color:#1E293B;">' + esc(s.name) + '</div>' +
             '<div style="font-size:13px;">' + s.rating + '</div>' +
           '</div>' +
-          '<div style="font-size:11px;color:rgba(241,245,249,0.45);">' + esc(s.sub) + '</div>' +
+          '<div style="font-size:11px;color:rgba(30,41,59,0.5);">' + esc(s.sub) + '</div>' +
         '</div>' +
       '</div>' +
-      '<div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.7;margin-bottom:8px;">' + esc(s.desc) + '</div>' +
+      '<div style="font-size:12px;color:rgba(30,41,59,0.7);line-height:1.7;margin-bottom:8px;">' + esc(s.desc) + '</div>' +
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;">' +
         '<div style="background:rgba(99,102,241,0.12);border-radius:10px;padding:7px 10px;font-size:11px;color:rgba(165,180,252,0.85);">🕐 ' + esc(s.best) + '</div>' +
-        '<div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:7px 10px;font-size:11px;color:rgba(241,245,249,0.55);">👥 ' + esc(s.crowds) + '</div>' +
+        '<div style="background:rgba(0,0,0,0.04);border-radius:10px;padding:7px 10px;font-size:11px;color:rgba(30,41,59,0.6);">👥 ' + esc(s.crowds) + '</div>' +
         '<div style="background:rgba(16,185,129,0.1);border-radius:10px;padding:7px 10px;font-size:11px;color:#6EE7B7;">💳 ' + esc(s.fee_txt) + '</div>' +
       '</div>' +
       '<div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:8px 11px;font-size:11px;color:#FCD34D;margin-bottom:10px;line-height:1.6;">💡 ' + esc(s.tip) + '</div>' +
@@ -2969,7 +3088,7 @@ function renderPack() {
   if (!list) return;
   var total = 0, done = 0, html = '';
   PACK_STATE.forEach(function(cat, ci) {
-    html += '<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.11);border-radius:16px;padding:14px;margin-bottom:8px;">' +
+    html += '<div style="background:#ffffff;border:1px solid rgba(255,255,255,0.11);border-radius:16px;padding:14px;margin-bottom:8px;">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
         '<div style="font-size:12px;font-weight:800;color:#F59E0B;">' + esc(cat.cat) + '</div>' +
         '<div style="display:flex;gap:6px;">' +
@@ -3156,9 +3275,9 @@ function renderBudget() {
     return '<div>' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
         '<div style="font-size:12px;font-weight:700;color:rgba(241,245,249,0.85);">' + b.cat + '</div>' +
-        '<div style="font-size:11px;color:rgba(241,245,249,0.45);">₪' + pct.toLocaleString('he-IL') + ' / ₪' + (Number(b.ils)||0).toLocaleString('he-IL') + '</div>' +
+        '<div style="font-size:11px;color:rgba(30,41,59,0.5);">₪' + pct.toLocaleString('he-IL') + ' / ₪' + (Number(b.ils)||0).toLocaleString('he-IL') + '</div>' +
       '</div>' +
-      '<div style="background:rgba(255,255,255,0.08);border-radius:6px;height:6px;overflow:hidden;">' +
+      '<div style="background:#ffffff;border-radius:6px;height:6px;overflow:hidden;">' +
         '<div style="width:' + Math.round(ratio*100) + '%;height:100%;background:' + color + ';border-radius:6px;transition:width 0.4s;"></div>' +
       '</div>' +
     '</div>';
@@ -3190,8 +3309,8 @@ function populateBudgetModal(budget, totalVal) {
   if (!inp) return;
   inp.innerHTML = budget.map(function(b, i) {
     return '<div style="display:flex;gap:8px;align-items:center;">' +
-      '<input data-bi="' + i + '" data-field="cat" value="' + b.cat + '" style="flex:1.5;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:10px;padding:10px 12px;font-size:13px;color:#F1F5F9;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;">' +
-      '<input data-bi="' + i + '" data-field="ils" type="number" value="' + (b.ils||0) + '" placeholder="₪" style="flex:0.8;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:10px;padding:10px 12px;font-size:13px;color:#F1F5F9;font-family:\'Rubik\',Arial,sans-serif;">' +
+      '<input data-bi="' + i + '" data-field="cat" value="' + b.cat + '" style="flex:1.5;background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:10px;padding:10px 12px;font-size:13px;color:#1E293B;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;">' +
+      '<input data-bi="' + i + '" data-field="ils" type="number" value="' + (b.ils||0) + '" placeholder="₪" style="flex:0.8;background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:10px;padding:10px 12px;font-size:13px;color:#1E293B;font-family:\'Rubik\',Arial,sans-serif;">' +
       '<button onclick="removeBudgetRow(' + i + ')" style="background:rgba(239,68,68,0.15);border:none;border-radius:8px;padding:8px 10px;color:#FCA5A5;font-size:14px;cursor:pointer;">🗑</button>' +
     '</div>';
   }).join('');
@@ -3290,14 +3409,14 @@ function renderExpenses() {
     return;
   }
   list.innerHTML = EXPENSES.map(function(e) {
-    return '<div style="background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.14);border-radius:16px;padding:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;">' +
-      '<div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:13px;color:#F1F5F9;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(e.name) + '</div>' +
-      '<div style="font-size:11px;color:rgba(241,245,249,0.35);">' + (e.note ? esc(e.note) + ' · ' : '') + (e.date || '') + '</div></div>' +
+    return '<div style="background:rgba(0,0,0,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:16px;padding:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;">' +
+      '<div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:13px;color:#1E293B;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(e.name) + '</div>' +
+      '<div style="font-size:11px;color:rgba(30,41,59,0.4);">' + (e.note ? esc(e.note) + ' · ' : '') + (e.date || '') + '</div></div>' +
       '<div style="text-align:left;direction:ltr;flex-shrink:0;">' +
       '<div style="font-weight:800;font-size:13px;color:#F59E0B;">' + Number(e.czk || 0).toLocaleString() + ' CZK</div>' +
       '<div style="font-size:12px;color:#F4634A;margin-bottom:6px;">₪' + Number(e.ils || 0).toLocaleString() + '</div>' +
       '<div style="display:flex;gap:5px;">' +
-      '<button data-edit-id="' + e.id + '" class="expEditBtn" style="background:rgba(255,255,255,0.09);color:rgba(241,245,249,0.72);border:1px solid rgba(255,255,255,0.14);border-radius:8px;padding:4px 9px;font-size:10px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">ערוך</button>' +
+      '<button data-edit-id="' + e.id + '" class="expEditBtn" style="background:rgba(0,0,0,0.07);color:rgba(241,245,249,0.72);border:1px solid rgba(255,255,255,0.14);border-radius:8px;padding:4px 9px;font-size:10px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">ערוך</button>' +
       '<button data-del-id="' + e.id + '" class="expDelBtn" style="background:rgba(244,99,74,0.11);color:#F4634A;border:1px solid rgba(244,99,74,0.2);border-radius:8px;padding:4px 9px;font-size:10px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">מחק</button>' +
       '</div></div></div>';
   }).join('');
@@ -3317,11 +3436,11 @@ function filterExpNameList(q) {
   if (!q) { buildExpNameList(); return; }
   var filtered = _expAllItems.filter(function(name) { return name.toLowerCase().indexOf(q) !== -1; });
   if (!filtered.length) {
-    el.innerHTML = '<div style="padding:12px;font-size:12px;color:rgba(241,245,249,0.35);text-align:center;">אין תוצאות — הטקסט שהקלדת ישמר כמו שהוא</div>';
+    el.innerHTML = '<div style="padding:12px;font-size:12px;color:rgba(30,41,59,0.4);text-align:center;">אין תוצאות — הטקסט שהקלדת ישמר כמו שהוא</div>';
     return;
   }
   el.innerHTML = filtered.map(function(name) {
-    return '<button type="button" onclick="pickExpName(this)" data-val="'+name.replace(/"/g,'&quot;')+'" style="display:block;width:100%;text-align:right;background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,0.05);padding:10px 12px;font-size:13px;font-weight:600;color:#F1F5F9;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;">'+name+'</button>';
+    return '<button type="button" onclick="pickExpName(this)" data-val="'+name.replace(/"/g,'&quot;')+'" style="display:block;width:100%;text-align:right;background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,0.05);padding:10px 12px;font-size:13px;font-weight:600;color:#1E293B;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;">'+name+'</button>';
   }).join('');
 }
 
@@ -3351,9 +3470,9 @@ function buildExpNameList() {
   var html = '<button type="button" onclick="qs(\'expName\').focus()" style="display:block;width:100%;text-align:right;background:rgba(244,99,74,0.08);border:0;border-bottom:1px solid rgba(255,255,255,0.08);padding:11px 12px;font-size:13px;font-weight:700;color:#FCA5A5;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;">✏️ כתב חופשי — הקלד בשדה למעלה</button>';
   cats.forEach(function(cat) {
     if (!cat.items.length) return;
-    html += '<div style="padding:8px 10px 4px;font-size:10px;font-weight:800;color:rgba(241,245,249,0.4);letter-spacing:1px;text-transform:uppercase;position:sticky;top:0;background:rgba(7,18,32,0.95);">'+cat.label+'</div>';
+    html += '<div style="padding:8px 10px 4px;font-size:10px;font-weight:800;color:rgba(30,41,59,0.45);letter-spacing:1px;text-transform:uppercase;position:sticky;top:0;background:rgba(7,18,32,0.95);">'+cat.label+'</div>';
     cat.items.forEach(function(name) {
-      html += '<button type="button" onclick="pickExpName(this)" data-val="'+name.replace(/"/g,'&quot;')+'" style="display:block;width:100%;text-align:right;background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,0.05);padding:10px 12px;font-size:13px;font-weight:600;color:#F1F5F9;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;">'+name+'</button>';
+      html += '<button type="button" onclick="pickExpName(this)" data-val="'+name.replace(/"/g,'&quot;')+'" style="display:block;width:100%;text-align:right;background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,0.05);padding:10px 12px;font-size:13px;font-weight:600;color:#1E293B;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;">'+name+'</button>';
     });
   });
   el.innerHTML = html;
@@ -3468,7 +3587,7 @@ function setVoiceLang(src, tgt) {
   voiceSrcLang = src; voiceTgtLang = tgt;
   var heBtn = qs('voiceLangHe'), csBtn = qs('voiceLangCs');
   var activeStyle = 'padding:9px;border-radius:11px;border:2px solid rgba(168,85,247,0.6);background:rgba(168,85,247,0.2);font-size:12px;font-weight:800;color:#C084FC;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;';
-  var idleStyle = 'padding:9px;border-radius:11px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);font-size:12px;font-weight:800;color:rgba(241,245,249,0.45);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;';
+  var idleStyle = 'padding:9px;border-radius:11px;border:1px solid rgba(0,0,0,0.09);background:rgba(0,0,0,0.04);font-size:12px;font-weight:800;color:rgba(30,41,59,0.5);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;';
   if (heBtn) heBtn.style.cssText = src === 'he' ? activeStyle : idleStyle;
   if (csBtn) csBtn.style.cssText = src === 'cs' ? activeStyle : idleStyle;
   var inp = qs('voiceInputText');
@@ -3617,7 +3736,7 @@ function fetchWeather(force) {
     } catch(e) {}
   }
   var row = document.getElementById('weatherRow');
-  if (row) row.innerHTML = '<div style="color:rgba(241,245,249,0.4);font-size:12px;padding:8px;">טוען מזג אוויר...</div>';
+  if (row) row.innerHTML = '<div style="color:rgba(30,41,59,0.45);font-size:12px;padding:8px;">טוען מזג אוויר...</div>';
   fetch('https://api.open-meteo.com/v1/forecast?latitude=50.08&longitude=14.44&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weathercode&timezone=Europe%2FPrague&forecast_days=14')
     .then(function(r) { return r.json(); })
     .then(function(data) {
@@ -3654,16 +3773,16 @@ function renderWeather(data) {
     var badge = inTrip ? '<div style="font-size:8px;color:#7DD3FC;font-weight:800;margin-bottom:2px;">✈️ טיול</div>' : '';
     html += '<div style="min-width:60px;background:' + bg + ';border:' + border + ';border-radius:12px;padding:8px 6px;text-align:center;flex-shrink:0;">'
       + badge
-      + '<div style="font-size:10px;font-weight:800;color:rgba(241,245,249,0.9);">' + dayName + '</div>'
-      + '<div style="font-size:9px;color:rgba(241,245,249,0.45);margin-bottom:4px;">' + dayDate + '</div>'
+      + '<div style="font-size:10px;font-weight:800;color:rgba(30,41,59,0.9);">' + dayName + '</div>'
+      + '<div style="font-size:9px;color:rgba(30,41,59,0.5);margin-bottom:4px;">' + dayDate + '</div>'
       + '<div style="font-size:22px;line-height:1;">' + emoji + '</div>'
-      + '<div style="font-size:9px;color:rgba(241,245,249,0.5);margin:2px 0;">' + desc + '</div>'
-      + '<div style="font-size:12px;font-weight:800;color:#F1F5F9;">' + tmax + '°</div>'
-      + '<div style="font-size:10px;color:rgba(241,245,249,0.45);">' + tmin + '°</div>'
+      + '<div style="font-size:9px;color:rgba(30,41,59,0.55);margin:2px 0;">' + desc + '</div>'
+      + '<div style="font-size:12px;font-weight:800;color:#1E293B;">' + tmax + '°</div>'
+      + '<div style="font-size:10px;color:rgba(30,41,59,0.5);">' + tmin + '°</div>'
       + rain
       + '</div>';
   }
-  row.innerHTML = html || '<div style="color:rgba(241,245,249,0.4);font-size:12px;">אין נתונים</div>';
+  row.innerHTML = html || '<div style="color:rgba(30,41,59,0.45);font-size:12px;">אין נתונים</div>';
   if (upd) upd.textContent = 'עודכן: ' + new Date().toLocaleString('he-IL', {hour:'2-digit',minute:'2-digit',day:'numeric',month:'numeric'});
 }
 
@@ -3889,7 +4008,7 @@ function initDesktopLayout() {
   navItems.forEach(function(item) {
     var btn = document.createElement('button');
     btn.id = 'deskNav-' + item.id;
-    btn.style.cssText = 'display:flex;flex-direction:row;align-items:center;gap:10px;padding:10px 12px;border-radius:11px;font-size:13px;font-weight:700;border:0;cursor:pointer;font-family:Rubik,Arial,sans-serif;background:transparent;color:rgba(241,245,249,0.5);width:100%;text-align:right;justify-content:flex-end;transition:background 0.15s,color 0.15s;';
+    btn.style.cssText = 'display:flex;flex-direction:row;align-items:center;gap:10px;padding:10px 12px;border-radius:11px;font-size:13px;font-weight:700;border:0;cursor:pointer;font-family:Rubik,Arial,sans-serif;background:transparent;color:rgba(30,41,59,0.55);width:100%;text-align:right;justify-content:flex-end;transition:background 0.15s,color 0.15s;';
     btn.innerHTML = '<span style="font-size:11px;font-weight:700;">' + item.label + '</span><span style="font-size:18px;">' + item.icon + '</span>';
     btn.addEventListener('click', function() {
       openTab(item.id);
@@ -4089,11 +4208,11 @@ function updateGpsDisplay(gps) {
 
       // תצוגה מפורטת
       var lines = [];
-      if (poi) lines.push('<strong style="color:#F1F5F9;">' + poi + '</strong>');
+      if (poi) lines.push('<strong style="color:#1E293B;">' + poi + '</strong>');
       if (street) lines.push(street);
       if (district) lines.push(district);
       var cityCountry = [city, country].filter(Boolean).join(', ');
-      if (cityCountry) lines.push('<span style="color:rgba(241,245,249,0.45);">' + cityCountry + '</span>');
+      if (cityCountry) lines.push('<span style="color:rgba(30,41,59,0.5);">' + cityCountry + '</span>');
 
       var mapLink = ' <a href="https://www.google.com/maps?q=' + gps.lat + ',' + gps.lng + '" target="_blank" style="color:#93C5FD;font-size:10px;text-decoration:none;">🗺️</a>';
       el.innerHTML = '📍 ' + (lines.join(' · ') || gps.lat.toFixed(5) + ', ' + gps.lng.toFixed(5)) + mapLink;
@@ -4538,12 +4657,12 @@ function renderPhotoDiary() {
       var gpsTag = p.gps && p.gps.lat
         ? '<a href="https://www.google.com/maps?q=' + p.gps.lat + ',' + p.gps.lng + '" target="_blank" style="position:absolute;bottom:62px;right:6px;background:rgba(59,130,246,0.85);border-radius:999px;padding:2px 7px;font-size:9px;font-weight:800;color:white;text-decoration:none;">🛰 GPS</a>'
         : '';
-      return '<div style="position:relative;border-radius:16px;overflow:hidden;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);">' +
+      return '<div style="position:relative;border-radius:16px;overflow:hidden;background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.09);">' +
         '<img src="' + p.dataUrl + '" style="width:100%;aspect-ratio:1;object-fit:cover;display:block;" loading="lazy" onclick="openPhotoViewer(' + p.id + ')">' +
         '<div style="padding:8px;">' +
-          '<div style="font-size:11px;font-weight:800;color:#F1F5F9;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">📍 ' + esc(p.place) + '</div>' +
-          '<div style="font-size:10px;color:rgba(241,245,249,0.4);">' + dateStr + '</div>' +
-          (p.note ? '<div style="font-size:10px;color:rgba(241,245,249,0.55);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(p.note) + '</div>' : '') +
+          '<div style="font-size:11px;font-weight:800;color:#1E293B;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">📍 ' + esc(p.place) + '</div>' +
+          '<div style="font-size:10px;color:rgba(30,41,59,0.45);">' + dateStr + '</div>' +
+          (p.note ? '<div style="font-size:10px;color:rgba(30,41,59,0.6);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(p.note) + '</div>' : '') +
         '</div>' +
         '<button onclick="deletePhoto(' + p.id + ')" style="position:absolute;top:6px;left:6px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;width:26px;height:26px;font-size:12px;cursor:pointer;color:white;">🗑</button>' +
         '<button onclick="sharePhoto(' + p.id + ')" style="position:absolute;top:36px;left:6px;background:rgba(37,211,102,0.75);border:none;border-radius:50%;width:26px;height:26px;font-size:12px;cursor:pointer;color:white;">📤</button>' +
@@ -4592,15 +4711,15 @@ function openPhotoViewer(id) {
       overlay.style.cssText = 'position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.95);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;';
       overlay.innerHTML =
         '<img src="' + p.dataUrl + '" style="max-width:100%;max-height:70vh;object-fit:contain;border-radius:12px;margin-bottom:16px;">' +
-        '<div style="text-align:center;color:#F1F5F9;width:100%;max-width:400px;">' +
+        '<div style="text-align:center;color:#1E293B;width:100%;max-width:400px;">' +
           '<div style="font-size:16px;font-weight:800;margin-bottom:4px;">📍 ' + esc(p.place) + '</div>' +
-          '<div style="font-size:12px;color:rgba(241,245,249,0.5);margin-bottom:8px;">' + dateStr + '</div>' +
+          '<div style="font-size:12px;color:rgba(30,41,59,0.55);margin-bottom:8px;">' + dateStr + '</div>' +
           (p.note ? '<div style="font-size:13px;color:rgba(241,245,249,0.75);margin-bottom:8px;">' + esc(p.note) + '</div>' : '') +
           (p.gps && p.gps.lat
             ? '<a href="https://www.google.com/maps?q=' + p.gps.lat + ',' + p.gps.lng + '" target="_blank" style="display:inline-block;background:rgba(59,130,246,0.2);border:1px solid rgba(59,130,246,0.4);border-radius:10px;padding:6px 14px;font-size:11px;font-weight:700;color:#93C5FD;text-decoration:none;margin-bottom:6px;">🛰 ' + p.gps.lat.toFixed(5) + ', ' + p.gps.lng.toFixed(5) + (p.gps.alt ? ' · ' + Math.round(p.gps.alt) + 'm' : '') + ' — פתח במפות</a>'
-            : '<div style="font-size:11px;color:rgba(241,245,249,0.25);margin-bottom:6px;">אין נתוני GPS</div>') +
+            : '<div style="font-size:11px;color:rgba(30,41,59,0.3);margin-bottom:6px;">אין נתוני GPS</div>') +
         '</div>' +
-        '<button style="margin-top:16px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:13px;padding:12px 32px;color:#F1F5F9;font-size:14px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">סגור</button>';
+        '<button style="margin-top:16px;background:rgba(0,0,0,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:13px;padding:12px 32px;color:#1E293B;font-size:14px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">סגור</button>';
       overlay.querySelector('button').onclick = function() { document.body.removeChild(overlay); };
       overlay.addEventListener('click', function(e) { if (e.target === overlay) document.body.removeChild(overlay); });
       document.body.appendChild(overlay);
