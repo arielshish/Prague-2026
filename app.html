@@ -2677,7 +2677,7 @@ function openMoveStop(dayIdx, stopIdx) {
   if (!picker) return;
   picker.innerHTML = state.map(function(d, idx) {
     var isCurrent = idx === dayIdx;
-    return '<button onclick="executeMove(' + idx + ')" style="background:' + (isCurrent ? 'rgba(244,99,74,0.2)' : 'rgba(255,255,255,0.09)') + ';border:1px solid ' + (isCurrent ? 'rgba(244,99,74,0.4)' : 'rgba(255,255,255,0.15)') + ';border-radius:12px;padding:10px 6px;font-size:12px;font-weight:800;color:' + (isCurrent ? '#F4634A' : '#F1F5F9') + ';cursor:' + (isCurrent ? 'default' : 'pointer') + ';font-family:\'Rubik\',Arial,sans-serif;">' +
+    return '<button onclick="executeMove(' + idx + ')" style="background:' + (isCurrent ? 'rgba(244,99,74,0.2)' : 'rgba(0,0,0,0.05)') + ';border:1px solid ' + (isCurrent ? 'rgba(244,99,74,0.4)' : 'rgba(0,0,0,0.12)') + ';border-radius:12px;padding:10px 6px;font-size:12px;font-weight:800;color:' + (isCurrent ? '#F4634A' : '#1E293B') + ';cursor:' + (isCurrent ? 'default' : 'pointer') + ';font-family:\'Rubik\',Arial,sans-serif;">' +
       (d.emoji||'📅') + '<br><span style="font-size:10px;">' + (idx+1) + '</span></button>';
   }).join('');
   var m = qs('moveStopModal'); if (m) m.style.display = 'flex';
@@ -4017,8 +4017,8 @@ function initDesktopLayout() {
       if (item.id === 'history') renderHistory();
       if (item.id === 'photodiary') renderPhotoDiary();
     });
-    btn.addEventListener('mouseenter', function() { if (!btn.classList.contains('dk-act')) btn.style.background='rgba(255,255,255,0.07)'; btn.style.color='#F1F5F9'; });
-    btn.addEventListener('mouseleave', function() { if (!btn.classList.contains('dk-act')) { btn.style.background='transparent'; btn.style.color='rgba(241,245,249,0.5)'; } });
+    btn.addEventListener('mouseenter', function() { if (!btn.classList.contains('dk-act')) btn.style.background='rgba(0,0,0,0.06)'; btn.style.color='#1E293B'; });
+    btn.addEventListener('mouseleave', function() { if (!btn.classList.contains('dk-act')) { btn.style.background='transparent'; btn.style.color='rgba(30,41,59,0.55)'; } });
     sidebar.appendChild(btn);
   });
 
