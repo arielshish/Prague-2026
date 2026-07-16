@@ -2509,15 +2509,19 @@ function showAttrDetail(attr, iconKey, nameKey, descKey, howKey, existing) {
     (how ? '<div style="font-size:11px;color:rgba(30,41,59,0.5);margin-bottom:14px;">🚇 ' + how + '</div>' : '') +
     '<div style="display:flex;gap:9px;margin-top:4px;">' +
       (mapUrl ? '<a href="' + mapUrl + '" target="_blank" style="flex:1;text-align:center;padding:10px 0;background:rgba(56,189,248,0.10);border:1px solid rgba(56,189,248,0.3);border-radius:12px;font-size:13px;font-weight:700;color:#0369A1;text-decoration:none;">🗺️ מפה</a>' : '') +
-      '<button onclick="(function(){' +
-        'var e=document.getElementById(\'addStopEmoji\'); if(e) e.value=\'' + (attr[iconKey]||'📍').replace(/'/g,"\\'") + '\';' +
-        'var n=document.getElementById(\'addStopName\'); if(n) n.value=\'' + name.replace(/'/g,"\\'") + '\';' +
-        'var t=document.getElementById(\'addStopTime\'); if(t) t.value=\'\';' +
-        'var d=document.getElementById(\'addStopDesc\'); if(d) d.value=\'' + desc.substring(0,100).replace(/'/g,"\\'").replace(/\n/g,' ') + '\';' +
-        'document.getElementById(\'attrDetailOverlay\').remove();' +
-      '})()" style="flex:1;padding:10px 0;background:rgba(244,99,74,0.2);border:1px solid rgba(244,99,74,0.4);border-radius:12px;font-size:13px;font-weight:700;color:#F4634A;cursor:pointer;font-family:Rubik,Arial,sans-serif;">📅 הוסף למסלול</button>' +
+      '<button id="btnAddStopFromDetail" style="flex:1;padding:10px 0;background:rgba(244,99,74,0.2);border:1px solid rgba(244,99,74,0.4);border-radius:12px;font-size:13px;font-weight:700;color:#F4634A;cursor:pointer;font-family:Rubik,Arial,sans-serif;">📅 הוסף למסלול</button>' +
     '</div>';
   overlay.appendChild(panel);
+  var addBtn = panel.querySelector('#btnAddStopFromDetail');
+  if (addBtn) {
+    addBtn.addEventListener('click', function() {
+      var e = document.getElementById('addStopEmoji'); if (e) e.value = (attr[iconKey]||'📍');
+      var n = document.getElementById('addStopName'); if (n) n.value = name;
+      var t = document.getElementById('addStopTime'); if (t) t.value = '';
+      var d = document.getElementById('addStopDesc'); if (d) d.value = desc.substring(0,100).replace(/\n/g,' ');
+      var over = document.getElementById('attrDetailOverlay'); if (over) over.remove();
+    });
+  }
   overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
   document.body.appendChild(overlay);
 }
