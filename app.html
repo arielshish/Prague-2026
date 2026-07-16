@@ -3023,37 +3023,67 @@ function renderCommunity() {
         '</div>' +
         (p.mapUrl ? '<a href="'+p.mapUrl+'" target="_blank" rel="noopener" style="flex-shrink:0;background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.25);border-radius:12px;padding:10px 12px;font-size:11px;font-weight:700;color:#065F46;text-decoration:none;text-align:center;line-height:1.3;">🗺️<br>נווט</a>' : '') +
       '</div>' +
-      '<div style="margin-top:12px;padding-top:12px;border-top:1px dashed rgba(30,41,59,0.1);display:flex;align-items:center;gap:10px;justify-content:space-between;">' +
+      '<div style="margin-top:12px;padding-top:12px;border-top:1px dashed rgba(30,41,59,0.1);display:flex;align-items:center;justify-content:space-between;">' +
         '<div style="font-size:11px;color:rgba(30,41,59,0.6);font-weight:700;">📅 הוספה ללו"ז הימים:</div>' +
-        (function() {
-          var selectHtml = '<select onchange="addCommunityStopToDay(this, ' + COMMUNITY.indexOf(p) + ')" style="background:#ffffff;border:1px solid rgba(30,41,59,0.2);border-radius:8px;padding:6px 10px;font-size:11px;color:#1E293B;font-family:\'Rubik\',Arial,sans-serif;font-weight:bold;cursor:pointer;">' +
-            '<option value="">➕ בחר יום...</option>';
-          var daysList = getDaysState();
-          if (daysList && daysList.length) {
-            daysList.forEach(function(d, idx) {
-              selectHtml += '<option value="' + idx + '">יום ' + d.id + ' (' + d.date.replace(' באוגוסט', '/8') + ')</option>';
-            });
-          }
-          selectHtml += '</select>';
-          return selectHtml;
-        })() +
+        '<button onclick="openAddCommunityStop(' + COMMUNITY.indexOf(p) + ')" style="background:#F4634A;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">➕ הוסף ללו"ז</button>' +
       '</div>' +
     '</div>';
   }).join('');
 }
 function setCommCat(cat) { _commCat = cat; renderCommunity(); }
 
-function addCommunityStopToDay(selectEl, recIdx) {
-  var dayIdxVal = selectEl.value;
-  if (dayIdxVal === '') return;
-  var dayIdx = Number(dayIdxVal);
+function openAddCommunityStop(recIdx) {
+  var rec = COMMUNITY[recIdx];
+  if (!rec) return;
+  var state = getDaysState();
+  var existing = document.getElementById('addCommunityStopOverlay');
+  if (existing) existing.remove();
+  
+  var overlay = document.createElement('div');
+  overlay.id = 'addCommunityStopOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200;display:flex;align-items:flex-end;justify-content:center;';
+
+  var dayBtns = state.map(function(d, i) {
+    var sel = i === 0;
+    return '<button type="button" onclick="_editStopSelectDay(this,' + i + ')" style="padding:5px 9px;border-radius:9px;font-size:11px;font-weight:700;border:1px solid ' + (sel ? '#F4634A' : 'rgba(0,0,0,0.15)') + ';background:' + (sel ? 'rgba(244,99,74,0.12)' : '#fff') + ';color:' + (sel ? '#F4634A' : '#1E293B') + ';cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;white-space:nowrap;">' + (d.emoji||'📅') + ' יום ' + (i+1) + '</button>';
+  }).join('');
+
+  overlay.innerHTML =
+    '<div style="position:relative;background:#F5EFE6;border-radius:24px 24px 0 0;padding:22px 20px 36px;width:min(680px,100%);z-index:1;direction:rtl;font-family:\'Rubik\',Arial,sans-serif;">' +
+    '<div style="font-size:15px;font-weight:900;color:#1E293B;margin-bottom:14px;">➕ הוספת תחנה — ' + (rec.icon||'📍') + ' ' + esc(rec.name) + '</div>' +
+    '<div style="font-size:11px;font-weight:700;color:rgba(30,41,59,0.5);margin-bottom:8px;">📅 בחר יום בטיול</div>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;" id="editStopDayBtns">' + dayBtns + '</div>' +
+    '<input type="hidden" id="editStopTargetDay" value="0">' +
+    '<div style="font-size:11px;font-weight:700;color:rgba(30,41,59,0.5);margin-bottom:8px;">⏱ מתי ביום?</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;" id="editTimeParts">' +
+    ['🌅 בוקר','☀️ צהריים','🌇 אחה״צ','🌙 ערב'].map(function(v, vi) {
+      var active = vi === 0;
+      return '<button type="button" onclick="setEditTimePart(this,\'' + v.replace(/'/g,"\\'") + '\')" style="padding:8px 4px;border-radius:11px;border:1px solid ' + (active ? '#F4634A' : 'rgba(0,0,0,0.15)') + ';background:' + (active ? 'rgba(244,99,74,0.12)' : '#fff') + ';color:' + (active ? '#F4634A' : '#1E293B') + ';font-size:11px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">' + v.split(' ')[0] + '<br>' + v.split(' ').slice(1).join(' ') + '</button>';
+    }).join('') +
+    '</div>' +
+    '<input id="editTimeInput" type="text" value="🌅 בוקר" placeholder="שעה מדויקת (לדוג׳ 10:00)" style="width:100%;background:#ffffff;border:1px solid rgba(0,0,0,0.15);border-radius:13px;padding:11px 14px;font-size:13px;color:#1E293B;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:14px;">' +
+    '<div style="display:flex;gap:8px;">' +
+    '<button onclick="document.getElementById(\'addCommunityStopOverlay\').remove()" style="flex:1;background:#fff;border:1px solid rgba(0,0,0,0.12);border-radius:13px;padding:12px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.6);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">ביטול</button>' +
+    '<button onclick="saveAddCommunityStop(' + recIdx + ')" style="flex:2;background:#F4634A;color:white;border:0;border-radius:13px;padding:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">✅ שמור וסדר</button>' +
+    '</div></div>';
+
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
+function saveAddCommunityStop(recIdx) {
+  var inp = document.getElementById('editTimeInput');
+  var val = inp ? inp.value.trim() : '';
+  var targetDayEl = document.getElementById('editStopTargetDay');
+  var dayIdx = targetDayEl ? parseInt(targetDayEl.value) : 0;
+  
   var rec = COMMUNITY[recIdx];
   if (!rec) return;
 
   var stop = {
     emoji: rec.icon || '📍',
     name: rec.name,
-    time: rec.duration ? rec.duration.replace('⏱️ ', '') : '60 דק׳',
+    time: val || '🌅 בוקר',
     desc: rec.desc || '',
     details: '🚇 איך להגיע: ' + (rec.how || '') + (rec.tips ? '\n💡 טיפ: ' + rec.tips : ''),
     tips: [
@@ -3067,11 +3097,14 @@ function addCommunityStopToDay(selectEl, recIdx) {
   var state = getDaysState();
   if (state && state[dayIdx]) {
     state[dayIdx].stops.push(stop);
+    sortDayStops(dayIdx);
     saveDaysState();
     if (typeof renderDays === 'function') renderDays();
     toast('✅ נוסף בהצלחה ליום ' + state[dayIdx].id + '!');
   }
-  selectEl.value = ''; // Reset select
+  
+  var overlay = document.getElementById('addCommunityStopOverlay');
+  if (overlay) overlay.remove();
 }
 
 //  SHOPPING
