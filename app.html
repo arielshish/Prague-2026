@@ -75,6 +75,47 @@
   .btn-ghost{background:rgba(0,0,0,0.05);color:rgba(30,41,59,0.75);border:1px solid rgba(0,0,0,0.12);border-radius:13px;padding:12px 14px;font-weight:700;font-size:13px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;}
   .nav-map-btn{display:inline-block;background:rgba(56,189,248,0.12);color:#0369A1;border:1px solid rgba(56,189,248,0.3);border-radius:9px;padding:5px 12px;font-size:11px;font-weight:700;text-decoration:none;font-family:'Rubik',Arial,sans-serif;}
   .tip-pill{background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.25);border-radius:10px;padding:7px 11px;font-size:11px;color:#92400E;}
+
+  /* ═══ Desktop Layout Optimization ═══ */
+  @media(min-width:768px) {
+    /* Split Day Layout */
+    .day-split-layout {
+      display: flex !important;
+      flex-direction: row-reverse !important; /* Row-reverse for RTL flow */
+      align-items: flex-start !important;
+      gap: 24px !important;
+      text-align: right !important;
+    }
+    .day-details-col {
+      flex: 1.2 !important;
+      width: 50% !important;
+    }
+    .day-timeline-col {
+      flex: 1 !important;
+      width: 50% !important;
+      border-right: 1px solid rgba(128,128,128,0.15) !important;
+      padding-right: 20px !important;
+    }
+    
+    /* Flights Grid */
+    .flights-grid {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr !important;
+      gap: 14px !important;
+      margin-bottom: 14px !important;
+    }
+    .flights-grid > div {
+      margin-bottom: 0 !important;
+    }
+    
+    /* Shopping & Photos grids */
+    #shoppingGrid {
+      grid-template-columns: 1fr 1fr !important;
+    }
+    #photoDiaryGrid {
+      grid-template-columns: 1fr 1fr 1fr !important;
+    }
+  }
 </style>
 <!-- Firebase SDK (compat mode) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -415,6 +456,7 @@ function showAuthError(msg) {
         ✅ בסך הכל — חברה זולה ומשרתת את המחיר
       </div>
     </div>
+    <div class="flights-grid">
     <div style="background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.16);border-radius:20px;overflow:hidden;margin-bottom:14px;">
       <div style="background:linear-gradient(135deg,#F4634A,#d6a54a);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;">
         <div style="font-size:16px;font-weight:900;color:white;">הלוך לפראג</div>
@@ -456,6 +498,7 @@ function showAuthError(msg) {
         </div>
       </div>
       <div style="background:rgba(0,0,0,0.22);padding:11px 18px;border-top:1px dashed rgba(255,255,255,0.10);font-size:12px;font-weight:600;color:rgba(30,41,59,0.6);">💡 הגעה לארץ לפנות בוקר (16 אוגוסט)</div>
+    </div>
     </div>
   </section>
 
@@ -2394,20 +2437,26 @@ function renderDays() {
     return '<div style="font-size:12px;color:rgba(30,41,59,0.65);padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.08);">💡 ' + esc(t) + '</div>';
   }).join('');
   card.innerHTML =
-    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">' +
-    '<span style="font-size:28px;">' + (d.emoji||'📅') + '</span>' +
-    '<div><div style="font-size:15px;font-weight:900;color:#1E293B;">' + esc(d.title||'') + '</div>' +
-    '<div style="font-size:12px;color:rgba(30,41,59,0.5);">📅 ' + esc(d.date||'') + '</div></div></div>' +
-    '<p style="font-size:12px;color:rgba(30,41,59,0.6);line-height:1.6;margin-bottom:4px;">' + esc(d.story||'') + '</p>' +
-    (d.peak ? '<div style="background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.25);border-radius:12px;padding:8px 12px;margin:10px 0;font-size:12px;color:#92400E;font-weight:600;">⭐ ' + esc(d.peak) + '</div>' : '') +
-    '<div style="font-size:11px;font-weight:800;color:#F4634A;letter-spacing:0.5px;text-transform:uppercase;margin:14px 0 8px;">🧭 מסלול היום</div>' +
-    '<div style="padding-right:20px;border-right:2px dashed rgba(244,99,74,0.3);">' + stopsHtml + '</div>' +
-    '<button onclick="openAddStop(' + (i-1) + ')" style="width:100%;background:rgba(0,0,0,0.04);border:1.5px dashed rgba(0,0,0,0.15);border-radius:13px;padding:10px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.5);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;margin:8px 0 12px;">➕ הוסף תחנה</button>' +
-    (d.meals ? '<div style="background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);border-radius:14px;padding:12px;margin-top:4px;">' +
-    '<div style="font-size:11px;font-weight:800;color:#1E40AF;margin-bottom:7px;text-transform:uppercase;letter-spacing:0.5px;">🍽️ ארוחות</div>' +
-    '<div style="font-size:12px;color:rgba(30,41,59,0.65);line-height:1.7;"><strong style="color:rgba(30,41,59,0.85);">צהריים:</strong> ' + esc(d.meals.lunch||'') + '<br><strong style="color:rgba(30,41,59,0.85);">ערב:</strong> ' + esc(d.meals.dinner||'') + '</div></div>' : '') +
-    (tipsHtml ? '<div style="margin-top:10px;"><div style="font-size:11px;font-weight:800;color:#065F46;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">💡 טיפים</div>' + tipsHtml + '</div>' : '') +
-    (d.mapUrl ? '<a href="' + d.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:12px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;margin-top:14px;">🗺️ מסלול מלא במפה</a>' : '');
+    '<div class="day-split-layout">' +
+      '<div class="day-details-col">' +
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">' +
+        '<span style="font-size:28px;">' + (d.emoji||'📅') + '</span>' +
+        '<div><div style="font-size:15px;font-weight:900;color:#1E293B;">' + esc(d.title||'') + '</div>' +
+        '<div style="font-size:12px;color:rgba(30,41,59,0.5);">📅 ' + esc(d.date||'') + '</div></div></div>' +
+        '<p style="font-size:12px;color:rgba(30,41,59,0.6);line-height:1.6;margin-bottom:4px;">' + esc(d.story||'') + '</p>' +
+        (d.peak ? '<div style="background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.25);border-radius:12px;padding:8px 12px;margin:10px 0;font-size:12px;color:#92400E;font-weight:600;">⭐ ' + esc(d.peak) + '</div>' : '') +
+        (d.meals ? '<div style="background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);border-radius:14px;padding:12px;margin-top:4px;">' +
+        '<div style="font-size:11px;font-weight:800;color:#1E40AF;margin-bottom:7px;text-transform:uppercase;letter-spacing:0.5px;">🍽️ ארוחות</div>' +
+        '<div style="font-size:12px;color:rgba(30,41,59,0.65);line-height:1.7;"><strong style="color:rgba(30,41,59,0.85);">צהריים:</strong> ' + esc(d.meals.lunch||'') + '<br><strong style="color:rgba(30,41,59,0.85);">ערב:</strong> ' + esc(d.meals.dinner||'') + '</div></div>' : '') +
+        (tipsHtml ? '<div style="margin-top:10px;"><div style="font-size:11px;font-weight:800;color:#065F46;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">💡 טיפים</div>' + tipsHtml + '</div>' : '') +
+        (d.mapUrl ? '<a href="' + d.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:12px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:'Rubik',Arial,sans-serif;margin-top:14px;">🗺️ מסלול מלא במפה</a>' : '') +
+      '</div>' +
+      '<div class="day-timeline-col">' +
+        '<div style="font-size:11px;font-weight:800;color:#F4634A;letter-spacing:0.5px;text-transform:uppercase;margin:0 0 8px;">🧭 מסלול היום</div>' +
+        '<div style="padding-right:20px;border-right:2px dashed rgba(244,99,74,0.3);">' + stopsHtml + '</div>' +
+        '<button onclick="openAddStop(' + (i-1) + ')" style="width:100%;background:rgba(0,0,0,0.04);border:1.5px dashed rgba(0,0,0,0.15);border-radius:13px;padding:10px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.5);cursor:pointer;font-family:'Rubik',Arial,sans-serif;margin:8px 0 12px;">➕ הוסף תחנה</button>' +
+      '</div>' +
+    '</div>';
 }
 
 function showStopDetail(dayIdx, stopIdx) {
