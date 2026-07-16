@@ -2402,24 +2402,47 @@ function saveDaysState() {
       .withSuccessHandler(function(r) { if (r && r.ok) toast('☁️ ימים סונכרנו!'); })
       .withFailureHandler(function() { toast('⚠️ שמור מקומית בלבד'); })
       .saveDaysCustom(DAYS_STATE);
+  } else {
+    ensureFirebaseAuth().then(function() {
+      getFirestoreDb().collection('appdata').doc('main').set({ days_custom: JSON.stringify(DAYS_STATE) }, { merge: true })
+        .then(function() { toast('☁️ ימים סונכרנו לענן!'); })
+        .catch(function() { toast('⚠️ שמור מקומית בלבד'); });
+    });
   }
 }
 
 function loadDaysFromSheets(silent) {
-  if (!isGas()) { renderDays(); return; }
-  if (!silent) toast('🔄 מסנכרן...');
-  google.script.run
-    .withSuccessHandler(function(r) {
-      if (r && r.ok && r.data) {
-        DAYS_STATE = r.data;
-        localStorage.setItem('prague_days_v1', JSON.stringify(DAYS_STATE));
-      } else {
-        DAYS_STATE = getDaysState();
+  if (isGas()) {
+    if (!silent) toast('🔄 מסנכרן...');
+    google.script.run
+      .withSuccessHandler(function(r) {
+        if (r && r.ok && r.data) {
+          DAYS_STATE = r.data;
+          localStorage.setItem('prague_days_v1', JSON.stringify(DAYS_STATE));
+        } else {
+          DAYS_STATE = getDaysState();
+        }
+        renderDays();
+      })
+      .withFailureHandler(function() { DAYS_STATE = getDaysState(); renderDays(); })
+      .loadDaysCustom();
+  } else {
+    if (!silent) toast('🔄 מסנכרן...');
+    ensureFirebaseAuth().then(function() {
+      return getFirestoreDb().collection('appdata').doc('main').get();
+    }).then(function(doc) {
+      if (doc.exists && doc.data().days_custom) {
+        try {
+          DAYS_STATE = JSON.parse(doc.data().days_custom);
+          localStorage.setItem('prague_days_v1', JSON.stringify(DAYS_STATE));
+        } catch(e) {}
       }
       renderDays();
-    })
-    .withFailureHandler(function() { DAYS_STATE = getDaysState(); renderDays(); })
-    .loadDaysCustom();
+    }).catch(function() {
+      DAYS_STATE = getDaysState();
+      renderDays();
+    });
+  }
 }
 
 function selectDay(i) { currentDay = i; renderDays(); }
@@ -3194,6 +3217,22 @@ function loadPack() {
       })
       .withFailureHandler(function() {})
       .loadAppData();
+  } else {
+    ensureFirebaseAuth().then(function() {
+      return getFirestoreDb().collection('appdata').doc('main').get();
+    }).then(function(doc) {
+      if (doc.exists && doc.data().packing_list) {
+        try {
+          var raw = JSON.parse(doc.data().packing_list);
+          var isNewFormat = raw && Array.isArray(raw) && raw.length > 0 && raw[0].items;
+          if (isNewFormat) {
+            PACK_STATE = raw;
+            savePackLocal(PACK_STATE);
+            renderPack();
+          }
+        } catch(e) {}
+      }
+    });
   }
 }
 
@@ -3204,6 +3243,11 @@ function savePack() {
       .withSuccessHandler(function(r) { if (r && r.ok) toast('☁️ צ\'ק-ליסט סונכרן!'); })
       .withFailureHandler(function() {})
       .savePackingList(PACK_STATE);
+  } else {
+    ensureFirebaseAuth().then(function() {
+      getFirestoreDb().collection('appdata').doc('main').set({ packing_list: JSON.stringify(PACK_STATE) }, { merge: true })
+        .then(function() { toast('☁️ צ\'ק-ליסט סונכרן לענן!'); });
+    });
   }
 }
 
@@ -3301,6 +3345,24 @@ function loadExpenses() {
         if (badge) { badge.textContent = '⚠️ מקומי'; badge.style.color = '#FCD34D'; }
       })
       .loadExpenses();
+  } else {
+    // Sync with Firebase
+    if (badge) { badge.textContent = '🔄 מסנכרן ענן'; badge.style.color = '#FCD34D'; }
+    ensureFirebaseAuth().then(function() {
+      return getFirestoreDb().collection('appdata').doc('main').get();
+    }).then(function(doc) {
+      if (doc.exists && doc.data().expenses) {
+        try {
+          EXPENSES = JSON.parse(doc.data().expenses) || [];
+          saveLocal();
+        } catch(e) {}
+      }
+      if (badge) { badge.textContent = '☁️ ענן מחובר'; badge.style.color = '#34D399'; badge.style.borderColor = 'rgba(52,211,153,0.3)'; badge.style.background = 'rgba(52,211,153,0.1)'; }
+      renderExpenses();
+    }).catch(function() {
+      if (badge) { badge.textContent = '⚠️ מקומי'; badge.style.color = '#FCD34D'; }
+      renderExpenses();
+    });
   }
 }
 
@@ -3340,25 +3402,49 @@ function saveBudget(b) {
     google.script.run
       .withFailureHandler(function() {})
       .saveBudgetCategories(b);
+  } else {
+    ensureFirebaseAuth().then(function() {
+      getFirestoreDb().collection('appdata').doc('main').set({ budget_categories: JSON.stringify(b) }, { merge: true });
+    });
   }
 }
 function syncBudgetFromSheets(cb) {
-  if (!isGas()) { if (cb) cb(); return; }
-  google.script.run
-    .withSuccessHandler(function(r) {
-      if (r && r.ok && r.data) {
-        if (r.data.budget_categories) {
-          localStorage.setItem('prague_budget_v1', JSON.stringify(r.data.budget_categories));
+  if (isGas()) {
+    google.script.run
+      .withSuccessHandler(function(r) {
+        if (r && r.ok && r.data) {
+          if (r.data.budget_categories) {
+            localStorage.setItem('prague_budget_v1', JSON.stringify(r.data.budget_categories));
+          }
+          if (r.data.total_budget != null) {
+            localStorage.setItem('prague_total_budget', String(r.data.total_budget));
+          }
         }
-        if (r.data.total_budget != null) {
-          localStorage.setItem('prague_total_budget', String(r.data.total_budget));
+        renderBudget();
+        if (cb) cb();
+      })
+      .withFailureHandler(function() { renderBudget(); if (cb) cb(); })
+      .loadBudgetSettings();
+  } else {
+    ensureFirebaseAuth().then(function() {
+      return getFirestoreDb().collection('appdata').doc('main').get();
+    }).then(function(doc) {
+      if (doc.exists) {
+        var d = doc.data();
+        if (d.budget_categories) {
+          localStorage.setItem('prague_budget_v1', d.budget_categories);
+        }
+        if (d.total_budget != null) {
+          localStorage.setItem('prague_total_budget', String(d.total_budget));
         }
       }
       renderBudget();
       if (cb) cb();
-    })
-    .withFailureHandler(function() { renderBudget(); if (cb) cb(); })
-    .loadBudgetSettings();
+    }).catch(function() {
+      renderBudget();
+      if (cb) cb();
+    });
+  }
 }
 
 function guessExpCat(name) {
@@ -3673,7 +3759,10 @@ function saveExpense() {
     } else {
       EXPENSES.unshift({id:Date.now(), date:new Date().toLocaleString('he-IL'), name:name, czk:czk, ils:ils, note:note});
     }
-    saveLocal(); ok();
+    saveLocal();
+    ensureFirebaseAuth().then(function() {
+      return getFirestoreDb().collection('appdata').doc('main').set({ expenses: JSON.stringify(EXPENSES) }, { merge: true });
+    }).then(ok).catch(fail);
   }
 }
 
