@@ -20,7 +20,9 @@
   body{background:#F5EFE6;direction:rtl;text-align:right;font-family:'Rubik',Arial,sans-serif;color:#1E293B;overflow-x:hidden;-webkit-text-size-adjust:100%;}
   html{overflow-x:hidden;background:#F5EFE6;}
   input,textarea,select{font-size:16px!important;}
-  button{touch-action:manipulation;}
+  button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+  button:hover,button:focus{outline:none;filter:none;opacity:1;}
+  a:hover,a:focus{outline:none;}
   #app{width:min(430px,100%);min-height:100vh;margin:0 auto;background:linear-gradient(180deg,#EDE4D8 0%,#E8DFD2 50%,#E2D8CA 100%);position:relative;overflow-x:hidden;padding-bottom:90px;}
   .tab{display:none;padding:14px 14px 0;animation:rise 0.25s ease both;}
   .tab.active{display:block;}
@@ -2528,7 +2530,7 @@ function buildBankCards(items, iconKey, nameKey, descKey, howKey) {
     var name = a[nameKey] || '';
     var existing = findItemInDays(name);
     var card = document.createElement('div');
-    card.style.cssText = 'flex-shrink:0;width:138px;background:rgba(0,0,0,0.04);border:1.5px solid rgba(255,255,255,0.13);border-radius:14px;padding:10px 11px;cursor:pointer;transition:all .15s;position:relative;';
+    card.style.cssText = 'flex-shrink:0;width:138px;background:rgba(0,0,0,0.04);border:1.5px solid rgba(0,0,0,0.10);border-radius:14px;padding:10px 11px;cursor:pointer;position:relative;';
     var bookingBadge = a.booking
       ? '<div style="margin-top:5px;padding:2px 6px;background:' + (a.booking.startsWith('✅') ? 'rgba(52,211,153,0.15)' : 'rgba(245,158,11,0.15)') + ';border-radius:6px;font-size:9px;font-weight:700;color:' + (a.booking.startsWith('✅') ? '#6EE7B7' : '#FCD34D') + ';line-height:1.4;">' + a.booking.substring(0,2) + (a.booking.startsWith('✅') ? ' חינם' : ' להזמין') + '</div>'
       : '';
