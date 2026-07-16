@@ -1283,6 +1283,68 @@ var remindersSchedule = {}; // { [id]: { day, time } }
 var _pendingAttrStop = null; // { emoji, name, desc } set before opening addStop overlay
 var restaurantsSchedule = {}; // { [name]: { day, time } }
 
+function showDayPicker() {
+  var existing = document.getElementById('dayPickerOverlay');
+  if (existing) existing.remove();
+  var state = getDaysState();
+  var overlay = document.createElement('div');
+  overlay.id = 'dayPickerOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.68);z-index:10001;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;';
+  var panel = document.createElement('div');
+  panel.style.cssText = 'background:#F5EFE6;border-radius:20px;padding:22px 18px 18px;width:100%;max-width:360px;direction:rtl;font-family:Rubik,Arial,sans-serif;';
+  var pending = _pendingAttrStop || {};
+  var shortName = (pending.name||'').length > 22 ? (pending.name||'').substring(0,22)+'…' : (pending.name||'');
+  var header = document.createElement('div');
+  header.style.cssText = 'font-size:14px;font-weight:900;color:#1E293B;margin-bottom:14px;text-align:center;';
+  header.textContent = '📅 הוסף ' + (pending.emoji||'') + ' ' + shortName + ' — בחר יום:';
+  var grid = document.createElement('div');
+  grid.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;';
+  state.forEach(function(d, i) {
+    var btn = document.createElement('button');
+    btn.style.cssText = 'padding:8px 4px;background:#fff;border:1.5px solid rgba(0,0,0,0.12);border-radius:12px;font-size:11px;font-weight:800;color:#1E293B;cursor:pointer;font-family:Rubik,Arial,sans-serif;text-align:center;line-height:1.4;';
+    btn.innerHTML = '<div style="font-size:18px;">' + d.emoji + '</div><div>יום ' + (i+1) + '</div><div style="font-size:9px;color:rgba(30,41,59,0.5);">' + d.date + '</div>';
+    btn.addEventListener('click', function() { addStopToDay(i); overlay.remove(); });
+    grid.appendChild(btn);
+  });
+  var cancelBtn = document.createElement('button');
+  cancelBtn.textContent = 'ביטול';
+  cancelBtn.style.cssText = 'width:100%;padding:10px;background:rgba(0,0,0,0.05);border:none;border-radius:10px;font-size:13px;color:rgba(30,41,59,0.55);cursor:pointer;font-family:Rubik,Arial,sans-serif;';
+  cancelBtn.addEventListener('click', function() { overlay.remove(); });
+  panel.appendChild(header);
+  panel.appendChild(grid);
+  panel.appendChild(cancelBtn);
+  overlay.appendChild(panel);
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
+function addStopToDay(dayIdx) {
+  if (!_pendingAttrStop) { toast('⚠️ שגיאה: אין נתוני תחנה'); return; }
+  var pending = _pendingAttrStop;
+  var state = getDaysState();
+  if (!state[dayIdx]) { toast('⚠️ יום לא קיים'); return; }
+  state[dayIdx].stops.push({ emoji: pending.emoji, name: pending.name, time: '', desc: pending.desc, mapUrl: '' });
+  sortDayStops(dayIdx);
+  saveDaysState();
+  renderDays();
+  toast('✅ ' + pending.name + ' נוספה ליום ' + (dayIdx + 1) + '!');
+}
+
+function addReminderToStop(id) {
+  var r = REMINDERS.find(function(x) { return x.id === id; });
+  if (!r) return;
+  var ov = document.getElementById('reminderDetailOverlay'); if (ov) ov.remove();
+  _pendingAttrStop = { emoji: r.emoji, name: r.title, desc: (r.details || r.desc || '').substring(0, 100).replace(/\n/g, ' ') };
+  showDayPicker();
+}
+
+function addShopToStop(idx) {
+  var s = SHOPS[idx];
+  if (!s) return;
+  _pendingAttrStop = { emoji: s.e, name: s.n, desc: (s.tip || '').substring(0, 100).replace(/\n/g, ' ') };
+  showDayPicker();
+}
+
 function initReminders() {
   var tripDate = new Date('2026-08-08');
   var today = new Date();
@@ -1427,10 +1489,11 @@ function showReminderDetail(id) {
     (r.details ? '<div style="font-size:13px;color:rgba(30,41,59,0.85);line-height:1.7;margin-bottom:14px;">' + r.details + '</div>' : '') +
     (r.tips ? '<div style="padding:9px 12px;background:rgba(251,191,36,0.10);border-right:3px solid rgba(245,158,11,0.5);border-radius:0 8px 8px 0;font-size:12px;color:#92400E;line-height:1.55;margin-bottom:14px;">' + r.tips + '</div>' : '') +
     '<div style="font-size:11px;color:rgba(30,41,59,0.5);margin-bottom:16px;">⏰ דדליין: ' + r.deadline.split('-').reverse().join('/') + '</div>' +
-    '<div style="display:flex;gap:9px;">' +
-      (r.url ? '<a href="' + r.url + '" target="_blank" style="flex:1;text-align:center;padding:10px 0;background:rgba(99,102,241,0.10);border:1px solid rgba(99,102,241,0.25);border-radius:12px;font-size:13px;font-weight:700;color:#4338CA;text-decoration:none;">🔗 לאתר ההזמנה</a>' : '') +
-      (!done ? '<button onclick="markReminderDone(\'' + r.id + '\');document.getElementById(\'reminderDetailOverlay\').remove();" style="flex:1;padding:10px 0;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);border-radius:12px;font-size:13px;font-weight:700;color:#065F46;cursor:pointer;font-family:Rubik,Arial,sans-serif;">✅ בוצע</button>' : '') +
-      (done ? '<button onclick="markReminderUndone(\'' + r.id + '\');document.getElementById(\'reminderDetailOverlay\').remove();" style="flex:1;padding:10px 0;background:rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.12);border-radius:12px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.45);cursor:pointer;font-family:Rubik,Arial,sans-serif;">↩️ בטל</button>' : '') +
+    '<div style="display:flex;gap:9px;flex-wrap:wrap;">' +
+      (r.url ? '<a href="' + r.url + '" target="_blank" style="flex:1;text-align:center;padding:10px 0;background:rgba(99,102,241,0.10);border:1px solid rgba(99,102,241,0.25);border-radius:12px;font-size:13px;font-weight:700;color:#4338CA;text-decoration:none;min-width:90px;">🔗 לאתר ההזמנה</a>' : '') +
+      '<button onclick="addReminderToStop(\'' + r.id + '\')" style="flex:1;padding:10px 0;background:rgba(244,99,74,0.12);border:1px solid rgba(244,99,74,0.3);border-radius:12px;font-size:13px;font-weight:700;color:#F4634A;cursor:pointer;font-family:Rubik,Arial,sans-serif;min-width:90px;">📅 הוסף למסלול</button>' +
+      (!done ? '<button onclick="markReminderDone(\'' + r.id + '\');document.getElementById(\'reminderDetailOverlay\').remove();" style="flex:1;padding:10px 0;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);border-radius:12px;font-size:13px;font-weight:700;color:#065F46;cursor:pointer;font-family:Rubik,Arial,sans-serif;min-width:90px;">✅ בוצע</button>' : '') +
+      (done ? '<button onclick="markReminderUndone(\'' + r.id + '\');document.getElementById(\'reminderDetailOverlay\').remove();" style="flex:1;padding:10px 0;background:rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.12);border-radius:12px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.45);cursor:pointer;font-family:Rubik,Arial,sans-serif;min-width:90px;">↩️ בטל</button>' : '') +
     '</div>';
 
   overlay.appendChild(panel);
@@ -2508,20 +2571,19 @@ function addAttrToStop() {
     var ov = document.getElementById('attrDetailOverlay'); if (ov) ov.remove();
     var modal = qs('addStopModal');
     var alreadyOpen = modal && modal.style.display !== 'none';
-    var dayIdx;
-    if (alreadyOpen) {
-      var btn = qs('btnSaveAddStop');
-      dayIdx = btn ? Number(btn.getAttribute('data-day')) : (currentDay||1)-1;
-    } else {
-      dayIdx = (currentDay || 1) - 1;
+    if (!alreadyOpen) {
+      showDayPicker();
+      return;
     }
+    var btn = qs('btnSaveAddStop');
+    var dayIdx = btn ? Number(btn.getAttribute('data-day')) : (currentDay||1)-1;
     if (isNaN(dayIdx) || dayIdx < 0) dayIdx = 0;
     var state = getDaysState();
     if (!state[dayIdx]) { toast('⚠️ יום לא קיים: ' + (dayIdx+1)); return; }
     state[dayIdx].stops.push({ emoji: pending.emoji, name: pending.name, time: '', desc: pending.desc, mapUrl: '' });
     sortDayStops(dayIdx);
     saveDaysState();
-    if (alreadyOpen) closeAddStopModal();
+    closeAddStopModal();
     renderDays();
     toast('✅ ' + pending.name + ' נוספה ליום ' + (dayIdx + 1) + '!');
   } catch(e) {
@@ -2963,14 +3025,17 @@ function setCommCat(cat) { _commCat = cat; renderCommunity(); }
 function renderShopping() {
   var grid = qs('shoppingGrid');
   if (!grid) return;
-  grid.innerHTML = SHOPS.map(function(s) {
+  grid.innerHTML = SHOPS.map(function(s, idx) {
     return '<div style="background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.16);border-radius:20px;padding:18px;box-shadow:0 8px 26px rgba(0,0,0,0.32);overflow:hidden;">' +
       '<div style="height:78px;border-radius:14px;background:linear-gradient(135deg,#0A1E38,#14305A);display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:14px;">' + s.e + '</div>' +
       '<div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:10px;"><div style="font-size:15px;font-weight:800;color:#1E293B;">' + esc(s.n) + '</div><div style="color:#F59E0B;font-size:11px;white-space:nowrap;">' + s.stars + '</div></div>' +
       '<div style="font-size:12px;color:rgba(30,41,59,0.6);line-height:1.75;margin-bottom:10px;">⏰ ' + s.hours + '<br>🚇 ' + esc(s.metro) + '<br>⏱️ ' + esc(s.time) + '</div>' +
       '<div style="font-size:11px;color:rgba(30,41,59,0.45);margin-bottom:10px;">📦 ' + esc(s.brands) + '</div>' +
       '<div class="tip-pill" style="margin-bottom:12px;">💡 ' + esc(s.tip) + '</div>' +
-      '<a href="' + s.map + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:12px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;">🗺️ ניווט למפה</a>' +
+      '<div style="display:flex;gap:8px;">' +
+        '<a href="' + s.map + '" target="_blank" rel="noopener" style="flex:1;display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:12px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;">🗺️ ניווט</a>' +
+        '<button onclick="addShopToStop(' + idx + ')" style="flex:1;background:rgba(244,99,74,0.15);border:1.5px solid rgba(244,99,74,0.35);color:#C2410C;border-radius:13px;padding:12px;font-weight:800;font-size:12px;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">📅 הוסף למסלול</button>' +
+      '</div>' +
       '</div>';
   }).join('');
 }
