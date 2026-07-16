@@ -263,7 +263,7 @@ function showAuthError(msg) {
   <!-- מודל הוספת תחנה ליום -->
   <div id="addStopModal" style="display:none;position:fixed;inset:0;z-index:80;align-items:flex-end;justify-content:center;">
     <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);" id="addStopOverlay"></div>
-    <div style="position:relative;background:linear-gradient(160deg,#1e293b,#0f172a);border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;z-index:1;">
+    <div style="position:relative;background:#F5EFE6;border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:min(680px,100%);z-index:1;">
       <h2 id="addStopTitle" style="margin:0 0 12px;font-size:17px;font-weight:900;color:#1E293B;">➕ הוסף תחנה</h2>
       <div style="display:flex;gap:6px;margin-bottom:10px;">
         <button id="bankTabAttr" onclick="switchBankTab('attr')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(244,99,74,0.25);color:#F4634A;font-weight:700;font-size:11px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🎟️ אטרקציות</button>
@@ -277,16 +277,16 @@ function showAuthError(msg) {
       <div style="margin-bottom:10px;">
         <div style="font-size:11px;font-weight:700;color:rgba(30,41,59,0.45);letter-spacing:0.5px;margin-bottom:7px;">⏰ מתי ביום?</div>
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px;">
-          <button type="button" class="daypart-btn" data-val="🌅 בוקר" onclick="selectDayPart(this)" style="padding:8px 4px;border-radius:11px;border:1px solid rgba(255,255,255,0.15);background:#ffffff;color:rgba(241,245,249,0.75);font-size:11px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🌅<br>בוקר</button>
-          <button type="button" class="daypart-btn" data-val="☀️ צהריים" onclick="selectDayPart(this)" style="padding:8px 4px;border-radius:11px;border:1px solid rgba(255,255,255,0.15);background:#ffffff;color:rgba(241,245,249,0.75);font-size:11px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">☀️<br>צהריים</button>
-          <button type="button" class="daypart-btn" data-val="🌇 אחה״צ" onclick="selectDayPart(this)" style="padding:8px 4px;border-radius:11px;border:1px solid rgba(255,255,255,0.15);background:#ffffff;color:rgba(241,245,249,0.75);font-size:11px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🌇<br>אחה״צ</button>
-          <button type="button" class="daypart-btn" data-val="🌙 ערב" onclick="selectDayPart(this)" style="padding:8px 4px;border-radius:11px;border:1px solid rgba(255,255,255,0.15);background:#ffffff;color:rgba(241,245,249,0.75);font-size:11px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🌙<br>ערב</button>
+          <button type="button" class="daypart-btn" data-val="🌅 בוקר" onclick="selectDayPart(this)" style="padding:8px 4px;border-radius:11px;border:1px solid rgba(0,0,0,0.12);background:#ffffff;color:#1E293B;font-size:11px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🌅<br>בוקר</button>
+          <button type="button" class="daypart-btn" data-val="☀️ צהריים" onclick="selectDayPart(this)" style="padding:8px 4px;border-radius:11px;border:1px solid rgba(0,0,0,0.12);background:#ffffff;color:#1E293B;font-size:11px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">☀️<br>צהריים</button>
+          <button type="button" class="daypart-btn" data-val="🌇 אחה״צ" onclick="selectDayPart(this)" style="padding:8px 4px;border-radius:11px;border:1px solid rgba(0,0,0,0.12);background:#ffffff;color:#1E293B;font-size:11px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🌇<br>אחה״צ</button>
+          <button type="button" class="daypart-btn" data-val="🌙 ערב" onclick="selectDayPart(this)" style="padding:8px 4px;border-radius:11px;border:1px solid rgba(0,0,0,0.12);background:#ffffff;color:#1E293B;font-size:11px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🌙<br>ערב</button>
         </div>
         <input id="addStopTime" type="text" placeholder="⏱ או שעה מדויקת (לדוג׳ 10:00)" style="width:100%;background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:13px;padding:11px 14px;font-size:13px;color:#1E293B;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;">
       </div>
       <textarea id="addStopDesc" placeholder="תיאור קצר..." style="width:100%;background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:13px;padding:12px 14px;font-size:13px;color:#1E293B;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;resize:none;height:70px;margin-bottom:14px;"></textarea>
       <div style="display:flex;gap:8px;">
-        <button onclick="closeAddStopModal()" style="flex:1;background:#ffffff;border:1px solid rgba(255,255,255,0.15);border-radius:13px;padding:13px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">ביטול</button>
+        <button onclick="closeAddStopModal()" style="flex:1;background:#ffffff;border:1px solid rgba(0,0,0,0.12);border-radius:13px;padding:13px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">ביטול</button>
         <button id="btnSaveAddStop" class="btn-primary" style="flex:2;">✅ הוסף</button>
       </div>
     </div>
@@ -295,7 +295,7 @@ function showAuthError(msg) {
   <!-- מודל העברת תחנה ליום אחר -->
   <div id="moveStopModal" style="display:none;position:fixed;inset:0;z-index:80;align-items:flex-end;justify-content:center;">
     <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);" id="moveStopOverlay"></div>
-    <div style="position:relative;background:linear-gradient(160deg,#1e293b,#0f172a);border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;z-index:1;">
+    <div style="position:relative;background:#F5EFE6;border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:min(680px,100%);z-index:1;">
       <h2 style="margin:0 0 14px;font-size:17px;font-weight:900;color:#1E293B;">↔️ העבר לאיזה יום?</h2>
       <div id="moveDayPicker" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;"></div>
     </div>
@@ -374,7 +374,7 @@ function showAuthError(msg) {
   <!-- מודל עריכת תקציב -->
   <div id="budgetModal" style="display:none;position:fixed;inset:0;z-index:80;align-items:flex-end;justify-content:center;">
     <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);pointer-events:none;" id="budgetOverlay"></div>
-    <div style="position:relative;background:linear-gradient(160deg,#1e293b,#0f172a);border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;z-index:1;max-height:85vh;overflow-y:auto;">
+    <div style="position:relative;background:#F5EFE6;border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:min(680px,100%);z-index:1;max-height:85vh;overflow-y:auto;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
         <h2 style="margin:0;font-size:18px;font-weight:900;color:#1E293B;">✏️ עריכת תקציב</h2>
         <button onclick="closeBudgetModal()" style="background:#ffffff;border:1px solid rgba(255,255,255,0.14);border-radius:10px;padding:6px 13px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.65);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">ביטול</button>
@@ -497,7 +497,7 @@ function showAuthError(msg) {
   <!-- מודל הוספת פריט/קטגוריה לצ'ק-ליסט -->
   <div id="packItemModal" style="display:none;position:fixed;inset:0;z-index:80;align-items:flex-end;justify-content:center;">
     <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);" id="packItemOverlay"></div>
-    <div style="position:relative;background:linear-gradient(160deg,#1e293b,#0f172a);border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;z-index:1;">
+    <div style="position:relative;background:#F5EFE6;border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:min(680px,100%);z-index:1;">
       <h2 id="packItemTitle" style="margin:0 0 16px;font-size:17px;font-weight:900;color:#1E293B;">➕ הוסף פריט</h2>
       <input id="packItemText" type="text" placeholder="שם הפריט..." style="width:100%;background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:13px;padding:13px 14px;font-size:15px;color:#1E293B;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:12px;">
       <button id="btnSavePackItem" class="btn-primary" style="width:100%;">✅ הוסף</button>
@@ -1000,7 +1000,7 @@ function showAuthError(msg) {
   <!-- מודל תיוג תמונה -->
   <div id="photoTagModal" style="display:none;position:fixed;inset:0;z-index:90;align-items:flex-end;justify-content:center;">
     <div style="position:absolute;inset:0;background:rgba(0,0,0,0.7);" id="photoTagOverlay"></div>
-    <div style="position:relative;background:linear-gradient(160deg,#1e293b,#0f172a);border-radius:28px 28px 0 0;padding:22px 20px 36px;width:100%;max-width:480px;z-index:1;max-height:90vh;overflow-y:auto;">
+    <div style="position:relative;background:#F5EFE6;border-radius:28px 28px 0 0;padding:22px 20px 36px;width:100%;max-width:min(680px,100%);z-index:1;max-height:90vh;overflow-y:auto;">
       <h2 style="margin:0 0 14px;font-size:17px;font-weight:900;color:#1E293B;">📷 תמונה חדשה</h2>
       <!-- תצוגה מקדימה -->
       <div id="photoPreviewWrap" style="background:rgba(0,0,0,0.04);border:1px dashed rgba(255,255,255,0.2);border-radius:16px;height:200px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;overflow:hidden;cursor:pointer;" onclick="qs('photoFileInput').click()">
@@ -1403,7 +1403,7 @@ function showReminderDetail(id) {
   overlay.id = 'reminderDetailOverlay';
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:9999;display:flex;align-items:flex-end;justify-content:center;';
   var panel = document.createElement('div');
-  panel.style.cssText = 'background:#F5EFE6;border-radius:22px 22px 0 0;padding:22px 20px 32px;width:100%;max-width:480px;box-shadow:0 -4px 30px rgba(0,0,0,0.5);direction:rtl;font-family:Rubik,Arial,sans-serif;max-height:82vh;overflow-y:auto;';
+  panel.style.cssText = 'background:#F5EFE6;border-radius:22px 22px 0 0;padding:22px 20px 32px;width:100%;max-width:min(680px,100%);box-shadow:0 -4px 30px rgba(0,0,0,0.5);direction:rtl;font-family:Rubik,Arial,sans-serif;max-height:82vh;overflow-y:auto;';
 
   var priorityColors = { critical:'#DC2626', important:'#B45309', logistics:'#0369A1' };
   var priorityLabels = { critical:'🔴 דחוף', important:'🟡 חשוב', logistics:'🔵 לוגיסטיקה' };
@@ -1492,7 +1492,7 @@ function _openScheduleModal(type, key, title, sched) {
   }).join('');
 
   overlay.innerHTML =
-    '<div style="background:#F5EFE6;border-radius:22px 22px 0 0;padding:22px 18px 36px;width:100%;max-width:480px;direction:rtl;font-family:Rubik,Arial,sans-serif;">' +
+    '<div style="background:#F5EFE6;border-radius:22px 22px 0 0;padding:22px 18px 36px;width:100%;max-width:min(680px,100%);direction:rtl;font-family:Rubik,Arial,sans-serif;">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">' +
         '<div style="font-size:15px;font-weight:900;color:#1E293B;">⏰ זמן ויום — ' + title + '</div>' +
         '<button onclick="document.getElementById(\'scheduleEditOverlay\').remove()" style="background:rgba(0,0,0,0.06);border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;color:#64748B;">✕</button>' +
@@ -2482,7 +2482,7 @@ function showAttrDetail(attr, iconKey, nameKey, descKey, howKey, existing) {
   overlay.id = 'attrDetailOverlay';
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:9999;display:flex;align-items:flex-end;justify-content:center;';
   var panel = document.createElement('div');
-  panel.style.cssText = 'background:#F5EFE6;border-radius:22px 22px 0 0;padding:22px 20px 32px;width:100%;max-width:480px;box-shadow:0 -4px 30px rgba(0,0,0,0.5);direction:rtl;font-family:Rubik,Arial,sans-serif;max-height:80vh;overflow-y:auto;';
+  panel.style.cssText = 'background:#F5EFE6;border-radius:22px 22px 0 0;padding:22px 20px 32px;width:100%;max-width:min(680px,100%);box-shadow:0 -4px 30px rgba(0,0,0,0.5);direction:rtl;font-family:Rubik,Arial,sans-serif;max-height:80vh;overflow-y:auto;';
   var existingRow = existing
     ? '<div style="margin-bottom:12px;padding:8px 12px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.4);border-radius:10px;font-size:13px;font-weight:700;color:#B45309;">📅 מוצב ביום ' + existing.dayNum + (existing.time ? ' · ' + existing.time : '') + ' — ' + existing.dayTitle + '</div>'
     : '';
