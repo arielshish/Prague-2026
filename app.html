@@ -17,11 +17,11 @@
   @keyframes riverDrift{0%,100%{transform:translateX(0)}50%{transform:translateX(-6px)}}
   @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
   *{box-sizing:border-box;margin:0;padding:0;}
-  body{background:#1a2744;direction:rtl;text-align:right;font-family:'Rubik',Arial,sans-serif;color:#F1F5F9;overflow-x:hidden;-webkit-text-size-adjust:100%;}
-  html{overflow-x:hidden;}
+  body{background:#F5EFE6;direction:rtl;text-align:right;font-family:'Rubik',Arial,sans-serif;color:#F1F5F9;overflow-x:hidden;-webkit-text-size-adjust:100%;}
+  html{overflow-x:hidden;background:#F5EFE6;}
   input,textarea,select{font-size:16px!important;}
   button{touch-action:manipulation;}
-  #app{width:min(430px,100%);min-height:100vh;margin:0 auto;background:linear-gradient(180deg,#1a2744 0%,#162038 50%,#121c30 100%);position:relative;overflow-x:hidden;padding-bottom:90px;}
+  #app{width:min(430px,100%);min-height:100vh;margin:0 auto;background:linear-gradient(180deg,#EDE4D8 0%,#E8DFD2 50%,#E2D8CA 100%);position:relative;overflow-x:hidden;padding-bottom:90px;}
   .tab{display:none;padding:14px 14px 0;animation:rise 0.25s ease both;}
   .tab.active{display:block;}
 
@@ -42,12 +42,12 @@
       display:flex;flex-direction:row;align-items:center;gap:10px;
       padding:10px 12px;border-radius:11px;font-size:13px;font-weight:700;
       border:0;cursor:pointer;font-family:'Rubik',Arial,sans-serif;
-      background:transparent;color:rgba(241,245,249,0.5);
+      background:transparent;color:rgba(30,41,59,0.55);
       width:100%;text-align:right;justify-content:flex-end;
       transition:background 0.15s,color 0.15s;
     }
-    #desktopSideNav button:hover{background:rgba(255,255,255,0.07);color:#F1F5F9;}
-    #desktopSideNav button.desk-active{background:rgba(244,99,74,0.15);color:#F4634A;}
+    #desktopSideNav button:hover{background:rgba(0,0,0,0.06);color:#1E293B;}
+    #desktopSideNav button.desk-active{background:rgba(244,99,74,0.12);color:#F4634A;}
     #desktopSideNav button span{font-size:18px;}
     #mainContent{flex:1;min-width:0;}
     /* hide mobile nav on desktop */
@@ -62,17 +62,17 @@
     #mainContent{display:contents;}
   }
   #dayButtons::-webkit-scrollbar{display:none;}
-  input::placeholder{color:rgba(241,245,249,0.28)!important;}
+  input::placeholder{color:rgba(30,41,59,0.35)!important;}
   input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
   input[type=checkbox]{width:18px;height:18px;accent-color:#F4634A;cursor:pointer;flex-shrink:0;}
-  .card{background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.16);border-radius:22px;padding:18px;margin-bottom:12px;box-shadow:0 8px 24px rgba(0,0,0,0.32);}
+  .card{background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:22px;padding:18px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,0.10);}
   .card-hdr{display:flex;align-items:center;justify-content:space-between;gap:8px;}
-  .back-btn{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:10px;padding:7px 12px;font-size:11px;font-weight:700;color:rgba(241,245,249,0.55);cursor:pointer;font-family:'Rubik',Arial,sans-serif;white-space:nowrap;}
-  .cat-chip{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:6px 12px;font-size:12px;font-weight:700;color:rgba(241,245,249,0.8);cursor:pointer;font-family:'Rubik',Arial,sans-serif;}
+  .back-btn{background:rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.10);border-radius:10px;padding:7px 12px;font-size:11px;font-weight:700;color:rgba(30,41,59,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;white-space:nowrap;}
+  .cat-chip{background:rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.10);border-radius:20px;padding:6px 12px;font-size:12px;font-weight:700;color:rgba(30,41,59,0.8);cursor:pointer;font-family:'Rubik',Arial,sans-serif;}
   .btn-primary{background:#F4634A;color:white;border:0;border-radius:13px;padding:12px 16px;font-weight:800;font-size:13px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;box-shadow:0 5px 14px rgba(244,99,74,0.32);}
-  .btn-ghost{background:rgba(255,255,255,0.09);color:rgba(241,245,249,0.75);border:1px solid rgba(255,255,255,0.15);border-radius:13px;padding:12px 14px;font-weight:700;font-size:13px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;}
-  .nav-map-btn{display:inline-block;background:rgba(255,255,255,0.10);color:rgba(241,245,249,0.78);border:1px solid rgba(255,255,255,0.15);border-radius:9px;padding:5px 12px;font-size:11px;font-weight:700;text-decoration:none;font-family:'Rubik',Arial,sans-serif;}
-  .tip-pill{background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:7px 11px;font-size:11px;color:#FCD34D;}
+  .btn-ghost{background:rgba(0,0,0,0.05);color:rgba(30,41,59,0.75);border:1px solid rgba(0,0,0,0.12);border-radius:13px;padding:12px 14px;font-weight:700;font-size:13px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;}
+  .nav-map-btn{display:inline-block;background:rgba(56,189,248,0.12);color:#0369A1;border:1px solid rgba(56,189,248,0.3);border-radius:9px;padding:5px 12px;font-size:11px;font-weight:700;text-decoration:none;font-family:'Rubik',Arial,sans-serif;}
+  .tip-pill{background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.25);border-radius:10px;padding:7px 11px;font-size:11px;color:#92400E;}
 </style>
 <!-- Firebase SDK (compat mode) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -138,7 +138,7 @@ function showAuthError(msg) {
   }
 })();
 </script>
-<div id="loginScreen" style="position:fixed;inset:0;background:#1a2744;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:32px;">
+<div id="loginScreen" style="position:fixed;inset:0;background:#EDE4D8;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:32px;">
   <div style="font-size:56px;">🏰</div>
   <div style="font-size:26px;font-weight:900;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;">פראג 2026</div>
   <div style="font-size:14px;color:rgba(241,245,249,0.5);font-family:'Rubik',Arial,sans-serif;">משפחת שיש</div>
@@ -425,14 +425,14 @@ function showAuthError(msg) {
           <div style="text-align:center;"><div style="font-size:28px;font-weight:900;color:#F1F5F9;line-height:1;">PRG</div><div style="font-size:17px;font-weight:700;color:#F59E0B;margin-top:3px;">08:45</div><div style="font-size:11px;color:rgba(241,245,249,0.45);">רוזינה</div></div>
         </div>
         <div style="border-top:1px dashed rgba(255,255,255,0.14);padding-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-          <div><div style="font-size:10px;color:rgba(241,245,249,0.38);text-transform:uppercase;margin-bottom:3px;">תאריך</div><div style="font-size:12px;font-weight:600;color:#F1F5F9;">8 אוגוסט 2026 (שבת)</div></div>
-          <div><div style="font-size:10px;color:rgba(241,245,249,0.38);text-transform:uppercase;margin-bottom:3px;">מחלקה</div><div style="font-size:12px;font-weight:600;color:#F1F5F9;">Economy</div></div>
+          <div><div style="font-size:10px;color:rgba(30,41,59,0.5);text-transform:uppercase;margin-bottom:3px;">תאריך</div><div style="font-size:12px;font-weight:600;color:#F1F5F9;">8 אוגוסט 2026 (שבת)</div></div>
+          <div><div style="font-size:10px;color:rgba(30,41,59,0.5);text-transform:uppercase;margin-bottom:3px;">מחלקה</div><div style="font-size:12px;font-weight:600;color:#F1F5F9;">Economy</div></div>
         </div>
         <div style="border-top:1px dashed rgba(255,255,255,0.14);padding-top:10px;display:grid;gap:4px;">
-          <div style="font-size:10px;color:rgba(241,245,249,0.38);text-transform:uppercase;margin-bottom:4px;">נוסעים</div>
-          <div style="font-size:12px;font-weight:600;color:rgba(241,245,249,0.82);">👤 Ariel Shish <span style="color:rgba(241,245,249,0.38);font-weight:400;">(מבוגר)</span></div>
-          <div style="font-size:12px;font-weight:600;color:rgba(241,245,249,0.82);">👤 Mariana Shish <span style="color:rgba(241,245,249,0.38);font-weight:400;">(מבוגרת)</span></div>
-          <div style="font-size:12px;font-weight:600;color:rgba(241,245,249,0.82);">👧 Adi Yasmin Shish <span style="color:rgba(241,245,249,0.38);font-weight:400;">(ילדה)</span></div>
+          <div style="font-size:10px;color:rgba(30,41,59,0.5);text-transform:uppercase;margin-bottom:4px;">נוסעים</div>
+          <div style="font-size:12px;font-weight:600;color:rgba(241,245,249,0.82);">👤 Ariel Shish <span style="color:rgba(30,41,59,0.5);font-weight:400;">(מבוגר)</span></div>
+          <div style="font-size:12px;font-weight:600;color:rgba(241,245,249,0.82);">👤 Mariana Shish <span style="color:rgba(30,41,59,0.5);font-weight:400;">(מבוגרת)</span></div>
+          <div style="font-size:12px;font-weight:600;color:rgba(241,245,249,0.82);">👧 Adi Yasmin Shish <span style="color:rgba(30,41,59,0.5);font-weight:400;">(ילדה)</span></div>
         </div>
       </div>
       <div style="background:rgba(0,0,0,0.22);padding:11px 18px;border-top:1px dashed rgba(255,255,255,0.10);font-size:12px;font-weight:600;color:rgba(241,245,249,0.55);">⚠️ לוודא טרמינל בנתב"ג לפני ההגעה</div>
@@ -449,8 +449,8 @@ function showAuthError(msg) {
           <div style="text-align:center;"><div style="font-size:28px;font-weight:900;color:#F1F5F9;line-height:1;">TLV</div><div style="font-size:17px;font-weight:700;color:#F59E0B;margin-top:3px;">04:35<sup style="font-size:10px;">+1</sup></div><div style="font-size:11px;color:rgba(241,245,249,0.45);">נתב"ג</div></div>
         </div>
         <div style="border-top:1px dashed rgba(255,255,255,0.14);padding-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          <div><div style="font-size:10px;color:rgba(241,245,249,0.38);text-transform:uppercase;margin-bottom:3px;">המראה</div><div style="font-size:12px;font-weight:600;color:#F1F5F9;">15 אוגוסט (שבת)</div></div>
-          <div><div style="font-size:10px;color:rgba(241,245,249,0.38);text-transform:uppercase;margin-bottom:3px;">נחיתה</div><div style="font-size:12px;font-weight:600;color:#F59E0B;">16 אוגוסט (ראשון)</div></div>
+          <div><div style="font-size:10px;color:rgba(30,41,59,0.5);text-transform:uppercase;margin-bottom:3px;">המראה</div><div style="font-size:12px;font-weight:600;color:#F1F5F9;">15 אוגוסט (שבת)</div></div>
+          <div><div style="font-size:10px;color:rgba(30,41,59,0.5);text-transform:uppercase;margin-bottom:3px;">נחיתה</div><div style="font-size:12px;font-weight:600;color:#F59E0B;">16 אוגוסט (ראשון)</div></div>
         </div>
       </div>
       <div style="background:rgba(0,0,0,0.22);padding:11px 18px;border-top:1px dashed rgba(255,255,255,0.10);font-size:12px;font-weight:600;color:rgba(241,245,249,0.55);">💡 הגעה לארץ לפנות בוקר (16 אוגוסט)</div>
@@ -1118,14 +1118,14 @@ function showAuthError(msg) {
   </div>
 
   <!-- ═══ NAV ═══ -->
-  <nav style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);height:76px;background:rgba(2,7,14,0.97);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-top:1px solid rgba(255,255,255,0.08);z-index:50;display:grid;grid-template-columns:repeat(7,1fr);">
+  <nav style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);height:76px;background:rgba(237,228,216,0.97);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-top:1px solid rgba(0,0,0,0.10);z-index:50;display:grid;grid-template-columns:repeat(7,1fr);">
     <button id="nav-home" style="border:0;background:transparent;color:#F4634A;font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">🏠</span>ראשי</button>
-    <button id="nav-days" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">📅</span>ימים</button>
-    <button id="nav-shopping" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">🛍️</span>קניות</button>
-    <button id="nav-expenses" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">💰</span>הוצאות</button>
-    <button id="nav-flights" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">✈️</span>טיסות</button>
-    <button id="nav-pack" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">🧳</span>ציוד</button>
-    <button onclick="openTab('reminders')" id="nav-reminders" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">🔔</span>תזכורות</button>
+    <button id="nav-days" style="border:0;background:transparent;color:rgba(30,41,59,0.5);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">📅</span>ימים</button>
+    <button id="nav-shopping" style="border:0;background:transparent;color:rgba(30,41,59,0.5);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">🛍️</span>קניות</button>
+    <button id="nav-expenses" style="border:0;background:transparent;color:rgba(30,41,59,0.5);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">💰</span>הוצאות</button>
+    <button id="nav-flights" style="border:0;background:transparent;color:rgba(30,41,59,0.5);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">✈️</span>טיסות</button>
+    <button id="nav-pack" style="border:0;background:transparent;color:rgba(30,41,59,0.5);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">🧳</span>ציוד</button>
+    <button onclick="openTab('reminders')" id="nav-reminders" style="border:0;background:transparent;color:rgba(30,41,59,0.5);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">🔔</span>תזכורות</button>
   </nav>
 </div>
 
@@ -1410,7 +1410,7 @@ function showReminderDetail(id) {
     '</div>' +
     (r.details ? '<div style="font-size:13px;color:rgba(241,245,249,0.8);line-height:1.7;margin-bottom:14px;">' + r.details + '</div>' : '') +
     (r.tips ? '<div style="padding:9px 12px;background:rgba(251,191,36,0.08);border-right:3px solid rgba(251,191,36,0.5);border-radius:0 8px 8px 0;font-size:12px;color:rgba(253,230,138,0.85);line-height:1.55;margin-bottom:14px;">' + r.tips + '</div>' : '') +
-    '<div style="font-size:11px;color:rgba(241,245,249,0.38);margin-bottom:16px;">⏰ דדליין: ' + r.deadline.split('-').reverse().join('/') + '</div>' +
+    '<div style="font-size:11px;color:rgba(30,41,59,0.5);margin-bottom:16px;">⏰ דדליין: ' + r.deadline.split('-').reverse().join('/') + '</div>' +
     '<div style="display:flex;gap:9px;">' +
       (r.url ? '<a href="' + r.url + '" target="_blank" style="flex:1;text-align:center;padding:10px 0;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);border-radius:12px;font-size:13px;font-weight:700;color:#A5B4FC;text-decoration:none;">🔗 לאתר ההזמנה</a>' : '') +
       (!done ? '<button onclick="markReminderDone(\'' + r.id + '\');document.getElementById(\'reminderDetailOverlay\').remove();" style="flex:1;padding:10px 0;background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.3);border-radius:12px;font-size:13px;font-weight:700;color:#34D399;cursor:pointer;font-family:Rubik,Arial,sans-serif;">✅ בוצע</button>' : '') +
@@ -1953,6 +1953,14 @@ var COMMUNITY = [
    who:'🧒 ילדים עד גיל 15 מתים עליו | 👨‍👩‍👧‍👦 יום משפחתי מושלם',
    how:'מטרו C → Nádraží Holešovice + אוטובוס 112 עד הכניסה', mapUrl:'https://www.google.com/maps/search/Prague+Zoo'},
 
+  {cat:'🎟️ אטרקציות', icon:'✡️', name:'בית הכנסת הגדול — Staronová synagoga', fb:'⭐⭐⭐⭐⭐', google:'4.7',
+   desc:'בית הכנסת הגדול (Staronová synagoga / "הישנה-חדשה") הוא בית הכנסת הפועל הקדום ביותר בעולם — נבנה בין 1270–1280! עדיין פעיל. ארכיטקטורה גותית מרהיבה, אווירה מיסטית מימי הביניים. לצדו הרובע היהודי המלא (Josefov) עם 6 בתי כנסת, בית עלמין עתיק, ומוזיאון יהודי. הרובע היהודי הוא אחד השמורים הטובים ביותר בעולם — לא לפספס!',
+   booking:'🎟️ כרטיס לרובע יהודי (כולל כל בתי הכנסת): jewishmuseum.cz | ~500 CZK | לקנות Online מראש — עמוס מאוד בקיץ! בית הכנסת הישן-חדש נפרד: ~200 CZK',
+   duration:'⏱️ 90 דקות–3 שעות (לפי כמה בתי כנסת ורוצים לראות)',
+   tips:'✡️ ללבוש כיפה (גברים) — מחלקים בכניסה. שבת — בית הכנסת פתוח לתפילה, מוזיאון סגור. לבוא בבוקר לפני ההמון.',
+   who:'👨‍👩‍👧‍👦 חשוב להכיר את ההיסטוריה | 📚 להכין ילדים לסיפור של הרובע לפני הביקור',
+   how:'מטרו A → Staroměstská + 5 דק׳ הליכה לרובע היהודי', mapUrl:'https://www.google.com/maps/search/Old+New+Synagogue+Prague+Jewish+Quarter'},
+
   {cat:'🎟️ אטרקציות', icon:'🏰', name:'מצודת פראג', fb:'⭐⭐⭐⭐', google:'4.5',
    desc:'המצודה הגדולה בעולם לפי גינס — 70,000 מ"ר! מכילה: קתדרלת סנט ויטוס (גותית מרהיבה, 14ה מאה), ארמון המלך הבוהמי, הכנסייה הרומנסקית, וסמטת הזהב — רחוב קטן ומרתק עם בתי נפחים, שריוניות וחרבות. מה שמרשים הכי הרבה הוא הנוף מבחוץ — מגן ה-Royal Garden ומגשר קרל מתחת.',
    booking:'🎟️ כרטיס Circuit B (מספיק) — 350 CZK מבוגר, 200 ילד | Online: hrad.cz | ביוגוסט תורים של שעה! לבוא לפני 9:00',
@@ -2000,6 +2008,22 @@ var COMMUNITY = [
    tips:'🥪 חובה להביא אוכל מפראג — אין מסעדות טובות. נעלי הליכה חובה. לבדוק לוח רכבות: cd.cz',
    who:'🥾 אוהבי טבע והליכה | 👦 ילדים מגיל 8+ | 🌄 הנוף הכי מרהיב בסביבה',
    how:'רכבת מ-Praha hlavní nádraží → Adršpach ~3 שעות', mapUrl:'https://www.google.com/maps/search/Adrsbach+rock+city'},
+
+  {cat:'🎟️ אטרקציות', icon:'🎡', name:'לונה פארק — Lunapark Holešovice', fb:'⭐⭐⭐⭐', google:'4.1',
+   desc:'פארק שעשועים מסורתי וסוחף בשכונת Holešovice — גלגל ענק (נוף על פראג!), רכבת הרים, בית עקומות, מכוניות התנגשות, ירי בקני, ומגוון מתקנים לילדים ולמבוגרים. פתוח מאי–ספטמבר. קטנוני יותר מפארקים אמריקאיים אבל האווירה נוסטלגית ומקסימה — חוויה צ׳כית מקומית אמיתית.',
+   booking:'✅ אין הזמנה מראש — כניסה חינם, מתקנים בנפרד ~50–100 CZK כל אחד | גלגל ענק: ~80 CZK',
+   duration:'⏱️ 1.5–3 שעות',
+   tips:'🎡 גלגל הענק — הכי שווה. לבוא אחה"צ מוקדם כשהמתקנים פחות עמוסים. ילדים מגיל 4+ יהנו מרוב המתקנים.',
+   who:'👦👧 ילדים כל הגילאים | 👨‍👩‍👧‍👦 חוויה קצרה ומשמחת | 🌇 יפה בשעות הערב עם האורות',
+   how:'מטרו C → Holešovice + הליכה 10 דק׳ לשטח Výstaviště', mapUrl:'https://www.google.com/maps/search/Lunapark+Holesovice+Prague'},
+
+  {cat:'🎟️ אטרקציות', icon:'🧱', name:'מוזיאון הלגו — LEGO Museum Prague', fb:'⭐⭐⭐⭐⭐', google:'4.5',
+   desc:'המוזיאון הגדול ביותר לאוסף לגו בעולם — 3 קומות עם מאות מודלים ייחודיים: ערים שלמות בלגו, דמויות Star Wars, אנימציה ואמנות, ואיזור בנייה חופשית לילדים. ה-LEGO Store הצמוד מאפשר לבחור לבנים בודדות ולבנות קופסה מותאמת אישית — חוויה שלא תמצאו בכל מקום! שונה לחלוטין מ-Hamleys.',
+   booking:'🎟️ מומלץ לקנות Online — legoland.cz | ~350 CZK מבוגר, ~250 ילד | הנחה לקומבו עם Disney Museum',
+   duration:'⏱️ 60–90 דקות',
+   tips:'🧱 ה-LEGO Store ממש ליד — לאפשר לילדים לבחור לבנים חופשית ("Pick a Brick"). להביא תיק — הם יקנו הרבה! להגיע בשעות בוקר — פחות עמוס.',
+   who:'👦👧 ילדים מגיל 4+ | 🧒 עד גיל 14 מתים עליו | 👨 גם מבוגרים אוהבי לגו',
+   how:'מטרו A/C → Václavské náměstí + 3 דק׳ הליכה', mapUrl:'https://www.google.com/maps/search/LEGO+Museum+Prague'},
 
   {cat:'🎟️ אטרקציות', icon:'⛲', name:'מזרקת Křižík', fb:'⭐⭐⭐⭐⭐', google:'4.7',
    desc:'מזרקה מוזיקלית היסטורית מ-1891 עם 50 מנורות צבעוניות ו-3,000 אפקטי מים — ספקטקל של 45 דק׳. מופעים כל ערב בין מאי לאוקטובר: תוכניות קלאסיות, אופרה, דובסטפ, ומוזיקת פופ. ממוקמת בשטח התערוכה Výstaviště. אפשר לשבת ביציע מקורה (כרטיס) או לצפות חינם מהחוץ.',
@@ -2158,7 +2182,7 @@ function openTab(id) {
     var sec = qs(name);
     if (sec) sec.className = sec.className.replace(' active','') + (name === id ? ' active' : '');
     var btn = qs('nav-' + name);
-    if (btn) btn.style.color = name === id ? '#F4634A' : 'rgba(241,245,249,0.38)';
+    if (btn) btn.style.color = name === id ? '#F4634A' : 'rgba(30,41,59,0.55)';
   });
   if (id === 'expenses') { loadExpenses(); syncBudgetFromSheets(); }
   if (id === 'days') renderDays();
@@ -2219,7 +2243,7 @@ function renderDays() {
   btnContainer.innerHTML = state.map(function(d, idx) {
     var a = idx + 1 === i;
     return '<button data-day="' + (idx+1) + '" style="min-width:42px;border:0;border-radius:12px;padding:7px 8px;background:' +
-      (a ? '#F4634A' : 'rgba(255,255,255,0.09)') + ';color:' + (a ? 'white' : 'rgba(241,245,249,0.55)') +
+      (a ? '#F4634A' : 'rgba(0,0,0,0.08)') + ';color:' + (a ? 'white' : 'rgba(30,41,59,0.7)') +
       ';font-weight:800;font-size:12px;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;flex-shrink:0;box-shadow:' +
       (a ? '0 4px 12px rgba(244,99,74,0.32)' : 'none') + ';">' + (idx+1) + '</button>';
   }).join('');
@@ -2232,41 +2256,42 @@ function renderDays() {
   var stopsHtml = (d.stops || []).map(function(s, si) {
     var hasDetails = !!(s.details || s.tips);
     var dayIdx = i - 1;
-    return '<div onclick="showStopDetail(' + dayIdx + ',' + si + ')" style="position:relative;margin-bottom:10px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.13);border-radius:14px;padding:13px;margin-right:16px;cursor:pointer;">' +
+    return '<div onclick="showStopDetail(' + dayIdx + ',' + si + ')" style="position:relative;margin-bottom:10px;background:#F8F5F0;border:1px solid rgba(0,0,0,0.09);border-radius:14px;padding:13px;margin-right:16px;cursor:pointer;">' +
       '<div style="position:absolute;right:-20px;top:16px;width:8px;height:8px;border-radius:50%;background:#F4634A;box-shadow:0 0 7px rgba(244,99,74,0.55);"></div>' +
       '<div style="display:flex;align-items:flex-start;gap:10px;">' +
       '<div style="font-size:22px;line-height:1;margin-top:1px;flex-shrink:0;">' + (s.emoji||'📍') + '</div>' +
       '<div style="flex:1;min-width:0;">' +
         '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:2px;">' +
-          '<div style="font-size:13px;font-weight:800;color:#F1F5F9;">' + esc(s.name) + '</div>' +
+          '<div style="font-size:13px;font-weight:800;color:#1E293B;">' + esc(s.name) + '</div>' +
           '<div style="display:flex;gap:4px;flex-shrink:0;">' +
-            (hasDetails ? '<span style="font-size:10px;color:rgba(241,245,249,0.35);align-self:center;">פרטים ›</span>' : '') +
-            '<button onclick="event.stopPropagation();openMoveStop(' + dayIdx + ',' + si + ')" style="background:rgba(59,130,246,0.18);border:none;border-radius:7px;padding:3px 7px;font-size:10px;color:#93C5FD;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">↔</button>' +
-            '<button onclick="event.stopPropagation();deleteStop(' + dayIdx + ',' + si + ')" style="background:rgba(239,68,68,0.15);border:none;border-radius:7px;padding:3px 7px;font-size:10px;color:#FCA5A5;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">✕</button>' +
+            (hasDetails ? '<span style="font-size:10px;color:rgba(30,41,59,0.4);align-self:center;">פרטים ›</span>' : '') +
+            '<button onclick="event.stopPropagation();openEditStopTime(' + dayIdx + ',' + si + ')" style="background:rgba(16,185,129,0.12);border:none;border-radius:7px;padding:3px 7px;font-size:10px;color:#065F46;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">⏰</button>' +
+            '<button onclick="event.stopPropagation();openMoveStop(' + dayIdx + ',' + si + ')" style="background:rgba(59,130,246,0.12);border:none;border-radius:7px;padding:3px 7px;font-size:10px;color:#1E40AF;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">↔</button>' +
+            '<button onclick="event.stopPropagation();deleteStop(' + dayIdx + ',' + si + ')" style="background:rgba(239,68,68,0.10);border:none;border-radius:7px;padding:3px 7px;font-size:10px;color:#991B1B;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">✕</button>' +
           '</div>' +
         '</div>' +
-        '<div style="font-size:11px;color:rgba(241,245,249,0.42);margin-bottom:6px;">⏱️ ' + esc(s.time||'') + '</div>' +
-        '<div style="font-size:12px;color:rgba(241,245,249,0.6);margin-bottom:8px;">' + esc(s.desc||'') + '</div>' +
+        '<div style="font-size:11px;color:rgba(30,41,59,0.5);margin-bottom:6px;">⏱️ ' + esc(s.time||'') + '</div>' +
+        '<div style="font-size:12px;color:rgba(30,41,59,0.65);margin-bottom:8px;">' + esc(s.desc||'') + '</div>' +
         (s.mapUrl ? '<a href="' + s.mapUrl + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="nav-map-btn">🗺️ נווט</a>' : '') +
       '</div></div></div>';
   }).join('');
   var tipsHtml = (d.tips || []).map(function(t) {
-    return '<div style="font-size:12px;color:rgba(241,245,249,0.65);padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.06);">💡 ' + esc(t) + '</div>';
+    return '<div style="font-size:12px;color:rgba(30,41,59,0.65);padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.08);">💡 ' + esc(t) + '</div>';
   }).join('');
   card.innerHTML =
     '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">' +
     '<span style="font-size:28px;">' + (d.emoji||'📅') + '</span>' +
-    '<div><div style="font-size:15px;font-weight:900;color:#F1F5F9;">' + esc(d.title||'') + '</div>' +
-    '<div style="font-size:12px;color:rgba(241,245,249,0.42);">📅 ' + esc(d.date||'') + '</div></div></div>' +
-    '<p style="font-size:12px;color:rgba(241,245,249,0.55);line-height:1.6;margin-bottom:4px;">' + esc(d.story||'') + '</p>' +
-    (d.peak ? '<div style="background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.2);border-radius:12px;padding:8px 12px;margin:10px 0;font-size:12px;color:#FCD34D;font-weight:600;">⭐ ' + esc(d.peak) + '</div>' : '') +
+    '<div><div style="font-size:15px;font-weight:900;color:#1E293B;">' + esc(d.title||'') + '</div>' +
+    '<div style="font-size:12px;color:rgba(30,41,59,0.5);">📅 ' + esc(d.date||'') + '</div></div></div>' +
+    '<p style="font-size:12px;color:rgba(30,41,59,0.6);line-height:1.6;margin-bottom:4px;">' + esc(d.story||'') + '</p>' +
+    (d.peak ? '<div style="background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.25);border-radius:12px;padding:8px 12px;margin:10px 0;font-size:12px;color:#92400E;font-weight:600;">⭐ ' + esc(d.peak) + '</div>' : '') +
     '<div style="font-size:11px;font-weight:800;color:#F4634A;letter-spacing:0.5px;text-transform:uppercase;margin:14px 0 8px;">🧭 מסלול היום</div>' +
     '<div style="padding-right:20px;border-right:2px dashed rgba(244,99,74,0.3);">' + stopsHtml + '</div>' +
-    '<button onclick="openAddStop(' + (i-1) + ')" style="width:100%;background:rgba(255,255,255,0.05);border:1px dashed rgba(255,255,255,0.2);border-radius:13px;padding:10px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.5);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;margin:8px 0 12px;">➕ הוסף תחנה</button>' +
-    (d.meals ? '<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:12px;margin-top:4px;">' +
-    '<div style="font-size:11px;font-weight:800;color:#93C5FD;margin-bottom:7px;text-transform:uppercase;letter-spacing:0.5px;">🍽️ ארוחות</div>' +
-    '<div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.7;"><strong style="color:rgba(241,245,249,0.82);">צהריים:</strong> ' + esc(d.meals.lunch||'') + '<br><strong style="color:rgba(241,245,249,0.82);">ערב:</strong> ' + esc(d.meals.dinner||'') + '</div></div>' : '') +
-    (tipsHtml ? '<div style="margin-top:10px;"><div style="font-size:11px;font-weight:800;color:#6EE7B7;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">💡 טיפים</div>' + tipsHtml + '</div>' : '') +
+    '<button onclick="openAddStop(' + (i-1) + ')" style="width:100%;background:rgba(0,0,0,0.04);border:1.5px dashed rgba(0,0,0,0.15);border-radius:13px;padding:10px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.5);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;margin:8px 0 12px;">➕ הוסף תחנה</button>' +
+    (d.meals ? '<div style="background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);border-radius:14px;padding:12px;margin-top:4px;">' +
+    '<div style="font-size:11px;font-weight:800;color:#1E40AF;margin-bottom:7px;text-transform:uppercase;letter-spacing:0.5px;">🍽️ ארוחות</div>' +
+    '<div style="font-size:12px;color:rgba(30,41,59,0.65);line-height:1.7;"><strong style="color:rgba(30,41,59,0.85);">צהריים:</strong> ' + esc(d.meals.lunch||'') + '<br><strong style="color:rgba(30,41,59,0.85);">ערב:</strong> ' + esc(d.meals.dinner||'') + '</div></div>' : '') +
+    (tipsHtml ? '<div style="margin-top:10px;"><div style="font-size:11px;font-weight:800;color:#065F46;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">💡 טיפים</div>' + tipsHtml + '</div>' : '') +
     (d.mapUrl ? '<a href="' + d.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:12px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;margin-top:14px;">🗺️ מסלול מלא במפה</a>' : '');
 }
 
@@ -2366,7 +2391,7 @@ function showAttrDetail(attr, iconKey, nameKey, descKey, howKey, existing) {
     (desc ? '<div style="font-size:13px;color:rgba(241,245,249,0.8);line-height:1.7;margin-bottom:14px;">' + desc + '</div>' : '') +
     (booking ? '<div style="padding:10px 12px;background:rgba(0,0,0,0.25);border-right:3px solid ' + bookingColor + ';border-radius:0 8px 8px 0;font-size:12px;font-weight:700;color:' + bookingColor + ';line-height:1.55;margin-bottom:10px;">' + booking + '</div>' : '') +
     (tips ? '<div style="padding:9px 12px;background:rgba(251,191,36,0.08);border-right:3px solid rgba(251,191,36,0.5);border-radius:0 8px 8px 0;font-size:12px;color:rgba(253,230,138,0.85);line-height:1.55;margin-bottom:10px;">' + tips + '</div>' : '') +
-    (how ? '<div style="font-size:11px;color:rgba(241,245,249,0.38);margin-bottom:14px;">🚇 ' + how + '</div>' : '') +
+    (how ? '<div style="font-size:11px;color:rgba(30,41,59,0.5);margin-bottom:14px;">🚇 ' + how + '</div>' : '') +
     '<div style="display:flex;gap:9px;margin-top:4px;">' +
       (mapUrl ? '<a href="' + mapUrl + '" target="_blank" style="flex:1;text-align:center;padding:10px 0;background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.3);border-radius:12px;font-size:13px;font-weight:700;color:#7DD3FC;text-decoration:none;">🗺️ מפה</a>' : '') +
       '<button onclick="(function(){' +
@@ -2448,6 +2473,57 @@ function openAddStop(dayIdx) {
   _currentBankTab = 'attr';
   switchBankTab('attr');
   var m = qs('addStopModal'); if (m) { m.style.display = 'flex'; }
+}
+
+function openEditStopTime(dayIdx, stopIdx) {
+  var s = (getDaysState()[dayIdx] || {stops:[]}).stops[stopIdx];
+  if (!s) return;
+  var existing = document.getElementById('editTimeOverlay');
+  if (existing) existing.remove();
+  var overlay = document.createElement('div');
+  overlay.id = 'editTimeOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200;display:flex;align-items:flex-end;justify-content:center;';
+  overlay.innerHTML =
+    '<div style="position:relative;background:linear-gradient(160deg,#1e293b,#0f172a);border-radius:24px 24px 0 0;padding:22px 20px 36px;width:min(430px,100%);z-index:1;">' +
+    '<div style="font-size:15px;font-weight:900;color:#F1F5F9;margin-bottom:14px;">⏰ ' + (s.emoji||'📍') + ' ' + s.name + '</div>' +
+    '<div style="font-size:11px;font-weight:700;color:rgba(241,245,249,0.4);margin-bottom:8px;">בחר מתי ביום</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;" id="editTimeParts">' +
+    ['🌅 בוקר','☀️ צהריים','🌇 אחה״צ','🌙 ערב'].map(function(v) {
+      var active = (s.time||'') === v;
+      return '<button type="button" onclick="setEditTimePart(this,\'' + v.replace(/'/g,"\\'") + '\')" style="padding:8px 4px;border-radius:11px;border:1px solid ' + (active ? 'rgba(244,99,74,0.45)' : 'rgba(255,255,255,0.15)') + ';background:' + (active ? 'rgba(244,99,74,0.25)' : 'rgba(255,255,255,0.07)') + ';color:' + (active ? '#F4634A' : 'rgba(241,245,249,0.75)') + ';font-size:11px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">' + v.split(' ')[0] + '<br>' + v.split(' ').slice(1).join(' ') + '</button>';
+    }).join('') +
+    '</div>' +
+    '<input id="editTimeInput" type="text" value="' + (s.time||'') + '" placeholder="שעה מדויקת (לדוג׳ 10:00)" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:11px 14px;font-size:13px;color:#F1F5F9;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:14px;">' +
+    '<div style="display:flex;gap:8px;">' +
+    '<button onclick="document.getElementById(\'editTimeOverlay\').remove()" style="flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:13px;padding:12px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.55);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">ביטול</button>' +
+    '<button onclick="saveEditStopTime(' + dayIdx + ',' + stopIdx + ')" style="flex:2;background:#F4634A;color:white;border:0;border-radius:13px;padding:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">✅ שמור</button>' +
+    '</div></div>';
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
+function setEditTimePart(btn, val) {
+  btn.parentElement.querySelectorAll('button').forEach(function(b) {
+    b.style.background = 'rgba(255,255,255,0.07)';
+    b.style.color = 'rgba(241,245,249,0.75)';
+    b.style.borderColor = 'rgba(255,255,255,0.15)';
+  });
+  btn.style.background = 'rgba(244,99,74,0.25)';
+  btn.style.color = '#F4634A';
+  btn.style.borderColor = 'rgba(244,99,74,0.45)';
+  var inp = document.getElementById('editTimeInput');
+  if (inp) inp.value = val;
+}
+
+function saveEditStopTime(dayIdx, stopIdx) {
+  var inp = document.getElementById('editTimeInput');
+  var val = inp ? inp.value.trim() : '';
+  getDaysState()[dayIdx].stops[stopIdx].time = val;
+  saveDaysState();
+  var ov = document.getElementById('editTimeOverlay');
+  if (ov) ov.remove();
+  renderDays();
+  toast('⏰ זמן עודכן!');
 }
 
 function selectDayPart(btn) {
@@ -3786,7 +3862,7 @@ function initDesktopLayout() {
   // Create sidebar
   var sidebar = document.createElement('div');
   sidebar.id = 'deskSidebar';
-  sidebar.style.cssText = 'position:fixed;top:0;right:calc(50% + 470px - 960px/2 + 0px);width:190px;height:100vh;background:rgba(4,13,24,0.97);border-left:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;padding:24px 10px 16px;gap:4px;z-index:40;overflow-y:auto;direction:rtl;';
+  sidebar.style.cssText = 'position:fixed;top:0;right:calc(50% + 470px - 960px/2 + 0px);width:190px;height:100vh;background:rgba(237,228,216,0.97);border-left:1px solid rgba(0,0,0,0.10);display:flex;flex-direction:column;padding:24px 10px 16px;gap:4px;z-index:40;overflow-y:auto;direction:rtl;backdrop-filter:blur(12px);';
 
   var navItems = [
     { id:'home',       icon:'🏠', label:'ראשי' },
