@@ -2477,17 +2477,28 @@ function findItemInDays(name) {
 
 function addAttrToStop() {
   if (!_pendingAttrStop) return;
-  var pending = _pendingAttrStop; // capture before any re-render clears it
+  var pending = _pendingAttrStop;
   var ov = document.getElementById('attrDetailOverlay'); if (ov) ov.remove();
+  // figure out target day
   var modal = qs('addStopModal');
   var alreadyOpen = modal && modal.style.display !== 'none';
-  if (!alreadyOpen) {
-    var dayIdx = (currentDay || 1) - 1;
-    openAddStop(dayIdx);
-  }
-  var e = document.getElementById('addStopEmoji'); if (e) e.value = pending.emoji;
-  var n = document.getElementById('addStopName');  if (n) { n.value = pending.name; n.scrollIntoView({behavior:'smooth',block:'center'}); }
-  var d = document.getElementById('addStopDesc');  if (d) d.value = pending.desc;
+  var dayIdx = alreadyOpen
+    ? Number(qs('btnSaveAddStop').getAttribute('data-day'))
+    : (currentDay || 1) - 1;
+  // build and save the stop directly — no second click needed
+  var stop = {
+    emoji: pending.emoji,
+    name:  pending.name,
+    time:  '',
+    desc:  pending.desc,
+    mapUrl: ''
+  };
+  getDaysState()[dayIdx].stops.push(stop);
+  sortDayStops(dayIdx);
+  saveDaysState();
+  if (alreadyOpen) closeAddStopModal();
+  renderDays();
+  toast('✅ ' + pending.name + ' נוספה ליום ' + (dayIdx + 1) + '!');
 }
 
 function showAttrDetail(attr, iconKey, nameKey, descKey, howKey, existing) {
