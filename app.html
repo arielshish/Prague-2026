@@ -2476,29 +2476,31 @@ function findItemInDays(name) {
 }
 
 function addAttrToStop() {
-  if (!_pendingAttrStop) return;
-  var pending = _pendingAttrStop;
-  var ov = document.getElementById('attrDetailOverlay'); if (ov) ov.remove();
-  // figure out target day
-  var modal = qs('addStopModal');
-  var alreadyOpen = modal && modal.style.display !== 'none';
-  var dayIdx = alreadyOpen
-    ? Number(qs('btnSaveAddStop').getAttribute('data-day'))
-    : (currentDay || 1) - 1;
-  // build and save the stop directly — no second click needed
-  var stop = {
-    emoji: pending.emoji,
-    name:  pending.name,
-    time:  '',
-    desc:  pending.desc,
-    mapUrl: ''
-  };
-  getDaysState()[dayIdx].stops.push(stop);
-  sortDayStops(dayIdx);
-  saveDaysState();
-  if (alreadyOpen) closeAddStopModal();
-  renderDays();
-  toast('✅ ' + pending.name + ' נוספה ליום ' + (dayIdx + 1) + '!');
+  try {
+    if (!_pendingAttrStop) { toast('⚠️ שגיאה: אין נתוני אטרקציה'); return; }
+    var pending = _pendingAttrStop;
+    var ov = document.getElementById('attrDetailOverlay'); if (ov) ov.remove();
+    var modal = qs('addStopModal');
+    var alreadyOpen = modal && modal.style.display !== 'none';
+    var dayIdx;
+    if (alreadyOpen) {
+      var btn = qs('btnSaveAddStop');
+      dayIdx = btn ? Number(btn.getAttribute('data-day')) : (currentDay||1)-1;
+    } else {
+      dayIdx = (currentDay || 1) - 1;
+    }
+    if (isNaN(dayIdx) || dayIdx < 0) dayIdx = 0;
+    var state = getDaysState();
+    if (!state[dayIdx]) { toast('⚠️ יום לא קיים: ' + (dayIdx+1)); return; }
+    state[dayIdx].stops.push({ emoji: pending.emoji, name: pending.name, time: '', desc: pending.desc, mapUrl: '' });
+    sortDayStops(dayIdx);
+    saveDaysState();
+    if (alreadyOpen) closeAddStopModal();
+    renderDays();
+    toast('✅ ' + pending.name + ' נוספה ליום ' + (dayIdx + 1) + '!');
+  } catch(e) {
+    toast('⚠️ שגיאה: ' + e.message);
+  }
 }
 
 function showAttrDetail(attr, iconKey, nameKey, descKey, howKey, existing) {
