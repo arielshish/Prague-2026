@@ -2477,11 +2477,14 @@ function findItemInDays(name) {
 
 function addAttrToStop() {
   if (!_pendingAttrStop) return;
+  var ov = document.getElementById('attrDetailOverlay'); if (ov) ov.remove();
+  // currentDay is 1-based; openAddStop expects 0-based index
+  var dayIdx = (currentDay || 1) - 1;
+  openAddStop(dayIdx);
+  // fill after openAddStop so the clear doesn't wipe our values
   var e = document.getElementById('addStopEmoji'); if (e) e.value = _pendingAttrStop.emoji;
   var n = document.getElementById('addStopName');  if (n) n.value = _pendingAttrStop.name;
-  var t = document.getElementById('addStopTime');  if (t) t.value = '';
   var d = document.getElementById('addStopDesc');  if (d) d.value = _pendingAttrStop.desc;
-  var ov = document.getElementById('attrDetailOverlay'); if (ov) ov.remove();
 }
 
 function showAttrDetail(attr, iconKey, nameKey, descKey, howKey, existing) {
