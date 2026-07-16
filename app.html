@@ -2405,9 +2405,9 @@ function saveDaysState() {
   }
 }
 
-function loadDaysFromSheets() {
+function loadDaysFromSheets(silent) {
   if (!isGas()) { renderDays(); return; }
-  toast('🔄 מסנכרן...');
+  if (!silent) toast('🔄 מסנכרן...');
   google.script.run
     .withSuccessHandler(function(r) {
       if (r && r.ok && r.data) {
@@ -2936,7 +2936,7 @@ function renderHistory() {
         '</div>' +
         '<div style="background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.18);border-radius:12px;padding:10px 12px;">' +
           '<div style="font-size:10px;font-weight:700;color:#92400E;letter-spacing:0.5px;margin-bottom:5px;">📸 איך לצלם</div>' +
-          '<div style="font-size:12px;color:rgba(241,245,249,0.75);line-height:1.65;">' + s.photo + '</div>' +
+          '<div style="font-size:12px;color:rgba(30,41,59,0.75);line-height:1.65;">' + s.photo + '</div>' +
         '</div>' +
         '<div style="background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.18);border-radius:12px;padding:10px 12px;">' +
           '<div style="font-size:12px;color:rgba(30,41,59,0.7);line-height:1.55;">' + s.tip + '</div>' +
@@ -2957,7 +2957,7 @@ function renderCommunity() {
   if (filterEl) {
     filterEl.innerHTML = cats.map(function(c) {
       var active = _commCat === c;
-      return '<button type="button" onclick="setCommCat(\''+c.replace(/'/g,'\\\'')+'\')" style="flex-shrink:0;background:'+(active?'rgba(52,211,153,0.25)':'rgba(255,255,255,0.07)')+';border:1px solid '+(active?'rgba(52,211,153,0.5)':'rgba(255,255,255,0.15)')+';border-radius:20px;padding:7px 14px;font-size:12px;font-weight:700;color:'+(active?'#6EE7B7':'rgba(241,245,249,0.7)')+';cursor:pointer;white-space:nowrap;font-family:\'Rubik\',Arial,sans-serif;">'+c+'</button>';
+      return '<button type="button" onclick="setCommCat(\''+c.replace(/'/g,'\\\'')+'\')" style="flex-shrink:0;background:'+(active?'rgba(52,211,153,0.25)':'rgba(255,255,255,0.07)')+';border:1px solid '+(active?'rgba(52,211,153,0.5)':'rgba(255,255,255,0.15)')+';border-radius:20px;padding:7px 14px;font-size:12px;font-weight:700;color:'+(active?'#C2410C':'rgba(30,41,59,0.7)')+';cursor:pointer;white-space:nowrap;font-family:\'Rubik\',Arial,sans-serif;">'+c+'</button>';
     }).join('');
   }
   var list = qs('commList'); if (!list) return;
@@ -3226,7 +3226,7 @@ function renderPack() {
       if (item.done) done++;
       html += '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.06);">' +
         '<input type="checkbox" data-ci="' + ci + '" data-ii="' + ii + '" ' + (item.done ? 'checked' : '') + ' style="accent-color:#065F46;width:17px;height:17px;flex-shrink:0;">' +
-        '<span style="flex:1;font-size:13px;color:' + (item.done ? 'rgba(241,245,249,0.3)' : 'rgba(241,245,249,0.85)') + ';' + (item.done ? 'text-decoration:line-through;' : '') + '">' + esc(item.text) + '</span>' +
+        '<span style="flex:1;font-size:13px;color:' + (item.done ? 'rgba(30,41,59,0.35)' : 'rgba(30,41,59,0.85)') + ';' + (item.done ? 'text-decoration:line-through;' : '') + '">' + esc(item.text) + '</span>' +
         '<button onclick="deletePackItem(' + ci + ',' + ii + ')" style="background:none;border:none;color:rgba(239,68,68,0.5);font-size:14px;cursor:pointer;padding:2px 4px;line-height:1;">✕</button>' +
       '</div>';
     });
@@ -3399,7 +3399,7 @@ function renderBudget() {
     var color = ratio < 0.7 ? '#6EE7B7' : ratio < 0.9 ? '#FCD34D' : '#FCA5A5';
     return '<div>' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
-        '<div style="font-size:12px;font-weight:700;color:rgba(241,245,249,0.85);">' + b.cat + '</div>' +
+        '<div style="font-size:12px;font-weight:700;color:rgba(30,41,59,0.85);">' + b.cat + '</div>' +
         '<div style="font-size:11px;color:rgba(30,41,59,0.5);">₪' + pct.toLocaleString('he-IL') + ' / ₪' + (Number(b.ils)||0).toLocaleString('he-IL') + '</div>' +
       '</div>' +
       '<div style="background:#ffffff;border-radius:6px;height:6px;overflow:hidden;">' +
@@ -3423,7 +3423,7 @@ function renderBudget() {
   var pb = qs('budgetProgressBar');
   if (pb) { pb.style.width = pct + '%'; pb.style.background = barColor; }
   var pctEl = qs('budgetPct');
-  if (pctEl) { pctEl.textContent = pct + '% נוצל'; pctEl.style.color = pct >= 90 ? '#FCA5A5' : pct >= 70 ? '#FCD34D' : 'rgba(241,245,249,0.6)'; }
+  if (pctEl) { pctEl.textContent = pct + '% נוצל'; pctEl.style.color = pct >= 90 ? '#EF4444' : pct >= 70 ? '#D97706' : 'rgba(30,41,59,0.6)'; }
 }
 
 function populateBudgetModal(budget, totalVal) {
@@ -3941,6 +3941,21 @@ document.addEventListener('DOMContentLoaded', function() {
   renderShopping();
   loadExpenses();
   syncBudgetFromSheets();
+
+  // Poll until isGas() becomes true, then run cloud loaders
+  var gasPollCount = 0;
+  var gasPoll = setInterval(function() {
+    gasPollCount++;
+    if (isGas()) {
+      clearInterval(gasPoll);
+      loadExpenses();
+      syncBudgetFromSheets();
+      loadDaysFromSheets(true);
+      loadPack();
+    } else if (gasPollCount > 50) {
+      clearInterval(gasPoll);
+    }
+  }, 100);
 
   // CZK/ILS conversion
   var czkInput = qs('expCzk'), ilsInput = qs('expIls');

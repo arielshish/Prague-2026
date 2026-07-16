@@ -2169,9 +2169,9 @@ function saveDaysState() {
   }
 }
 
-function loadDaysFromSheets() {
+function loadDaysFromSheets(silent) {
   if (!isGas()) { renderDays(); return; }
-  toast('🔄 מסנכרן...');
+  if (!silent) toast('🔄 מסנכרן...');
   google.script.run
     .withSuccessHandler(function(r) {
       if (r && r.ok && r.data) {
@@ -3594,6 +3594,21 @@ document.addEventListener('DOMContentLoaded', function() {
   renderShopping();
   loadExpenses();
   syncBudgetFromSheets();
+
+  // Poll until isGas() becomes true, then run cloud loaders
+  var gasPollCount = 0;
+  var gasPoll = setInterval(function() {
+    gasPollCount++;
+    if (isGas()) {
+      clearInterval(gasPoll);
+      loadExpenses();
+      syncBudgetFromSheets();
+      loadDaysFromSheets(true);
+      loadPack();
+    } else if (gasPollCount > 50) {
+      clearInterval(gasPoll);
+    }
+  }, 100);
 
   // CZK/ILS conversion
   var czkInput = qs('expCzk'), ilsInput = qs('expIls');
