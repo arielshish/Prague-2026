@@ -2243,12 +2243,12 @@ function renderDays() {
         '<div style="font-size:11px;font-weight:800;color:#93C5FD;margin-bottom:7px;text-transform:uppercase;letter-spacing:0.5px;">🍽️ ארוחות</div>' +
         '<div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.7;"><strong style="color:rgba(241,245,249,0.82);">צהריים:</strong> ' + esc(d.meals.lunch||'') + '<br><strong style="color:rgba(241,245,249,0.82);">ערב:</strong> ' + esc(d.meals.dinner||'') + '</div></div>' : '') +
         (tipsHtml ? '<div style="margin-top:10px;"><div style="font-size:11px;font-weight:800;color:#6EE7B7;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">💡 טיפים</div>' + tipsHtml + '</div>' : '') +
-        (d.mapUrl ? '<a href="' + d.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:12px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:'Rubik',Arial,sans-serif;margin-top:14px;">🗺️ מסלול מלא במפה</a>' : '') +
+        (d.mapUrl ? '<a href="' + d.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:12px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;margin-top:14px;">🗺️ מסלול מלא במפה</a>' : '') +
       '</div>' +
       '<div class="day-timeline-col">' +
         '<div style="font-size:11px;font-weight:800;color:#F4634A;letter-spacing:0.5px;text-transform:uppercase;margin:0 0 8px;">🧭 מסלול היום</div>' +
         '<div style="padding-right:20px;border-right:2px dashed rgba(244,99,74,0.3);">' + stopsHtml + '</div>' +
-        '<button onclick="openAddStop(' + (i-1) + ')" style="width:100%;background:rgba(255,255,255,0.05);border:1px dashed rgba(255,255,255,0.2);border-radius:13px;padding:10px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.5);cursor:pointer;font-family:'Rubik',Arial,sans-serif;margin:8px 0 12px;">➕ הוסף תחנה</button>' +
+        '<button onclick="openAddStop(' + (i-1) + ')" style="width:100%;background:rgba(255,255,255,0.05);border:1px dashed rgba(255,255,255,0.2);border-radius:13px;padding:10px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.5);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;margin:8px 0 12px;">➕ הוסף תחנה</button>' +
       '</div>' +
     '</div>';
 }
