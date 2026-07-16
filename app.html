@@ -2363,7 +2363,7 @@ function openTab(id) {
     var btn = qs('nav-' + name);
     if (btn) btn.style.color = name === id ? '#F4634A' : 'rgba(30,41,59,0.55)';
   });
-  if (id === 'expenses') { loadExpenses(); syncBudgetFromSheets(); }
+  if (id === 'expenses') { loadExpenses(); syncBudgetFromSheets(); syncBudgetFromFirebase(); }
   if (id === 'days') { renderDays(); loadDaysFromSheets(); }
   if (id === 'pack') loadPack();
   if (id === 'restaurants') renderRestaurants();
@@ -3229,12 +3229,38 @@ function loadPackLocal() {
     return null;
   } catch(e) { return null; }
 }
-function savePackLocal(state) { localStorage.setItem('prague_pack_v2', JSON.stringify(state)); }
+function savePackLocal(state) {
+  localStorage.setItem('prague_pack_v2', JSON.stringify(state));
+  if (!isGas()) {
+    try {
+      ensureFirebaseAuth().then(function() {
+        getFirestoreDb().collection('appdata').doc('pack').set({ data: JSON.stringify(state), ts: Date.now() })
+          .catch(function(e) { console.warn('Firestore pack save failed', e); });
+      });
+    } catch(e) {}
+  }
+}
 
 function loadPack() {
   // תמיד מציג מקומי מיידית
   PACK_STATE = loadPackLocal() || getDefaultPackCats();
   renderPack();
+  // Firebase sync for GitHub Pages
+  if (!isGas()) {
+    try {
+      ensureFirebaseAuth().then(function() {
+        return getFirestoreDb().collection('appdata').doc('pack').get();
+      }).then(function(doc) {
+        if (doc.exists && doc.data().data) {
+          try {
+            var remote = JSON.parse(doc.data().data);
+            var isNewFormat = Array.isArray(remote) && remote.length > 0 && remote[0].items;
+            if (isNewFormat) { PACK_STATE = remote; savePackLocal(remote); renderPack(); }
+          } catch(e) {}
+        }
+      }).catch(function(e) { console.warn('loadPack firebase error', e); });
+    } catch(e) {}
+  }
   if (isGas()) {
     google.script.run
       .withSuccessHandler(function(r) {
@@ -3342,6 +3368,8 @@ function loadExpenses() {
   var badge = qs('syncBadge');
   // תמיד טוען מקומי קודם לתגובה מיידית
   loadLocal();
+  // טוען מ-Firebase (GitHub Pages) לסנכרון בין מכשירים
+  loadExpensesFromFirebase();
   if (isGas()) {
     if (badge) badge.textContent = '🔄 מסנכרן';
     google.script.run
@@ -3363,7 +3391,37 @@ function loadLocal() {
   renderExpenses();
 }
 
-function saveLocal() { localStorage.setItem('prague_exp_v10', JSON.stringify(EXPENSES)); }
+function saveLocal() {
+  localStorage.setItem('prague_exp_v10', JSON.stringify(EXPENSES));
+  if (!isGas()) {
+    try {
+      ensureFirebaseAuth().then(function() {
+        getFirestoreDb().collection('appdata').doc('expenses').set({ data: JSON.stringify(EXPENSES), ts: Date.now() })
+          .catch(function(e) { console.warn('Firestore expenses save failed', e); });
+      });
+    } catch(e) { console.warn('saveLocal firebase error', e); }
+  }
+}
+
+function loadExpensesFromFirebase() {
+  if (isGas()) return;
+  try {
+    ensureFirebaseAuth().then(function() {
+      return getFirestoreDb().collection('appdata').doc('expenses').get();
+    }).then(function(doc) {
+      if (doc.exists && doc.data().data) {
+        try {
+          var remote = JSON.parse(doc.data().data);
+          if (remote.length >= EXPENSES.length) {
+            EXPENSES = remote;
+            localStorage.setItem('prague_exp_v10', doc.data().data);
+            renderExpenses();
+          }
+        } catch(e) {}
+      }
+    }).catch(function(e) { console.warn('loadExpensesFromFirebase error', e); });
+  } catch(e) {}
+}
 
 // ── תקציב ──
 var DEFAULT_BUDGET = [
@@ -3386,7 +3444,37 @@ function saveTotalBudget(val) {
     google.script.run
       .withFailureHandler(function() {})
       .saveTotalBudget(val);
+  } else {
+    try {
+      ensureFirebaseAuth().then(function() {
+        getFirestoreDb().collection('appdata').doc('budget').set({ total: val, ts: Date.now() }, { merge: true })
+          .catch(function(e) { console.warn('Firestore total budget save failed', e); });
+      });
+    } catch(e) {}
   }
+}
+
+function syncBudgetFromFirebase(cb) {
+  if (isGas()) { if (cb) cb(); return; }
+  try {
+    ensureFirebaseAuth().then(function() {
+      return getFirestoreDb().collection('appdata').doc('budget').get();
+    }).then(function(doc) {
+      if (doc.exists) {
+        if (doc.data().categories) {
+          try {
+            var cats = JSON.parse(doc.data().categories);
+            localStorage.setItem('prague_budget_v1', JSON.stringify(cats));
+          } catch(e) {}
+        }
+        if (doc.data().total) {
+          localStorage.setItem('prague_total_budget', String(doc.data().total));
+        }
+        renderExpenses();
+      }
+      if (cb) cb();
+    }).catch(function() { if (cb) cb(); });
+  } catch(e) { if (cb) cb(); }
 }
 function saveBudget(b) {
   localStorage.setItem('prague_budget_v1', JSON.stringify(b));
@@ -3394,6 +3482,13 @@ function saveBudget(b) {
     google.script.run
       .withFailureHandler(function() {})
       .saveBudgetCategories(b);
+  } else {
+    try {
+      ensureFirebaseAuth().then(function() {
+        getFirestoreDb().collection('appdata').doc('budget').set({ categories: JSON.stringify(b), ts: Date.now() }, { merge: true })
+          .catch(function(e) { console.warn('Firestore budget save failed', e); });
+      });
+    } catch(e) {}
   }
 }
 function syncBudgetFromSheets(cb) {
