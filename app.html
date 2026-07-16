@@ -172,10 +172,22 @@ function getFirestoreDb() {
 // Anonymous auth so Firestore rules can require request.auth != null instead of open access
 function ensureFirebaseAuth() {
   if (_authReadyPromise) return _authReadyPromise;
-  getFirestoreDb();
-  _authReadyPromise = firebase.auth(_fbApp).signInAnonymously()
-    .then(function() { return true; })
-    .catch(function(err) { console.warn('Firebase anonymous auth failed', err); return false; });
+  try {
+    if (typeof firebase === 'undefined') {
+      throw new Error('Firebase SDK is not loaded. Please check your network or adblocker.');
+    }
+    getFirestoreDb();
+    _authReadyPromise = firebase.auth(_fbApp).signInAnonymously()
+      .then(function() { return true; })
+      .catch(function(err) { 
+        window._lastFirebaseError = err;
+        console.warn('Firebase anonymous auth failed', err); 
+        return false; 
+      });
+  } catch(e) {
+    window._lastFirebaseError = e;
+    _authReadyPromise = Promise.resolve(false);
+  }
   return _authReadyPromise;
 }
 
@@ -2406,7 +2418,7 @@ function saveDaysState() {
     ensureFirebaseAuth().then(function() {
       getFirestoreDb().collection('appdata').doc('main').set({ days_custom: JSON.stringify(DAYS_STATE) }, { merge: true })
         .then(function() { toast('☁️ ימים סונכרנו לענן!'); })
-        .catch(function() { toast('⚠️ שמור מקומית בלבד'); });
+        .catch(function(err) { window._lastFirebaseError = err; toast('⚠️ שמור מקומית בלבד'); });
     });
   }
 }
@@ -2428,7 +2440,8 @@ function loadDaysFromSheets(silent) {
       .loadDaysCustom();
   } else {
     if (!silent) toast('🔄 מסנכרן...');
-    ensureFirebaseAuth().then(function() {
+    ensureFirebaseAuth().then(function(ready) {
+      if (!ready) throw new Error('Firebase Auth failed to initialize');
       return getFirestoreDb().collection('appdata').doc('main').get();
     }).then(function(doc) {
       if (doc.exists && doc.data().days_custom) {
@@ -2438,7 +2451,8 @@ function loadDaysFromSheets(silent) {
         } catch(e) {}
       }
       renderDays();
-    }).catch(function() {
+    }).catch(function(err) {
+      window._lastFirebaseError = err;
       DAYS_STATE = getDaysState();
       renderDays();
     });
@@ -3218,7 +3232,8 @@ function loadPack() {
       .withFailureHandler(function() {})
       .loadAppData();
   } else {
-    ensureFirebaseAuth().then(function() {
+    ensureFirebaseAuth().then(function(ready) {
+      if (!ready) throw new Error('Firebase Auth failed to initialize');
       return getFirestoreDb().collection('appdata').doc('main').get();
     }).then(function(doc) {
       if (doc.exists && doc.data().packing_list) {
@@ -3232,6 +3247,8 @@ function loadPack() {
           }
         } catch(e) {}
       }
+    }).catch(function(err) {
+      window._lastFirebaseError = err;
     });
   }
 }
@@ -3246,7 +3263,7 @@ function savePack() {
   } else {
     ensureFirebaseAuth().then(function() {
       getFirestoreDb().collection('appdata').doc('main').set({ packing_list: JSON.stringify(PACK_STATE) }, { merge: true })
-        .then(function() { toast('☁️ צ\'ק-ליסט סונכרן לענן!'); });
+        .then(function() { toast('☁️ צ\'ק-ליסט סונכרן לענן!'); }).catch(function(err) { window._lastFirebaseError = err; });
     });
   }
 }
@@ -3332,6 +3349,29 @@ function loadExpenses() {
   var badge = qs('syncBadge');
   // תמיד טוען מקומי קודם לתגובה מיידית
   loadLocal();
+  
+  // Setup debug click handler on the badge
+  if (badge && !badge.dataset.hasDebug) {
+    badge.dataset.hasDebug = 'true';
+    badge.style.cursor = 'pointer';
+    badge.title = 'לחץ להצגת פרטי סנכרון';
+    badge.onclick = function() {
+      var statusInfo = '🔔 פרטי סנכרון ענן (Firebase):\n\n' +
+        '• isGas: ' + isGas() + '\n' +
+        '• Firebase SDK loaded: ' + (typeof firebase !== 'undefined') + '\n';
+      if (typeof firebase !== 'undefined') {
+        statusInfo += '• Auth user: ' + (firebase.auth && firebase.auth().currentUser ? firebase.auth().currentUser.uid : 'None (Anonymous)') + '\n';
+      }
+      statusInfo += '• Status Text: ' + badge.textContent + '\n\n';
+      if (window._lastFirebaseError) {
+        statusInfo += '❌ שגיאה אחרונה שנרשמה:\n' + window._lastFirebaseError.message + '\n\n' + (window._lastFirebaseError.stack || '');
+      } else {
+        statusInfo += '✅ לא נרשמו שגיאות ענן.';
+      }
+      alert(statusInfo);
+    };
+  }
+
   if (isGas()) {
     if (badge) badge.textContent = '🔄 מסנכרן';
     google.script.run
@@ -3348,7 +3388,8 @@ function loadExpenses() {
   } else {
     // Sync with Firebase
     if (badge) { badge.textContent = '🔄 מסנכרן ענן'; badge.style.color = '#FCD34D'; }
-    ensureFirebaseAuth().then(function() {
+    ensureFirebaseAuth().then(function(ready) {
+      if (!ready) throw new Error('Firebase Auth failed to initialize');
       return getFirestoreDb().collection('appdata').doc('main').get();
     }).then(function(doc) {
       if (doc.exists && doc.data().expenses) {
@@ -3359,8 +3400,10 @@ function loadExpenses() {
       }
       if (badge) { badge.textContent = '☁️ ענן מחובר'; badge.style.color = '#34D399'; badge.style.borderColor = 'rgba(52,211,153,0.3)'; badge.style.background = 'rgba(52,211,153,0.1)'; }
       renderExpenses();
-    }).catch(function() {
-      if (badge) { badge.textContent = '⚠️ מקומי'; badge.style.color = '#FCD34D'; }
+    }).catch(function(err) {
+      window._lastFirebaseError = err;
+      console.warn('Firebase sync failed', err);
+      if (badge) { badge.textContent = '⚠️ מקומי'; badge.style.color = '#FCD34D'; badge.style.borderColor = 'rgba(245,158,11,0.28)'; badge.style.background = 'rgba(245,158,11,0.12)'; }
       renderExpenses();
     });
   }
@@ -3426,7 +3469,8 @@ function syncBudgetFromSheets(cb) {
       .withFailureHandler(function() { renderBudget(); if (cb) cb(); })
       .loadBudgetSettings();
   } else {
-    ensureFirebaseAuth().then(function() {
+    ensureFirebaseAuth().then(function(ready) {
+      if (!ready) throw new Error('Firebase Auth failed to initialize');
       return getFirestoreDb().collection('appdata').doc('main').get();
     }).then(function(doc) {
       if (doc.exists) {
@@ -3440,7 +3484,8 @@ function syncBudgetFromSheets(cb) {
       }
       renderBudget();
       if (cb) cb();
-    }).catch(function() {
+    }).catch(function(err) {
+      window._lastFirebaseError = err;
       renderBudget();
       if (cb) cb();
     });
