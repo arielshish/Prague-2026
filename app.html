@@ -223,6 +223,313 @@ function showAuthError(msg) {
     });
   }
 })();
+
+
+// Generic modal opener for adding ANY item as a stop in days (light mode)
+function openAddCustomStop(type, data) {
+  var existing = document.getElementById('addCommunityStopOverlay');
+  if (existing) existing.remove();
+  
+  var overlay = document.createElement('div');
+  overlay.id = 'addCommunityStopOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:flex-end;justify-content:center;';
+
+  var daysList = getDaysState();
+  var dayBtns = daysList.map(function(d, i) {
+    var sel = i === 0;
+    return '<button type="button" onclick="_editStopSelectDay(this,' + i + ')" style="padding:5px 9px;border-radius:9px;font-size:11px;font-weight:700;border:1px solid ' + (sel ? '#F4634A' : 'rgba(0,0,0,0.15)') + ';background:' + (sel ? 'rgba(244,99,74,0.12)' : '#fff') + ';color:' + (sel ? '#F4634A' : '#1E293B') + ';cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;white-space:nowrap;">' + (d.emoji||'📅') + ' יום ' + (i+1) + '</button>';
+  }).join('');
+
+  overlay.innerHTML =
+    '<div style="position:relative;background:#F5EFE6;border-radius:24px 24px 0 0;padding:22px 20px 36px;width:min(680px,100%);z-index:1;direction:rtl;font-family:\'Rubik\',Arial,sans-serif;">' +
+    '<div style="font-size:15px;font-weight:900;color:#1E293B;margin-bottom:14px;">➕ הוספת תחנה — ' + (data.emoji||'📍') + ' ' + esc(data.name) + '</div>' +
+    '<div style="font-size:11px;font-weight:700;color:rgba(30,41,59,0.5);margin-bottom:8px;">📅 בחר יום בטיול</div>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;" id="editStopDayBtns">' + dayBtns + '</div>' +
+    '<input type="hidden" id="editStopTargetDay" value="0">' +
+    '<div style="font-size:11px;font-weight:700;color:rgba(30,41,59,0.5);margin-bottom:8px;">⏱ מתי ביום?</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;" id="editTimeParts">' +
+    ['🌅 בוקר','☀️ צהריים','🌇 אחה״צ','🌙 ערב'].map(function(v, vi) {
+      var active = vi === 0;
+      return '<button type="button" onclick="setEditTimePart(this,\'' + v.replace(/'/g,"\\'") + '\')" style="padding:8px 4px;border-radius:11px;border:1px solid ' + (active ? '#F4634A' : 'rgba(0,0,0,0.15)') + ';background:' + (active ? 'rgba(244,99,74,0.12)' : '#fff') + ';color:' + (active ? '#F4634A' : '#1E293B') + ';font-size:11px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">' + v.split(' ')[0] + '<br>' + v.split(' ').slice(1).join(' ') + '</button>';
+    }).join('') +
+    '</div>' +
+    '<input id="editTimeInput" type="text" value="🌅 בוקר" placeholder="שעה מדויקת (לדוג׳ 10:00)" style="width:100%;background:#ffffff;border:1px solid rgba(0,0,0,0.15);border-radius:13px;padding:11px 14px;font-size:13px;color:#1E293B;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:14px;">' +
+    '<div style="display:flex;gap:8px;">' +
+    '<button onclick="document.getElementById(\'addCommunityStopOverlay\').remove()" style="flex:1;background:#fff;border:1px solid rgba(0,0,0,0.12);border-radius:13px;padding:12px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.6);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">ביטול</button>' +
+    '<button id="btnSaveAddCustomStop" style="flex:2;background:#F4634A;color:white;border:0;border-radius:13px;padding:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">✅ שמור וסדר</button>' +
+    '</div></div>';
+
+  overlay.querySelector('#btnSaveAddCustomStop').onclick = function() {
+    var inp = document.getElementById('editTimeInput');
+    var val = inp ? inp.value.trim() : '';
+    var targetDayEl = document.getElementById('editStopTargetDay');
+    var dayIdx = targetDayEl ? parseInt(targetDayEl.value) : 0;
+
+    var stop = {
+      emoji: data.emoji || '📍',
+      name: data.name,
+      time: val || '🌅 בוקר',
+      desc: data.desc || '',
+      details: data.details || '',
+      tips: data.tips || [],
+      booking: data.booking || 'ללא צורך.',
+      mapUrl: data.mapUrl || ''
+    };
+
+    checkDayFullAndAdd(dayIdx, stop);
+    overlay.remove();
+  };
+
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
+function openAddReminderStop(id) {
+  var r = REMINDERS.find(function(x){ return x.id === id; });
+  if (!r) return;
+  openAddCustomStop('reminder', {
+    emoji: r.emoji || '🔔',
+    name: r.title,
+    desc: r.desc || '',
+    details: r.details || '',
+    tips: r.tips ? [r.tips] : [],
+    booking: r.url ? ('קישור להזמנה: ' + r.url) : 'אין קישור.',
+    mapUrl: ''
+  });
+}
+
+function openAddRestaurantStop(name) {
+  var r = RESTAURANTS.find(function(x){ return x.name === name; });
+  if (!r) return;
+  openAddCustomStop('restaurant', {
+    emoji: r.icon || '🍽️',
+    name: r.name,
+    desc: r.desc || '',
+    details: r.sub || '',
+    tips: [r.badge],
+    booking: 'מחיר ממוצע: ' + r.price + ' CZK',
+    mapUrl: r.mapUrl || ''
+  });
+}
+
+function openAddDessertStop(idx) {
+  var d = DESSERTS[idx];
+  if (!d) return;
+  openAddCustomStop('dessert', {
+    emoji: d.icon || '🍦',
+    name: d.name,
+    desc: d.desc || '',
+    details: d.sub || '',
+    tips: [d.tag, d.rating],
+    booking: 'מיקום: ' + d.where,
+    mapUrl: d.mapUrl || ''
+  });
+}
+
+function openAddPhotoStop(idx) {
+  var s = PHOTO_SPOTS[idx];
+  if (!s) return;
+  openAddCustomStop('photo', {
+    emoji: s.icon || '📸',
+    name: s.name,
+    desc: s.desc || '',
+    details: 'שעות מומלצות: ' + s.best + '\nצפיפות: ' + s.crowds,
+    tips: [s.tip],
+    booking: 'עלות כניסה: ' + s.fee_txt,
+    mapUrl: s.mapUrl || ''
+  });
+}
+
+// ─── Day Overload Manager (Light Mode) ───
+function checkDayFullAndAdd(dayIdx, stop) {
+  var state = getDaysState();
+  if (!state || !state[dayIdx]) return;
+  
+  // Add stop first
+  state[dayIdx].stops.push(stop);
+  sortDayStops(dayIdx);
+  saveDaysState();
+  if (typeof renderDays === 'function') renderDays();
+  
+  // Check if overloaded (>= 5 stops)
+  if (state[dayIdx].stops.length >= 5) {
+    showDayFullPrompt(dayIdx, stop.name);
+  } else {
+    toast('✅ נוסף בהצלחה ליום ' + state[dayIdx].id + '!');
+  }
+}
+
+function showDayFullPrompt(dayIdx, addedStopName) {
+  var state = getDaysState();
+  var d = state[dayIdx];
+  var existing = document.getElementById('dayFullPromptOverlay');
+  if (existing) existing.remove();
+
+  var overlay = document.createElement('div');
+  overlay.id = 'dayFullPromptOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;';
+  
+  overlay.innerHTML = 
+    '<div style="background:#F5EFE6;border-radius:24px;padding:24px;width:100%;max-width:420px;box-shadow:0 10px 30px rgba(0,0,0,0.3);direction:rtl;font-family:\'Rubik\',Arial,sans-serif;border:1px solid rgba(0,0,0,0.06);">' +
+      '<div style="font-size:36px;text-align:center;margin-bottom:12px;">⚠️</div>' +
+      '<h3 style="font-size:16px;font-weight:900;color:#1E293B;text-align:center;margin-bottom:10px;">יום ' + d.id + ' עמוס מאוד!</h3>' +
+      '<p style="font-size:13px;color:rgba(30,41,59,0.7);text-align:center;line-height:1.6;margin-bottom:20px;">' +
+        'הוספת את <b>' + esc(addedStopName) + '</b>. יש כעת <b>' + d.stops.length + ' תחנות</b> מתוכננות ליום זה.<br>' +
+        'מומלץ לא להעמיס יותר מדי כדי ליהנות מהטיול ברוגע. האם תרצה להעביר משהו ליום אחר?' +
+      '</p>' +
+      '<div style="display:flex;flex-direction:column;gap:8px;">' +
+        '<button id="btnOpenRebalance" style="width:100%;background:#F4634A;color:white;border:none;border-radius:13px;padding:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">🔀 סדר מחדש את יום ' + d.id + '</button>' +
+        '<button id="btnKeepAsIs" style="width:100%;background:#fff;border:1px solid rgba(0,0,0,0.12);color:rgba(30,41,59,0.6);border-radius:13px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">השאר הכל כפי שהוא</button>' +
+      '</div>' +
+    '</div>';
+
+  overlay.querySelector('#btnOpenRebalance').onclick = function() {
+    overlay.remove();
+    showRebalanceDayModal(dayIdx);
+  };
+  
+  overlay.querySelector('#btnKeepAsIs').onclick = function() {
+    overlay.remove();
+  };
+
+  document.body.appendChild(overlay);
+}
+
+function showRebalanceDayModal(dayIdx) {
+  var existing = document.getElementById('rebalanceDayOverlay');
+  if (existing) existing.remove();
+
+  var overlay = document.createElement('div');
+  overlay.id = 'rebalanceDayOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:10000;display:flex;align-items:flex-end;justify-content:center;';
+  
+  var state = getDaysState();
+  var d = state[dayIdx];
+  
+  var stopRows = d.stops.map(function(s, stopIdx) {
+    // Generate move options
+    var selectHtml = '<select onchange="rebalanceMoveStop(' + dayIdx + ',' + stopIdx + ', this)" style="background:#ffffff;border:1px solid rgba(30,41,59,0.2);border-radius:8px;padding:5px 8px;font-size:11px;color:#1E293B;font-family:\'Rubik\',Arial,sans-serif;font-weight:bold;cursor:pointer;width:110px;">' +
+      '<option value="">העבר ליום...</option>';
+    state.forEach(function(otherD, otherIdx) {
+      if (otherIdx !== dayIdx) {
+        selectHtml += '<option value="' + otherIdx + '">יום ' + otherD.id + '</option>';
+      }
+    });
+    selectHtml += '</select>';
+
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.05);gap:10px;">' +
+      '<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">' +
+        '<span style="font-size:18px;">' + (s.emoji||'📍') + '</span>' +
+        '<div style="min-width:0;">' +
+          '<div style="font-size:12px;font-weight:800;color:#1E293B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(s.name) + '</div>' +
+          '<div style="font-size:10px;color:rgba(30,41,59,0.45);">' + esc(s.time || 'לא נקבע זמן') + '</div>' +
+        '</div>' +
+      '</div>' +
+      selectHtml +
+    '</div>';
+  }).join('');
+
+  overlay.innerHTML = 
+    '<div style="background:#F5EFE6;border-radius:24px 24px 0 0;padding:22px 20px 36px;width:100%;max-width:min(680px,100%);direction:rtl;font-family:\'Rubik\',Arial,sans-serif;box-sizing:border-box;max-height:85vh;display:flex;flex-direction:column;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-shrink:0;">' +
+        '<div style="font-size:15px;font-weight:900;color:#1E293B;">🔀 איזון עומסים — יום ' + d.id + ' (' + d.stops.length + ' תחנות)</div>' +
+        '<button id="btnCloseRebalance" style="background:rgba(0,0,0,0.06);border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;color:#64748B;">✕</button>' +
+      '</div>' +
+      '<div style="flex:1;overflow-y:auto;padding-right:4px;margin-bottom:16px;-webkit-overflow-scrolling:touch;">' +
+        stopRows +
+      '</div>' +
+      '<button id="btnDoneRebalance" style="width:100%;background:#065F46;color:white;border:none;border-radius:13px;padding:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;flex-shrink:0;">סיום ואישור ✅</button>' +
+    '</div>';
+
+  var closeFn = function() {
+    overlay.remove();
+  };
+  
+  overlay.querySelector('#btnCloseRebalance').onclick = closeFn;
+  overlay.querySelector('#btnDoneRebalance').onclick = closeFn;
+
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) closeFn(); });
+  document.body.appendChild(overlay);
+}
+
+function rebalanceMoveStop(fromDayIdx, stopIdx, selectEl) {
+  var toDayIdxVal = selectEl.value;
+  if (toDayIdxVal === '') return;
+  var toDayIdx = Number(toDayIdxVal);
+  
+  var state = getDaysState();
+  var stop = state[fromDayIdx].stops[stopIdx];
+  if (!stop) return;
+  
+  // Move stop
+  state[fromDayIdx].stops.splice(stopIdx, 1);
+  state[toDayIdx].stops.push(stop);
+  
+  sortDayStops(fromDayIdx);
+  sortDayStops(toDayIdx);
+  saveDaysState();
+  
+  if (typeof renderDays === 'function') renderDays();
+  toast('✅ ' + stop.name + ' הועבר ליום ' + state[toDayIdx].id + '!');
+  
+  // Rerender the rebalance overlay
+  showRebalanceDayModal(fromDayIdx);
+}
+
+// ─── Drag and Drop Timeline Sorting (Light Mode) ───
+function stopDragStart(ev, dayIdx, stopIdx) {
+  ev.dataTransfer.setData("text/plain", JSON.stringify({dayIdx: dayIdx, stopIdx: stopIdx}));
+  ev.dataTransfer.effectAllowed = "move";
+  ev.currentTarget.style.opacity = "0.5";
+}
+function stopDragOver(ev, el) {
+  ev.preventDefault();
+  ev.dataTransfer.dropEffect = "move";
+  el.style.borderTop = "3px solid #F4634A";
+  el.style.paddingTop = "10px";
+}
+function stopDragLeave(el) {
+  el.style.borderTop = "1px solid rgba(0,0,0,0.09)";
+  el.style.paddingTop = "13px";
+}
+function stopDrop(ev, targetDayIdx, targetStopIdx, el) {
+  ev.preventDefault();
+  el.style.borderTop = "1px solid rgba(0,0,0,0.09)";
+  el.style.paddingTop = "13px";
+  try {
+    var data = JSON.parse(ev.dataTransfer.getData("text/plain"));
+    var fromDayIdx = data.dayIdx;
+    var fromStopIdx = data.stopIdx;
+    if (fromDayIdx !== targetDayIdx) return;
+    if (fromStopIdx === targetStopIdx) return;
+    
+    var state = getDaysState();
+    var stops = state[targetDayIdx].stops;
+    var movedStop = stops.splice(fromStopIdx, 1)[0];
+    stops.splice(targetStopIdx, 0, movedStop);
+    
+    saveDaysState();
+    renderDays();
+    toast("✅ סדר התחנות עודכן!");
+  } catch (err) {
+    console.error(err);
+  }
+}
+function moveStopUpDown(dayIdx, stopIdx, direction) {
+  var state = getDaysState();
+  var stops = state[dayIdx].stops;
+  var targetIdx = stopIdx + direction;
+  if (targetIdx < 0 || targetIdx >= stops.length) return;
+  
+  var temp = stops[stopIdx];
+  stops[stopIdx] = stops[targetIdx];
+  stops[targetIdx] = temp;
+  
+  saveDaysState();
+  renderDays();
+  toast("✅ סדר התחנות עודכן!");
+}
+
 </script>
 <div id="loginScreen" style="position:fixed;inset:0;background:#EDE4D8;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:32px;">
   <div style="font-size:56px;">🏰</div>
@@ -5091,311 +5398,6 @@ function openPhotoViewer(id) {
     };
   });
 }
-</script>
+
 </body>
 </html>
-
-// Generic modal opener for adding ANY item as a stop in days (light mode)
-function openAddCustomStop(type, data) {
-  var existing = document.getElementById('addCommunityStopOverlay');
-  if (existing) existing.remove();
-  
-  var overlay = document.createElement('div');
-  overlay.id = 'addCommunityStopOverlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:flex-end;justify-content:center;';
-
-  var daysList = getDaysState();
-  var dayBtns = daysList.map(function(d, i) {
-    var sel = i === 0;
-    return '<button type="button" onclick="_editStopSelectDay(this,' + i + ')" style="padding:5px 9px;border-radius:9px;font-size:11px;font-weight:700;border:1px solid ' + (sel ? '#F4634A' : 'rgba(0,0,0,0.15)') + ';background:' + (sel ? 'rgba(244,99,74,0.12)' : '#fff') + ';color:' + (sel ? '#F4634A' : '#1E293B') + ';cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;white-space:nowrap;">' + (d.emoji||'📅') + ' יום ' + (i+1) + '</button>';
-  }).join('');
-
-  overlay.innerHTML =
-    '<div style="position:relative;background:#F5EFE6;border-radius:24px 24px 0 0;padding:22px 20px 36px;width:min(680px,100%);z-index:1;direction:rtl;font-family:\'Rubik\',Arial,sans-serif;">' +
-    '<div style="font-size:15px;font-weight:900;color:#1E293B;margin-bottom:14px;">➕ הוספת תחנה — ' + (data.emoji||'📍') + ' ' + esc(data.name) + '</div>' +
-    '<div style="font-size:11px;font-weight:700;color:rgba(30,41,59,0.5);margin-bottom:8px;">📅 בחר יום בטיול</div>' +
-    '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;" id="editStopDayBtns">' + dayBtns + '</div>' +
-    '<input type="hidden" id="editStopTargetDay" value="0">' +
-    '<div style="font-size:11px;font-weight:700;color:rgba(30,41,59,0.5);margin-bottom:8px;">⏱ מתי ביום?</div>' +
-    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;" id="editTimeParts">' +
-    ['🌅 בוקר','☀️ צהריים','🌇 אחה״צ','🌙 ערב'].map(function(v, vi) {
-      var active = vi === 0;
-      return '<button type="button" onclick="setEditTimePart(this,\'' + v.replace(/'/g,"\\'") + '\')" style="padding:8px 4px;border-radius:11px;border:1px solid ' + (active ? '#F4634A' : 'rgba(0,0,0,0.15)') + ';background:' + (active ? 'rgba(244,99,74,0.12)' : '#fff') + ';color:' + (active ? '#F4634A' : '#1E293B') + ';font-size:11px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">' + v.split(' ')[0] + '<br>' + v.split(' ').slice(1).join(' ') + '</button>';
-    }).join('') +
-    '</div>' +
-    '<input id="editTimeInput" type="text" value="🌅 בוקר" placeholder="שעה מדויקת (לדוג׳ 10:00)" style="width:100%;background:#ffffff;border:1px solid rgba(0,0,0,0.15);border-radius:13px;padding:11px 14px;font-size:13px;color:#1E293B;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:14px;">' +
-    '<div style="display:flex;gap:8px;">' +
-    '<button onclick="document.getElementById(\'addCommunityStopOverlay\').remove()" style="flex:1;background:#fff;border:1px solid rgba(0,0,0,0.12);border-radius:13px;padding:12px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.6);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">ביטול</button>' +
-    '<button id="btnSaveAddCustomStop" style="flex:2;background:#F4634A;color:white;border:0;border-radius:13px;padding:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">✅ שמור וסדר</button>' +
-    '</div></div>';
-
-  overlay.querySelector('#btnSaveAddCustomStop').onclick = function() {
-    var inp = document.getElementById('editTimeInput');
-    var val = inp ? inp.value.trim() : '';
-    var targetDayEl = document.getElementById('editStopTargetDay');
-    var dayIdx = targetDayEl ? parseInt(targetDayEl.value) : 0;
-
-    var stop = {
-      emoji: data.emoji || '📍',
-      name: data.name,
-      time: val || '🌅 בוקר',
-      desc: data.desc || '',
-      details: data.details || '',
-      tips: data.tips || [],
-      booking: data.booking || 'ללא צורך.',
-      mapUrl: data.mapUrl || ''
-    };
-
-    checkDayFullAndAdd(dayIdx, stop);
-    overlay.remove();
-  };
-
-  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
-  document.body.appendChild(overlay);
-}
-
-function openAddReminderStop(id) {
-  var r = REMINDERS.find(function(x){ return x.id === id; });
-  if (!r) return;
-  openAddCustomStop('reminder', {
-    emoji: r.emoji || '🔔',
-    name: r.title,
-    desc: r.desc || '',
-    details: r.details || '',
-    tips: r.tips ? [r.tips] : [],
-    booking: r.url ? ('קישור להזמנה: ' + r.url) : 'אין קישור.',
-    mapUrl: ''
-  });
-}
-
-function openAddRestaurantStop(name) {
-  var r = RESTAURANTS.find(function(x){ return x.name === name; });
-  if (!r) return;
-  openAddCustomStop('restaurant', {
-    emoji: r.icon || '🍽️',
-    name: r.name,
-    desc: r.desc || '',
-    details: r.sub || '',
-    tips: [r.badge],
-    booking: 'מחיר ממוצע: ' + r.price + ' CZK',
-    mapUrl: r.mapUrl || ''
-  });
-}
-
-function openAddDessertStop(idx) {
-  var d = DESSERTS[idx];
-  if (!d) return;
-  openAddCustomStop('dessert', {
-    emoji: d.icon || '🍦',
-    name: d.name,
-    desc: d.desc || '',
-    details: d.sub || '',
-    tips: [d.tag, d.rating],
-    booking: 'מיקום: ' + d.where,
-    mapUrl: d.mapUrl || ''
-  });
-}
-
-function openAddPhotoStop(idx) {
-  var s = PHOTO_SPOTS[idx];
-  if (!s) return;
-  openAddCustomStop('photo', {
-    emoji: s.icon || '📸',
-    name: s.name,
-    desc: s.desc || '',
-    details: 'שעות מומלצות: ' + s.best + '\nצפיפות: ' + s.crowds,
-    tips: [s.tip],
-    booking: 'עלות כניסה: ' + s.fee_txt,
-    mapUrl: s.mapUrl || ''
-  });
-}
-
-// ─── Day Overload Manager (Light Mode) ───
-function checkDayFullAndAdd(dayIdx, stop) {
-  var state = getDaysState();
-  if (!state || !state[dayIdx]) return;
-  
-  // Add stop first
-  state[dayIdx].stops.push(stop);
-  sortDayStops(dayIdx);
-  saveDaysState();
-  if (typeof renderDays === 'function') renderDays();
-  
-  // Check if overloaded (>= 5 stops)
-  if (state[dayIdx].stops.length >= 5) {
-    showDayFullPrompt(dayIdx, stop.name);
-  } else {
-    toast('✅ נוסף בהצלחה ליום ' + state[dayIdx].id + '!');
-  }
-}
-
-function showDayFullPrompt(dayIdx, addedStopName) {
-  var state = getDaysState();
-  var d = state[dayIdx];
-  var existing = document.getElementById('dayFullPromptOverlay');
-  if (existing) existing.remove();
-
-  var overlay = document.createElement('div');
-  overlay.id = 'dayFullPromptOverlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;';
-  
-  overlay.innerHTML = 
-    '<div style="background:#F5EFE6;border-radius:24px;padding:24px;width:100%;max-width:420px;box-shadow:0 10px 30px rgba(0,0,0,0.3);direction:rtl;font-family:\'Rubik\',Arial,sans-serif;border:1px solid rgba(0,0,0,0.06);">' +
-      '<div style="font-size:36px;text-align:center;margin-bottom:12px;">⚠️</div>' +
-      '<h3 style="font-size:16px;font-weight:900;color:#1E293B;text-align:center;margin-bottom:10px;">יום ' + d.id + ' עמוס מאוד!</h3>' +
-      '<p style="font-size:13px;color:rgba(30,41,59,0.7);text-align:center;line-height:1.6;margin-bottom:20px;">' +
-        'הוספת את <b>' + esc(addedStopName) + '</b>. יש כעת <b>' + d.stops.length + ' תחנות</b> מתוכננות ליום זה.<br>' +
-        'מומלץ לא להעמיס יותר מדי כדי ליהנות מהטיול ברוגע. האם תרצה להעביר משהו ליום אחר?' +
-      '</p>' +
-      '<div style="display:flex;flex-direction:column;gap:8px;">' +
-        '<button id="btnOpenRebalance" style="width:100%;background:#F4634A;color:white;border:none;border-radius:13px;padding:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">🔀 סדר מחדש את יום ' + d.id + '</button>' +
-        '<button id="btnKeepAsIs" style="width:100%;background:#fff;border:1px solid rgba(0,0,0,0.12);color:rgba(30,41,59,0.6);border-radius:13px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">השאר הכל כפי שהוא</button>' +
-      '</div>' +
-    '</div>';
-
-  overlay.querySelector('#btnOpenRebalance').onclick = function() {
-    overlay.remove();
-    showRebalanceDayModal(dayIdx);
-  };
-  
-  overlay.querySelector('#btnKeepAsIs').onclick = function() {
-    overlay.remove();
-  };
-
-  document.body.appendChild(overlay);
-}
-
-function showRebalanceDayModal(dayIdx) {
-  var existing = document.getElementById('rebalanceDayOverlay');
-  if (existing) existing.remove();
-
-  var overlay = document.createElement('div');
-  overlay.id = 'rebalanceDayOverlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:10000;display:flex;align-items:flex-end;justify-content:center;';
-  
-  var state = getDaysState();
-  var d = state[dayIdx];
-  
-  var stopRows = d.stops.map(function(s, stopIdx) {
-    // Generate move options
-    var selectHtml = '<select onchange="rebalanceMoveStop(' + dayIdx + ',' + stopIdx + ', this)" style="background:#ffffff;border:1px solid rgba(30,41,59,0.2);border-radius:8px;padding:5px 8px;font-size:11px;color:#1E293B;font-family:\'Rubik\',Arial,sans-serif;font-weight:bold;cursor:pointer;width:110px;">' +
-      '<option value="">העבר ליום...</option>';
-    state.forEach(function(otherD, otherIdx) {
-      if (otherIdx !== dayIdx) {
-        selectHtml += '<option value="' + otherIdx + '">יום ' + otherD.id + '</option>';
-      }
-    });
-    selectHtml += '</select>';
-
-    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.05);gap:10px;">' +
-      '<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">' +
-        '<span style="font-size:18px;">' + (s.emoji||'📍') + '</span>' +
-        '<div style="min-width:0;">' +
-          '<div style="font-size:12px;font-weight:800;color:#1E293B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(s.name) + '</div>' +
-          '<div style="font-size:10px;color:rgba(30,41,59,0.45);">' + esc(s.time || 'לא נקבע זמן') + '</div>' +
-        '</div>' +
-      '</div>' +
-      selectHtml +
-    '</div>';
-  }).join('');
-
-  overlay.innerHTML = 
-    '<div style="background:#F5EFE6;border-radius:24px 24px 0 0;padding:22px 20px 36px;width:100%;max-width:min(680px,100%);direction:rtl;font-family:\'Rubik\',Arial,sans-serif;box-sizing:border-box;max-height:85vh;display:flex;flex-direction:column;">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-shrink:0;">' +
-        '<div style="font-size:15px;font-weight:900;color:#1E293B;">🔀 איזון עומסים — יום ' + d.id + ' (' + d.stops.length + ' תחנות)</div>' +
-        '<button id="btnCloseRebalance" style="background:rgba(0,0,0,0.06);border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;color:#64748B;">✕</button>' +
-      '</div>' +
-      '<div style="flex:1;overflow-y:auto;padding-right:4px;margin-bottom:16px;-webkit-overflow-scrolling:touch;">' +
-        stopRows +
-      '</div>' +
-      '<button id="btnDoneRebalance" style="width:100%;background:#065F46;color:white;border:none;border-radius:13px;padding:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;flex-shrink:0;">סיום ואישור ✅</button>' +
-    '</div>';
-
-  var closeFn = function() {
-    overlay.remove();
-  };
-  
-  overlay.querySelector('#btnCloseRebalance').onclick = closeFn;
-  overlay.querySelector('#btnDoneRebalance').onclick = closeFn;
-
-  overlay.addEventListener('click', function(e){ if(e.target===overlay) closeFn(); });
-  document.body.appendChild(overlay);
-}
-
-function rebalanceMoveStop(fromDayIdx, stopIdx, selectEl) {
-  var toDayIdxVal = selectEl.value;
-  if (toDayIdxVal === '') return;
-  var toDayIdx = Number(toDayIdxVal);
-  
-  var state = getDaysState();
-  var stop = state[fromDayIdx].stops[stopIdx];
-  if (!stop) return;
-  
-  // Move stop
-  state[fromDayIdx].stops.splice(stopIdx, 1);
-  state[toDayIdx].stops.push(stop);
-  
-  sortDayStops(fromDayIdx);
-  sortDayStops(toDayIdx);
-  saveDaysState();
-  
-  if (typeof renderDays === 'function') renderDays();
-  toast('✅ ' + stop.name + ' הועבר ליום ' + state[toDayIdx].id + '!');
-  
-  // Rerender the rebalance overlay
-  showRebalanceDayModal(fromDayIdx);
-}
-
-// ─── Drag and Drop Timeline Sorting (Light Mode) ───
-function stopDragStart(ev, dayIdx, stopIdx) {
-  ev.dataTransfer.setData("text/plain", JSON.stringify({dayIdx: dayIdx, stopIdx: stopIdx}));
-  ev.dataTransfer.effectAllowed = "move";
-  ev.currentTarget.style.opacity = "0.5";
-}
-function stopDragOver(ev, el) {
-  ev.preventDefault();
-  ev.dataTransfer.dropEffect = "move";
-  el.style.borderTop = "3px solid #F4634A";
-  el.style.paddingTop = "10px";
-}
-function stopDragLeave(el) {
-  el.style.borderTop = "1px solid rgba(0,0,0,0.09)";
-  el.style.paddingTop = "13px";
-}
-function stopDrop(ev, targetDayIdx, targetStopIdx, el) {
-  ev.preventDefault();
-  el.style.borderTop = "1px solid rgba(0,0,0,0.09)";
-  el.style.paddingTop = "13px";
-  try {
-    var data = JSON.parse(ev.dataTransfer.getData("text/plain"));
-    var fromDayIdx = data.dayIdx;
-    var fromStopIdx = data.stopIdx;
-    if (fromDayIdx !== targetDayIdx) return;
-    if (fromStopIdx === targetStopIdx) return;
-    
-    var state = getDaysState();
-    var stops = state[targetDayIdx].stops;
-    var movedStop = stops.splice(fromStopIdx, 1)[0];
-    stops.splice(targetStopIdx, 0, movedStop);
-    
-    saveDaysState();
-    renderDays();
-    toast("✅ סדר התחנות עודכן!");
-  } catch (err) {
-    console.error(err);
-  }
-}
-function moveStopUpDown(dayIdx, stopIdx, direction) {
-  var state = getDaysState();
-  var stops = state[dayIdx].stops;
-  var targetIdx = stopIdx + direction;
-  if (targetIdx < 0 || targetIdx >= stops.length) return;
-  
-  var temp = stops[stopIdx];
-  stops[stopIdx] = stops[targetIdx];
-  stops[targetIdx] = temp;
-  
-  saveDaysState();
-  renderDays();
-  toast("✅ סדר התחנות עודכן!");
-}
