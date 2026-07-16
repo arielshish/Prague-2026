@@ -1384,6 +1384,12 @@ function showDayTimePicker(emoji, name, desc) {
     saveDaysState();
     renderDays();
     overlay.remove();
+    // close bank modal if open
+    var modal = qs('addStopModal');
+    if (modal && modal.style.display !== 'none') closeAddStopModal();
+    // navigate to days tab so user sees the result
+    openTab('days');
+    setTimeout(function() { selectDay(selectedDay + 1); }, 80);
     toast('✅ ' + (name||'') + ' נוספה ליום ' + (selectedDay + 1) + (finalTime ? ' · ' + finalTime : '') + '!');
   });
 
