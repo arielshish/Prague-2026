@@ -2301,7 +2301,7 @@ function openTab(id) {
     if (btn) btn.style.color = name === id ? '#F4634A' : 'rgba(30,41,59,0.55)';
   });
   if (id === 'expenses') { loadExpenses(); syncBudgetFromSheets(); }
-  if (id === 'days') renderDays();
+  if (id === 'days') { renderDays(); loadDaysFromSheets(); }
   if (id === 'pack') loadPack();
   if (id === 'restaurants') renderRestaurants();
   if (id === 'reminders') initReminders();
@@ -2323,30 +2323,56 @@ function getDaysState() {
 }
 
 function saveDaysState() {
-  localStorage.setItem('prague_days_v1', JSON.stringify(DAYS_STATE));
+  var json = JSON.stringify(DAYS_STATE);
+  localStorage.setItem('prague_days_v1', json);
   if (isGas()) {
     google.script.run
       .withSuccessHandler(function(r) { if (r && r.ok) toast('☁️ ימים סונכרנו!'); })
       .withFailureHandler(function() { toast('⚠️ שמור מקומית בלבד'); })
       .saveDaysCustom(DAYS_STATE);
+  } else {
+    // Firebase sync for GitHub Pages version
+    try {
+      ensureFirebaseAuth().then(function() {
+        getFirestoreDb().collection('appdata').doc('days').set({ data: json, ts: Date.now() })
+          .catch(function(e) { console.warn('Firestore days save failed', e); });
+      });
+    } catch(e) { console.warn('saveDaysState firebase error', e); }
   }
 }
 
 function loadDaysFromSheets() {
-  if (!isGas()) { renderDays(); return; }
-  toast('🔄 מסנכרן...');
-  google.script.run
-    .withSuccessHandler(function(r) {
-      if (r && r.ok && r.data) {
-        DAYS_STATE = r.data;
-        localStorage.setItem('prague_days_v1', JSON.stringify(DAYS_STATE));
-      } else {
-        DAYS_STATE = getDaysState();
-      }
-      renderDays();
-    })
-    .withFailureHandler(function() { DAYS_STATE = getDaysState(); renderDays(); })
-    .loadDaysCustom();
+  if (isGas()) {
+    toast('🔄 מסנכרן...');
+    google.script.run
+      .withSuccessHandler(function(r) {
+        if (r && r.ok && r.data) {
+          DAYS_STATE = r.data;
+          localStorage.setItem('prague_days_v1', JSON.stringify(DAYS_STATE));
+        } else {
+          DAYS_STATE = getDaysState();
+        }
+        renderDays();
+      })
+      .withFailureHandler(function() { DAYS_STATE = getDaysState(); renderDays(); })
+      .loadDaysCustom();
+  } else {
+    // GitHub Pages: load from Firebase, fall back to localStorage
+    try {
+      ensureFirebaseAuth().then(function() {
+        return getFirestoreDb().collection('appdata').doc('days').get();
+      }).then(function(doc) {
+        if (doc.exists && doc.data().data) {
+          try {
+            var remote = JSON.parse(doc.data().data);
+            DAYS_STATE = remote;
+            localStorage.setItem('prague_days_v1', doc.data().data);
+          } catch(e) {}
+        }
+        renderDays();
+      }).catch(function() { DAYS_STATE = getDaysState(); renderDays(); });
+    } catch(e) { DAYS_STATE = getDaysState(); renderDays(); }
+  }
 }
 
 function selectDay(i) { currentDay = i; renderDays(); }
@@ -2499,6 +2525,7 @@ function addAttrToStop() {
     renderDays();
     toast('✅ ' + pending.name + ' נוספה ליום ' + (dayIdx + 1) + '!');
   } catch(e) {
+    console.error('addAttrToStop error:', e);
     toast('⚠️ שגיאה: ' + e.message);
   }
 }
