@@ -2554,11 +2554,11 @@ function buildBankCards(items, iconKey, nameKey, descKey, howKey) {
 function switchBankTab(tab) {
   _currentBankTab = tab;
   var tabs = { attr: 'bankTabAttr', rest: 'bankTabRest', shop: 'bankTabShop' };
-  var colors = { attr: ['rgba(244,99,74,0.25)','#F4634A'], rest: ['rgba(56,189,248,0.2)','#38BDF8'], shop: ['rgba(168,85,247,0.2)','#C084FC'] };
+  var colors = { attr: ['rgba(244,99,74,0.18)','#C2410C'], rest: ['rgba(56,189,248,0.15)','#0369A1'], shop: ['rgba(168,85,247,0.15)','#6D28D9'] };
   Object.keys(tabs).forEach(function(k) {
     var el = qs(tabs[k]); if (!el) return;
     if (k === tab) { el.style.background = colors[k][0]; el.style.color = colors[k][1]; }
-    else { el.style.background = 'rgba(255,255,255,0.06)'; el.style.color = 'rgba(241,245,249,0.45)'; }
+    else { el.style.background = 'rgba(0,0,0,0.05)'; el.style.color = 'rgba(30,41,59,0.55)'; }
   });
   var comm = typeof COMMUNITY !== 'undefined' ? COMMUNITY : [];
   var rest = typeof RESTAURANTS !== 'undefined' ? RESTAURANTS : [];
