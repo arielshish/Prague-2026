@@ -128,9 +128,10 @@ function showAuthError(msg) {
   if (err) { err.textContent = msg; err.style.display = 'block'; }
 }
 
-// Check session on load
+// Check session on load — bypass login in GAS context
 (function() {
-  if (sessionStorage.getItem(SESSION_KEY) === '1') {
+  var gasMode = typeof google !== 'undefined' && google.script && google.script.run;
+  if (gasMode || sessionStorage.getItem(SESSION_KEY) === '1') {
     document.addEventListener('DOMContentLoaded', function() {
       var ls = document.getElementById('loginScreen');
       var app = document.getElementById('app');
@@ -268,9 +269,10 @@ function showAuthError(msg) {
     <div style="position:relative;background:#F5EFE6;border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:min(680px,100%);z-index:1;">
       <h2 id="addStopTitle" style="margin:0 0 12px;font-size:17px;font-weight:900;color:#1E293B;">➕ הוסף תחנה</h2>
       <div style="display:flex;gap:6px;margin-bottom:10px;">
-        <button id="bankTabAttr" onclick="switchBankTab('attr')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(244,99,74,0.25);color:#F4634A;font-weight:700;font-size:11px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🎟️ אטרקציות</button>
-        <button id="bankTabRest" onclick="switchBankTab('rest')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(0,0,0,0.04);color:rgba(30,41,59,0.5);font-weight:700;font-size:11px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🍽️ אוכל</button>
-        <button id="bankTabShop" onclick="switchBankTab('shop')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(0,0,0,0.04);color:rgba(30,41,59,0.5);font-weight:700;font-size:11px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🛍️ קניות</button>
+        <button id="bankTabAttr" onclick="switchBankTab('attr')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(244,99,74,0.25);color:#F4634A;font-weight:700;font-size:10px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🎟️ אטרקציות</button>
+        <button id="bankTabRest" onclick="switchBankTab('rest')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(0,0,0,0.04);color:rgba(30,41,59,0.5);font-weight:700;font-size:10px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🍽️ אוכל</button>
+        <button id="bankTabShop" onclick="switchBankTab('shop')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(0,0,0,0.04);color:rgba(30,41,59,0.5);font-weight:700;font-size:10px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🛍️ קניות</button>
+        <button id="bankTabRem" onclick="switchBankTab('rem')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(0,0,0,0.04);color:rgba(30,41,59,0.5);font-weight:700;font-size:10px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">⏰ תזכורות</button>
       </div>
       <div id="attrBankRow" style="display:flex;gap:9px;overflow-x:auto;padding-bottom:10px;margin-bottom:14px;scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
       <div style="font-size:11px;font-weight:700;color:rgba(30,41,59,0.45);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;">✏️ או הקלד ידנית</div>
@@ -1283,66 +1285,133 @@ var remindersSchedule = {}; // { [id]: { day, time } }
 var _pendingAttrStop = null; // { emoji, name, desc } set before opening addStop overlay
 var restaurantsSchedule = {}; // { [name]: { day, time } }
 
-function showDayPicker() {
-  var existing = document.getElementById('dayPickerOverlay');
-  if (existing) existing.remove();
+function showDayTimePicker(emoji, name, desc) {
+  var ex = document.getElementById('dayTimePickerOverlay');
+  if (ex) ex.remove();
   var state = getDaysState();
+  var selectedDay = null;
+  var selectedTime = '';
+
   var overlay = document.createElement('div');
-  overlay.id = 'dayPickerOverlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.68);z-index:10001;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;';
+  overlay.id = 'dayTimePickerOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:10002;display:flex;align-items:flex-end;justify-content:center;';
+
   var panel = document.createElement('div');
-  panel.style.cssText = 'background:#F5EFE6;border-radius:20px;padding:22px 18px 18px;width:100%;max-width:360px;direction:rtl;font-family:Rubik,Arial,sans-serif;';
-  var pending = _pendingAttrStop || {};
-  var shortName = (pending.name||'').length > 22 ? (pending.name||'').substring(0,22)+'…' : (pending.name||'');
+  panel.style.cssText = 'background:#F5EFE6;border-radius:24px 24px 0 0;padding:22px 18px 36px;width:100%;max-width:480px;direction:rtl;font-family:Rubik,Arial,sans-serif;max-height:85vh;overflow-y:auto;box-shadow:0 -4px 30px rgba(0,0,0,0.4);';
+
   var header = document.createElement('div');
-  header.style.cssText = 'font-size:14px;font-weight:900;color:#1E293B;margin-bottom:14px;text-align:center;';
-  header.textContent = '📅 הוסף ' + (pending.emoji||'') + ' ' + shortName + ' — בחר יום:';
-  var grid = document.createElement('div');
-  grid.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;';
+  header.style.cssText = 'font-size:15px;font-weight:900;color:#1E293B;margin-bottom:16px;text-align:center;';
+  var shortName = (name||'').length > 26 ? (name||'').substring(0,26)+'…' : (name||'');
+  header.textContent = (emoji||'📍') + ' ' + shortName;
+
+  var dayLabel = document.createElement('div');
+  dayLabel.style.cssText = 'font-size:11px;font-weight:700;color:rgba(30,41,59,0.45);letter-spacing:0.5px;margin-bottom:8px;';
+  dayLabel.textContent = '📅 בחר יום:';
+
+  var dayGrid = document.createElement('div');
+  dayGrid.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;';
+  var dayBtns = [];
   state.forEach(function(d, i) {
     var btn = document.createElement('button');
-    btn.style.cssText = 'padding:8px 4px;background:#fff;border:1.5px solid rgba(0,0,0,0.12);border-radius:12px;font-size:11px;font-weight:800;color:#1E293B;cursor:pointer;font-family:Rubik,Arial,sans-serif;text-align:center;line-height:1.4;';
+    btn.style.cssText = 'padding:8px 4px;background:#fff;border:2px solid rgba(0,0,0,0.10);border-radius:12px;font-size:11px;font-weight:800;color:#1E293B;cursor:pointer;font-family:Rubik,Arial,sans-serif;text-align:center;line-height:1.4;';
     btn.innerHTML = '<div style="font-size:18px;">' + d.emoji + '</div><div>יום ' + (i+1) + '</div><div style="font-size:9px;color:rgba(30,41,59,0.5);">' + d.date + '</div>';
-    btn.addEventListener('click', function() { addStopToDay(i); overlay.remove(); });
-    grid.appendChild(btn);
+    btn.addEventListener('click', (function(idx, b) {
+      return function() {
+        selectedDay = idx;
+        dayBtns.forEach(function(x) { x.style.borderColor = 'rgba(0,0,0,0.10)'; x.style.background = '#fff'; });
+        b.style.borderColor = '#F4634A';
+        b.style.background = 'rgba(244,99,74,0.08)';
+      };
+    })(i, btn));
+    dayBtns.push(btn);
+    dayGrid.appendChild(btn);
   });
+
+  var timeLabel = document.createElement('div');
+  timeLabel.style.cssText = 'font-size:11px;font-weight:700;color:rgba(30,41,59,0.45);letter-spacing:0.5px;margin-bottom:8px;';
+  timeLabel.textContent = '⏰ מתי ביום? (אופציונלי)';
+
+  var timeGrid = document.createElement('div');
+  timeGrid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px;';
+  var timeParts = [['🌅','בוקר','🌅 בוקר'],['☀️','צהריים','☀️ צהריים'],['🌇','אחה״צ','🌇 אחה״צ'],['🌙','ערב','🌙 ערב']];
+  var timePartBtns = [];
+  var timeInput = document.createElement('input');
+  timeParts.forEach(function(tp) {
+    var btn = document.createElement('button');
+    btn.style.cssText = 'padding:8px 4px;border-radius:11px;border:1.5px solid rgba(0,0,0,0.12);background:#fff;color:#1E293B;font-size:11px;font-weight:700;cursor:pointer;font-family:Rubik,Arial,sans-serif;line-height:1.3;';
+    btn.innerHTML = tp[0] + '<br>' + tp[1];
+    btn.addEventListener('click', (function(val, b) {
+      return function() {
+        selectedTime = val;
+        timePartBtns.forEach(function(x) { x.style.borderColor = 'rgba(0,0,0,0.12)'; x.style.background = '#fff'; });
+        b.style.borderColor = '#F4634A';
+        b.style.background = 'rgba(244,99,74,0.10)';
+        timeInput.value = '';
+      };
+    })(tp[2], btn));
+    timePartBtns.push(btn);
+    timeGrid.appendChild(btn);
+  });
+
+  timeInput.type = 'text';
+  timeInput.placeholder = '⏱ שעה מדויקת (לדוג׳ 10:00)';
+  timeInput.style.cssText = 'width:100%;background:#fff;border:1.5px solid rgba(0,0,0,0.09);border-radius:12px;padding:10px 14px;font-size:13px;color:#1E293B;font-family:Rubik,Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:16px;';
+  timeInput.addEventListener('input', function() {
+    if (timeInput.value) {
+      selectedTime = timeInput.value;
+      timePartBtns.forEach(function(x) { x.style.borderColor = 'rgba(0,0,0,0.12)'; x.style.background = '#fff'; });
+    }
+  });
+
+  var btnRow = document.createElement('div');
+  btnRow.style.cssText = 'display:flex;gap:8px;';
+
   var cancelBtn = document.createElement('button');
   cancelBtn.textContent = 'ביטול';
-  cancelBtn.style.cssText = 'width:100%;padding:10px;background:rgba(0,0,0,0.05);border:none;border-radius:10px;font-size:13px;color:rgba(30,41,59,0.55);cursor:pointer;font-family:Rubik,Arial,sans-serif;';
+  cancelBtn.style.cssText = 'flex:1;background:#fff;border:1.5px solid rgba(0,0,0,0.12);border-radius:13px;padding:13px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.6);cursor:pointer;font-family:Rubik,Arial,sans-serif;';
   cancelBtn.addEventListener('click', function() { overlay.remove(); });
+
+  var addBtn = document.createElement('button');
+  addBtn.textContent = '✅ הוסף למסלול';
+  addBtn.style.cssText = 'flex:2;background:#F4634A;border:none;border-radius:13px;padding:13px;font-size:13px;font-weight:800;color:#fff;cursor:pointer;font-family:Rubik,Arial,sans-serif;';
+  addBtn.addEventListener('click', function() {
+    if (selectedDay === null) { toast('⚠️ בחר יום תחילה'); return; }
+    var st = getDaysState();
+    if (!st[selectedDay]) { toast('⚠️ יום לא קיים'); return; }
+    var finalTime = (timeInput.value || selectedTime || '').trim();
+    st[selectedDay].stops.push({ emoji: emoji||'📍', name: name||'', time: finalTime, desc: (desc||'').substring(0,120).replace(/\n/g,' '), mapUrl: '' });
+    sortDayStops(selectedDay);
+    saveDaysState();
+    renderDays();
+    overlay.remove();
+    toast('✅ ' + (name||'') + ' נוספה ליום ' + (selectedDay + 1) + (finalTime ? ' · ' + finalTime : '') + '!');
+  });
+
+  btnRow.appendChild(cancelBtn);
+  btnRow.appendChild(addBtn);
   panel.appendChild(header);
-  panel.appendChild(grid);
-  panel.appendChild(cancelBtn);
+  panel.appendChild(dayLabel);
+  panel.appendChild(dayGrid);
+  panel.appendChild(timeLabel);
+  panel.appendChild(timeGrid);
+  panel.appendChild(timeInput);
+  panel.appendChild(btnRow);
   overlay.appendChild(panel);
   overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
   document.body.appendChild(overlay);
-}
-
-function addStopToDay(dayIdx) {
-  if (!_pendingAttrStop) { toast('⚠️ שגיאה: אין נתוני תחנה'); return; }
-  var pending = _pendingAttrStop;
-  var state = getDaysState();
-  if (!state[dayIdx]) { toast('⚠️ יום לא קיים'); return; }
-  state[dayIdx].stops.push({ emoji: pending.emoji, name: pending.name, time: '', desc: pending.desc, mapUrl: '' });
-  sortDayStops(dayIdx);
-  saveDaysState();
-  renderDays();
-  toast('✅ ' + pending.name + ' נוספה ליום ' + (dayIdx + 1) + '!');
 }
 
 function addReminderToStop(id) {
   var r = REMINDERS.find(function(x) { return x.id === id; });
   if (!r) return;
   var ov = document.getElementById('reminderDetailOverlay'); if (ov) ov.remove();
-  _pendingAttrStop = { emoji: r.emoji, name: r.title, desc: (r.details || r.desc || '').substring(0, 100).replace(/\n/g, ' ') };
-  showDayPicker();
+  showDayTimePicker(r.emoji, r.title, (r.details || r.desc || '').substring(0, 120).replace(/\n/g, ' '));
 }
 
 function addShopToStop(idx) {
   var s = SHOPS[idx];
   if (!s) return;
-  _pendingAttrStop = { emoji: s.e, name: s.n, desc: (s.tip || '').substring(0, 100).replace(/\n/g, ' ') };
-  showDayPicker();
+  showDayTimePicker(s.e, s.n, (s.tip || '').substring(0, 120).replace(/\n/g, ' '));
 }
 
 function initReminders() {
@@ -2649,7 +2718,9 @@ function showAttrDetail(attr, iconKey, nameKey, descKey, howKey, existing) {
   var addBtn = document.createElement('button');
   addBtn.style.cssText = 'flex:1;padding:10px 0;background:rgba(244,99,74,0.2);border:1px solid rgba(244,99,74,0.4);border-radius:12px;font-size:13px;font-weight:700;color:#F4634A;cursor:pointer;font-family:Rubik,Arial,sans-serif;';
   addBtn.textContent = '📅 הוסף למסלול';
-  addBtn.addEventListener('click', function() { addAttrToStop(); });
+  addBtn.addEventListener('click', (function(e, n, d) {
+    return function() { overlay.remove(); showDayTimePicker(e, n, d); };
+  })(emoji, name, desc.substring(0,120).replace(/\n/g,' ')));
   btnsDiv.appendChild(addBtn);
 
   overlay.appendChild(panel);
@@ -2677,19 +2748,19 @@ function buildBankCards(items, iconKey, nameKey, descKey, howKey) {
       '<div style="font-size:12px;font-weight:700;color:#1E293B;line-height:1.3;">' + name + '</div>' +
       bookingBadge +
       existingBadge;
-    card.addEventListener('click', (function(attr, ex) {
+    card.addEventListener('click', (function(attr) {
       return function() {
-        showAttrDetail(attr, iconKey, nameKey, descKey, howKey, ex);
+        showDayTimePicker(attr[iconKey]||'📍', attr[nameKey]||'', (attr[descKey]||'').substring(0,120).replace(/\n/g,' '));
       };
-    })(a, existing));
+    })(a));
     bank.appendChild(card);
   });
 }
 
 function switchBankTab(tab) {
   _currentBankTab = tab;
-  var tabs = { attr: 'bankTabAttr', rest: 'bankTabRest', shop: 'bankTabShop' };
-  var colors = { attr: ['rgba(244,99,74,0.18)','#C2410C'], rest: ['rgba(56,189,248,0.15)','#0369A1'], shop: ['rgba(168,85,247,0.15)','#6D28D9'] };
+  var tabs = { attr: 'bankTabAttr', rest: 'bankTabRest', shop: 'bankTabShop', rem: 'bankTabRem' };
+  var colors = { attr: ['rgba(244,99,74,0.18)','#C2410C'], rest: ['rgba(56,189,248,0.15)','#0369A1'], shop: ['rgba(168,85,247,0.15)','#6D28D9'], rem: ['rgba(251,191,36,0.18)','#92400E'] };
   Object.keys(tabs).forEach(function(k) {
     var el = qs(tabs[k]); if (!el) return;
     if (k === tab) { el.style.background = colors[k][0]; el.style.color = colors[k][1]; }
@@ -2700,17 +2771,37 @@ function switchBankTab(tab) {
   if (tab === 'attr') {
     buildBankCards(comm.filter(function(c){ return c.cat === '🎟️ אטרקציות'; }), 'icon', 'name', 'desc', 'how');
   } else if (tab === 'rest') {
-    // RESTAURANTS + COMMUNITY מסעדות + קינוחים
     var foodItems = rest.map(function(r){ return {icon:r.icon,name:r.name,desc:r.desc||r.sub||'',how:''}; });
     var commFood = comm.filter(function(c){ return c.cat === '🍽️ מסעדות' || c.cat === '🍦 קינוחים'; })
       .map(function(c){ return {icon:c.icon,name:c.name,desc:c.desc||'',how:c.how||''}; });
-    // deduplicate by name
     var seen = {}; var merged = [];
     foodItems.concat(commFood).forEach(function(x){ if (!seen[x.name]){ seen[x.name]=1; merged.push(x); } });
     buildBankCards(merged, 'icon', 'name', 'desc', 'how');
-  } else {
-    buildBankCards(comm.filter(function(c){ return c.cat === '🛍️ קניות'; }), 'icon', 'name', 'desc', 'how');
+  } else if (tab === 'shop') {
+    var shopItems = (typeof SHOPS !== 'undefined' ? SHOPS : []).map(function(s){ return {icon:s.e,name:s.n,desc:s.tip||'',how:s.metro||''}; });
+    buildBankCards(shopItems, 'icon', 'name', 'desc', 'how');
+  } else if (tab === 'rem') {
+    buildBankRemCards();
   }
+}
+
+function buildBankRemCards() {
+  var bank = qs('attrBankRow');
+  if (!bank) return;
+  bank.innerHTML = '';
+  var rems = typeof REMINDERS !== 'undefined' ? REMINDERS : [];
+  rems.forEach(function(r) {
+    var card = document.createElement('div');
+    card.style.cssText = 'flex-shrink:0;width:138px;background:rgba(251,191,36,0.08);border:1.5px solid rgba(251,191,36,0.25);border-radius:14px;padding:10px 11px;cursor:pointer;position:relative;';
+    card.innerHTML =
+      '<div style="font-size:22px;margin-bottom:4px;">' + (r.emoji||'📌') + '</div>' +
+      '<div style="font-size:12px;font-weight:700;color:#1E293B;line-height:1.3;">' + (r.title||'') + '</div>' +
+      (r.deadline ? '<div style="margin-top:5px;padding:2px 6px;background:rgba(239,68,68,0.12);border-radius:6px;font-size:9px;font-weight:700;color:#DC2626;">⏳ ' + r.deadline + '</div>' : '');
+    card.addEventListener('click', (function(rem) {
+      return function() { showDayTimePicker(rem.emoji, rem.title, (rem.details||rem.desc||'').substring(0,120).replace(/\n/g,' ')); };
+    })(r));
+    bank.appendChild(card);
+  });
 }
 
 function openAddStop(dayIdx) {
