@@ -5600,15 +5600,22 @@ function requestPhotoGps() {
   }
   if (btn) btn.textContent = '⏳';
   if (gpsEl) { gpsEl.style.display = 'block'; gpsEl.textContent = '📡 מאתר...'; }
-  navigator.geolocation.getCurrentPosition(function(pos) {
+  function onGpsSuccess(pos) {
     var gps = { lat: pos.coords.latitude, lng: pos.coords.longitude, alt: pos.coords.altitude };
     window._photoPendingGps = gps;
     if (btn) btn.textContent = '✅ GPS';
     updateGpsDisplay(gps, 'device');
-  }, function() {
+  }
+  function onGpsError(err) {
     if (btn) btn.textContent = '📍 GPS';
-    if (gpsEl) { gpsEl.style.display = 'block'; gpsEl.textContent = '❌ GPS לא זמין — בדוק הגדרות מיקום'; }
-  }, { timeout: 15000, enableHighAccuracy: true, maximumAge: 0 });
+    var msg = err && err.code === 1
+      ? '🚫 גישה למיקום נדחתה — אפשר בהגדרות → Safari → מיקום'
+      : '❌ GPS לא זמין — נסה שוב בחוץ';
+    if (gpsEl) { gpsEl.style.display = 'block'; gpsEl.textContent = msg; }
+  }
+  // קודם מהיר (WiFi/סלולר), אח"כ GPS מדויק אם נדרש
+  navigator.geolocation.getCurrentPosition(onGpsSuccess, onGpsError,
+    { timeout: 8000, enableHighAccuracy: false, maximumAge: 60000 });
 }
 
 function openPhotoModal(placeName) {
