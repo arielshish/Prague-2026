@@ -4023,15 +4023,36 @@ function loadExpenses() {
     if (badge) badge.textContent = '🔄 מסנכרן';
     google.script.run
       .withSuccessHandler(function(rows) {
-        EXPENSES = rows || [];
-        saveLocal();
-        // sync Sheets → Firebase so web app sees updates
+        var sheetsExpenses = rows || [];
+        var sheetsIds = {};
+        sheetsExpenses.forEach(function(e) { sheetsIds[String(e.id)] = true; });
+        // merge with Firebase: include web-only expenses not in Sheets
         ensureFirebaseAuth().then(function() {
+          return getFirestoreDb().collection('appdata').doc('main').get();
+        }).then(function(doc) {
+          var merged = sheetsExpenses.slice();
+          if (doc.exists && doc.data().expenses) {
+            try {
+              var fbExpenses = JSON.parse(doc.data().expenses) || [];
+              fbExpenses.forEach(function(e) {
+                if (!sheetsIds[String(e.id)]) merged.push(e);
+              });
+              merged.sort(function(a, b) { return Number(b.id) - Number(a.id); });
+            } catch(e) {}
+          }
+          EXPENSES = merged;
+          saveLocal();
+          // push merged back to Firebase
           getFirestoreDb().collection('appdata').doc('main').set({ expenses: JSON.stringify(EXPENSES) }, { merge: true })
             .catch(function(e) { console.warn('GAS→Firebase sync failed', e); });
+          if (badge) { badge.textContent = '✅ מסונכרן'; badge.style.color = '#6EE7B7'; badge.style.borderColor = 'rgba(16,185,129,0.3)'; badge.style.background = 'rgba(16,185,129,0.1)'; }
+          renderExpenses();
+        }).catch(function() {
+          EXPENSES = sheetsExpenses;
+          saveLocal();
+          if (badge) { badge.textContent = '✅ מסונכרן'; badge.style.color = '#6EE7B7'; }
+          renderExpenses();
         });
-        if (badge) { badge.textContent = '✅ מסונכרן'; badge.style.color = '#6EE7B7'; badge.style.borderColor = 'rgba(16,185,129,0.3)'; badge.style.background = 'rgba(16,185,129,0.1)'; }
-        renderExpenses();
       })
       .withFailureHandler(function() {
         if (badge) { badge.textContent = '⚠️ מקומי'; badge.style.color = '#FCD34D'; }
