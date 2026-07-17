@@ -3498,11 +3498,14 @@ function loadLocal() {
 }
 
 function saveLocal() {
-  localStorage.setItem('prague_exp_v10', JSON.stringify(EXPENSES));
+  var ts = Date.now();
+  var json = JSON.stringify(EXPENSES);
+  localStorage.setItem('prague_exp_v10', json);
+  localStorage.setItem('prague_exp_ts', String(ts));
   if (!isGas()) {
     try {
       ensureFirebaseAuth().then(function() {
-        getFirestoreDb().collection('appdata').doc('expenses').set({ data: JSON.stringify(EXPENSES), ts: Date.now() })
+        getFirestoreDb().collection('appdata').doc('expenses').set({ data: json, ts: ts })
           .catch(function(e) { console.warn('Firestore expenses save failed', e); });
       });
     } catch(e) { console.warn('saveLocal firebase error', e); }
@@ -3518,9 +3521,12 @@ function loadExpensesFromFirebase() {
       if (doc.exists && doc.data().data) {
         try {
           var remote = JSON.parse(doc.data().data);
-          if (remote.length >= EXPENSES.length) {
+          var localTs = parseInt(localStorage.getItem('prague_exp_ts') || '0');
+          var remoteTs = doc.data().ts || 0;
+          if (remoteTs > localTs) {
             EXPENSES = remote;
             localStorage.setItem('prague_exp_v10', doc.data().data);
+            localStorage.setItem('prague_exp_ts', String(remoteTs));
             renderExpenses();
           }
         } catch(e) {}
@@ -3917,7 +3923,7 @@ function saveExpense() {
   var note = qs('expNote').value.trim();
   if (!name) { toast('חסר שם הוצאה'); return; }
   if (btn) { btn.disabled = true; btn.textContent = '⏳ שומר...'; }
-  var ok = function() { if (btn) { btn.disabled = false; btn.textContent = 'שמור הוצאה 💸'; } closeExpense(); loadExpenses(); toast('✅ נשמר!'); };
+  var ok = function() { if (btn) { btn.disabled = false; btn.textContent = 'שמור הוצאה 💸'; } closeExpense(); renderExpenses(); toast('✅ נשמר!'); };
   var fail = function() { if (btn) { btn.disabled = false; btn.textContent = 'שמור הוצאה 💸'; } toast('❌ שגיאה בשמירה'); };
   if (isGas()) {
     if (EDIT_ID) { google.script.run.withSuccessHandler(ok).withFailureHandler(fail).updateExpense(EDIT_ID, name, czk, ils, note); }
@@ -3950,12 +3956,12 @@ function editExpense(id) {
 
 function deleteExpense(id) {
   if (!confirm('למחוק את ההוצאה?')) return;
-  var ok = function() { loadExpenses(); toast('🗑️ נמחק'); };
   if (isGas()) {
+    var ok = function() { loadExpenses(); toast('🗑️ נמחק'); };
     google.script.run.withSuccessHandler(ok).withFailureHandler(function() { toast('שגיאה במחיקה'); }).deleteExpense(id);
   } else {
     EXPENSES = EXPENSES.filter(function(e) { return Number(e.id) !== Number(id); });
-    saveLocal(); ok();
+    saveLocal(); renderExpenses(); toast('🗑️ נמחק');
   }
 }
 
