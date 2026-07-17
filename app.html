@@ -5274,9 +5274,14 @@ function gpsGet(file) {
       window._photoPendingGps = gps;
       gpsUiSuccess(gps);
     },
-    function() {
-      // GPS נכשל — מנסה EXIF
-      gpsFromExif(file, function(gps) { window._photoPendingGps = gps; gpsUiSuccess(gps); }, gpsUiFail);
+    function(err) {
+      if (err && err.code === 1) {
+        var el = qs('photoGpsDisplay'), btn = qs('btnGetGps');
+        if (btn) btn.textContent = '📍 GPS';
+        if (el) { el.style.display = 'block'; el.style.color = '#F87171'; el.textContent = '🚫 גישה נדחתה — הגדרות ← Safari ← מיקום'; }
+      } else {
+        gpsFromExif(file, function(gps) { window._photoPendingGps = gps; gpsUiSuccess(gps); }, gpsUiFail);
+      }
     },
     { timeout: 8000, enableHighAccuracy: true }
   );
