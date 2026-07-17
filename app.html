@@ -2891,16 +2891,21 @@ function loadDaysFromSheets(silent) {
       .loadDaysCustom();
   } else {
     if (!silent) toast('🔄 מסנכרן...');
-    ensureFirebaseAuth().then(function(ready) {
-      if (!ready) throw new Error('Firebase Auth failed to initialize');
-      return getFirestoreDb().collection('appdata').doc('main').get();
-    }).then(function(doc) {
+    var daysTimeout = new Promise(function(_, reject) { setTimeout(function() { reject(new Error('timeout')); }, 8000); });
+    Promise.race([
+      ensureFirebaseAuth().then(function(ready) {
+        if (!ready) throw new Error('Firebase Auth failed');
+        return getFirestoreDb().collection('appdata').doc('main').get();
+      }),
+      daysTimeout
+    ]).then(function(doc) {
       if (doc.exists && doc.data().days_custom) {
         try {
           DAYS_STATE = JSON.parse(doc.data().days_custom);
           localStorage.setItem('prague_days_v1', JSON.stringify(DAYS_STATE));
         } catch(e) {}
       }
+      if (!silent) toast('✅ מסונכרן');
       renderDays();
     }).catch(function(err) {
       window._lastFirebaseError = err;
@@ -4074,10 +4079,14 @@ function loadExpenses() {
   } else {
     // Sync with Firebase
     if (badge) { badge.textContent = '🔄 מסנכרן ענן'; badge.style.color = '#FCD34D'; }
-    ensureFirebaseAuth().then(function(ready) {
-      if (!ready) throw new Error('Firebase Auth failed to initialize');
-      return getFirestoreDb().collection('appdata').doc('main').get();
-    }).then(function(doc) {
+    var fbTimeout = new Promise(function(_, reject) { setTimeout(function() { reject(new Error('timeout')); }, 8000); });
+    Promise.race([
+      ensureFirebaseAuth().then(function(ready) {
+        if (!ready) throw new Error('Firebase Auth failed');
+        return getFirestoreDb().collection('appdata').doc('main').get();
+      }),
+      fbTimeout
+    ]).then(function(doc) {
       if (doc.exists && doc.data().expenses) {
         try {
           EXPENSES = JSON.parse(doc.data().expenses) || [];
