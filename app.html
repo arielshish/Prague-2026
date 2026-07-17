@@ -3958,8 +3958,14 @@ function deleteExpense(id) {
     var ok = function() { loadExpenses(); toast('🗑️ נמחק'); };
     google.script.run.withSuccessHandler(ok).withFailureHandler(function() { toast('שגיאה במחיקה'); }).deleteExpense(id);
   } else {
-    EXPENSES = EXPENSES.filter(function(e) { return Number(e.id) !== Number(id); });
-    saveLocal(); renderExpenses(); toast('🗑️ נמחק');
+    var before = EXPENSES.length;
+    var numId = Number(id);
+    console.log('[deleteExpense] id=', id, 'numId=', numId, 'EXPENSES before=', EXPENSES.map(function(e){return {id:e.id,name:e.name};}));
+    EXPENSES = EXPENSES.filter(function(e) { return Number(e.id) !== numId; });
+    console.log('[deleteExpense] EXPENSES after=', EXPENSES.length, 'removed=', before - EXPENSES.length);
+    saveLocal();
+    renderExpenses();
+    toast('🗑️ נמחק (' + (before - EXPENSES.length === 0 ? 'לא נמצא!' : 'OK') + ')');
   }
 }
 
