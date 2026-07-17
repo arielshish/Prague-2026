@@ -2440,7 +2440,7 @@ function openTab(id) {
     var btn = qs('nav-' + name);
     if (btn) btn.style.color = name === id ? '#F4634A' : 'rgba(30,41,59,0.55)';
   });
-  if (id === 'expenses') { loadExpenses(); syncBudgetFromSheets(); syncBudgetFromFirebase(); }
+  if (id === 'expenses') { loadExpenses(); if (!window._expFirebaseLoaded) { window._expFirebaseLoaded = true; loadExpensesFromFirebase(); } syncBudgetFromSheets(); syncBudgetFromFirebase(); }
   if (id === 'days') { renderDays(); loadDaysFromSheets(); }
   if (id === 'pack') loadPack();
   if (id === 'restaurants') renderRestaurants();
@@ -3474,8 +3474,6 @@ function loadExpenses() {
   var badge = qs('syncBadge');
   // תמיד טוען מקומי קודם לתגובה מיידית
   loadLocal();
-  // טוען מ-Firebase (GitHub Pages) לסנכרון בין מכשירים
-  loadExpensesFromFirebase();
   if (isGas()) {
     if (badge) badge.textContent = '🔄 מסנכרן';
     google.script.run
@@ -4201,6 +4199,7 @@ document.addEventListener('DOMContentLoaded', function() {
   renderDays();
   renderShopping();
   loadExpenses();
+  loadExpensesFromFirebase();
   syncBudgetFromSheets();
 
   // CZK/ILS conversion
