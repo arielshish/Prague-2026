@@ -4935,8 +4935,30 @@ document.addEventListener('DOMContentLoaded', function() {
     window._photoPendingGps = null;
     window._photoPendingOrigFile = file;
 
-    // GPS אוטומטי עם בחירת תמונה
-    requestPhotoGps();
+    // GPS inline — enableHighAccuracy:false = WiFi/סלולר, עובד בפנים ומהיר
+    if (navigator.geolocation) {
+      var _gpsEl = qs('photoGpsDisplay');
+      var _gpsBtn = qs('btnGetGps');
+      if (_gpsEl) { _gpsEl.style.display = 'block'; _gpsEl.textContent = '📡 מאתר מיקום...'; }
+      if (_gpsBtn) _gpsBtn.textContent = '⏳';
+      navigator.geolocation.getCurrentPosition(
+        function(pos) {
+          var gps = { lat: pos.coords.latitude, lng: pos.coords.longitude, alt: pos.coords.altitude };
+          window._photoPendingGps = gps;
+          if (_gpsBtn) _gpsBtn.textContent = '✅ GPS';
+          updateGpsDisplay(gps, 'device');
+        },
+        function(err) {
+          if (_gpsBtn) _gpsBtn.textContent = '📍 GPS';
+          if (err && err.code === 1) {
+            if (_gpsEl) { _gpsEl.style.display = 'block'; _gpsEl.textContent = '🚫 גישה למיקום נדחתה — אפשר בהגדרות'; }
+          } else {
+            if (_gpsEl) _gpsEl.style.display = 'none';
+          }
+        },
+        { timeout: 8000, enableHighAccuracy: false, maximumAge: 30000 }
+      );
+    }
 
     // כווץ + הוסף מסגרת
     var reader = new FileReader();
