@@ -4937,32 +4937,37 @@ document.addEventListener('DOMContentLoaded', function() {
     window._photoPendingGps = null;
     window._photoPendingOrigFile = file;
 
-    // GPS דרך Geolocation API (iOS מוחק EXIF בדפדפן)
+    // GPS מהטלפון (לא שירות מיקום מקוון — Nominatim רק הופך קואורדינטות לכתובת)
     var gpsEl = qs('photoGpsDisplay');
-    if (gpsEl) { gpsEl.style.display = 'block'; gpsEl.style.color = '#93C5FD'; gpsEl.textContent = '📍 מאתר מיקום...'; }
+    if (gpsEl) { gpsEl.style.display = 'block'; gpsEl.style.color = '#93C5FD'; gpsEl.textContent = '📡 מאתר GPS מהטלפון...'; }
+
+    function tryExifGps() {
+      var gpsReader = new FileReader();
+      gpsReader.onload = function(ev) {
+        var gps = extractExifGps(ev.target.result);
+        if (gps && gps.lat) {
+          window._photoPendingGps = gps;
+          updateGpsDisplay(gps, 'exif');
+        } else {
+          window._photoPendingGps = null;
+          if (gpsEl) { gpsEl.textContent = '❌ GPS לא זמין — הפעל מיקום בטלפון'; gpsEl.style.color = 'rgba(241,245,249,0.4)'; }
+        }
+      };
+      gpsReader.readAsArrayBuffer(file);
+    }
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(function(pos) {
         var gps = { lat: pos.coords.latitude, lng: pos.coords.longitude, alt: pos.coords.altitude };
         window._photoPendingGps = gps;
-        updateGpsDisplay(gps);
-      }, function() {
-        // נסיון גיבוי: EXIF
-        var gpsReader = new FileReader();
-        gpsReader.onload = function(ev) {
-          var gps = extractExifGps(ev.target.result);
-          window._photoPendingGps = gps;
-          updateGpsDisplay(gps);
-        };
-        gpsReader.readAsArrayBuffer(file);
-      }, { timeout: 8000, enableHighAccuracy: true });
+        updateGpsDisplay(gps, 'device');
+      }, function(err) {
+        // GPS הטלפון נכשל — מנסה EXIF מהתמונה
+        if (gpsEl) { gpsEl.textContent = '📷 GPS הטלפון לא זמין, בודק EXIF תמונה...'; gpsEl.style.color = '#93C5FD'; }
+        tryExifGps();
+      }, { timeout: 15000, enableHighAccuracy: true, maximumAge: 0 });
     } else {
-      var gpsReader = new FileReader();
-      gpsReader.onload = function(ev) {
-        var gps = extractExifGps(ev.target.result);
-        window._photoPendingGps = gps;
-        updateGpsDisplay(gps);
-      };
-      gpsReader.readAsArrayBuffer(file);
+      tryExifGps();
     }
 
     // כווץ + הוסף מסגרת
@@ -5218,11 +5223,12 @@ function dmsToDecimal(dms) {
   return dms[0] + dms[1] / 60 + dms[2] / 3600;
 }
 
-function updateGpsDisplay(gps) {
+function updateGpsDisplay(gps, source) {
   var el = qs('photoGpsDisplay');
   if (!el) return;
   if (gps && gps.lat) {
-    el.innerHTML = '📍 GPS נמצא — מחפש מיקום...';
+    var srcLabel = source === 'device' ? '📱 GPS הטלפון' : source === 'exif' ? '📷 GPS מהתמונה' : '📍 GPS';
+    el.innerHTML = srcLabel + ' — מחפש כתובת...';
     el.style.color = '#93C5FD';
     el.style.display = 'block';
     // Reverse geocode via Nominatim
@@ -5260,15 +5266,15 @@ function updateGpsDisplay(gps) {
       if (cityCountry) lines.push('<span style="color:rgba(30,41,59,0.5);">' + cityCountry + '</span>');
 
       var mapLink = ' <a href="https://www.google.com/maps?q=' + gps.lat + ',' + gps.lng + '" target="_blank" style="color:#1D4ED8;font-size:10px;text-decoration:none;">🗺️</a>';
-      el.innerHTML = '📍 ' + (lines.join(' · ') || gps.lat.toFixed(5) + ', ' + gps.lng.toFixed(5)) + mapLink;
+      el.innerHTML = srcLabel + ': ' + (lines.join(' · ') || gps.lat.toFixed(5) + ', ' + gps.lng.toFixed(5)) + mapLink;
       el.style.color = '#6EE7B7';
     })
     .catch(function() {
-      el.innerHTML = '📍 ' + gps.lat.toFixed(5) + ', ' + gps.lng.toFixed(5) +
+      el.innerHTML = srcLabel + ': ' + gps.lat.toFixed(5) + ', ' + gps.lng.toFixed(5) +
         ' <a href="https://www.google.com/maps?q=' + gps.lat + ',' + gps.lng + '" target="_blank" style="color:#1D4ED8;font-size:10px;">🗺️</a>';
     });
   } else {
-    el.innerHTML = '📍 אין GPS בתמונה';
+    el.innerHTML = '❌ GPS לא זמין';
     el.style.color = 'rgba(241,245,249,0.3)';
     el.style.display = 'block';
   }
