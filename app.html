@@ -4935,7 +4935,8 @@ document.addEventListener('DOMContentLoaded', function() {
     window._photoPendingGps = null;
     window._photoPendingOrigFile = file;
 
-    // GPS נלקח בנפרד דרך כפתור btnGetGps (requestPhotoGps)
+    // GPS אוטומטי עם בחירת תמונה
+    requestPhotoGps();
 
     // כווץ + הוסף מסגרת
     var reader = new FileReader();
@@ -5608,14 +5609,14 @@ function requestPhotoGps() {
   }
   function onGpsError(err) {
     if (btn) btn.textContent = '📍 GPS';
-    var msg = err && err.code === 1
-      ? '🚫 גישה למיקום נדחתה — אפשר בהגדרות → Safari → מיקום'
-      : '❌ GPS לא זמין — נסה שוב בחוץ';
-    if (gpsEl) { gpsEl.style.display = 'block'; gpsEl.textContent = msg; }
+    if (err && err.code === 1) {
+      if (gpsEl) { gpsEl.style.display = 'block'; gpsEl.textContent = '🚫 גישה למיקום נדחתה — אפשר בהגדרות → Safari → מיקום'; }
+    } else {
+      if (gpsEl) { gpsEl.style.display = 'none'; }
+    }
   }
-  // קודם מהיר (WiFi/סלולר), אח"כ GPS מדויק אם נדרש
   navigator.geolocation.getCurrentPosition(onGpsSuccess, onGpsError,
-    { timeout: 8000, enableHighAccuracy: false, maximumAge: 60000 });
+    { timeout: 10000, enableHighAccuracy: true, maximumAge: 0 });
 }
 
 function openPhotoModal(placeName) {
