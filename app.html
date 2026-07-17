@@ -4935,7 +4935,8 @@ document.addEventListener('DOMContentLoaded', function() {
     window._photoPendingGps = null;
     window._photoPendingOrigFile = file;
 
-    gpsGet(file);
+    // iOS PWA: getCurrentPosition דורש gesture ישיר — כאן רק EXIF
+    gpsFromExif(file, function(gps) { window._photoPendingGps = gps; gpsUiSuccess(gps); }, function() {});
 
     // כווץ + הוסף מסגרת
     var reader = new FileReader();
@@ -5281,9 +5282,9 @@ function gpsGet(file) {
   );
 }
 
-// --- כפתור GPS ידני ---
+// --- כפתור GPS ידני (gesture ישיר → עובד על iOS PWA) ---
 function requestPhotoGps() {
-  gpsGet(null);
+  gpsGet(window._photoPendingOrigFile || null);
 }
 
 function addPragueFrame(ctx, w, h) {
