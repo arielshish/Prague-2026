@@ -4955,9 +4955,14 @@ document.addEventListener('DOMContentLoaded', function() {
       };
       abReader.onerror = function() {
         if (_gpsBtn) _gpsBtn.textContent = '📍 GPS';
-        if (_gpsEl) _gpsEl.style.display = 'none';
+        if (_gpsEl) { _gpsEl.style.display = 'block'; _gpsEl.textContent = '⚠️ GPS לא זמין בתמונה זו'; }
       };
       abReader.readAsArrayBuffer(_gpsFile);
+    }
+
+    function onNoGps() {
+      if (_gpsBtn) _gpsBtn.textContent = '📍 GPS';
+      if (_gpsEl) { _gpsEl.style.display = 'block'; _gpsEl.textContent = '⚠️ GPS לא זמין בתמונה זו'; }
     }
 
     if (navigator.geolocation) {
@@ -4980,7 +4985,7 @@ document.addEventListener('DOMContentLoaded', function() {
             tryExifGps();
           }
         },
-        { timeout: 8000, enableHighAccuracy: true, maximumAge: 30000 }
+        { timeout: 6000, enableHighAccuracy: false, maximumAge: 60000 }
       );
     } else {
       // אין geolocation — מנסה EXIF
@@ -5661,16 +5666,14 @@ function requestPhotoGps() {
   function onGpsError(err) {
     if (btn) btn.textContent = '📍 GPS';
     if (err && err.code === 1) {
-      // הרשאה נדחתה
       if (gpsEl) { gpsEl.style.display = 'block'; gpsEl.textContent = '🚫 גישה למיקום נדחתה — אפשר בהגדרות → Safari → מיקום'; }
     } else {
-      // timeout או שגיאה אחרת — מסתיר בשקט
-      if (gpsEl) { gpsEl.style.display = 'none'; }
+      if (gpsEl) { gpsEl.style.display = 'block'; gpsEl.textContent = '⚠️ לא הצלחנו לאתר מיקום — נסה שוב'; }
     }
   }
 
   navigator.geolocation.getCurrentPosition(onGpsSuccess, onGpsError,
-    { timeout: 8000, enableHighAccuracy: true, maximumAge: 30000 });
+    { timeout: 6000, enableHighAccuracy: false, maximumAge: 60000 });
 }
 
 function openPhotoModal(placeName) {
