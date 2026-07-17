@@ -4937,9 +4937,8 @@ document.addEventListener('DOMContentLoaded', function() {
     window._photoPendingGps = null;
     window._photoPendingOrigFile = file;
 
-    // GPS מהטלפון (לא שירות מיקום מקוון — Nominatim רק הופך קואורדינטות לכתובת)
+    // GPS — iOS PWA דורש לחיצת כפתור ישירה כדי לקבל הרשאת מיקום
     var gpsEl = qs('photoGpsDisplay');
-    if (gpsEl) { gpsEl.style.display = 'block'; gpsEl.style.color = '#93C5FD'; gpsEl.textContent = '📡 מאתר GPS מהטלפון...'; }
 
     function tryExifGps() {
       var gpsReader = new FileReader();
@@ -4950,26 +4949,27 @@ document.addEventListener('DOMContentLoaded', function() {
           updateGpsDisplay(gps, 'exif');
         } else {
           window._photoPendingGps = null;
-          if (gpsEl) { gpsEl.textContent = '❌ GPS לא זמין — הפעל מיקום בטלפון'; gpsEl.style.color = 'rgba(241,245,249,0.4)'; }
+          if (gpsEl) { gpsEl.innerHTML = '❌ GPS לא זמין'; gpsEl.style.color = 'rgba(241,245,249,0.4)'; }
         }
       };
       gpsReader.readAsArrayBuffer(file);
     }
 
-    function doGetPosition() {
-      navigator.geolocation.getCurrentPosition(function(pos) {
-        var gps = { lat: pos.coords.latitude, lng: pos.coords.longitude, alt: pos.coords.altitude };
-        window._photoPendingGps = gps;
-        updateGpsDisplay(gps, 'device');
-      }, function(err) {
-        if (gpsEl) { gpsEl.textContent = '📷 GPS הטלפון לא זמין, בודק EXIF תמונה...'; gpsEl.style.color = '#93C5FD'; }
-        tryExifGps();
-      }, { timeout: 15000, enableHighAccuracy: true, maximumAge: 0 });
-    }
-
-    if (navigator.geolocation) {
-      // iOS מציג דיאלוג הרשאה אוטומטי כשקוראים getCurrentPosition
-      doGetPosition();
+    if (navigator.geolocation && gpsEl) {
+      gpsEl.style.display = 'block';
+      gpsEl.innerHTML = '<button id="_gpsBtn" style="background:#3B82F6;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:13px;cursor:pointer;">📍 רשום מיקום GPS</button>';
+      gpsEl.querySelector('#_gpsBtn').addEventListener('click', function() {
+        gpsEl.style.color = '#93C5FD';
+        gpsEl.textContent = '📡 מאתר GPS...';
+        navigator.geolocation.getCurrentPosition(function(pos) {
+          var gps = { lat: pos.coords.latitude, lng: pos.coords.longitude, alt: pos.coords.altitude };
+          window._photoPendingGps = gps;
+          updateGpsDisplay(gps, 'device');
+        }, function() {
+          gpsEl.textContent = '📷 GPS לא זמין, בודק EXIF...';
+          tryExifGps();
+        }, { timeout: 15000, enableHighAccuracy: true, maximumAge: 0 });
+      });
     } else {
       tryExifGps();
     }
