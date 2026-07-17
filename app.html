@@ -3953,20 +3953,31 @@ function editExpense(id) {
 }
 
 function deleteExpense(id) {
-  if (!confirm('למחוק את ההוצאה?')) return;
-  if (isGas()) {
-    var ok = function() { loadExpenses(); toast('🗑️ נמחק'); };
-    google.script.run.withSuccessHandler(ok).withFailureHandler(function() { toast('שגיאה במחיקה'); }).deleteExpense(id);
-  } else {
-    var before = EXPENSES.length;
-    var numId = Number(id);
-    console.log('[deleteExpense] id=', id, 'numId=', numId, 'EXPENSES before=', EXPENSES.map(function(e){return {id:e.id,name:e.name};}));
-    EXPENSES = EXPENSES.filter(function(e) { return Number(e.id) !== numId; });
-    console.log('[deleteExpense] EXPENSES after=', EXPENSES.length, 'removed=', before - EXPENSES.length);
-    saveLocal();
-    renderExpenses();
-    toast('🗑️ נמחק (' + (before - EXPENSES.length === 0 ? 'לא נמצא!' : 'OK') + ')');
-  }
+  var numId = Number(id);
+  var exp = EXPENSES.filter(function(e) { return Number(e.id) === numId; })[0];
+  var expName = exp ? exp.name : 'הוצאה';
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:19999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  overlay.innerHTML = '<div style="background:#1E293B;border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;font-family:Rubik,Arial,sans-serif;">' +
+    '<div style="font-size:32px;margin-bottom:12px;">🗑️</div>' +
+    '<div style="font-size:15px;font-weight:700;color:#F1F5F9;margin-bottom:8px;">למחוק את ההוצאה?</div>' +
+    '<div style="font-size:13px;color:rgba(241,245,249,0.6);margin-bottom:20px;">' + esc(expName) + '</div>' +
+    '<div style="display:flex;gap:10px;justify-content:center;">' +
+    '<button id="_delCancel" style="flex:1;padding:11px;border-radius:12px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:#F1F5F9;font-size:14px;font-weight:700;cursor:pointer;font-family:Rubik,Arial,sans-serif;">ביטול</button>' +
+    '<button id="_delConfirm" style="flex:1;padding:11px;border-radius:12px;border:none;background:#EF4444;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:Rubik,Arial,sans-serif;">מחק</button>' +
+    '</div></div>';
+  document.body.appendChild(overlay);
+  overlay.querySelector('#_delCancel').addEventListener('click', function() { overlay.remove(); });
+  overlay.querySelector('#_delConfirm').addEventListener('click', function() {
+    overlay.remove();
+    if (isGas()) {
+      var ok = function() { loadExpenses(); toast('🗑️ נמחק'); };
+      google.script.run.withSuccessHandler(ok).withFailureHandler(function() { toast('שגיאה במחיקה'); }).deleteExpense(id);
+    } else {
+      EXPENSES = EXPENSES.filter(function(e) { return Number(e.id) !== numId; });
+      saveLocal(); renderExpenses(); toast('🗑️ נמחק');
+    }
+  });
 }
 
 // ═══ VOICE TRANSLATOR ═══
