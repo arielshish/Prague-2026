@@ -16,7 +16,7 @@
   @keyframes riverDrift{0%,100%{transform:translateX(0)}50%{transform:translateX(-6px)}}
   @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
   *{box-sizing:border-box;margin:0;padding:0;}
-  body{background:#040D18;direction:rtl;text-align:right;font-family:'Rubik',Arial,sans-serif;color:#F1F5F9;overflow-x:hidden;-webkit-text-size-adjust:100%;}
+  body{background:#040D18;direction:rtl;text-align:right;font-family:\'Rubik\',Arial,sans-serif;color:#F1F5F9;overflow-x:hidden;-webkit-text-size-adjust:100%;}
   html{overflow-x:hidden;}
   input,textarea,select{font-size:16px!important;}
   button{touch-action:manipulation;}
@@ -40,7 +40,7 @@
     #desktopSideNav button{
       display:flex;flex-direction:row;align-items:center;gap:10px;
       padding:10px 12px;border-radius:11px;font-size:13px;font-weight:700;
-      border:0;cursor:pointer;font-family:'Rubik',Arial,sans-serif;
+      border:0;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;
       background:transparent;color:rgba(241,245,249,0.5);
       width:100%;text-align:right;justify-content:flex-end;
       transition:background 0.15s,color 0.15s;
@@ -66,12 +66,84 @@
   input[type=checkbox]{width:18px;height:18px;accent-color:#F4634A;cursor:pointer;flex-shrink:0;}
   .card{background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.16);border-radius:22px;padding:18px;margin-bottom:12px;box-shadow:0 8px 24px rgba(0,0,0,0.32);}
   .card-hdr{display:flex;align-items:center;justify-content:space-between;gap:8px;}
-  .back-btn{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:10px;padding:7px 12px;font-size:11px;font-weight:700;color:rgba(241,245,249,0.55);cursor:pointer;font-family:'Rubik',Arial,sans-serif;white-space:nowrap;}
-  .cat-chip{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:6px 12px;font-size:12px;font-weight:700;color:rgba(241,245,249,0.8);cursor:pointer;font-family:'Rubik',Arial,sans-serif;}
-  .btn-primary{background:#F4634A;color:white;border:0;border-radius:13px;padding:12px 16px;font-weight:800;font-size:13px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;box-shadow:0 5px 14px rgba(244,99,74,0.32);}
-  .btn-ghost{background:rgba(255,255,255,0.09);color:rgba(241,245,249,0.75);border:1px solid rgba(255,255,255,0.15);border-radius:13px;padding:12px 14px;font-weight:700;font-size:13px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;}
-  .nav-map-btn{display:inline-block;background:rgba(255,255,255,0.10);color:rgba(241,245,249,0.78);border:1px solid rgba(255,255,255,0.15);border-radius:9px;padding:5px 12px;font-size:11px;font-weight:700;text-decoration:none;font-family:'Rubik',Arial,sans-serif;}
+  .back-btn{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:10px;padding:7px 12px;font-size:11px;font-weight:700;color:rgba(241,245,249,0.55);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;white-space:nowrap;}
+  .cat-chip{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:6px 12px;font-size:12px;font-weight:700;color:rgba(241,245,249,0.8);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;}
+  .btn-primary{background:#F4634A;color:white;border:0;border-radius:13px;padding:12px 16px;font-weight:800;font-size:13px;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;box-shadow:0 5px 14px rgba(244,99,74,0.32);}
+  .btn-ghost{background:rgba(255,255,255,0.09);color:rgba(241,245,249,0.75);border:1px solid rgba(255,255,255,0.15);border-radius:13px;padding:12px 14px;font-weight:700;font-size:13px;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;}
+  .nav-map-btn{display:inline-block;background:rgba(255,255,255,0.10);color:rgba(241,245,249,0.78);border:1px solid rgba(255,255,255,0.15);border-radius:9px;padding:5px 12px;font-size:11px;font-weight:700;text-decoration:none;font-family:\'Rubik\',Arial,sans-serif;}
   .tip-pill{background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:7px 11px;font-size:11px;color:#FCD34D;}
+
+    /* ═══ Desktop Layout Optimization ═══ */
+  @media(min-width:768px) {
+    body {
+      display: flex !important;
+      flex-direction: row-reverse !important;
+      justify-content: center !important;
+      align-items: flex-start !important;
+      gap: 20px !important;
+      padding: 20px !important;
+      min-height: 100vh !important;
+      box-sizing: border-box !important;
+    }
+    
+    #app {
+      margin: 0 !important;
+      max-width: 960px !important;
+      width: 100% !important;
+      flex: 1 !important;
+      border-radius: 20px !important;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12) !important;
+    }
+    
+    #deskSidebar {
+      position: sticky !important;
+      top: 20px !important;
+      right: auto !important;
+      left: auto !important;
+      height: calc(100vh - 40px) !important;
+      border-radius: 20px !important;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.1) !important;
+      margin: 0 !important;
+    }
+
+    /* Split Day Layout */
+    .day-split-layout {
+      display: flex !important;
+      flex-direction: row-reverse !important; /* Row-reverse for RTL flow */
+      align-items: flex-start !important;
+      gap: 24px !important;
+      text-align: right !important;
+    }
+    .day-details-col {
+      flex: 1.2 !important;
+      width: 50% !important;
+    }
+    .day-timeline-col {
+      flex: 1 !important;
+      width: 50% !important;
+      border-right: 1px solid rgba(128,128,128,0.15) !important;
+      padding-right: 20px !important;
+    }
+    
+    /* Flights Grid */
+    .flights-grid {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr !important;
+      gap: 14px !important;
+      margin-bottom: 14px !important;
+    }
+    .flights-grid > div {
+      margin-bottom: 0 !important;
+    }
+    
+    /* Shopping & Photos grids */
+    #shoppingGrid {
+      grid-template-columns: 1fr 1fr !important;
+    }
+    #photoDiaryGrid {
+      grid-template-columns: 1fr 1fr 1fr !important;
+    }
+  }
 </style>
 <div id="app">
 
@@ -136,15 +208,15 @@
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
-      <button id="btnHomeFlights" style="background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.25);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#FCD34D;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;">✈️<br><span style="font-size:10px;font-weight:700;">טיסות</span></button>
-      <button id="btnHomeRestaurants" style="background:rgba(244,99,74,0.10);border:1px solid rgba(244,99,74,0.22);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#FCA5A5;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;">🍽️<br><span style="font-size:10px;font-weight:700;">מסעדות</span></button>
-      <button id="btnHomePack" style="background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.22);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#6EE7B7;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;">🧳<br><span style="font-size:10px;font-weight:700;">ציוד</span></button>
-      <button id="btnHomeInfo" style="background:rgba(168,85,247,0.10);border:1px solid rgba(168,85,247,0.22);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#C084FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;">📘<br><span style="font-size:10px;font-weight:700;">מידע</span></button>
-      <button id="btnHomeHistory" style="background:rgba(251,191,36,0.10);border:1px solid rgba(251,191,36,0.22);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#FDE68A;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;">🏛️<br><span style="font-size:10px;font-weight:700;">היסטוריה</span></button>
-      <button id="btnHomePhotoDiary" style="background:rgba(236,72,153,0.10);border:1px solid rgba(236,72,153,0.22);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#F9A8D4;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;">📷<br><span style="font-size:10px;font-weight:700;">תמונות</span></button>
-      <button id="btnHomeCommunity" style="background:rgba(52,211,153,0.10);border:1px solid rgba(52,211,153,0.25);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#6EE7B7;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;grid-column:1 / -1;">👥<br><span style="font-size:10px;font-weight:700;">המלצות קהילה</span></button>
-      <button id="btnHomeGuides" style="background:rgba(251,146,60,0.10);border:1px solid rgba(251,146,60,0.25);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#FED7AA;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;grid-column:1 / -1;">🎙️<br><span style="font-size:10px;font-weight:700;">מדריכים בעברית</span></button>
-      <button id="btnHomeLang" style="background:rgba(168,85,247,0.10);border:1px solid rgba(168,85,247,0.22);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#C084FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;text-align:center;grid-column:1 / -1;">🌐<br><span style="font-size:10px;font-weight:700;">שפה ותרגום</span></button>
+      <button id="btnHomeFlights" style="background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.25);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#FCD34D;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;text-align:center;">✈️<br><span style="font-size:10px;font-weight:700;">טיסות</span></button>
+      <button id="btnHomeRestaurants" style="background:rgba(244,99,74,0.10);border:1px solid rgba(244,99,74,0.22);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#FCA5A5;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;text-align:center;">🍽️<br><span style="font-size:10px;font-weight:700;">מסעדות</span></button>
+      <button id="btnHomePack" style="background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.22);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#6EE7B7;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;text-align:center;">🧳<br><span style="font-size:10px;font-weight:700;">ציוד</span></button>
+      <button id="btnHomeInfo" style="background:rgba(168,85,247,0.10);border:1px solid rgba(168,85,247,0.22);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#C084FC;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;text-align:center;">📘<br><span style="font-size:10px;font-weight:700;">מידע</span></button>
+      <button id="btnHomeHistory" style="background:rgba(251,191,36,0.10);border:1px solid rgba(251,191,36,0.22);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#FDE68A;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;text-align:center;">🏛️<br><span style="font-size:10px;font-weight:700;">היסטוריה</span></button>
+      <button id="btnHomePhotoDiary" style="background:rgba(236,72,153,0.10);border:1px solid rgba(236,72,153,0.22);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#F9A8D4;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;text-align:center;">📷<br><span style="font-size:10px;font-weight:700;">תמונות</span></button>
+      <button id="btnHomeCommunity" style="background:rgba(52,211,153,0.10);border:1px solid rgba(52,211,153,0.25);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#6EE7B7;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;text-align:center;grid-column:1 / -1;">👥<br><span style="font-size:10px;font-weight:700;">המלצות קהילה</span></button>
+      <button id="btnHomeGuides" style="background:rgba(251,146,60,0.10);border:1px solid rgba(251,146,60,0.25);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#FED7AA;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;text-align:center;grid-column:1 / -1;">🎙️<br><span style="font-size:10px;font-weight:700;">מדריכים בעברית</span></button>
+      <button id="btnHomeLang" style="background:rgba(168,85,247,0.10);border:1px solid rgba(168,85,247,0.22);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#C084FC;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;text-align:center;grid-column:1 / -1;">🌐<br><span style="font-size:10px;font-weight:700;">שפה ותרגום</span></button>
     </div>
     <div style="background:linear-gradient(135deg,rgba(244,99,74,0.13),rgba(244,99,74,0.055));border:1px solid rgba(244,99,74,0.24);border-radius:20px;padding:16px;margin-bottom:10px;">
       <div style="font-size:14px;font-weight:800;color:#F1F5F9;margin-bottom:7px;">🛍️ יום 7 — יום קניות</div>
@@ -163,7 +235,7 @@
     <div style="background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.22);border-radius:20px;padding:16px;margin-top:12px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
         <div style="font-size:13px;font-weight:800;color:#7DD3FC;">🌤️ מזג אוויר — פראג</div>
-        <button onclick="fetchWeather(true)" style="background:none;border:none;font-size:11px;color:rgba(125,211,252,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;font-weight:700;">🔄 רענן</button>
+        <button onclick="fetchWeather(true)" style="background:none;border:none;font-size:11px;color:rgba(125,211,252,0.6);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;font-weight:700;">🔄 רענן</button>
       </div>
       <div id="weatherRow" style="display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:4px;">
         <div style="color:rgba(241,245,249,0.3);font-size:12px;padding:8px 0;">טוען...</div>
@@ -191,18 +263,18 @@
     <div style="position:relative;background:linear-gradient(160deg,#1e293b,#0f172a);border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;z-index:1;">
       <h2 id="addStopTitle" style="margin:0 0 12px;font-size:17px;font-weight:900;color:#F1F5F9;">➕ הוסף תחנה</h2>
       <div style="display:flex;gap:6px;margin-bottom:10px;">
-        <button id="bankTabAttr" onclick="switchBankTab('attr')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(244,99,74,0.25);color:#F4634A;font-weight:700;font-size:11px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🎟️ אטרקציות</button>
-        <button id="bankTabRest" onclick="switchBankTab('rest')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(255,255,255,0.06);color:rgba(241,245,249,0.45);font-weight:700;font-size:11px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🍽️ אוכל</button>
-        <button id="bankTabShop" onclick="switchBankTab('shop')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(255,255,255,0.06);color:rgba(241,245,249,0.45);font-weight:700;font-size:11px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🛍️ קניות</button>
+        <button id="bankTabAttr" onclick="switchBankTab('attr')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(244,99,74,0.25);color:#F4634A;font-weight:700;font-size:11px;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">🎟️ אטרקציות</button>
+        <button id="bankTabRest" onclick="switchBankTab('rest')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(255,255,255,0.06);color:rgba(241,245,249,0.45);font-weight:700;font-size:11px;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">🍽️ אוכל</button>
+        <button id="bankTabShop" onclick="switchBankTab('shop')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(255,255,255,0.06);color:rgba(241,245,249,0.45);font-weight:700;font-size:11px;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">🛍️ קניות</button>
       </div>
       <div id="attrBankRow" style="display:flex;gap:9px;overflow-x:auto;padding-bottom:10px;margin-bottom:14px;scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
       <div style="font-size:11px;font-weight:700;color:rgba(241,245,249,0.4);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;">✏️ או הקלד ידנית</div>
-      <input id="addStopEmoji" type="text" maxlength="4" placeholder="😀" style="width:56px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:11px 10px;font-size:22px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;text-align:center;box-sizing:border-box;margin-bottom:10px;">
-      <input id="addStopName" type="text" placeholder="שם המקום" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:12px 14px;font-size:14px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:10px;">
-      <input id="addStopTime" type="text" placeholder="⏱ זמן (לדוג׳ 2-3 שעות)" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:12px 14px;font-size:14px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:10px;">
-      <textarea id="addStopDesc" placeholder="תיאור קצר..." style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:12px 14px;font-size:13px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;resize:none;height:70px;margin-bottom:14px;"></textarea>
+      <input id="addStopEmoji" type="text" maxlength="4" placeholder="😀" style="width:56px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:11px 10px;font-size:22px;color:#F1F5F9;font-family:\'Rubik\',Arial,sans-serif;text-align:center;box-sizing:border-box;margin-bottom:10px;">
+      <input id="addStopName" type="text" placeholder="שם המקום" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:12px 14px;font-size:14px;color:#F1F5F9;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:10px;">
+      <input id="addStopTime" type="text" placeholder="⏱ זמן (לדוג׳ 2-3 שעות)" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:12px 14px;font-size:14px;color:#F1F5F9;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:10px;">
+      <textarea id="addStopDesc" placeholder="תיאור קצר..." style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:12px 14px;font-size:13px;color:#F1F5F9;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;box-sizing:border-box;resize:none;height:70px;margin-bottom:14px;"></textarea>
       <div style="display:flex;gap:8px;">
-        <button onclick="closeAddStopModal()" style="flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:13px;padding:13px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.55);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">ביטול</button>
+        <button onclick="closeAddStopModal()" style="flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:13px;padding:13px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.55);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">ביטול</button>
         <button id="btnSaveAddStop" class="btn-primary" style="flex:2;">✅ הוסף</button>
       </div>
     </div>
@@ -246,7 +318,7 @@
     <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:16px;margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
         <div style="font-size:13px;font-weight:800;color:#F1F5F9;">📊 תקציב מול בפועל</div>
-        <button id="btnEditBudget" onclick="openBudgetModal()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:4px 10px;font-size:11px;font-weight:700;color:rgba(241,245,249,0.7);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">✏️ ערוך</button>
+        <button id="btnEditBudget" onclick="openBudgetModal()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:4px 10px;font-size:11px;font-weight:700;color:rgba(241,245,249,0.7);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">✏️ ערוך</button>
       </div>
       <!-- כרטיס סיכום גדול -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
@@ -293,18 +365,18 @@
     <div style="position:relative;background:linear-gradient(160deg,#1e293b,#0f172a);border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;z-index:1;max-height:85vh;overflow-y:auto;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
         <h2 style="margin:0;font-size:18px;font-weight:900;color:#F1F5F9;">✏️ עריכת תקציב</h2>
-        <button onclick="closeBudgetModal()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:10px;padding:6px 13px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">ביטול</button>
+        <button onclick="closeBudgetModal()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:10px;padding:6px 13px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">ביטול</button>
       </div>
       <div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);border-radius:14px;padding:14px;margin-bottom:16px;">
         <div style="font-size:11px;font-weight:700;color:#FCD34D;margin-bottom:8px;letter-spacing:0.5px;">💰 תקציב כולל לטיול (₪)</div>
-        <input id="budgetTotalInput" type="number" placeholder="לדוג׳ 15000" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(245,158,11,0.35);border-radius:10px;padding:11px 13px;font-size:18px;font-weight:800;color:#FCD34D;font-family:'Rubik',Arial,sans-serif;box-sizing:border-box;text-align:center;">
+        <input id="budgetTotalInput" type="number" placeholder="לדוג׳ 15000" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(245,158,11,0.35);border-radius:10px;padding:11px 13px;font-size:18px;font-weight:800;color:#FCD34D;font-family:\'Rubik\',Arial,sans-serif;box-sizing:border-box;text-align:center;">
       </div>
       <div style="font-size:11px;font-weight:700;color:rgba(241,245,249,0.5);margin-bottom:10px;letter-spacing:0.5px;">📊 פירוט לפי קטגוריה (₪)</div>
       <div id="budgetInputs" style="display:grid;gap:10px;margin-bottom:16px;"></div>
-      <button id="btnAddBudgetCat" onclick="(function(){var b=loadBudget();b.push({cat:'קטגוריה חדשה',ils:0});saveBudget(b);openBudgetModal();})()" style="width:100%;background:rgba(255,255,255,0.07);border:1px dashed rgba(255,255,255,0.2);border-radius:13px;padding:11px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;margin-bottom:14px;">➕ הוסף קטגוריה</button>
+      <button id="btnAddBudgetCat" onclick="(function(){var b=loadBudget();b.push({cat:'קטגוריה חדשה',ils:0});saveBudget(b);openBudgetModal();})()" style="width:100%;background:rgba(255,255,255,0.07);border:1px dashed rgba(255,255,255,0.2);border-radius:13px;padding:11px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;margin-bottom:14px;">➕ הוסף קטגוריה</button>
       <div style="display:flex;gap:10px;">
-        <button onclick="closeBudgetModal()" style="flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:13px;padding:14px;font-size:14px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">ביטול</button>
-        <button id="btnSaveBudget" onclick="saveBudgetFromModalAndInvalidate()" style="flex:2;background:#F4634A;color:white;border:0;border-radius:13px;padding:14px;font-size:15px;font-weight:900;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">💾 שמור</button>
+        <button onclick="closeBudgetModal()" style="flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:13px;padding:14px;font-size:14px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">ביטול</button>
+        <button id="btnSaveBudget" onclick="saveBudgetFromModalAndInvalidate()" style="flex:2;background:#F4634A;color:white;border:0;border-radius:13px;padding:14px;font-size:15px;font-weight:900;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">💾 שמור</button>
       </div>
     </div>
   </div>
@@ -329,6 +401,7 @@
         ✅ בסך הכל — חברה זולה ומשרתת את המחיר
       </div>
     </div>
+    <div class="flights-grid">
     <div style="background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.16);border-radius:20px;overflow:hidden;margin-bottom:14px;">
       <div style="background:linear-gradient(135deg,#F4634A,#d6a54a);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;">
         <div style="font-size:16px;font-weight:900;color:white;">הלוך לפראג</div>
@@ -371,6 +444,7 @@
       </div>
       <div style="background:rgba(0,0,0,0.22);padding:11px 18px;border-top:1px dashed rgba(255,255,255,0.10);font-size:12px;font-weight:600;color:rgba(241,245,249,0.55);">💡 הגעה לארץ לפנות בוקר (16 אוגוסט)</div>
     </div>
+    </div>
   </section>
 
   <!-- ═══ RESTAURANTS ═══ -->
@@ -381,9 +455,9 @@
     </div>
     <!-- טאבים פנימיים -->
     <div style="display:flex;gap:8px;margin-bottom:16px;">
-      <button id="tabResBtn" onclick="switchFoodTab('restaurants')" style="flex:1;padding:9px;border-radius:12px;border:none;font-size:12px;font-weight:800;font-family:'Rubik',Arial,sans-serif;cursor:pointer;background:rgba(244,99,74,0.25);color:#F4634A;">🍽️ מסעדות</button>
-      <button id="tabDesBtn" onclick="switchFoodTab('desserts')" style="flex:1;padding:9px;border-radius:12px;border:none;font-size:12px;font-weight:800;font-family:'Rubik',Arial,sans-serif;cursor:pointer;background:rgba(255,255,255,0.07);color:rgba(241,245,249,0.5);">🍦 קינוחים</button>
-      <button id="tabPhotoBtn" onclick="switchFoodTab('photo')" style="flex:1;padding:9px;border-radius:12px;border:none;font-size:12px;font-weight:800;font-family:'Rubik',Arial,sans-serif;cursor:pointer;background:rgba(255,255,255,0.07);color:rgba(241,245,249,0.5);">📸 לצלם</button>
+      <button id="tabResBtn" onclick="switchFoodTab('restaurants')" style="flex:1;padding:9px;border-radius:12px;border:none;font-size:12px;font-weight:800;font-family:\'Rubik\',Arial,sans-serif;cursor:pointer;background:rgba(244,99,74,0.25);color:#F4634A;">🍽️ מסעדות</button>
+      <button id="tabDesBtn" onclick="switchFoodTab('desserts')" style="flex:1;padding:9px;border-radius:12px;border:none;font-size:12px;font-weight:800;font-family:\'Rubik\',Arial,sans-serif;cursor:pointer;background:rgba(255,255,255,0.07);color:rgba(241,245,249,0.5);">🍦 קינוחים</button>
+      <button id="tabPhotoBtn" onclick="switchFoodTab('photo')" style="flex:1;padding:9px;border-radius:12px;border:none;font-size:12px;font-weight:800;font-family:\'Rubik\',Arial,sans-serif;cursor:pointer;background:rgba(255,255,255,0.07);color:rgba(241,245,249,0.5);">📸 לצלם</button>
     </div>
     <div id="restaurantsList" style="display:grid;gap:12px;"></div>
     <div id="dessertsList" style="display:none;grid-template-columns:1fr;gap:12px;"></div>
@@ -403,11 +477,11 @@
       <div style="font-size:13px;font-weight:700;color:#6EE7B7;">התקדמות</div>
       <div style="display:flex;align-items:center;gap:10px;">
         <div id="packProgress" style="font-size:13px;font-weight:800;color:#F1F5F9;">0 / 0</div>
-        <button id="btnSyncPack" style="background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:4px 9px;font-size:11px;font-weight:700;color:#6EE7B7;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">☁️ סנכרן</button>
+        <button id="btnSyncPack" style="background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:4px 9px;font-size:11px;font-weight:700;color:#6EE7B7;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">☁️ סנכרן</button>
       </div>
     </div>
     <div id="packList" style="display:grid;gap:8px;"></div>
-    <button id="btnAddPackCat" style="width:100%;background:rgba(255,255,255,0.05);border:1px dashed rgba(255,255,255,0.2);border-radius:14px;padding:12px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.5);cursor:pointer;font-family:'Rubik',Arial,sans-serif;margin-top:8px;">➕ הוסף קטגוריה</button>
+    <button id="btnAddPackCat" style="width:100%;background:rgba(255,255,255,0.05);border:1px dashed rgba(255,255,255,0.2);border-radius:14px;padding:12px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.5);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;margin-top:8px;">➕ הוסף קטגוריה</button>
   </section>
 
   <!-- מודל הוספת פריט/קטגוריה לצ'ק-ליסט -->
@@ -415,7 +489,7 @@
     <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);" id="packItemOverlay"></div>
     <div style="position:relative;background:linear-gradient(160deg,#1e293b,#0f172a);border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;z-index:1;">
       <h2 id="packItemTitle" style="margin:0 0 16px;font-size:17px;font-weight:900;color:#F1F5F9;">➕ הוסף פריט</h2>
-      <input id="packItemText" type="text" placeholder="שם הפריט..." style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:13px 14px;font-size:15px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:12px;">
+      <input id="packItemText" type="text" placeholder="שם הפריט..." style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:13px 14px;font-size:15px;color:#F1F5F9;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:12px;">
       <button id="btnSavePackItem" class="btn-primary" style="width:100%;">✅ הוסף</button>
     </div>
   </div>
@@ -521,7 +595,7 @@
       <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:18px;padding:16px;">
         <div style="font-size:14px;font-weight:700;color:#F1F5F9;margin-bottom:7px;">⚙️ מחשבון שער המרה</div>
         <div style="font-size:12px;color:rgba(241,245,249,0.42);margin-bottom:10px;">כמה קרונות בשקל אחד</div>
-        <input id="rate" type="number" step="0.01" value="6.4" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:12px 14px;font-size:14px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:ltr;box-sizing:border-box;margin-bottom:6px;">
+        <input id="rate" type="number" step="0.01" value="6.4" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:12px 14px;font-size:14px;color:#F1F5F9;font-family:\'Rubik\',Arial,sans-serif;direction:ltr;box-sizing:border-box;margin-bottom:6px;">
         <div id="rateStatus" style="font-size:11px;color:rgba(241,245,249,0.4);margin-bottom:10px;min-height:16px;"></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
           <button id="btnSaveRate" class="btn-ghost" style="font-size:12px;padding:10px;">💾 שמור ידני</button>
@@ -533,12 +607,12 @@
           <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:8px;">
             <div>
               <div style="font-size:10px;color:rgba(241,245,249,0.4);margin-bottom:4px;text-align:center;">₪ שקלים</div>
-              <input id="calcIls" type="number" inputmode="decimal" placeholder="0" style="width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(245,158,11,0.35);border-radius:11px;padding:11px 10px;font-size:18px;font-weight:800;color:#FCD34D;font-family:'Rubik',Arial,sans-serif;text-align:center;box-sizing:border-box;">
+              <input id="calcIls" type="number" inputmode="decimal" placeholder="0" style="width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(245,158,11,0.35);border-radius:11px;padding:11px 10px;font-size:18px;font-weight:800;color:#FCD34D;font-family:\'Rubik\',Arial,sans-serif;text-align:center;box-sizing:border-box;">
             </div>
             <div style="font-size:18px;color:rgba(241,245,249,0.3);text-align:center;padding-bottom:2px;">=</div>
             <div>
               <div style="font-size:10px;color:rgba(241,245,249,0.4);margin-bottom:4px;text-align:center;">Kč קרונות</div>
-              <input id="calcCzk" type="number" inputmode="decimal" placeholder="0" style="width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(99,102,241,0.35);border-radius:11px;padding:11px 10px;font-size:18px;font-weight:800;color:#A5B4FC;font-family:'Rubik',Arial,sans-serif;text-align:center;box-sizing:border-box;">
+              <input id="calcCzk" type="number" inputmode="decimal" placeholder="0" style="width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(99,102,241,0.35);border-radius:11px;padding:11px 10px;font-size:18px;font-weight:800;color:#A5B4FC;font-family:\'Rubik\',Arial,sans-serif;text-align:center;box-sizing:border-box;">
             </div>
           </div>
           <div id="calcHint" style="font-size:11px;color:rgba(241,245,249,0.3);text-align:center;">הקלד בכל אחד מהשדות</div>
@@ -690,7 +764,7 @@
         <div style="font-size:22px;margin-bottom:6px;">🌐</div>
         <div style="font-size:14px;font-weight:800;color:#C084FC;margin-bottom:4px;">שפה ותרגום</div>
         <div style="font-size:12px;color:rgba(241,245,249,0.45);margin-bottom:14px;">מתרגם קולי עברית ↔ צ'כית + ביטויים שימושיים</div>
-        <button onclick="openTab('lang')" style="width:100%;background:rgba(168,85,247,0.25);border:1px solid rgba(168,85,247,0.45);border-radius:13px;padding:12px;font-size:14px;font-weight:800;color:#C084FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">פתח שפה ותרגום →</button>
+        <button onclick="openTab('lang')" style="width:100%;background:rgba(168,85,247,0.25);border:1px solid rgba(168,85,247,0.45);border-radius:13px;padding:12px;font-size:14px;font-weight:800;color:#C084FC;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">פתח שפה ותרגום →</button>
       </div>
 
       <!-- טיפים מהשטח -->
@@ -905,8 +979,8 @@
       <button class="back-btn" id="btnBackPhotoDiary">← ראשי</button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
-      <button id="btnNewPhoto" style="background:linear-gradient(135deg,rgba(236,72,153,0.2),rgba(168,85,247,0.2));border:1px solid rgba(236,72,153,0.35);border-radius:16px;padding:14px 8px;font-size:12px;font-weight:800;color:#F9A8D4;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">📷 צלם תמונה</button>
-      <button id="btnShareAll" style="background:linear-gradient(135deg,rgba(37,211,102,0.2),rgba(59,130,246,0.2));border:1px solid rgba(37,211,102,0.35);border-radius:16px;padding:14px 8px;font-size:12px;font-weight:800;color:#86EFAC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">📤 שתף תמונות</button>
+      <button id="btnNewPhoto" style="background:linear-gradient(135deg,rgba(236,72,153,0.2),rgba(168,85,247,0.2));border:1px solid rgba(236,72,153,0.35);border-radius:16px;padding:14px 8px;font-size:12px;font-weight:800;color:#F9A8D4;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">📷 צלם תמונה</button>
+      <button id="btnShareAll" style="background:linear-gradient(135deg,rgba(37,211,102,0.2),rgba(59,130,246,0.2));border:1px solid rgba(37,211,102,0.35);border-radius:16px;padding:14px 8px;font-size:12px;font-weight:800;color:#86EFAC;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">📤 שתף תמונות</button>
     </div>
     <div id="driveBackupStatus" style="display:none;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:12px;padding:10px 14px;font-size:12px;color:#6EE7B7;margin-bottom:12px;text-align:center;white-space:pre-wrap;"></div>
     <div id="photoDiaryEmpty" style="text-align:center;padding:40px 20px;color:rgba(241,245,249,0.3);font-size:13px;">עדיין אין תמונות — לחצו על הכפתור למעלה להתחיל!</div>
@@ -931,13 +1005,13 @@
       <!-- שם המקום -->
       <div style="font-size:11px;font-weight:700;color:rgba(241,245,249,0.5);margin-bottom:6px;letter-spacing:0.5px;">📍 מקום</div>
       <div id="photoPlaceChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div>
-      <input id="photoPlaceCustom" type="text" placeholder="או כתבו מקום חופשי..." style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:12px;padding:10px 13px;font-size:13px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:12px;">
+      <input id="photoPlaceCustom" type="text" placeholder="או כתבו מקום חופשי..." style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:12px;padding:10px 13px;font-size:13px;color:#F1F5F9;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:12px;">
       <!-- הערה -->
       <div style="font-size:11px;font-weight:700;color:rgba(241,245,249,0.5);margin-bottom:6px;letter-spacing:0.5px;">✏️ הערה אישית (אופציונלי)</div>
-      <textarea id="photoNote" placeholder="מה הרגשתם? מה ראיתם?" rows="2" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:12px;padding:10px 13px;font-size:13px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;resize:none;margin-bottom:14px;"></textarea>
+      <textarea id="photoNote" placeholder="מה הרגשתם? מה ראיתם?" rows="2" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:12px;padding:10px 13px;font-size:13px;color:#F1F5F9;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;box-sizing:border-box;resize:none;margin-bottom:14px;"></textarea>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-        <button onclick="closePhotoModal()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:12px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">ביטול</button>
-        <button id="btnSavePhoto" style="background:linear-gradient(135deg,#ec4899,#8b5cf6);border:none;border-radius:13px;padding:12px;font-size:13px;font-weight:800;color:white;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">💾 שמור תמונה</button>
+        <button onclick="closePhotoModal()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:12px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">ביטול</button>
+        <button id="btnSavePhoto" style="background:linear-gradient(135deg,#ec4899,#8b5cf6);border:none;border-radius:13px;padding:12px;font-size:13px;font-weight:800;color:white;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">💾 שמור תמונה</button>
       </div>
     </div>
   </div>
@@ -964,18 +1038,18 @@
         <div style="font-size:14px;font-weight:700;color:#C084FC;margin-bottom:4px;">⌨️ תרגום טקסט</div>
         <div style="font-size:11px;color:rgba(241,245,249,0.4);margin-bottom:12px;">הקלידו — תרגום אוטומטי תוך שנייה</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-          <button id="voiceLangHe" onclick="setVoiceLang('he','cs')" style="padding:9px;border-radius:11px;border:2px solid rgba(168,85,247,0.6);background:rgba(168,85,247,0.2);font-size:12px;font-weight:800;color:#C084FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🇮🇱 עברית → צ'כית</button>
-          <button id="voiceLangCs" onclick="setVoiceLang('cs','he')" style="padding:9px;border-radius:11px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);font-size:12px;font-weight:800;color:rgba(241,245,249,0.45);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🇨🇿 צ'כית → עברית</button>
+          <button id="voiceLangHe" onclick="setVoiceLang('he','cs')" style="padding:9px;border-radius:11px;border:2px solid rgba(168,85,247,0.6);background:rgba(168,85,247,0.2);font-size:12px;font-weight:800;color:#C084FC;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">🇮🇱 עברית → צ'כית</button>
+          <button id="voiceLangCs" onclick="setVoiceLang('cs','he')" style="padding:9px;border-radius:11px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);font-size:12px;font-weight:800;color:rgba(241,245,249,0.45);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">🇨🇿 צ'כית → עברית</button>
         </div>
-        <textarea id="voiceInputText" placeholder="הקלידו כאן — תרגום אוטומטי תוך שנייה..." style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(168,85,247,0.3);border-radius:13px;padding:12px 14px;font-size:14px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;resize:none;height:70px;margin-bottom:10px;"></textarea>
+        <textarea id="voiceInputText" placeholder="הקלידו כאן — תרגום אוטומטי תוך שנייה..." style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(168,85,247,0.3);border-radius:13px;padding:12px 14px;font-size:14px;color:#F1F5F9;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;box-sizing:border-box;resize:none;height:70px;margin-bottom:10px;"></textarea>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
-          <button onclick="translateVoiceText()" style="background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.4);border-radius:13px;padding:12px 8px;font-size:12px;font-weight:800;color:#A5B4FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🌐 תרגם</button>
-          <button onclick="clearVoiceTranslator()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:13px;padding:12px 8px;font-size:12px;font-weight:800;color:rgba(241,245,249,0.4);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🗑️ נקה</button>
+          <button onclick="translateVoiceText()" style="background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.4);border-radius:13px;padding:12px 8px;font-size:12px;font-weight:800;color:#A5B4FC;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">🌐 תרגם</button>
+          <button onclick="clearVoiceTranslator()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:13px;padding:12px 8px;font-size:12px;font-weight:800;color:rgba(241,245,249,0.4);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">🗑️ נקה</button>
         </div>
         <div id="voiceTranslateResult" style="display:none;background:rgba(0,0,0,0.25);border:1px solid rgba(168,85,247,0.25);border-radius:13px;padding:14px;">
           <div style="font-size:10px;color:rgba(241,245,249,0.35);margin-bottom:6px;letter-spacing:1px;">תרגום</div>
           <div id="voiceTranslateText" style="font-size:16px;font-weight:700;color:#E9D5FF;line-height:1.5;margin-bottom:10px;"></div>
-          <button onclick="speakTranslation()" style="width:100%;background:rgba(168,85,247,0.25);border:1px solid rgba(168,85,247,0.4);border-radius:10px;padding:10px;font-size:13px;font-weight:800;color:#C084FC;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🔊 השמע בקול</button>
+          <button onclick="speakTranslation()" style="width:100%;background:rgba(168,85,247,0.25);border:1px solid rgba(168,85,247,0.4);border-radius:10px;padding:10px;font-size:13px;font-weight:800;color:#C084FC;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">🔊 השמע בקול</button>
         </div>
         <div id="voiceStatus" style="font-size:11px;color:rgba(241,245,249,0.35);text-align:center;margin-top:8px;min-height:16px;"></div>
       </div>
@@ -1012,10 +1086,10 @@
 
     <!-- Send email buttons -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
-      <button onclick="sendRemindersEmail()" style="background:linear-gradient(135deg,#F4634A,#E85D04);color:white;border:0;border-radius:13px;padding:13px 10px;font-weight:800;font-size:13px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;box-shadow:0 4px 14px rgba(244,99,74,0.3);">
+      <button onclick="sendRemindersEmail()" style="background:linear-gradient(135deg,#F4634A,#E85D04);color:white;border:0;border-radius:13px;padding:13px 10px;font-weight:800;font-size:13px;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;box-shadow:0 4px 14px rgba(244,99,74,0.3);">
         📧 שלח מייל סיכום
       </button>
-      <button onclick="triggerReminderEmail()" id="btnTriggerEmail" style="background:linear-gradient(135deg,#6366f1,#4f46e5);color:white;border:0;border-radius:13px;padding:13px 10px;font-weight:800;font-size:13px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;box-shadow:0 4px 14px rgba(99,102,241,0.3);">
+      <button onclick="triggerReminderEmail()" id="btnTriggerEmail" style="background:linear-gradient(135deg,#6366f1,#4f46e5);color:white;border:0;border-radius:13px;padding:13px 10px;font-weight:800;font-size:13px;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;box-shadow:0 4px 14px rgba(99,102,241,0.3);">
         🔔 שלח תזכורת עכשיו
       </button>
     </div>
@@ -1035,13 +1109,13 @@
 
   <!-- ═══ NAV ═══ -->
   <nav style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);height:76px;background:rgba(2,7,14,0.97);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-top:1px solid rgba(255,255,255,0.08);z-index:50;display:grid;grid-template-columns:repeat(7,1fr);">
-    <button id="nav-home" style="border:0;background:transparent;color:#F4634A;font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">🏠</span>ראשי</button>
-    <button id="nav-days" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">📅</span>ימים</button>
-    <button id="nav-shopping" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">🛍️</span>קניות</button>
-    <button id="nav-expenses" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">💰</span>הוצאות</button>
-    <button id="nav-flights" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">✈️</span>טיסות</button>
-    <button id="nav-pack" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">🧳</span>ציוד</button>
-    <button onclick="openTab('reminders')" id="nav-reminders" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">🔔</span>תזכורות</button>
+    <button id="nav-home" style="border:0;background:transparent;color:#F4634A;font-size:9px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">🏠</span>ראשי</button>
+    <button id="nav-days" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">📅</span>ימים</button>
+    <button id="nav-shopping" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">🛍️</span>קניות</button>
+    <button id="nav-expenses" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">💰</span>הוצאות</button>
+    <button id="nav-flights" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">✈️</span>טיסות</button>
+    <button id="nav-pack" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">🧳</span>ציוד</button>
+    <button onclick="openTab('reminders')" id="nav-reminders" style="border:0;background:transparent;color:rgba(241,245,249,0.38);font-size:9px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">🔔</span>תזכורות</button>
   </nav>
 </div>
 
@@ -1052,27 +1126,27 @@
     <div style="width:34px;height:4px;background:rgba(255,255,255,0.18);border-radius:2px;margin:0 auto 14px;"></div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
       <h2 id="expenseTitle" style="margin:0;font-size:18px;font-weight:900;color:#F1F5F9;">➕ הוסף הוצאה</h2>
-      <button onclick="closeExpense()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:10px;padding:6px 13px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:'Rubik',Arial,sans-serif;">ביטול</button>
+      <button onclick="closeExpense()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:10px;padding:6px 13px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">ביטול</button>
     </div>
     <!-- שם -->
-    <input id="expName" type="text" placeholder="🔍 חפש או הקלד חופשי..." oninput="filterExpNameList(this.value)" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:13px 14px;font-size:15px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:8px;">
+    <input id="expName" type="text" placeholder="🔍 חפש או הקלד חופשי..." oninput="filterExpNameList(this.value)" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:13px 14px;font-size:15px;color:#F1F5F9;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:8px;">
     <!-- קטגוריה לתקציב -->
     <div id="expCatChips" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;"></div>
     <input type="hidden" id="expCat" value="">
     <!-- רשימה נגללת -->
     <div id="expNameList" style="max-height:200px;overflow-y:auto;-webkit-overflow-scrolling:touch;margin-bottom:10px;border:1px solid rgba(255,255,255,0.08);border-radius:14px;background:rgba(0,0,0,0.18);"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-      <input id="expCzk" type="number" inputmode="decimal" placeholder="CZK" style="background:rgba(245,158,11,0.09);border:1px solid rgba(245,158,11,0.3);border-radius:13px;padding:13px 12px;font-size:15px;color:#F59E0B;font-family:'Rubik',Arial,sans-serif;direction:ltr;font-weight:700;box-sizing:border-box;width:100%;">
-      <input id="expIls" type="number" inputmode="decimal" placeholder="₪" style="background:rgba(244,99,74,0.09);border:1px solid rgba(244,99,74,0.3);border-radius:13px;padding:13px 12px;font-size:15px;color:#F4634A;font-family:'Rubik',Arial,sans-serif;direction:ltr;font-weight:700;box-sizing:border-box;width:100%;">
+      <input id="expCzk" type="number" inputmode="decimal" placeholder="CZK" style="background:rgba(245,158,11,0.09);border:1px solid rgba(245,158,11,0.3);border-radius:13px;padding:13px 12px;font-size:15px;color:#F59E0B;font-family:\'Rubik\',Arial,sans-serif;direction:ltr;font-weight:700;box-sizing:border-box;width:100%;">
+      <input id="expIls" type="number" inputmode="decimal" placeholder="₪" style="background:rgba(244,99,74,0.09);border:1px solid rgba(244,99,74,0.3);border-radius:13px;padding:13px 12px;font-size:15px;color:#F4634A;font-family:\'Rubik\',Arial,sans-serif;direction:ltr;font-weight:700;box-sizing:border-box;width:100%;">
     </div>
-    <input id="expNote" type="text" placeholder="הערה (אופציונלי)" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:13px 14px;font-size:14px;color:#F1F5F9;font-family:'Rubik',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:14px;">
-    <button id="btnSaveExpense" style="width:100%;background:linear-gradient(135deg,#F4634A,#e8522e);color:white;border:0;border-radius:15px;padding:16px;font-size:15px;font-weight:900;cursor:pointer;font-family:'Rubik',Arial,sans-serif;box-shadow:0 8px 22px rgba(244,99,74,0.38);">שמור הוצאה 💸</button>
+    <input id="expNote" type="text" placeholder="הערה (אופציונלי)" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:13px 14px;font-size:14px;color:#F1F5F9;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:14px;">
+    <button id="btnSaveExpense" style="width:100%;background:linear-gradient(135deg,#F4634A,#e8522e);color:white;border:0;border-radius:15px;padding:16px;font-size:15px;font-weight:900;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;box-shadow:0 8px 22px rgba(244,99,74,0.38);">שמור הוצאה 💸</button>
   </div>
 </div>
 
 
 <!-- TOAST -->
-<div id="toast" style="display:none;position:fixed;top:54px;left:50%;transform:translateX(-50%);background:rgba(2,7,14,0.96);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,0.15);color:#F1F5F9;padding:11px 20px;border-radius:14px;z-index:100;font-weight:600;font-size:13px;white-space:nowrap;box-shadow:0 6px 22px rgba(0,0,0,0.45);font-family:'Rubik',Arial,sans-serif;"></div>
+<div id="toast" style="display:none;position:fixed;top:54px;left:50%;transform:translateX(-50%);background:rgba(2,7,14,0.96);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,0.15);color:#F1F5F9;padding:11px 20px;border-radius:14px;z-index:100;font-weight:600;font-size:13px;white-space:nowrap;box-shadow:0 6px 22px rgba(0,0,0,0.45);font-family:\'Rubik\',Arial,sans-serif;"></div>
 
 <script>
 // ═══════════════════════════════════════════
@@ -1284,6 +1358,7 @@ function renderReminders() {
           (r.duration ? '<div style="font-size:11px;color:#7DD3FC;margin-bottom:6px;">' + r.duration + '</div>' : '') +
           '<div style="font-size:11px;color:rgba(241,245,249,0.4);margin-bottom:10px;">📅 ' + r.day + ' · דדליין: ' + r.deadline.split('-').reverse().join('/') + '</div>' +
           '<div style="display:flex;gap:8px;flex-wrap:wrap;" onclick="event.stopPropagation()">' +
+            '<button onclick="openAddReminderStop(\'' + r.id + '\')" style="background:#F4634A;color:white;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:Rubik,Arial,sans-serif;">➕ הוסף ללו"ז</button>' +
             (r.url ? '<a href="' + r.url + '" target="_blank" style="background:rgba(99,102,241,0.2);color:#A5B4FC;border:1px solid rgba(99,102,241,0.3);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;font-family:Rubik,Arial,sans-serif;">🔗 לאתר ההזמנה</a>' : '') +
             (!done ? '<button onclick="markReminderDone(\'' + r.id + '\')" style="background:rgba(52,211,153,0.15);color:#34D399;border:1px solid rgba(52,211,153,0.3);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:Rubik,Arial,sans-serif;">✅ בוצע</button>' : '') +
             (done ? '<button onclick="markReminderUndone(\'' + r.id + '\')" style="background:rgba(255,255,255,0.05);color:rgba(241,245,249,0.4);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:Rubik,Arial,sans-serif;">↩️ בטל</button>' : '') +
@@ -2095,9 +2170,9 @@ function saveDaysState() {
   }
 }
 
-function loadDaysFromSheets() {
+function loadDaysFromSheets(silent) {
   if (!isGas()) { renderDays(); return; }
-  toast('🔄 מסנכרן...');
+  if (!silent) toast('🔄 מסנכרן...');
   google.script.run
     .withSuccessHandler(function(r) {
       if (r && r.ok && r.data) {
@@ -2135,7 +2210,13 @@ function renderDays() {
   var stopsHtml = (d.stops || []).map(function(s, si) {
     var hasDetails = !!(s.details || s.tips);
     var dayIdx = i - 1;
-    return '<div onclick="showStopDetail(' + dayIdx + ',' + si + ')" style="position:relative;margin-bottom:10px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.13);border-radius:14px;padding:13px;margin-right:16px;cursor:pointer;">' +
+    return '<div onclick="showStopDetail(' + dayIdx + ',' + si + ')" ' +
+      'draggable="true" ' +
+      'ondragstart="stopDragStart(event,' + dayIdx + ',' + si + ')" ' +
+      'ondragover="stopDragOver(event, this)" ' +
+      'ondragleave="stopDragLeave(this)" ' +
+      'ondrop="stopDrop(event,' + dayIdx + ',' + si + ', this)" ' +
+      'style="position:relative;margin-bottom:10px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.13);border-radius:14px;padding:13px;margin-right:16px;cursor:grab;transition:all 0.2s ease;">' +
       '<div style="position:absolute;right:-20px;top:16px;width:8px;height:8px;border-radius:50%;background:#F4634A;box-shadow:0 0 7px rgba(244,99,74,0.55);"></div>' +
       '<div style="display:flex;align-items:flex-start;gap:10px;">' +
       '<div style="font-size:22px;line-height:1;margin-top:1px;flex-shrink:0;">' + (s.emoji||'📍') + '</div>' +
@@ -2144,6 +2225,8 @@ function renderDays() {
           '<div style="font-size:13px;font-weight:800;color:#F1F5F9;">' + esc(s.name) + '</div>' +
           '<div style="display:flex;gap:4px;flex-shrink:0;">' +
             (hasDetails ? '<span style="font-size:10px;color:rgba(241,245,249,0.35);align-self:center;">פרטים ›</span>' : '') +
+            '<button onclick="event.stopPropagation();moveStopUpDown(' + dayIdx + ',' + si + ',-1)" style="background:rgba(255,255,255,0.08);border:none;border-radius:7px;padding:3px 5px;font-size:10px;color:#F1F5F9;cursor:pointer;">🔼</button>' +
+            '<button onclick="event.stopPropagation();moveStopUpDown(' + dayIdx + ',' + si + ',1)" style="background:rgba(255,255,255,0.08);border:none;border-radius:7px;padding:3px 5px;font-size:10px;color:#F1F5F9;cursor:pointer;">🔽</button>' +
             '<button onclick="event.stopPropagation();openMoveStop(' + dayIdx + ',' + si + ')" style="background:rgba(59,130,246,0.18);border:none;border-radius:7px;padding:3px 7px;font-size:10px;color:#93C5FD;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">↔</button>' +
             '<button onclick="event.stopPropagation();deleteStop(' + dayIdx + ',' + si + ')" style="background:rgba(239,68,68,0.15);border:none;border-radius:7px;padding:3px 7px;font-size:10px;color:#FCA5A5;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">✕</button>' +
           '</div>' +
@@ -2157,20 +2240,26 @@ function renderDays() {
     return '<div style="font-size:12px;color:rgba(241,245,249,0.65);padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.06);">💡 ' + esc(t) + '</div>';
   }).join('');
   card.innerHTML =
-    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">' +
-    '<span style="font-size:28px;">' + (d.emoji||'📅') + '</span>' +
-    '<div><div style="font-size:15px;font-weight:900;color:#F1F5F9;">' + esc(d.title||'') + '</div>' +
-    '<div style="font-size:12px;color:rgba(241,245,249,0.42);">📅 ' + esc(d.date||'') + '</div></div></div>' +
-    '<p style="font-size:12px;color:rgba(241,245,249,0.55);line-height:1.6;margin-bottom:4px;">' + esc(d.story||'') + '</p>' +
-    (d.peak ? '<div style="background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.2);border-radius:12px;padding:8px 12px;margin:10px 0;font-size:12px;color:#FCD34D;font-weight:600;">⭐ ' + esc(d.peak) + '</div>' : '') +
-    '<div style="font-size:11px;font-weight:800;color:#F4634A;letter-spacing:0.5px;text-transform:uppercase;margin:14px 0 8px;">🧭 מסלול היום</div>' +
-    '<div style="padding-right:20px;border-right:2px dashed rgba(244,99,74,0.3);">' + stopsHtml + '</div>' +
-    '<button onclick="openAddStop(' + (i-1) + ')" style="width:100%;background:rgba(255,255,255,0.05);border:1px dashed rgba(255,255,255,0.2);border-radius:13px;padding:10px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.5);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;margin:8px 0 12px;">➕ הוסף תחנה</button>' +
-    (d.meals ? '<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:12px;margin-top:4px;">' +
-    '<div style="font-size:11px;font-weight:800;color:#93C5FD;margin-bottom:7px;text-transform:uppercase;letter-spacing:0.5px;">🍽️ ארוחות</div>' +
-    '<div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.7;"><strong style="color:rgba(241,245,249,0.82);">צהריים:</strong> ' + esc(d.meals.lunch||'') + '<br><strong style="color:rgba(241,245,249,0.82);">ערב:</strong> ' + esc(d.meals.dinner||'') + '</div></div>' : '') +
-    (tipsHtml ? '<div style="margin-top:10px;"><div style="font-size:11px;font-weight:800;color:#6EE7B7;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">💡 טיפים</div>' + tipsHtml + '</div>' : '') +
-    (d.mapUrl ? '<a href="' + d.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:12px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;margin-top:14px;">🗺️ מסלול מלא במפה</a>' : '');
+    '<div class="day-split-layout">' +
+      '<div class="day-details-col">' +
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">' +
+        '<span style="font-size:28px;">' + (d.emoji||'📅') + '</span>' +
+        '<div><div style="font-size:15px;font-weight:900;color:#F1F5F9;">' + esc(d.title||'') + '</div>' +
+        '<div style="font-size:12px;color:rgba(241,245,249,0.42);">📅 ' + esc(d.date||'') + '</div></div></div>' +
+        '<p style="font-size:12px;color:rgba(241,245,249,0.55);line-height:1.6;margin-bottom:4px;">' + esc(d.story||'') + '</p>' +
+        (d.peak ? '<div style="background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.2);border-radius:12px;padding:8px 12px;margin:10px 0;font-size:12px;color:#FCD34D;font-weight:600;">⭐ ' + esc(d.peak) + '</div>' : '') +
+        (d.meals ? '<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:12px;margin-top:4px;">' +
+        '<div style="font-size:11px;font-weight:800;color:#93C5FD;margin-bottom:7px;text-transform:uppercase;letter-spacing:0.5px;">🍽️ ארוחות</div>' +
+        '<div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.7;"><strong style="color:rgba(241,245,249,0.82);">צהריים:</strong> ' + esc(d.meals.lunch||'') + '<br><strong style="color:rgba(241,245,249,0.82);">ערב:</strong> ' + esc(d.meals.dinner||'') + '</div></div>' : '') +
+        (tipsHtml ? '<div style="margin-top:10px;"><div style="font-size:11px;font-weight:800;color:#6EE7B7;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">💡 טיפים</div>' + tipsHtml + '</div>' : '') +
+        (d.mapUrl ? '<a href="' + d.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:12px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;margin-top:14px;">🗺️ מסלול מלא במפה</a>' : '') +
+      '</div>' +
+      '<div class="day-timeline-col">' +
+        '<div style="font-size:11px;font-weight:800;color:#F4634A;letter-spacing:0.5px;text-transform:uppercase;margin:0 0 8px;">🧭 מסלול היום</div>' +
+        '<div style="padding-right:20px;border-right:2px dashed rgba(244,99,74,0.3);">' + stopsHtml + '</div>' +
+        '<button onclick="openAddStop(' + (i-1) + ')" style="width:100%;background:rgba(255,255,255,0.05);border:1px dashed rgba(255,255,255,0.2);border-radius:13px;padding:10px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.5);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;margin:8px 0 12px;">➕ הוסף תחנה</button>' +
+      '</div>' +
+    '</div>';
 }
 
 function showStopDetail(dayIdx, stopIdx) {
@@ -2272,15 +2361,19 @@ function showAttrDetail(attr, iconKey, nameKey, descKey, howKey, existing) {
     (how ? '<div style="font-size:11px;color:rgba(241,245,249,0.38);margin-bottom:14px;">🚇 ' + how + '</div>' : '') +
     '<div style="display:flex;gap:9px;margin-top:4px;">' +
       (mapUrl ? '<a href="' + mapUrl + '" target="_blank" style="flex:1;text-align:center;padding:10px 0;background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.3);border-radius:12px;font-size:13px;font-weight:700;color:#7DD3FC;text-decoration:none;">🗺️ מפה</a>' : '') +
-      '<button onclick="(function(){' +
-        'var e=document.getElementById(\'addStopEmoji\'); if(e) e.value=\'' + (attr[iconKey]||'📍').replace(/'/g,"\\'") + '\';' +
-        'var n=document.getElementById(\'addStopName\'); if(n) n.value=\'' + name.replace(/'/g,"\\'") + '\';' +
-        'var t=document.getElementById(\'addStopTime\'); if(t) t.value=\'\';' +
-        'var d=document.getElementById(\'addStopDesc\'); if(d) d.value=\'' + desc.substring(0,100).replace(/'/g,"\\'").replace(/\n/g,' ') + '\';' +
-        'document.getElementById(\'attrDetailOverlay\').remove();' +
-      '})()" style="flex:1;padding:10px 0;background:rgba(244,99,74,0.2);border:1px solid rgba(244,99,74,0.4);border-radius:12px;font-size:13px;font-weight:700;color:#F4634A;cursor:pointer;font-family:Rubik,Arial,sans-serif;">📅 הוסף למסלול</button>' +
+      '<button id="btnAddStopFromDetail" style="flex:1;padding:10px 0;background:rgba(244,99,74,0.2);border:1px solid rgba(244,99,74,0.4);border-radius:12px;font-size:13px;font-weight:700;color:#F4634A;cursor:pointer;font-family:Rubik,Arial,sans-serif;">📅 הוסף למסלול</button>' +
     '</div>';
   overlay.appendChild(panel);
+  var addBtn = panel.querySelector('#btnAddStopFromDetail');
+  if (addBtn) {
+    addBtn.addEventListener('click', function() {
+      var e = document.getElementById('addStopEmoji'); if (e) e.value = (attr[iconKey]||'📍');
+      var n = document.getElementById('addStopName'); if (n) n.value = name;
+      var t = document.getElementById('addStopTime'); if (t) t.value = '';
+      var d = document.getElementById('addStopDesc'); if (d) d.value = desc.substring(0,100).replace(/\n/g,' ');
+      var over = document.getElementById('attrDetailOverlay'); if (over) over.remove();
+    });
+  }
   overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
   document.body.appendChild(overlay);
 }
@@ -2516,7 +2609,7 @@ function renderHistory() {
         '<div style="background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.18);border-radius:12px;padding:10px 12px;">' +
           '<div style="font-size:12px;color:rgba(241,245,249,0.65);line-height:1.55;">' + s.tip + '</div>' +
         '</div>' +
-        '<button onclick="openPhotoModal(' + JSON.stringify(s.name) + ')" style="width:100%;background:linear-gradient(135deg,rgba(236,72,153,0.18),rgba(168,85,247,0.18));border:1px solid rgba(236,72,153,0.3);border-radius:13px;padding:11px;font-size:12px;font-weight:800;color:#F9A8D4;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">📷 צלם כאן — שמור ביומן</button>' +
+        '<button onclick="openPhotoModal(HISTORY_SPOTS[' + HISTORY_SPOTS.indexOf(s) + '].name)" style="width:100%;background:linear-gradient(135deg,rgba(236,72,153,0.18),rgba(168,85,247,0.18));border:1px solid rgba(236,72,153,0.3);border-radius:13px;padding:11px;font-size:12px;font-weight:800;color:#F9A8D4;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">📷 צלם כאן — שמור ביומן</button>' +
       '</div>' +
     '</div>';
   }).join('');
@@ -2561,10 +2654,89 @@ function renderCommunity() {
         '</div>' +
         (p.mapUrl ? '<a href="'+p.mapUrl+'" target="_blank" rel="noopener" style="flex-shrink:0;background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.25);border-radius:12px;padding:10px 12px;font-size:11px;font-weight:700;color:#6EE7B7;text-decoration:none;text-align:center;line-height:1.3;">🗺️<br>נווט</a>' : '') +
       '</div>' +
+      '<div style="margin-top:12px;padding-top:12px;border-top:1px dashed rgba(255,255,255,0.1);display:flex;align-items:center;gap:10px;justify-content:space-between;">' +
+        '<div style="font-size:11px;color:rgba(241,245,249,0.6);font-weight:700;">📅 הוספה ללו"ז הימים:</div>' +
+        '<button onclick="openAddCommunityStop(' + COMMUNITY.indexOf(p) + ')" style="background:#F4634A;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">➕ הוסף ללו"ז</button>' +
+      '</div>' +
     '</div>';
   }).join('');
 }
 function setCommCat(cat) { _commCat = cat; renderCommunity(); }
+
+function openAddCommunityStop(recIdx) {
+  var rec = COMMUNITY[recIdx];
+  if (!rec) return;
+  var state = getDaysState();
+  var existing = document.getElementById('addCommunityStopOverlay');
+  if (existing) existing.remove();
+  
+  var overlay = document.createElement('div');
+  overlay.id = 'addCommunityStopOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200;display:flex;align-items:flex-end;justify-content:center;';
+
+  var dayBtns = state.map(function(d, i) {
+    var sel = i === 0;
+    return '<button type="button" onclick="_editStopSelectDay(this,' + i + ')" style="padding:5px 9px;border-radius:9px;font-size:11px;font-weight:700;border:1px solid ' + (sel ? '#F4634A' : 'rgba(255,255,255,0.15)') + ';background:' + (sel ? 'rgba(244,99,74,0.2)' : 'rgba(255,255,255,0.05)') + ';color:' + (sel ? '#F4634A' : '#F1F5F9') + ';cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;white-space:nowrap;">' + (d.emoji||'📅') + ' יום ' + (i+1) + '</button>';
+  }).join('');
+
+  overlay.innerHTML =
+    '<div style="position:relative;background:linear-gradient(180deg,#0C1F38,#060F1F);border-radius:24px 24px 0 0;padding:22px 20px 36px;width:min(680px,100%);z-index:1;direction:rtl;font-family:\'Rubik\',Arial,sans-serif;border:1px solid rgba(255,255,255,0.1);">' +
+    '<div style="font-size:15px;font-weight:900;color:#F1F5F9;margin-bottom:14px;">➕ הוספת תחנה — ' + (rec.icon||'📍') + ' ' + esc(rec.name) + '</div>' +
+    '<div style="font-size:11px;font-weight:700;color:rgba(241,245,249,0.5);margin-bottom:8px;">📅 בחר יום בטיול</div>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;" id="editStopDayBtns">' + dayBtns + '</div>' +
+    '<input type="hidden" id="editStopTargetDay" value="0">' +
+    '<div style="font-size:11px;font-weight:700;color:rgba(241,245,249,0.5);margin-bottom:8px;">⏱ מתי ביום?</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;" id="editTimeParts">' +
+    ['🌅 בוקר','☀️ צהריים','🌇 אחה״צ','🌙 ערב'].map(function(v, vi) {
+      var active = vi === 0;
+      return '<button type="button" onclick="setEditTimePart(this,\'' + v.replace(/'/g,"\\'") + '\')" style="padding:8px 4px;border-radius:11px;border:1px solid ' + (active ? '#F4634A' : 'rgba(255,255,255,0.15)') + ';background:' + (active ? 'rgba(244,99,74,0.2)' : 'rgba(255,255,255,0.05)') + ';color:' + (active ? '#F4634A' : '#F1F5F9') + ';font-size:11px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">' + v.split(' ')[0] + '<br>' + v.split(' ').slice(1).join(' ') + '</button>';
+    }).join('') +
+    '</div>' +
+    '<input id="editTimeInput" type="text" value="🌅 בוקר" placeholder="שעה מדויקת (לדוג׳ 10:00)" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:11px 14px;font-size:13px;color:#F1F5F9;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:14px;">' +
+    '<div style="display:flex;gap:8px;">' +
+    '<button onclick="document.getElementById(\'addCommunityStopOverlay\').remove()" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:13px;padding:12px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">ביטול</button>' +
+    '<button onclick="saveAddCommunityStop(' + recIdx + ')" style="flex:2;background:#F4634A;color:white;border:0;border-radius:13px;padding:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">✅ שמור וסדר</button>' +
+    '</div></div>';
+
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
+function saveAddCommunityStop(recIdx) {
+  var inp = document.getElementById('editTimeInput');
+  var val = inp ? inp.value.trim() : '';
+  var targetDayEl = document.getElementById('editStopTargetDay');
+  var dayIdx = targetDayEl ? parseInt(targetDayEl.value) : 0;
+  
+  var rec = COMMUNITY[recIdx];
+  if (!rec) return;
+
+  var stop = {
+    emoji: rec.icon || '📍',
+    name: rec.name,
+    time: val || '🌅 בוקר',
+    desc: rec.desc || '',
+    details: '🚇 איך להגיע: ' + (rec.how || '') + (rec.tips ? '\n💡 טיפ: ' + rec.tips : ''),
+    tips: [
+      'דירוג גוגל: ' + (rec.google || '—'),
+      'פייסבוק: ' + (rec.fb || '—')
+    ],
+    booking: rec.booking || 'ללא צורך.',
+    mapUrl: rec.mapUrl || ''
+  };
+
+  var state = getDaysState();
+  if (state && state[dayIdx]) {
+    state[dayIdx].stops.push(stop);
+    sortDayStops(dayIdx);
+    saveDaysState();
+    if (typeof renderDays === 'function') renderDays();
+    toast('✅ נוסף בהצלחה ליום ' + state[dayIdx].id + '!');
+  }
+  
+  var overlay = document.getElementById('addCommunityStopOverlay');
+  if (overlay) overlay.remove();
+}
 
 //  SHOPPING
 // ═══════════════════════════════════════════
@@ -2673,7 +2845,10 @@ function renderDesserts() {
         '<div style="background:' + LEVEL_COLORS[lv] + ';border:1px solid ' + LEVEL_BORDER[lv] + ';border-radius:10px;padding:4px 10px;font-size:11px;font-weight:700;color:' + LEVEL_TXT[lv] + ';">' + esc(d.price) + '</div>' +
       '</div>' +
       '<div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:7px 11px;font-size:11px;color:rgba(241,245,249,0.45);margin-bottom:10px;">📍 ' + esc(d.where) + '</div>' +
-      '<a href="' + d.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:linear-gradient(90deg,#ec4899,#f97316);color:white;text-decoration:none;border-radius:12px;padding:10px;font-weight:800;font-size:12px;font-family:\'Rubik\',Arial,sans-serif;">🗺️ ניווט</a>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">' +
+        '<a href="' + d.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:linear-gradient(90deg,#ec4899,#f97316);color:white;text-decoration:none;border-radius:12px;padding:10px;font-weight:800;font-size:12px;font-family:\'Rubik\',Arial,sans-serif;">🗺️ ניווט</a>' +
+        '<button onclick="openAddDessertStop(' + DESSERTS.indexOf(d) + ')" style="background:#F4634A;color:white;border:none;border-radius:12px;padding:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">➕ הוסף ללו"ז</button>' +
+      '</div>' +
     '</div>';
   });
   list.innerHTML = html;
@@ -2716,7 +2891,7 @@ function renderPhotoSpots() {
       '<div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:8px 11px;font-size:11px;color:#FCD34D;margin-bottom:10px;line-height:1.6;">💡 ' + esc(s.tip) + '</div>' +
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">' +
         '<a href="' + s.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:linear-gradient(90deg,#6366f1,#8b5cf6);color:white;text-decoration:none;border-radius:12px;padding:10px;font-weight:800;font-size:12px;font-family:\'Rubik\',Arial,sans-serif;">🗺️ ניווט</a>' +
-        '<button onclick="openPhotoModal(' + JSON.stringify(s.name) + ')" style="background:linear-gradient(135deg,rgba(236,72,153,0.25),rgba(168,85,247,0.25));border:1px solid rgba(236,72,153,0.35);border-radius:12px;padding:10px;font-size:12px;font-weight:800;color:#F9A8D4;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">📷 צלם</button>' +
+        '<button onclick="openPhotoModal(PHOTO_SPOTS[' + PHOTO_SPOTS.indexOf(s) + '].name)" style="background:linear-gradient(135deg,rgba(236,72,153,0.25),rgba(168,85,247,0.25));border:1px solid rgba(236,72,153,0.35);border-radius:12px;padding:10px;font-size:12px;font-weight:800;color:#F9A8D4;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">📷 צלם</button>' +
       '</div>' +
     '</div>';
   });
@@ -3511,6 +3686,21 @@ document.addEventListener('DOMContentLoaded', function() {
   loadExpenses();
   syncBudgetFromSheets();
 
+  // Poll until isGas() becomes true, then run cloud loaders
+  var gasPollCount = 0;
+  var gasPoll = setInterval(function() {
+    gasPollCount++;
+    if (isGas()) {
+      clearInterval(gasPoll);
+      loadExpenses();
+      syncBudgetFromSheets();
+      loadDaysFromSheets(true);
+      loadPack();
+    } else if (gasPollCount > 50) {
+      clearInterval(gasPoll);
+    }
+  }, 100);
+
   // CZK/ILS conversion
   var czkInput = qs('expCzk'), ilsInput = qs('expIls');
   if (czkInput) czkInput.addEventListener('input', calcIls);
@@ -4289,7 +4479,7 @@ function openPhotoModal(placeName) {
       ? [placeName]
       : PLACE_SUGGESTIONS.slice(0, 8);
     chips.innerHTML = suggestions.map(function(n) {
-      return '<button onclick="selectPlaceChip(this,' + JSON.stringify(n) + ')" style="background:rgba(236,72,153,0.15);border:1px solid rgba(236,72,153,0.3);border-radius:999px;padding:5px 12px;font-size:11px;font-weight:700;color:#F9A8D4;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">' + esc(n) + '</button>';
+      return '<button data-place="' + esc(n) + '" onclick="selectPlaceChip(this)" style="background:rgba(236,72,153,0.15);border:1px solid rgba(236,72,153,0.3);border-radius:999px;padding:5px 12px;font-size:11px;font-weight:700;color:#F9A8D4;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">' + esc(n) + '</button>';
     }).join('');
   }
 
@@ -4300,6 +4490,7 @@ function openPhotoModal(placeName) {
 }
 
 function selectPlaceChip(btn, name) {
+  if (!name) name = btn.getAttribute('data-place') || '';
   var custom = qs('photoPlaceCustom'); if (custom) custom.value = name;
   var chips = qs('photoPlaceChips');
   if (chips) chips.querySelectorAll('button').forEach(function(b) {
@@ -4420,6 +4611,313 @@ function openPhotoViewer(id) {
     };
   });
 }
+
+
+// Generic modal opener for adding ANY item as a stop in days (dark mode)
+function openAddCustomStop(type, data) {
+  var existing = document.getElementById('addCommunityStopOverlay');
+  if (existing) existing.remove();
+  
+  var overlay = document.createElement('div');
+  overlay.id = 'addCommunityStopOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:flex-end;justify-content:center;';
+
+  var daysList = getDaysState();
+  var dayBtns = daysList.map(function(d, i) {
+    var sel = i === 0;
+    return '<button type="button" onclick="_editStopSelectDay(this,' + i + ')" style="padding:5px 9px;border-radius:9px;font-size:11px;font-weight:700;border:1px solid ' + (sel ? '#F4634A' : 'rgba(255,255,255,0.15)') + ';background:' + (sel ? 'rgba(244,99,74,0.2)' : 'rgba(255,255,255,0.05)') + ';color:' + (sel ? '#F4634A' : '#F1F5F9') + ';cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;white-space:nowrap;">' + (d.emoji||'📅') + ' יום ' + (i+1) + '</button>';
+  }).join('');
+
+  overlay.innerHTML =
+    '<div style="position:relative;background:linear-gradient(180deg,#0C1F38,#060F1F);border-radius:24px 24px 0 0;padding:22px 20px 36px;width:min(680px,100%);z-index:1;direction:rtl;font-family:\'Rubik\',Arial,sans-serif;border:1px solid rgba(255,255,255,0.1);">' +
+    '<div style="font-size:15px;font-weight:900;color:#F1F5F9;margin-bottom:14px;">➕ הוספת תחנה — ' + (data.emoji||'📍') + ' ' + esc(data.name) + '</div>' +
+    '<div style="font-size:11px;font-weight:700;color:rgba(241,245,249,0.5);margin-bottom:8px;">📅 בחר יום בטיול</div>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;" id="editStopDayBtns">' + dayBtns + '</div>' +
+    '<input type="hidden" id="editStopTargetDay" value="0">' +
+    '<div style="font-size:11px;font-weight:700;color:rgba(241,245,249,0.5);margin-bottom:8px;">⏱ מתי ביום?</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;" id="editTimeParts">' +
+    ['🌅 בוקר','☀️ צהריים','🌇 אחה״צ','🌙 ערב'].map(function(v, vi) {
+      var active = vi === 0;
+      return '<button type="button" onclick="setEditTimePart(this,\'' + v.replace(/'/g,"\\'") + '\')" style="padding:8px 4px;border-radius:11px;border:1px solid ' + (active ? '#F4634A' : 'rgba(255,255,255,0.15)') + ';background:' + (active ? 'rgba(244,99,74,0.2)' : 'rgba(255,255,255,0.05)') + ';color:' + (active ? '#F4634A' : '#F1F5F9') + ';font-size:11px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">' + v.split(' ')[0] + '<br>' + v.split(' ').slice(1).join(' ') + '</button>';
+    }).join('') +
+    '</div>' +
+    '<input id="editTimeInput" type="text" value="🌅 בוקר" placeholder="שעה מדויקת (לדוג׳ 10:00)" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:11px 14px;font-size:13px;color:#F1F5F9;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:14px;">' +
+    '<div style="display:flex;gap:8px;">' +
+    '<button onclick="document.getElementById(\'addCommunityStopOverlay\').remove()" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:13px;padding:12px;font-size:13px;font-weight:700;color:rgba(241,245,249,0.6);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">ביטול</button>' +
+    '<button id="btnSaveAddCustomStop" style="flex:2;background:#F4634A;color:white;border:0;border-radius:13px;padding:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">✅ שמור וסדר</button>' +
+    '</div></div>';
+
+  overlay.querySelector('#btnSaveAddCustomStop').onclick = function() {
+    var inp = document.getElementById('editTimeInput');
+    var val = inp ? inp.value.trim() : '';
+    var targetDayEl = document.getElementById('editStopTargetDay');
+    var dayIdx = targetDayEl ? parseInt(targetDayEl.value) : 0;
+
+    var stop = {
+      emoji: data.emoji || '📍',
+      name: data.name,
+      time: val || '🌅 בוקר',
+      desc: data.desc || '',
+      details: data.details || '',
+      tips: data.tips || [],
+      booking: data.booking || 'ללא צורך.',
+      mapUrl: data.mapUrl || ''
+    };
+
+    checkDayFullAndAdd(dayIdx, stop);
+    overlay.remove();
+  };
+
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
+function openAddReminderStop(id) {
+  var r = REMINDERS.find(function(x){ return x.id === id; });
+  if (!r) return;
+  openAddCustomStop('reminder', {
+    emoji: r.emoji || '🔔',
+    name: r.title,
+    desc: r.desc || '',
+    details: r.details || '',
+    tips: r.tips ? [r.tips] : [],
+    booking: r.url ? ('קישור להזמנה: ' + r.url) : 'אין קישור.',
+    mapUrl: ''
+  });
+}
+
+function openAddRestaurantStop(name) {
+  var r = RESTAURANTS.find(function(x){ return x.name === name; });
+  if (!r) return;
+  openAddCustomStop('restaurant', {
+    emoji: r.icon || '🍽️',
+    name: r.name,
+    desc: r.desc || '',
+    details: r.sub || '',
+    tips: [r.badge],
+    booking: 'מחיר ממוצע: ' + r.price + ' CZK',
+    mapUrl: r.mapUrl || ''
+  });
+}
+
+function openAddDessertStop(idx) {
+  var d = DESSERTS[idx];
+  if (!d) return;
+  openAddCustomStop('dessert', {
+    emoji: d.icon || '🍦',
+    name: d.name,
+    desc: d.desc || '',
+    details: d.sub || '',
+    tips: [d.tag, d.rating],
+    booking: 'מיקום: ' + d.where,
+    mapUrl: d.mapUrl || ''
+  });
+}
+
+function openAddPhotoStop(idx) {
+  var s = PHOTO_SPOTS[idx];
+  if (!s) return;
+  openAddCustomStop('photo', {
+    emoji: s.icon || '📸',
+    name: s.name,
+    desc: s.desc || '',
+    details: 'שעות מומלצות: ' + s.best + '\nצפיפות: ' + s.crowds,
+    tips: [s.tip],
+    booking: 'עלות כניסה: ' + s.fee_txt,
+    mapUrl: s.mapUrl || ''
+  });
+}
+
+// ─── Day Overload Manager (Dark Mode) ───
+function checkDayFullAndAdd(dayIdx, stop) {
+  var state = getDaysState();
+  if (!state || !state[dayIdx]) return;
+  
+  // Add stop first
+  state[dayIdx].stops.push(stop);
+  sortDayStops(dayIdx);
+  saveDaysState();
+  if (typeof renderDays === 'function') renderDays();
+  
+  // Check if overloaded (>= 5 stops)
+  if (state[dayIdx].stops.length >= 5) {
+    showDayFullPrompt(dayIdx, stop.name);
+  } else {
+    toast('✅ נוסף בהצלחה ליום ' + state[dayIdx].id + '!');
+  }
+}
+
+function showDayFullPrompt(dayIdx, addedStopName) {
+  var state = getDaysState();
+  var d = state[dayIdx];
+  var existing = document.getElementById('dayFullPromptOverlay');
+  if (existing) existing.remove();
+
+  var overlay = document.createElement('div');
+  overlay.id = 'dayFullPromptOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;';
+  
+  overlay.innerHTML = 
+    '<div style="background:linear-gradient(180deg,#0C1F38,#060F1F);border-radius:24px;padding:24px;width:100%;max-width:420px;box-shadow:0 10px 30px rgba(0,0,0,0.5);direction:rtl;font-family:\'Rubik\',Arial,sans-serif;border:1px solid rgba(255,255,255,0.1);">' +
+      '<div style="font-size:36px;text-align:center;margin-bottom:12px;">⚠️</div>' +
+      '<h3 style="font-size:16px;font-weight:900;color:#F1F5F9;text-align:center;margin-bottom:10px;">יום ' + d.id + ' עמוס מאוד!</h3>' +
+      '<p style="font-size:13px;color:rgba(241,245,249,0.7);text-align:center;line-height:1.6;margin-bottom:20px;">' +
+        'הוספת את <b>' + esc(addedStopName) + '</b>. יש כעת <b>' + d.stops.length + ' תחנות</b> מתוכננות ליום זה.<br>' +
+        'מומלץ לא להעמיס יותר מדי כדי ליהנות מהטיול ברוגע. האם תרצה להעביר משהו ליום אחר?' +
+      '</p>' +
+      '<div style="display:flex;flex-direction:column;gap:8px;">' +
+        '<button id="btnOpenRebalance" style="width:100%;background:#F4634A;color:white;border:none;border-radius:13px;padding:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">🔀 סדר מחדש את יום ' + d.id + '</button>' +
+        '<button id="btnKeepAsIs" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:rgba(241,245,249,0.6);border-radius:13px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">השאר הכל כפי שהוא</button>' +
+      '</div>' +
+    '</div>';
+
+  overlay.querySelector('#btnOpenRebalance').onclick = function() {
+    overlay.remove();
+    showRebalanceDayModal(dayIdx);
+  };
+  
+  overlay.querySelector('#btnKeepAsIs').onclick = function() {
+    overlay.remove();
+  };
+
+  document.body.appendChild(overlay);
+}
+
+function showRebalanceDayModal(dayIdx) {
+  var existing = document.getElementById('rebalanceDayOverlay');
+  if (existing) existing.remove();
+
+  var overlay = document.createElement('div');
+  overlay.id = 'rebalanceDayOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:10000;display:flex;align-items:flex-end;justify-content:center;';
+  
+  var state = getDaysState();
+  var d = state[dayIdx];
+  
+  var stopRows = d.stops.map(function(s, stopIdx) {
+    // Generate move options
+    var selectHtml = '<select onchange="rebalanceMoveStop(' + dayIdx + ',' + stopIdx + ', this)" style="background:#1E293B;border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:5px 8px;font-size:11px;color:#F1F5F9;font-family:\'Rubik\',Arial,sans-serif;font-weight:bold;cursor:pointer;width:110px;">' +
+      '<option value="">העבר ליום...</option>';
+    state.forEach(function(otherD, otherIdx) {
+      if (otherIdx !== dayIdx) {
+        selectHtml += '<option value="' + otherIdx + '">יום ' + otherD.id + '</option>';
+      }
+    });
+    selectHtml += '</select>';
+
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.08);gap:10px;">' +
+      '<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">' +
+        '<span style="font-size:18px;">' + (s.emoji||'📍') + '</span>' +
+        '<div style="min-width:0;">' +
+          '<div style="font-size:12px;font-weight:800;color:#F1F5F9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(s.name) + '</div>' +
+          '<div style="font-size:10px;color:rgba(241,245,249,0.45);">' + esc(s.time || 'לא נקבע זמן') + '</div>' +
+        '</div>' +
+      '</div>' +
+      selectHtml +
+    '</div>';
+  }).join('');
+
+  overlay.innerHTML = 
+    '<div style="background:linear-gradient(180deg,#0C1F38,#060F1F);border-radius:24px 24px 0 0;padding:22px 20px 36px;width:100%;max-width:min(680px,100%);direction:rtl;font-family:\'Rubik\',Arial,sans-serif;box-sizing:border-box;max-height:85vh;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,0.1);">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-shrink:0;">' +
+        '<div style="font-size:15px;font-weight:900;color:#F1F5F9;">🔀 איזון עומסים — יום ' + d.id + ' (' + d.stops.length + ' תחנות)</div>' +
+        '<button id="btnCloseRebalance" style="background:rgba(255,255,255,0.06);border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;color:#94A3B8;">✕</button>' +
+      '</div>' +
+      '<div style="flex:1;overflow-y:auto;padding-right:4px;margin-bottom:16px;-webkit-overflow-scrolling:touch;">' +
+        stopRows +
+      '</div>' +
+      '<button id="btnDoneRebalance" style="width:100%;background:#065F46;color:white;border:none;border-radius:13px;padding:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;flex-shrink:0;">סיום ואישור ✅</button>' +
+    '</div>';
+
+  var closeFn = function() {
+    overlay.remove();
+  };
+  
+  overlay.querySelector('#btnCloseRebalance').onclick = closeFn;
+  overlay.querySelector('#btnDoneRebalance').onclick = closeFn;
+
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) closeFn(); });
+  document.body.appendChild(overlay);
+}
+
+function rebalanceMoveStop(fromDayIdx, stopIdx, selectEl) {
+  var toDayIdxVal = selectEl.value;
+  if (toDayIdxVal === '') return;
+  var toDayIdx = Number(toDayIdxVal);
+  
+  var state = getDaysState();
+  var stop = state[fromDayIdx].stops[stopIdx];
+  if (!stop) return;
+  
+  // Move stop
+  state[fromDayIdx].stops.splice(stopIdx, 1);
+  state[toDayIdx].stops.push(stop);
+  
+  sortDayStops(fromDayIdx);
+  sortDayStops(toDayIdx);
+  saveDaysState();
+  
+  if (typeof renderDays === 'function') renderDays();
+  toast('✅ ' + stop.name + ' הועבר ליום ' + state[toDayIdx].id + '!');
+  
+  // Rerender the rebalance overlay
+  showRebalanceDayModal(fromDayIdx);
+}
+
+// ─── Drag and Drop Timeline Sorting (Dark Mode) ───
+function stopDragStart(ev, dayIdx, stopIdx) {
+  ev.dataTransfer.setData("text/plain", JSON.stringify({dayIdx: dayIdx, stopIdx: stopIdx}));
+  ev.dataTransfer.effectAllowed = "move";
+  ev.currentTarget.style.opacity = "0.5";
+}
+function stopDragOver(ev, el) {
+  ev.preventDefault();
+  ev.dataTransfer.dropEffect = "move";
+  el.style.borderTop = "3px solid #F4634A";
+  el.style.paddingTop = "10px";
+}
+function stopDragLeave(el) {
+  el.style.borderTop = "1px solid rgba(255,255,255,0.13)";
+  el.style.paddingTop = "13px";
+}
+function stopDrop(ev, targetDayIdx, targetStopIdx, el) {
+  ev.preventDefault();
+  el.style.borderTop = "1px solid rgba(255,255,255,0.13)";
+  el.style.paddingTop = "13px";
+  try {
+    var data = JSON.parse(ev.dataTransfer.getData("text/plain"));
+    var fromDayIdx = data.dayIdx;
+    var fromStopIdx = data.stopIdx;
+    if (fromDayIdx !== targetDayIdx) return;
+    if (fromStopIdx === targetStopIdx) return;
+    
+    var state = getDaysState();
+    var stops = state[targetDayIdx].stops;
+    var movedStop = stops.splice(fromStopIdx, 1)[0];
+    stops.splice(targetStopIdx, 0, movedStop);
+    
+    saveDaysState();
+    renderDays();
+    toast("✅ סדר התחנות עודכן!");
+  } catch (err) {
+    console.error(err);
+  }
+}
+function moveStopUpDown(dayIdx, stopIdx, direction) {
+  var state = getDaysState();
+  var stops = state[dayIdx].stops;
+  var targetIdx = stopIdx + direction;
+  if (targetIdx < 0 || targetIdx >= stops.length) return;
+  
+  var temp = stops[stopIdx];
+  stops[stopIdx] = stops[targetIdx];
+  stops[targetIdx] = temp;
+  
+  saveDaysState();
+  renderDays();
+  toast("✅ סדר התחנות עודכן!");
+}
+
 </script>
 </body>
 </html>

@@ -1236,3 +1236,16 @@ function setupDailyReminderTrigger() {
   Logger.log('Daily reminder trigger set for 09:00');
 }
 
+
+// ═══ Public wrapper functions for client-side access ═══
+function savePackingList(list) {
+  return savePackingList_(list);
+}
+
+function loadDaysCustom() {
+  return loadDaysFromSheets_();
+}
+
+function saveDaysCustom(days) {
+  return saveSetting('days_custom', JSON.stringify(days));
+}
