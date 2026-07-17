@@ -2910,10 +2910,23 @@ function renderDays() {
   if (!btnContainer) return;
   btnContainer.innerHTML = state.map(function(d, idx) {
     var a = idx + 1 === i;
-    return '<button data-day="' + (idx+1) + '" style="min-width:42px;border:0;border-radius:12px;padding:7px 8px;background:' +
+    // חלץ תאריך קצר (לדוג' "8/8") מתוך d.date ("8 באוגוסט" → "8/8")
+    var dateShort = '';
+    if (d.date) {
+      var m = d.date.match(/(\d+)/g);
+      if (m && m.length >= 1) {
+        var months = {'ינואר':'1','פברואר':'2','מרץ':'3','אפריל':'4','מאי':'5','יוני':'6','יולי':'7','אוגוסט':'8','ספטמבר':'9','אוקטובר':'10','נובמבר':'11','דצמבר':'12'};
+        var mn = Object.keys(months).find(function(k){ return d.date.indexOf(k) !== -1; });
+        dateShort = m[0] + '/' + (mn ? months[mn] : (m[1]||''));
+      }
+    }
+    return '<button data-day="' + (idx+1) + '" style="min-width:42px;border:0;border-radius:12px;padding:6px 8px;background:' +
       (a ? '#F4634A' : 'rgba(0,0,0,0.08)') + ';color:' + (a ? 'white' : 'rgba(30,41,59,0.7)') +
-      ';font-weight:800;font-size:12px;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;flex-shrink:0;box-shadow:' +
-      (a ? '0 4px 12px rgba(244,99,74,0.32)' : 'none') + ';">' + (idx+1) + '</button>';
+      ';font-weight:800;font-size:13px;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;flex-shrink:0;box-shadow:' +
+      (a ? '0 4px 12px rgba(244,99,74,0.32)' : 'none') + ';line-height:1.2;display:flex;flex-direction:column;align-items:center;gap:1px;">' +
+      '<span>' + (idx+1) + '</span>' +
+      (dateShort ? '<span style="font-size:9px;font-weight:600;opacity:' + (a ? '0.9' : '0.55') + ';">' + dateShort + '</span>' : '') +
+      '</button>';
   }).join('');
   btnContainer.querySelectorAll('button[data-day]').forEach(function(btn) {
     btn.addEventListener('click', function() { selectDay(Number(this.getAttribute('data-day'))); });
