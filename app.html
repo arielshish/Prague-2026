@@ -5600,23 +5600,34 @@ function requestPhotoGps() {
     return;
   }
   if (btn) btn.textContent = '⏳';
-  if (gpsEl) { gpsEl.style.display = 'block'; gpsEl.textContent = '📡 מאתר...'; }
+  if (gpsEl) { gpsEl.style.display = 'block'; gpsEl.textContent = '📡 מאתר מיקום...'; }
+
   function onGpsSuccess(pos) {
     var gps = { lat: pos.coords.latitude, lng: pos.coords.longitude, alt: pos.coords.altitude };
     window._photoPendingGps = gps;
     if (btn) btn.textContent = '✅ GPS';
     updateGpsDisplay(gps, 'device');
   }
+
   function onGpsError(err) {
     if (btn) btn.textContent = '📍 GPS';
     if (err && err.code === 1) {
+      // הרשאה נדחתה
       if (gpsEl) { gpsEl.style.display = 'block'; gpsEl.textContent = '🚫 גישה למיקום נדחתה — אפשר בהגדרות → Safari → מיקום'; }
     } else {
+      // timeout או שגיאה אחרת — מסתיר בשקט
       if (gpsEl) { gpsEl.style.display = 'none'; }
     }
   }
-  navigator.geolocation.getCurrentPosition(onGpsSuccess, onGpsError,
-    { timeout: 10000, enableHighAccuracy: true, maximumAge: 0 });
+
+  // enableHighAccuracy:false = WiFi/סלולר, מהיר מאוד (<2 שנייה) ועובד בפנים
+  // enableHighAccuracy:true = GPS לווייני, איטי ולא עובד בפנים
+  navigator.geolocation.getCurrentPosition(onGpsSuccess, function(err) {
+    if (err && err.code === 1) { onGpsError(err); return; }
+    // אם נכשל ב-low accuracy — נסה high accuracy
+    navigator.geolocation.getCurrentPosition(onGpsSuccess, onGpsError,
+      { timeout: 8000, enableHighAccuracy: true, maximumAge: 0 });
+  }, { timeout: 5000, enableHighAccuracy: false, maximumAge: 30000 });
 }
 
 function openPhotoModal(placeName) {
