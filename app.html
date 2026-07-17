@@ -5683,7 +5683,15 @@ function openPhotoModal(placeName) {
     var fi = qs('photoFileInput'); if (fi) fi.click();
   }
 
-  if (!navigator.geolocation) {
+  // Chrome על iOS לא תומך ב-GPS — הצג הודעה ופתח מצלמה
+  var isChromeIOS = /CriOS/i.test(navigator.userAgent);
+  if (isChromeIOS || !navigator.geolocation) {
+    var el = qs('photoGpsDisplay');
+    if (el && isChromeIOS) {
+      el.style.display = 'block';
+      el.style.color = '#FBBF24';
+      el.textContent = '⚠️ GPS לא זמין ב-Chrome — פתח ב-Safari';
+    }
     setTimeout(_openCamera, 200);
     return;
   }
