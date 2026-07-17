@@ -4956,16 +4956,20 @@ document.addEventListener('DOMContentLoaded', function() {
       gpsReader.readAsArrayBuffer(file);
     }
 
-    if (navigator.geolocation) {
+    function doGetPosition() {
       navigator.geolocation.getCurrentPosition(function(pos) {
         var gps = { lat: pos.coords.latitude, lng: pos.coords.longitude, alt: pos.coords.altitude };
         window._photoPendingGps = gps;
         updateGpsDisplay(gps, 'device');
       }, function(err) {
-        // GPS הטלפון נכשל — מנסה EXIF מהתמונה
         if (gpsEl) { gpsEl.textContent = '📷 GPS הטלפון לא זמין, בודק EXIF תמונה...'; gpsEl.style.color = '#93C5FD'; }
         tryExifGps();
       }, { timeout: 15000, enableHighAccuracy: true, maximumAge: 0 });
+    }
+
+    if (navigator.geolocation) {
+      // iOS מציג דיאלוג הרשאה אוטומטי כשקוראים getCurrentPosition
+      doGetPosition();
     } else {
       tryExifGps();
     }
