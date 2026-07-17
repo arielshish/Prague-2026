@@ -5275,15 +5275,26 @@ function gpsGet(file) {
       gpsUiSuccess(gps);
     },
     function(err) {
+      var el = qs('photoGpsDisplay'), btn = qs('btnGetGps');
+      if (btn) btn.textContent = '📍 GPS';
+      if (!el) { el = qs('photoGpsDisplay'); }
+      el.style.display = 'block';
       if (err && err.code === 1) {
-        var el = qs('photoGpsDisplay'), btn = qs('btnGetGps');
-        if (btn) btn.textContent = '📍 GPS';
-        if (el) { el.style.display = 'block'; el.style.color = '#F87171'; el.textContent = '🚫 גישה נדחתה — הגדרות ← Safari ← מיקום'; }
+        el.style.color = '#F87171';
+        el.textContent = '🚫 גישה נדחתה — הגדרות ← מיקום ← Safari';
+      } else if (err && err.code === 2) {
+        el.style.color = '#FBBF24';
+        el.textContent = '📡 מיקום לא זמין כרגע';
       } else {
-        gpsFromExif(file, function(gps) { window._photoPendingGps = gps; gpsUiSuccess(gps); }, gpsUiFail);
+        el.style.color = '#FBBF24';
+        el.textContent = '⏱️ פסק זמן — מנסה EXIF...';
+        gpsFromExif(file, function(gps) { window._photoPendingGps = gps; gpsUiSuccess(gps); }, function() {
+          el.style.color = 'rgba(241,245,249,0.4)';
+          el.textContent = '📍 אין GPS (קוד ' + (err ? err.code : '?') + ')';
+        });
       }
     },
-    { timeout: 10000, enableHighAccuracy: false, maximumAge: 0 }
+    { timeout: 8000, enableHighAccuracy: false, maximumAge: 0 }
   );
 }
 
