@@ -4968,40 +4968,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (navigator.geolocation) {
-      // בדוק הרשאה — אם לא ניתנה, הצג overlay ובקש
-      var permQuery = navigator.permissions && navigator.permissions.query;
-      if (permQuery) {
-        navigator.permissions.query({ name: 'geolocation' }).then(function(result) {
-          if (result.state === 'denied') {
-            if (gpsEl) { gpsEl.textContent = '🚫 גישה למיקום חסומה — אפשר בהגדרות הטלפון'; gpsEl.style.color = '#FCA5A5'; }
-          } else if (result.state === 'prompt') {
-            // הצג overlay שמסביר ואז קורא getCurrentPosition (שיציג את הדיאלוג של המערכת)
-            var ov = document.createElement('div');
-            ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:29999;display:flex;align-items:center;justify-content:center;padding:20px;';
-            ov.innerHTML = '<div style="background:#1E293B;border-radius:16px;padding:24px;max-width:320px;width:100%;text-align:center;direction:rtl;">' +
-              '<div style="font-size:40px;margin-bottom:12px;">📍</div>' +
-              '<div style="color:#F1F5F9;font-size:17px;font-weight:700;margin-bottom:8px;">גישה למיקום</div>' +
-              '<div style="color:rgba(241,245,249,0.7);font-size:14px;margin-bottom:20px;">כדי לתייג את הצילום במיקום המדויק, האפליקציה צריכה גישה ל-GPS של הטלפון.</div>' +
-              '<button id="_gpsAllow" style="background:#3B82F6;color:#fff;border:none;border-radius:10px;padding:12px 28px;font-size:16px;font-weight:700;cursor:pointer;width:100%;">אפשר מיקום</button>' +
-              '<button id="_gpsSkip" style="background:none;color:rgba(241,245,249,0.5);border:none;font-size:14px;cursor:pointer;margin-top:12px;width:100%;">דלג</button>' +
-              '</div>';
-            document.body.appendChild(ov);
-            ov.querySelector('#_gpsAllow').addEventListener('click', function() {
-              ov.remove();
-              doGetPosition();
-            });
-            ov.querySelector('#_gpsSkip').addEventListener('click', function() {
-              ov.remove();
-              if (gpsEl) { gpsEl.style.display = 'none'; }
-            });
-          } else {
-            // granted
-            doGetPosition();
-          }
-        }).catch(function() { doGetPosition(); });
-      } else {
-        doGetPosition();
-      }
+      // iOS מציג דיאלוג הרשאה אוטומטי כשקוראים getCurrentPosition
+      doGetPosition();
     } else {
       tryExifGps();
     }
