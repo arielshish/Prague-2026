@@ -169,24 +169,25 @@ function getFirestoreDb() {
   _fbDb = firebase.firestore(_fbApp);
   return _fbDb;
 }
-// Anonymous auth so Firestore rules can require request.auth != null instead of open access
 function ensureFirebaseAuth() {
   if (_authReadyPromise) return _authReadyPromise;
   try {
     if (typeof firebase === 'undefined') {
-      throw new Error('Firebase SDK is not loaded. Please check your network or adblocker.');
+      _authReadyPromise = Promise.resolve(true);
+      return _authReadyPromise;
     }
     getFirestoreDb();
+    // נסה anonymous auth — אם נכשל, ממשיך בלי auth (Firestore rules קובעים)
     _authReadyPromise = firebase.auth(_fbApp).signInAnonymously()
       .then(function() { return true; })
-      .catch(function(err) { 
+      .catch(function(err) {
         window._lastFirebaseError = err;
-        console.warn('Firebase anonymous auth failed', err); 
-        return false; 
+        console.warn('Firebase anonymous auth failed, trying without auth:', err.code);
+        return true; // ממשיך בלי auth
       });
   } catch(e) {
     window._lastFirebaseError = e;
-    _authReadyPromise = Promise.resolve(false);
+    _authReadyPromise = Promise.resolve(true); // ממשיך בלי auth
   }
   return _authReadyPromise;
 }
@@ -2894,7 +2895,7 @@ function loadDaysFromSheets(silent) {
     var daysTimeout = new Promise(function(_, reject) { setTimeout(function() { reject(new Error('timeout')); }, 8000); });
     Promise.race([
       ensureFirebaseAuth().then(function(ready) {
-        if (!ready) throw new Error('Firebase Auth failed');
+
         return getFirestoreDb().collection('appdata').doc('main').get();
       }),
       daysTimeout
@@ -3898,7 +3899,7 @@ function loadPack() {
       .loadAppData();
   } else {
     ensureFirebaseAuth().then(function(ready) {
-      if (!ready) throw new Error('Firebase Auth failed to initialize');
+
       return getFirestoreDb().collection('appdata').doc('main').get();
     }).then(function(doc) {
       if (doc.exists && doc.data().packing_list) {
@@ -4082,7 +4083,7 @@ function loadExpenses() {
     var fbTimeout = new Promise(function(_, reject) { setTimeout(function() { reject(new Error('timeout')); }, 8000); });
     Promise.race([
       ensureFirebaseAuth().then(function(ready) {
-        if (!ready) throw new Error('Firebase Auth failed');
+
         return getFirestoreDb().collection('appdata').doc('main').get();
       }),
       fbTimeout
@@ -4231,7 +4232,7 @@ function syncBudgetFromSheets(cb) {
       .loadBudgetSettings();
   } else {
     ensureFirebaseAuth().then(function(ready) {
-      if (!ready) throw new Error('Firebase Auth failed to initialize');
+
       return getFirestoreDb().collection('appdata').doc('main').get();
     }).then(function(doc) {
       if (doc.exists) {
