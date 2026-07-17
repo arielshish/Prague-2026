@@ -2936,7 +2936,7 @@ function renderDays() {
       '<div style="font-size:22px;line-height:1;margin-top:1px;flex-shrink:0;">' + (s.emoji||'📍') + '</div>' +
       '<div style="flex:1;min-width:0;">' +
         '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:2px;">' +
-          '<div style="font-size:13px;font-weight:800;color:#1E293B;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">' + esc(s.name) + '</div>' +
+          '<div style="font-size:13px;font-weight:800;color:#1E293B;min-width:0;word-break:break-word;">' + esc(s.name) + '</div>' +
           '<div style="display:flex;gap:3px;flex-shrink:0;">' +
             (hasDetails ? '<span style="font-size:10px;color:rgba(30,41,59,0.4);align-self:center;">פרטים ›</span>' : '') +
             '<button onclick="event.stopPropagation();moveStopUpDown(' + dayIdx + ',' + si + ',-1)" style="background:rgba(0,0,0,0.05);border:none;border-radius:6px;padding:2px 4px;font-size:10px;cursor:pointer;line-height:1;">🔼</button>' +
