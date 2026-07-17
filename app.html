@@ -5677,7 +5677,34 @@ function openPhotoModal(placeName) {
 
   var m = qs('photoTagModal'); if (m) m.style.display = 'flex';
 
-  // פתח מצלמה אוטומטית — המיקום ייבקש אחרי בחירת התמונה
+  // בקש GPS מיידית — זה gesture ישיר (לחיצת כפתור), עובד על iOS PWA
+  if (navigator.geolocation) {
+    gpsUiLoading();
+    navigator.geolocation.getCurrentPosition(
+      function(pos) {
+        var gps = { lat: pos.coords.latitude, lng: pos.coords.longitude, alt: pos.coords.altitude };
+        window._photoPendingGps = gps;
+        gpsUiSuccess(gps);
+      },
+      function(err) {
+        var el = qs('photoGpsDisplay'), btn = qs('btnGetGps');
+        if (btn) btn.textContent = '📍 GPS';
+        if (el) {
+          el.style.display = 'block';
+          if (err && err.code === 1) {
+            el.style.color = '#F87171';
+            el.textContent = '🚫 גישה נדחתה — הגדרות ← מיקום';
+          } else {
+            el.style.color = 'rgba(241,245,249,0.3)';
+            el.textContent = '📍 לא נמצא מיקום';
+          }
+        }
+      },
+      { timeout: 10000, enableHighAccuracy: false, maximumAge: 30000 }
+    );
+  }
+
+  // פתח מצלמה אוטומטית
   setTimeout(function() { var fi = qs('photoFileInput'); if (fi) fi.click(); }, 200);
 }
 
