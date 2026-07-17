@@ -919,9 +919,10 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
         <div style="font-size:14px;font-weight:700;color:#1D4ED8;margin-bottom:10px;">🚇 תחבורה ציבורית</div>
         <div style="font-size:12px;color:rgba(241,245,249,0.62);line-height:1.9;">
           <div style="font-weight:700;color:#1E293B;margin-bottom:4px;">מהמלון (Comfort Hotel Prague City East):</div>
-          מטרו A מ-<strong style="color:#1D4ED8;">Strašnická</strong> או <strong style="color:#1D4ED8;">Skalka</strong><br>
+          מטרו A מ-<strong style="color:#1D4ED8;">Strašnická</strong> (דקה הליכה!) או <strong style="color:#1D4ED8;">Skalka</strong><br>
+          🚋 טרם מ-<strong style="color:#1D4ED8;">Solidarita</strong> (דקה הליכה!) ← גן חיות, Slavia Arena<br>
           <strong style="color:#1D4ED8;">Můstek</strong> ← Primark · <strong style="color:#1D4ED8;">Náměstí Republiky</strong> ← Palladium<br>
-          <strong style="color:#1D4ED8;">Malostranská</strong> ← טירת פראג<br><br>
+          <strong style="color:#1D4ED8;">Malostranská</strong> ← טירת פראג · <strong style="color:#1D4ED8;">Depo Hostivař</strong> (2 תחנות) ← Fashion Arena<br><br>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
             <div style="background:rgba(59,130,246,0.1);border-radius:8px;padding:8px;text-align:center;">
               <div style="font-size:11px;color:rgba(30,41,59,0.55);">כרטיס 30 דקות</div>
@@ -2429,6 +2430,14 @@ var RESTAURANTS = [
    price:'800–1,200 CZK',badge:'⭐⭐ ילדים',badgeClr:'rgba(5,150,105,0.22)',badgeTxt:'#6EE7B7',
    mapUrl:'https://www.google.com/maps/search/Mistral+Cafe+Prague+Valentinska'},
   // ── 💰💰 בינוני ──────────────────────────────────────
+  {level:1,icon:'🍝',name:'Pasta Fresca',sub:'פסטה איטלקית טרייה — מומלץ מהשטח',
+   desc:'מסעדה איטלקית שמכינה פסטה טרייה במקום. מומלצת מאוד מישראלים שחזרו. מחירים נוחים, אוכל טעים, מתאים למשפחות. טוב לארוחת צהריים בין אטרקציות.',
+   price:'350–650 CZK',badge:'⭐ מומלץ',badgeClr:'rgba(244,99,74,0.22)',badgeTxt:'#FCA5A5',
+   mapUrl:'https://www.google.com/maps/search/Pasta+Fresca+Prague'},
+  {level:2,icon:'🍺',name:'Lokál Dlouhááá',sub:'ביר פאב צ\'כי — לב העיר העתיקה',
+   desc:'הסניף המפורסם ביותר של רשת Lokál — ממוקם בלב העיר העתיקה ברחוב Dlouhá. ברית פלסנר מהחבית, svíčková קלאסי, אווירה צ\'כית אמיתית. פחות תיירותי ממה שנראה — מקומיים אוהבים אותו מאוד.',
+   price:'800–1,200 CZK',badge:'⭐ מקומי',badgeClr:'rgba(8,145,178,0.22)',badgeTxt:'#67E8F9',
+   mapUrl:'https://www.google.com/maps/search/Lokal+Dlouha+Prague'},
   {level:2,icon:'🍺',name:'Lokál Korunní',sub:'ביר פאב צ׳כי אמיתי — Vinohrady',
    desc:'המסעדה הצ׳כית הכי אותנטית. מלאה מקומיים, אפס תיירים. svíčková = בקר בציר שמנת עם קנדרלי — המנה הצ׳כית הקלאסית. פילסנר מהחבית.',
    price:'900–1,300 CZK',badge:'⭐⭐ מקומי',badgeClr:'rgba(8,145,178,0.22)',badgeTxt:'#67E8F9',
@@ -2686,7 +2695,38 @@ var COMMUNITY = [
   {cat:'🛍️ קניות', icon:'💎', name:'Parizska Street — רחוב פריז', fb:'⭐⭐⭐⭐⭐', google:'4.6', desc:'רחוב הבוטיקים היוקרתיים — Dior, Louis Vuitton, Hermès. יפהפה לסיבוב ערב גם ללא קנייה.',
    how:'מטרו A → Staroměstská + 2 דק׳ הליכה צפונה', mapUrl:'https://www.google.com/maps/search/Parizska+Street+Prague'},
   {cat:'🛍️ קניות', icon:'🏺', name:'Nerudova Street', fb:'⭐⭐⭐⭐', google:'4.5', desc:'רחוב קניות מיוחד מהמאה ה-16 — חנויות מקומיות, גלריות, מזכרות אמנותיות. בדרך למצודה.',
-   how:'טראם 22 → Malostranské náměstí + עלייה ברגל', mapUrl:'https://www.google.com/maps/search/Nerudova+Street+Prague'}
+   how:'טראם 22 → Malostranské náměstí + עלייה ברגל', mapUrl:'https://www.google.com/maps/search/Nerudova+Street+Prague'},
+  {cat:'🛍️ קניות', icon:'🏷️', name:'Fashion Arena Prague Outlet', fb:'⭐⭐⭐⭐', google:'4.3', desc:'אאוטלט מותגים — Nike, Adidas, Tommy Hilfiger, Calvin Klein. מציאות אמיתיות! מטרו A 2 תחנות מזרחה מהמלון לDepo Hostivař, אחר כך שאטל חינם.',
+   how:'מטרו A → Depo Hostivař (2 תחנות מהמלון!) + שאטל חינם לאאוטלט', mapUrl:'https://www.google.com/maps/search/Fashion+Arena+Prague+Outlet'},
+  // ── 🎟️ אטרקציות חדשות ──
+  {cat:'🎟️ אטרקציות', icon:'🎢', name:'Majaland Prague', fb:'⭐⭐⭐⭐⭐', google:'4.5',
+   desc:'פארק שעשועים מקורה לילדים — מושלם לימי גשם או חום קיצוני! יש כאן מגלשות, רכבות, מתקני טיפוס, אזורי VR ומנהרות. בנוי בתוך בניין ענק, ממוזג, אין תלות מזג אוויר. מאוד מומלץ לילדים עד גיל 12.',
+   booking:'🎟️ מומלץ להזמין Online מראש — majaland.cz | ~400 CZK לילד, ~300 CZK למבוגר',
+   duration:'⏱️ 3–5 שעות',
+   tips:'🌧️ מושלם ליום גשם! יש מסעדה בפנים. להביא גרביים אנטי-החלקה.',
+   who:'🧒 ילדים עד גיל 12 | 👨‍👩‍👧‍👦 יום משפחתי מקורה',
+   how:'מטרו A → Rajská zahrada + 10 דק׳ הליכה | או Bolt', mapUrl:'https://www.google.com/maps/search/Majaland+Prague'},
+  {cat:'🎟️ אטרקציות', icon:'🎬', name:'Karel Zeman Museum', fb:'⭐⭐⭐⭐⭐', google:'4.6',
+   desc:'מוזיאון קסם קולנועי אינטראקטיבי! Karel Zeman היה פיוניר האנימציה והאפקטים המיוחדים של צ\'כיה. המוזיאון מציג את הסרטים שלו עם תפאורות שאפשר להיכנס אליהן ולצלם — ילדים (ומבוגרים) שוכחים מה זמן. יחודי לפראג.',
+   booking:'🎟️ museumkarlazeman.cz | ~200 CZK מבוגר, ~150 CZK ילד | קטן ולא עמוס — אפשר בלי הזמנה',
+   duration:'⏱️ 60–90 דקות',
+   tips:'📸 להביא סוללה מלאה — הרבה תמונות. קרוב מאוד לגשר קארל.',
+   who:'👧🧒 ילדים מגיל 6+ | 🎨 אוהבי קולנוע ואנימציה',
+   how:'מטרו A → Staroměstská + 8 דק׳ הליכה לכיוון מלה סטרנה', mapUrl:'https://www.google.com/maps/search/Karel+Zeman+Museum+Prague'},
+  {cat:'🎟️ אטרקציות', icon:'⚽', name:'Fortuna Arena — סיור אצטדיון Slavia', fb:'⭐⭐⭐⭐', google:'4.4',
+   desc:'סיור מרתק מאחורי הקלעים של אצטדיון Slavia Prague — אחד הקבוצות המפורסמות בצ\'כיה. רואים את חדרי ההלבשה, הדשא, האצטדיון מבפנים. חסידי כדורגל — חובה! גם לילדים שלא מכירים — חוויה יחידה. מרחק 5 דקות בטרם מהמלון!',
+   booking:'🎟️ slavia.cz — לבדוק לוח סיורים | ~200–300 CZK | לפעמים ניתן להצטרף בלי הזמנה',
+   duration:'⏱️ 60–90 דקות',
+   tips:'⚽ לבדוק שאין משחק באותו יום — ביום משחק הסיורים מבוטלים. תחנת טרם Solidarita — דקה מהמלון!',
+   who:'👦 ילדים אוהבי ספורט | ⚽ חסידי כדורגל',
+   how:'טרם → תחנת Solidarita (דקה הליכה מהמלון!) → 2 תחנות לכיוון Hostivař', mapUrl:'https://www.google.com/maps/search/Fortuna+Arena+Slavia+Prague+stadium+tour'},
+  {cat:'🎟️ אטרקציות', icon:'🍔', name:'Manifesto Market — Anděl', fb:'⭐⭐⭐⭐⭐', google:'4.5',
+   desc:'פוד קורט מגניב בקונטיינרים צבעוניים בשכונת Anděl — אווירה הכי "היפסטרית" בפראג. מגוון ענק של אוכל מהעולם: בורגרים, אסייתי, פיצה, ועוד. מושב בחוץ, אורות חגיגיים, אווירה כיפית. מושלם לארוחת ערב בסגנון שונה ואכילה בחוץ.',
+   booking:'✅ ללא הזמנה — הגיעו ובחרו! | שעות: 11:00–22:00 בימי חול, עד 23:00 בסופ"ש',
+   duration:'⏱️ 60–90 דקות',
+   tips:'🌆 כיף יותר בערב עם האורות. קרוב לקניון Nový Smíchov — אפשר לשלב.',
+   who:'👨‍👩‍👧‍👦 כל הגילאים | 🌙 אידיאלי לארוחת ערב כיפית',
+   how:'מטרו B → Anděl + 3 דק׳ הליכה', mapUrl:'https://www.google.com/maps/search/Manifesto+Market+Andel+Prague'}
 ];
 
 // photo spots sorted cheap→expensive (by entrance fee)
