@@ -1408,7 +1408,10 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
         </div>
       </div>
       <input id="photoFileInput" type="file" accept="image/*" capture="environment" style="display:none;">
-      <div id="photoGpsDisplay" style="display:none;font-size:11px;font-weight:600;color:#065F46;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:7px 11px;margin-bottom:10px;"></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <button id="btnGetGps" onclick="requestPhotoGps()" style="flex-shrink:0;background:#10B981;color:#fff;border:none;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">📍 GPS</button>
+        <div id="photoGpsDisplay" style="flex:1;display:none;font-size:11px;font-weight:600;color:#065F46;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:7px 11px;"></div>
+      </div>
       <!-- שם המקום -->
       <div style="font-size:11px;font-weight:700;color:rgba(30,41,59,0.55);margin-bottom:6px;letter-spacing:0.5px;">📍 מקום</div>
       <div id="photoPlaceChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div>
@@ -4937,42 +4940,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window._photoPendingGps = null;
     window._photoPendingOrigFile = file;
 
-    // GPS — iOS PWA דורש לחיצת כפתור ישירה כדי לקבל הרשאת מיקום
-    var gpsEl = qs('photoGpsDisplay');
-
-    function tryExifGps() {
-      var gpsReader = new FileReader();
-      gpsReader.onload = function(ev) {
-        var gps = extractExifGps(ev.target.result);
-        if (gps && gps.lat) {
-          window._photoPendingGps = gps;
-          updateGpsDisplay(gps, 'exif');
-        } else {
-          window._photoPendingGps = null;
-          if (gpsEl) { gpsEl.innerHTML = '❌ GPS לא זמין'; gpsEl.style.color = 'rgba(241,245,249,0.4)'; }
-        }
-      };
-      gpsReader.readAsArrayBuffer(file);
-    }
-
-    if (navigator.geolocation && gpsEl) {
-      gpsEl.style.display = 'block';
-      gpsEl.innerHTML = '<button id="_gpsBtn" style="background:#3B82F6;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:13px;cursor:pointer;">📍 רשום מיקום GPS</button>';
-      gpsEl.querySelector('#_gpsBtn').addEventListener('click', function() {
-        gpsEl.style.color = '#93C5FD';
-        gpsEl.textContent = '📡 מאתר GPS...';
-        navigator.geolocation.getCurrentPosition(function(pos) {
-          var gps = { lat: pos.coords.latitude, lng: pos.coords.longitude, alt: pos.coords.altitude };
-          window._photoPendingGps = gps;
-          updateGpsDisplay(gps, 'device');
-        }, function() {
-          gpsEl.textContent = '📷 GPS לא זמין, בודק EXIF...';
-          tryExifGps();
-        }, { timeout: 15000, enableHighAccuracy: true, maximumAge: 0 });
-      });
-    } else {
-      tryExifGps();
-    }
+    // GPS נלקח בנפרד דרך כפתור btnGetGps (requestPhotoGps)
 
     // כווץ + הוסף מסגרת
     var reader = new FileReader();
@@ -5628,12 +5596,33 @@ var PLACE_SUGGESTIONS = (function() {
   return names;
 }());
 
+function requestPhotoGps() {
+  var gpsEl = qs('photoGpsDisplay');
+  var btn = qs('btnGetGps');
+  if (!navigator.geolocation) {
+    if (gpsEl) { gpsEl.style.display = 'block'; gpsEl.textContent = '❌ GPS לא נתמך'; }
+    return;
+  }
+  if (btn) btn.textContent = '⏳';
+  if (gpsEl) { gpsEl.style.display = 'block'; gpsEl.textContent = '📡 מאתר...'; }
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    var gps = { lat: pos.coords.latitude, lng: pos.coords.longitude, alt: pos.coords.altitude };
+    window._photoPendingGps = gps;
+    if (btn) btn.textContent = '✅ GPS';
+    updateGpsDisplay(gps, 'device');
+  }, function() {
+    if (btn) btn.textContent = '📍 GPS';
+    if (gpsEl) { gpsEl.style.display = 'block'; gpsEl.textContent = '❌ GPS לא זמין — בדוק הגדרות מיקום'; }
+  }, { timeout: 15000, enableHighAccuracy: true, maximumAge: 0 });
+}
+
 function openPhotoModal(placeName) {
   _photoModalPlace = placeName || null;
   window._photoPendingDataUrl = null;
   window._photoPendingGps = null;
   window._photoPendingOrigFile = null;
-  var gpsEl = qs('photoGpsDisplay'); if (gpsEl) gpsEl.style.display = 'none';
+  var gpsEl = qs('photoGpsDisplay'); if (gpsEl) { gpsEl.style.display = 'none'; gpsEl.textContent = ''; }
+  var gpsBtn = qs('btnGetGps'); if (gpsBtn) gpsBtn.textContent = '📍 GPS';
   var img = qs('photoPreviewImg');
   var ph  = qs('photoPreviewPlaceholder');
   if (img) { img.src = ''; img.style.display = 'none'; }
