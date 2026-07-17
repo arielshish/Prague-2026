@@ -4935,29 +4935,36 @@ document.addEventListener('DOMContentLoaded', function() {
     window._photoPendingGps = null;
     window._photoPendingOrigFile = file;
 
-    // GPS inline — enableHighAccuracy:false = WiFi/סלולר, עובד בפנים ומהיר
+    // GPS דרך Geolocation API, fallback ל-EXIF
+    var gpsEl = qs('photoGpsDisplay');
+    var gpsBtn = qs('btnGetGps');
+    if (gpsEl) { gpsEl.style.display = 'block'; gpsEl.style.color = '#93C5FD'; gpsEl.textContent = '📍 מאתר מיקום...'; }
+    if (gpsBtn) gpsBtn.textContent = '⏳';
     if (navigator.geolocation) {
-      var _gpsEl = qs('photoGpsDisplay');
-      var _gpsBtn = qs('btnGetGps');
-      if (_gpsEl) { _gpsEl.style.display = 'block'; _gpsEl.textContent = '📡 מאתר מיקום...'; }
-      if (_gpsBtn) _gpsBtn.textContent = '⏳';
-      navigator.geolocation.getCurrentPosition(
-        function(pos) {
-          var gps = { lat: pos.coords.latitude, lng: pos.coords.longitude, alt: pos.coords.altitude };
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        var gps = { lat: pos.coords.latitude, lng: pos.coords.longitude, alt: pos.coords.altitude };
+        window._photoPendingGps = gps;
+        if (gpsBtn) gpsBtn.textContent = '✅';
+        updateGpsDisplay(gps);
+      }, function() {
+        if (gpsBtn) gpsBtn.textContent = '📍 GPS';
+        var gpsReader = new FileReader();
+        gpsReader.onload = function(ev) {
+          var gps = extractExifGps(ev.target.result);
           window._photoPendingGps = gps;
-          if (_gpsBtn) _gpsBtn.textContent = '✅ GPS';
-          updateGpsDisplay(gps, 'device');
-        },
-        function(err) {
-          if (_gpsBtn) _gpsBtn.textContent = '📍 GPS';
-          if (err && err.code === 1) {
-            if (_gpsEl) { _gpsEl.style.display = 'block'; _gpsEl.textContent = '🚫 גישה למיקום נדחתה — אפשר בהגדרות'; }
-          } else {
-            if (_gpsEl) _gpsEl.style.display = 'none';
-          }
-        },
-        { timeout: 8000, enableHighAccuracy: false, maximumAge: 30000 }
-      );
+          updateGpsDisplay(gps);
+        };
+        gpsReader.readAsArrayBuffer(file);
+      }, { timeout: 8000, enableHighAccuracy: true });
+    } else {
+      if (gpsBtn) gpsBtn.textContent = '📍 GPS';
+      var gpsReader = new FileReader();
+      gpsReader.onload = function(ev) {
+        var gps = extractExifGps(ev.target.result);
+        window._photoPendingGps = gps;
+        updateGpsDisplay(gps);
+      };
+      gpsReader.readAsArrayBuffer(file);
     }
 
     // כווץ + הוסף מסגרת
@@ -5213,61 +5220,66 @@ function dmsToDecimal(dms) {
   return dms[0] + dms[1] / 60 + dms[2] / 3600;
 }
 
-function updateGpsDisplay(gps, source) {
+function updateGpsDisplay(gps) {
   var el = qs('photoGpsDisplay');
   if (!el) return;
   if (gps && gps.lat) {
-    var srcLabel = source === 'device' ? '📱 GPS הטלפון' : source === 'exif' ? '📷 GPS מהתמונה' : '📍 GPS';
-    el.innerHTML = srcLabel + ' — מחפש כתובת...';
+    el.innerHTML = '📍 GPS נמצא — מחפש מיקום...';
     el.style.color = '#93C5FD';
     el.style.display = 'block';
-    // Reverse geocode via Nominatim
     fetch('https://nominatim.openstreetmap.org/reverse?lat=' + gps.lat + '&lon=' + gps.lng + '&format=json&zoom=18&addressdetails=1', {
       headers: { 'Accept-Language': 'he,en' }
     })
     .then(function(r) { return r.json(); })
     .then(function(data) {
       var addr = data.address || {};
-      // שם מקום ספציפי (אטרקציה / בניין / עסק)
       var poi = addr.tourism || addr.amenity || addr.leisure || addr.shop ||
                 addr.historic || addr.attraction || addr.building || addr.place || '';
-      // רחוב + מספר
       var street = [addr.road, addr.house_number].filter(Boolean).join(' ');
-      // שכונה / רובע
       var district = addr.suburb || addr.neighbourhood || addr.city_district || addr.quarter || '';
-      // עיר
       var city = addr.city || addr.town || addr.village || addr.municipality || '';
-      // מדינה
       var country = addr.country || '';
-
-      // שם קצר לשמירה בשדה (POI או רחוב)
       var shortName = poi || street || district || city || '';
       var placeEl = qs('photoPlaceCustom');
       if (shortName && placeEl && !placeEl.value) {
         placeEl.value = shortName;
       }
-
-      // תצוגה מפורטת
       var lines = [];
       if (poi) lines.push('<strong style="color:#1E293B;">' + poi + '</strong>');
       if (street) lines.push(street);
       if (district) lines.push(district);
       var cityCountry = [city, country].filter(Boolean).join(', ');
       if (cityCountry) lines.push('<span style="color:rgba(30,41,59,0.5);">' + cityCountry + '</span>');
-
       var mapLink = ' <a href="https://www.google.com/maps?q=' + gps.lat + ',' + gps.lng + '" target="_blank" style="color:#1D4ED8;font-size:10px;text-decoration:none;">🗺️</a>';
-      el.innerHTML = srcLabel + ': ' + (lines.join(' · ') || gps.lat.toFixed(5) + ', ' + gps.lng.toFixed(5)) + mapLink;
+      el.innerHTML = '📍 ' + (lines.join(' · ') || gps.lat.toFixed(5) + ', ' + gps.lng.toFixed(5)) + mapLink;
       el.style.color = '#6EE7B7';
     })
     .catch(function() {
-      el.innerHTML = srcLabel + ': ' + gps.lat.toFixed(5) + ', ' + gps.lng.toFixed(5) +
+      el.innerHTML = '📍 ' + gps.lat.toFixed(5) + ', ' + gps.lng.toFixed(5) +
         ' <a href="https://www.google.com/maps?q=' + gps.lat + ',' + gps.lng + '" target="_blank" style="color:#1D4ED8;font-size:10px;">🗺️</a>';
     });
   } else {
-    el.innerHTML = '❌ GPS לא זמין';
+    el.innerHTML = '📍 אין GPS בתמונה';
     el.style.color = 'rgba(241,245,249,0.3)';
     el.style.display = 'block';
   }
+}
+
+function requestPhotoGps() {
+  var gpsEl = qs('photoGpsDisplay');
+  var btn = qs('btnGetGps');
+  if (!navigator.geolocation) return;
+  if (gpsEl) { gpsEl.style.display = 'block'; gpsEl.style.color = '#93C5FD'; gpsEl.textContent = '📍 מאתר מיקום...'; }
+  if (btn) btn.textContent = '⏳';
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    var gps = { lat: pos.coords.latitude, lng: pos.coords.longitude, alt: pos.coords.altitude };
+    window._photoPendingGps = gps;
+    if (btn) btn.textContent = '✅';
+    updateGpsDisplay(gps);
+  }, function() {
+    if (btn) btn.textContent = '📍 GPS';
+    if (gpsEl) { gpsEl.textContent = '📍 אין GPS'; gpsEl.style.color = 'rgba(241,245,249,0.3)'; }
+  }, { timeout: 8000, enableHighAccuracy: true });
 }
 
 function addPragueFrame(ctx, w, h) {
@@ -5614,43 +5626,6 @@ var PLACE_SUGGESTIONS = (function() {
   return names;
 }());
 
-function requestPhotoGps() {
-  var gpsEl = qs('photoGpsDisplay');
-  var btn = qs('btnGetGps');
-  if (!navigator.geolocation) {
-    if (gpsEl) { gpsEl.style.display = 'block'; gpsEl.textContent = '❌ GPS לא נתמך'; }
-    return;
-  }
-  if (btn) btn.textContent = '⏳';
-  if (gpsEl) { gpsEl.style.display = 'block'; gpsEl.textContent = '📡 מאתר מיקום...'; }
-
-  function onGpsSuccess(pos) {
-    var gps = { lat: pos.coords.latitude, lng: pos.coords.longitude, alt: pos.coords.altitude };
-    window._photoPendingGps = gps;
-    if (btn) btn.textContent = '✅ GPS';
-    updateGpsDisplay(gps, 'device');
-  }
-
-  function onGpsError(err) {
-    if (btn) btn.textContent = '📍 GPS';
-    if (err && err.code === 1) {
-      // הרשאה נדחתה
-      if (gpsEl) { gpsEl.style.display = 'block'; gpsEl.textContent = '🚫 גישה למיקום נדחתה — אפשר בהגדרות → Safari → מיקום'; }
-    } else {
-      // timeout או שגיאה אחרת — מסתיר בשקט
-      if (gpsEl) { gpsEl.style.display = 'none'; }
-    }
-  }
-
-  // enableHighAccuracy:false = WiFi/סלולר, מהיר מאוד (<2 שנייה) ועובד בפנים
-  // enableHighAccuracy:true = GPS לווייני, איטי ולא עובד בפנים
-  navigator.geolocation.getCurrentPosition(onGpsSuccess, function(err) {
-    if (err && err.code === 1) { onGpsError(err); return; }
-    // אם נכשל ב-low accuracy — נסה high accuracy
-    navigator.geolocation.getCurrentPosition(onGpsSuccess, onGpsError,
-      { timeout: 8000, enableHighAccuracy: true, maximumAge: 0 });
-  }, { timeout: 5000, enableHighAccuracy: false, maximumAge: 30000 });
-}
 
 function openPhotoModal(placeName) {
   _photoModalPlace = placeName || null;
