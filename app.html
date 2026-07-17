@@ -4935,10 +4935,32 @@ document.addEventListener('DOMContentLoaded', function() {
     window._photoPendingGps = null;
     window._photoPendingOrigFile = file;
 
-    // GPS inline — enableHighAccuracy:false = WiFi/סלולר, עובד בפנים ומהיר
+    // GPS: תחילה מנסה GPS הטלפון, אם נכשל — מנסה EXIF מהתמונה
+    var _gpsEl = qs('photoGpsDisplay');
+    var _gpsBtn = qs('btnGetGps');
+    var _gpsFile = file; // closure על הקובץ לצורך EXIF
+
+    function tryExifGps() {
+      var abReader = new FileReader();
+      abReader.onload = function(ev2) {
+        var gps = extractExifGps(ev2.target.result);
+        if (gps) {
+          window._photoPendingGps = gps;
+          if (_gpsBtn) _gpsBtn.textContent = '✅ GPS';
+          updateGpsDisplay(gps, 'exif');
+        } else {
+          if (_gpsBtn) _gpsBtn.textContent = '📍 GPS';
+          if (_gpsEl) _gpsEl.style.display = 'none';
+        }
+      };
+      abReader.onerror = function() {
+        if (_gpsBtn) _gpsBtn.textContent = '📍 GPS';
+        if (_gpsEl) _gpsEl.style.display = 'none';
+      };
+      abReader.readAsArrayBuffer(_gpsFile);
+    }
+
     if (navigator.geolocation) {
-      var _gpsEl = qs('photoGpsDisplay');
-      var _gpsBtn = qs('btnGetGps');
       if (_gpsEl) { _gpsEl.style.display = 'block'; _gpsEl.textContent = '📡 מאתר מיקום...'; }
       if (_gpsBtn) _gpsBtn.textContent = '⏳';
       navigator.geolocation.getCurrentPosition(
@@ -4949,15 +4971,20 @@ document.addEventListener('DOMContentLoaded', function() {
           updateGpsDisplay(gps, 'device');
         },
         function(err) {
-          if (_gpsBtn) _gpsBtn.textContent = '📍 GPS';
           if (err && err.code === 1) {
+            // הרשאה נדחתה — לא מנסים EXIF, מציגים הודעה
+            if (_gpsBtn) _gpsBtn.textContent = '📍 GPS';
             if (_gpsEl) { _gpsEl.style.display = 'block'; _gpsEl.textContent = '🚫 גישה למיקום נדחתה — אפשר בהגדרות'; }
           } else {
-            if (_gpsEl) _gpsEl.style.display = 'none';
+            // timeout או שגיאה — מנסה EXIF מהתמונה
+            tryExifGps();
           }
         },
-        { timeout: 8000, enableHighAccuracy: false, maximumAge: 30000 }
+        { timeout: 8000, enableHighAccuracy: true, maximumAge: 30000 }
       );
+    } else {
+      // אין geolocation — מנסה EXIF
+      tryExifGps();
     }
 
     // כווץ + הוסף מסגרת
@@ -5642,14 +5669,8 @@ function requestPhotoGps() {
     }
   }
 
-  // enableHighAccuracy:false = WiFi/סלולר, מהיר מאוד (<2 שנייה) ועובד בפנים
-  // enableHighAccuracy:true = GPS לווייני, איטי ולא עובד בפנים
-  navigator.geolocation.getCurrentPosition(onGpsSuccess, function(err) {
-    if (err && err.code === 1) { onGpsError(err); return; }
-    // אם נכשל ב-low accuracy — נסה high accuracy
-    navigator.geolocation.getCurrentPosition(onGpsSuccess, onGpsError,
-      { timeout: 8000, enableHighAccuracy: true, maximumAge: 0 });
-  }, { timeout: 5000, enableHighAccuracy: false, maximumAge: 30000 });
+  navigator.geolocation.getCurrentPosition(onGpsSuccess, onGpsError,
+    { timeout: 8000, enableHighAccuracy: true, maximumAge: 30000 });
 }
 
 function openPhotoModal(placeName) {
