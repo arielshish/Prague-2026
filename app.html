@@ -2936,14 +2936,14 @@ function renderDays() {
       '<div style="font-size:22px;line-height:1;margin-top:1px;flex-shrink:0;">' + (s.emoji||'📍') + '</div>' +
       '<div style="flex:1;min-width:0;">' +
         '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:2px;">' +
-          '<div style="font-size:13px;font-weight:800;color:#1E293B;">' + esc(s.name) + '</div>' +
-          '<div style="display:flex;gap:4px;flex-shrink:0;">' +
+          '<div style="font-size:13px;font-weight:800;color:#1E293B;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">' + esc(s.name) + '</div>' +
+          '<div style="display:flex;gap:3px;flex-shrink:0;">' +
             (hasDetails ? '<span style="font-size:10px;color:rgba(30,41,59,0.4);align-self:center;">פרטים ›</span>' : '') +
-            '<button onclick="event.stopPropagation();moveStopUpDown(' + dayIdx + ',' + si + ',-1)" style="background:rgba(0,0,0,0.05);border:none;border-radius:7px;padding:3px 5px;font-size:10px;cursor:pointer;">🔼</button>' +
-            '<button onclick="event.stopPropagation();moveStopUpDown(' + dayIdx + ',' + si + ',1)" style="background:rgba(0,0,0,0.05);border:none;border-radius:7px;padding:3px 5px;font-size:10px;cursor:pointer;">🔽</button>' +
-            '<button onclick="event.stopPropagation();openEditStopTime(' + dayIdx + ',' + si + ')" style="background:rgba(16,185,129,0.12);border:none;border-radius:7px;padding:3px 7px;font-size:10px;color:#065F46;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">⏰</button>' +
-            '<button onclick="event.stopPropagation();openMoveStop(' + dayIdx + ',' + si + ')" style="background:rgba(59,130,246,0.12);border:none;border-radius:7px;padding:3px 7px;font-size:10px;color:#1E40AF;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">↔</button>' +
-            '<button onclick="event.stopPropagation();deleteStop(' + dayIdx + ',' + si + ')" style="background:rgba(239,68,68,0.10);border:none;border-radius:7px;padding:3px 7px;font-size:10px;color:#991B1B;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">✕</button>' +
+            '<button onclick="event.stopPropagation();moveStopUpDown(' + dayIdx + ',' + si + ',-1)" style="background:rgba(0,0,0,0.05);border:none;border-radius:6px;padding:2px 4px;font-size:10px;cursor:pointer;line-height:1;">🔼</button>' +
+            '<button onclick="event.stopPropagation();moveStopUpDown(' + dayIdx + ',' + si + ',1)" style="background:rgba(0,0,0,0.05);border:none;border-radius:6px;padding:2px 4px;font-size:10px;cursor:pointer;line-height:1;">🔽</button>' +
+            '<button onclick="event.stopPropagation();openEditStopTime(' + dayIdx + ',' + si + ')" style="background:rgba(16,185,129,0.12);border:none;border-radius:6px;padding:2px 5px;font-size:10px;color:#065F46;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;line-height:1;">⏰</button>' +
+            '<button onclick="event.stopPropagation();openMoveStop(' + dayIdx + ',' + si + ')" style="background:rgba(59,130,246,0.12);border:none;border-radius:6px;padding:2px 5px;font-size:10px;color:#1E40AF;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;line-height:1;">↔</button>' +
+            '<button onclick="event.stopPropagation();deleteStop(' + dayIdx + ',' + si + ')" style="background:rgba(239,68,68,0.10);border:none;border-radius:6px;padding:2px 5px;font-size:10px;color:#991B1B;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;line-height:1;">✕</button>' +
           '</div>' +
         '</div>' +
         '<div style="font-size:11px;color:rgba(30,41,59,0.5);margin-bottom:6px;">⏱️ ' + esc(s.time||'') + '</div>' +
