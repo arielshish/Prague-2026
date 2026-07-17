@@ -2465,19 +2465,18 @@ function getDaysState() {
 function saveDaysState() {
   var json = JSON.stringify(DAYS_STATE);
   localStorage.setItem('prague_days_v1', json);
+  // always sync to Firebase for cross-device sync
+  try {
+    ensureFirebaseAuth().then(function() {
+      getFirestoreDb().collection('appdata').doc('days').set({ data: json, ts: Date.now() })
+        .catch(function(e) { console.warn('Firestore days save failed', e); });
+    });
+  } catch(e) { console.warn('saveDaysState firebase error', e); }
   if (isGas()) {
     google.script.run
       .withSuccessHandler(function(r) { if (r && r.ok) toast('☁️ ימים סונכרנו!'); })
       .withFailureHandler(function() { toast('⚠️ שמור מקומית בלבד'); })
       .saveDaysCustom(DAYS_STATE);
-  } else {
-    // Firebase sync for GitHub Pages version
-    try {
-      ensureFirebaseAuth().then(function() {
-        getFirestoreDb().collection('appdata').doc('days').set({ data: json, ts: Date.now() })
-          .catch(function(e) { console.warn('Firestore days save failed', e); });
-      });
-    } catch(e) { console.warn('saveDaysState firebase error', e); }
   }
 }
 
@@ -3500,14 +3499,13 @@ function saveLocal() {
   var json = JSON.stringify(EXPENSES);
   localStorage.setItem('prague_exp_v10', json);
   localStorage.setItem('prague_exp_ts', String(ts));
-  if (!isGas()) {
-    try {
-      ensureFirebaseAuth().then(function() {
-        getFirestoreDb().collection('appdata').doc('expenses').set({ data: json, ts: ts })
-          .catch(function(e) { console.warn('Firestore expenses save failed', e); });
-      });
-    } catch(e) { console.warn('saveLocal firebase error', e); }
-  }
+  // always sync to Firebase — both GAS and GitHub Pages, so cross-device sync works
+  try {
+    ensureFirebaseAuth().then(function() {
+      getFirestoreDb().collection('appdata').doc('expenses').set({ data: json, ts: ts })
+        .catch(function(e) { console.warn('Firestore expenses save failed', e); });
+    });
+  } catch(e) { console.warn('saveLocal firebase error', e); }
 }
 
 function loadExpensesFromFirebase() {
@@ -3521,16 +3519,17 @@ function loadExpensesFromFirebase() {
           var remote = JSON.parse(doc.data().data);
           var localTs = parseInt(localStorage.getItem('prague_exp_ts') || '0');
           var remoteTs = doc.data().ts || 0;
-          if (remoteTs > localTs) {
+          // load if: no local timestamp yet, OR remote is newer, OR same time (remote wins for cross-device)
+          if (!localTs || remoteTs >= localTs) {
             EXPENSES = remote;
             localStorage.setItem('prague_exp_v10', doc.data().data);
             localStorage.setItem('prague_exp_ts', String(remoteTs));
             renderExpenses();
           }
-        } catch(e) {}
+        } catch(e) { console.warn('loadExpensesFromFirebase parse error', e); }
       }
     }).catch(function(e) { console.warn('loadExpensesFromFirebase error', e); });
-  } catch(e) {}
+  } catch(e) { console.warn('loadExpensesFromFirebase init error', e); }
 }
 
 // ── תקציב ──
