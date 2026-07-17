@@ -151,7 +151,6 @@
 <!-- Firebase SDK (compat mode) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script>
 // Firebase init for GitHub Pages (non-GAS) persistence
 var _fbApp = null;
@@ -170,24 +169,10 @@ function getFirestoreDb() {
   return _fbDb;
 }
 function ensureFirebaseAuth() {
-  if (_authReadyPromise) return _authReadyPromise;
-  try {
-    if (typeof firebase === 'undefined') {
-      _authReadyPromise = Promise.resolve(true);
-      return _authReadyPromise;
-    }
+  // דולג על auth — Firestore נגיש ישירות (rules: allow read, write: if true)
+  if (!_authReadyPromise) {
     getFirestoreDb();
-    // נסה anonymous auth — אם נכשל, ממשיך בלי auth (Firestore rules קובעים)
-    _authReadyPromise = firebase.auth(_fbApp).signInAnonymously()
-      .then(function() { return true; })
-      .catch(function(err) {
-        window._lastFirebaseError = err;
-        console.warn('Firebase anonymous auth failed, trying without auth:', err.code);
-        return true; // ממשיך בלי auth
-      });
-  } catch(e) {
-    window._lastFirebaseError = e;
-    _authReadyPromise = Promise.resolve(true); // ממשיך בלי auth
+    _authReadyPromise = Promise.resolve(true);
   }
   return _authReadyPromise;
 }
