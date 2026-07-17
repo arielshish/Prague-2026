@@ -4120,7 +4120,6 @@ function loadExpensesFromFirebase() {
           var remote = JSON.parse(doc.data().data);
           var localTs = parseInt(localStorage.getItem('prague_exp_ts') || '0');
           var remoteTs = doc.data().ts || 0;
-          // load if: no local timestamp yet, OR remote is newer, OR same time (remote wins for cross-device)
           if (!localTs || remoteTs >= localTs) {
             EXPENSES = remote;
             localStorage.setItem('prague_exp_v10', doc.data().data);
@@ -4131,6 +4130,131 @@ function loadExpensesFromFirebase() {
       }
     }).catch(function(e) { console.warn('loadExpensesFromFirebase error', e); });
   } catch(e) { console.warn('loadExpensesFromFirebase init error', e); }
+}
+
+// ── Real-time sync (onSnapshot) ──
+var _realtimeUnsubs = [];
+function initRealtimeSync() {
+  if (isGas()) return;
+  try {
+    var db = getFirestoreDb();
+
+    // הוצאות
+    var u1 = db.collection('appdata').doc('expenses').onSnapshot(function(doc) {
+      if (!doc.exists || !doc.data().data) return;
+      try {
+        var remote = JSON.parse(doc.data().data);
+        var remoteTs = doc.data().ts || 0;
+        var localTs = parseInt(localStorage.getItem('prague_exp_ts') || '0');
+        if (remoteTs > localTs) {
+          EXPENSES = remote;
+          localStorage.setItem('prague_exp_v10', doc.data().data);
+          localStorage.setItem('prague_exp_ts', String(remoteTs));
+          renderExpenses();
+          showSyncBadge('💳');
+        }
+      } catch(e) {}
+    }, function(e) { console.warn('onSnapshot expenses', e); });
+    _realtimeUnsubs.push(u1);
+
+    // ימי הטיול + ציוד + תקציב + תזכורות (כולם ב-appdata/main)
+    var u2 = db.collection('appdata').doc('main').onSnapshot(function(doc) {
+      if (!doc.exists) return;
+      var d = doc.data();
+
+      // ימים
+      if (d.days_custom) {
+        try {
+          var remoteDays = JSON.parse(d.days_custom);
+          var localDays = localStorage.getItem('prague_days_v1');
+          if (JSON.stringify(remoteDays) !== localDays) {
+            DAYS_STATE = remoteDays;
+            localStorage.setItem('prague_days_v1', d.days_custom);
+            renderDays();
+            showSyncBadge('📅');
+          }
+        } catch(e) {}
+      }
+
+      // ציוד
+      if (d.packing_list) {
+        try {
+          var remotePack = JSON.parse(d.packing_list);
+          var localPack = localStorage.getItem('prague_pack_v2');
+          if (JSON.stringify(remotePack) !== localPack) {
+            PACK_STATE = remotePack;
+            localStorage.setItem('prague_pack_v2', d.packing_list);
+            renderPack();
+            showSyncBadge('🎒');
+          }
+        } catch(e) {}
+      }
+
+      // תקציב
+      if (d.budget_categories) {
+        try {
+          var localBudget = localStorage.getItem('prague_budget_v1');
+          if (d.budget_categories !== localBudget) {
+            localStorage.setItem('prague_budget_v1', d.budget_categories);
+            renderExpenses();
+            showSyncBadge('💰');
+          }
+        } catch(e) {}
+      }
+
+      // תזכורות שבוצעו
+      if (d.remindersDone) {
+        try {
+          var localRem = localStorage.getItem('prague_remindersDone');
+          if (d.remindersDone !== localRem) {
+            remindersDone = JSON.parse(d.remindersDone);
+            localStorage.setItem('prague_remindersDone', d.remindersDone);
+            if (typeof renderReminders === 'function') renderReminders();
+            showSyncBadge('🔔');
+          }
+        } catch(e) {}
+      }
+    }, function(e) { console.warn('onSnapshot main', e); });
+    _realtimeUnsubs.push(u2);
+
+    // ציוד (doc נפרד)
+    var u3 = db.collection('appdata').doc('pack').onSnapshot(function(doc) {
+      if (!doc.exists || !doc.data().data) return;
+      try {
+        var remote = JSON.parse(doc.data().data);
+        var isNewFormat = Array.isArray(remote) && remote.length > 0 && remote[0].items;
+        if (!isNewFormat) return;
+        var remoteTs = doc.data().ts || 0;
+        var localTs = parseInt(localStorage.getItem('prague_pack_ts') || '0');
+        if (remoteTs > localTs) {
+          PACK_STATE = remote;
+          localStorage.setItem('prague_pack_v2', JSON.stringify(remote));
+          localStorage.setItem('prague_pack_ts', String(remoteTs));
+          renderPack();
+          showSyncBadge('🎒');
+        }
+      } catch(e) {}
+    }, function(e) { console.warn('onSnapshot pack', e); });
+    _realtimeUnsubs.push(u3);
+
+  } catch(e) { console.warn('initRealtimeSync error', e); }
+}
+
+var _syncBadgeTimer = null;
+function showSyncBadge(emoji) {
+  var badge = document.getElementById('syncBadge');
+  if (!badge) return;
+  badge.textContent = emoji + ' עודכן';
+  badge.style.background = 'rgba(34,197,94,0.12)';
+  badge.style.borderColor = 'rgba(34,197,94,0.3)';
+  badge.style.color = '#15803D';
+  clearTimeout(_syncBadgeTimer);
+  _syncBadgeTimer = setTimeout(function() {
+    badge.textContent = '☁️ מסונכרן';
+    badge.style.background = '';
+    badge.style.borderColor = '';
+    badge.style.color = '';
+  }, 2500);
 }
 
 // ── תקציב ──
@@ -4844,6 +4968,9 @@ document.addEventListener('DOMContentLoaded', function() {
   loadExpenses();
   loadExpensesFromFirebase();
   syncBudgetFromSheets();
+
+  // Real-time sync — onSnapshot לכל הנתונים
+  ensureFirebaseAuth().then(function() { initRealtimeSync(); });
 
   // Poll until isGas() becomes true, then run cloud loaders
   var gasPollCount = 0;
