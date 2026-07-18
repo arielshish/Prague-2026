@@ -636,11 +636,7 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
         <button class="back-btn" id="btnBackDays">← ראשי</button>
       </div>
     </div>
-    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-      <button id="dayPrevBtn" onclick="(function(){var t=getDaysState().length;var n=currentDay-1;if(n>=1)selectDay(n);})()" style="flex-shrink:0;background:#ffffff;border:1px solid rgba(30,41,59,0.12);border-radius:10px;width:36px;height:36px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#1E293B;font-family:'Rubik',Arial,sans-serif;transition:opacity 0.2s;">›</button>
-      <div id="dayButtons" style="flex:1;display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
-      <button id="dayNextBtn" onclick="(function(){var t=getDaysState().length;var n=currentDay+1;if(n<=t)selectDay(n);})()" style="flex-shrink:0;background:#ffffff;border:1px solid rgba(30,41,59,0.12);border-radius:10px;width:36px;height:36px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#1E293B;font-family:'Rubik',Arial,sans-serif;transition:opacity 0.2s;">‹</button>
-    </div>
+    <div id="dayButtons" style="display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
     <div id="dayCard" class="card"></div>
   </section>
 
