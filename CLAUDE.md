@@ -17,10 +17,30 @@
 > עדכון אחרון: 2026-07-18
 
 ### מבנה נתונים מרכזי
-- `COMMUNITY[]` — בנק אטרקציות: `{cat, icon, name, fb, google, desc, booking, duration, tips, who, how, mapUrl}`
-- `RESTAURANTS[]` — מסעדות: `{level, icon, name, sub, desc, price, badge, badgeClr, badgeTxt, google, mapUrl}`
-- `DAYS[]` — לוז ראשוני: ימים עם stops: `{emoji, name, time, desc, details, tips, booking, mapUrl, google, duration, who}`
-- `getDaysState()` — מחזיר את מצב הימים הנוכחי (Firestore / local)
+
+#### ALL_PLACES[] — מקור יחיד לכל האטרקציות (2026-07-18)
+```
+ALL_PLACES[] — 105 פריטים עם שדה type:
+  type:'shop'       → {icon, name, stars, hours, metro, duration, brands, tip, mapUrl}
+  type:'restaurant' → {icon, name, level, sub, desc, price, badge, badgeClr, badgeTxt, google, mapUrl}
+  type:'dessert'    → {icon, name, level, sub, desc, price, rating, tag, tagClr, where, mapUrl}
+  type:'community'  → {icon, name, cat, fb, google, desc, booking, duration, tips, who, how, mapUrl}
+  type:'photo'      → {icon, name, fee, sub, desc, best, crowds, fee_txt, rating, tip, mapUrl}
+```
+**Computed views** (נגז��ות מ-ALL_PLACES, read-only):
+```javascript
+var COMMUNITY   = ALL_PLACES.filter(p => p.type==='community');
+var RESTAURANTS = ALL_PLACES.filter(p => p.type==='restaurant');
+var SHOPS       = ALL_PLACES.filter(p => p.type==='shop');
+var DESSERTS    = ALL_PLACES.filter(p => p.type==='dessert');
+var PHOTO_SPOTS = ALL_PLACES.filter(p => p.type==='photo');
+```
+**נשארים נפרדים** (לא חלק מ-ALL_PLACES):
+- `REMINDERS[]` — משימות לפני הטיול לסימון ✅
+- `DAYS[]` — לוז בסיס ראשוני (מחליפו `DAYS_STATE` מ-Firestore)
+
+#### שדות תזמון
+- `getDaysState()` — מח��יר את מצב הימים הנוכחי (Firestore / local)
 - `findItemInDays(name)` — מחזיר `{dayNum, dayTitle, time}` אם תחנה נמצאת ביום כלשהו, אחרת `null`
 
 ### טאבים ראשיים
