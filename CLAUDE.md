@@ -1,5 +1,7 @@
 # Prague 2026 — משפחת שיש (repo ציבורי — GitHub Pages בלבד)
 
+> עדכון אחרון: 2026-07-18 (גרסה 10 — תיקון טאב מיקום + PLACE_IMGS מורחב)
+
 זהו repo **ציבורי בכוונה** (חייב להישאר public כדי ש-GitHub Pages יעבוד בחשבון חינמי).
 
 ## מה יש כאן, ומה לא
@@ -14,7 +16,7 @@
 
 ## מפת הפיצ'רים הקיימים ב-app.html
 
-> עדכון אחרון: 2026-07-18 (גרסה 9 — Rich Map Dialog)
+> עדכון אחרון: 2026-07-18 (גרסה 10 — תיקון טאב מיקום + PLACE_IMGS מורחב)
 
 ### מבנה נתונים מרכזי
 
@@ -93,20 +95,25 @@ var PHOTO_SPOTS = ALL_PLACES.filter(p => p.type==='photo');
 - realtime listener (`appdata/main` onSnapshot) מקשיב ל-`total_budget` ומעדכן `renderBudget()` מיידית
 - הוסרה קריאה מתה ל-`appdata/budget.categories` ב-`syncBudgetFromFirebase()`
 
-#### דיאלוג מפה עשיר — Rich Map Dialog (2026-07-18 גרסה 9)
-- `showMapNavDialog(p, coords)` — scrollable bottom sheet בלחיצה על כל pin במפה
+#### דיאלוג מפה עשיר — Rich Map Dialog (גרסה 10)
+- `showMapNavDialog(p, coords)` (~שורה 4644) — scrollable bottom sheet בלחיצה על כל pin/כרטיס
 - header: icon + שם + תג ✅ "כבר בלוז · יום X" אם ב-DAYS
 - מידע לפי type: community (desc/duration/google/who/how/booking/tips) | restaurant (badge/sub/desc/price/google) | dessert (sub/desc/tag/rating/price/where) | shop (stars/hours/metro/duration/brands/tip) | photo (sub/desc/rating/best/crowds/fee/tip)
+- **תיקון קריטי (גרסה 10)**: `tips` community items הוא **string** לא array — שמירה מלאה עם `Array.isArray` guard. בלי זה: `p.tips.forEach` זורק TypeError ושום דיאלוג לא נפתח.
+- **תיקון קריטי (גרסה 10)**: כפתור "הוסף ללוז" בדיאלוג משתמש ב-`window._mapNavPlace` — לא inline data — מונע שבירת onclick בגלל `"` בתוך desc/name (כמו `מ"ר`, `בסופ"ש`).
+- `_openNearbyDialog(apIdx, lat, lng)` (~שורה 4901) — wrapper עם try-catch; `apIdx = ALL_PLACES.indexOf(p)` — אינדקס מספרי, ללא בעיות escaping
 - כפתורי ניווט נעוצים בתחתית: Google Maps | Waze | 📍 מפה מקומית | סגור
 
 #### תמונות + טאב מיקום (2026-07-18)
 - **תמונות מסעדות**: כרטיסי מסעדה עם תמונה 150px — gradient+emoji fallback, Wikimedia Commons אם קיים ב-PLACE_IMGS
 - `restaurantImgHtml(r)` — helper שמחזיר HTML של תמונה עם onerror fallback
 - `PLACE_IMGS` — lookup לפי שם מקום → URL תמונה (Wikimedia Commons)
-- `PLACE_COORDS` — קואורדינטות [lat,lng] ל-40+ מקומות בפראג
+- `PLACE_COORDS` — קואורדינטות [lat,lng] לכל 105 המקומות ב-ALL_PLACES (~שורה 4396)
+- `PLACE_IMGS` — 35+ תמונות Wikimedia Commons לפי שם מקום (~שורה 4494)
 - **טאב מיקום** (`location`) — מפת Leaflet+OpenStreetMap, כפתור "📍 אתרו אותי" (Geolocation API)
-- Pins צבעוניים: כתום=בלוז, כחול=מסעדות, ירוק=אטרקציות, סגול=אתם כאן
+- Pins צבעוניים: כתום=בלוז, כחול=מסעדות, ירוק=אטרקציות, סגול=אתם כאן, צהוב=קניות
 - רשימת מקומות קרובים ממוינת לפי מרחק Haversine + פילטר קטגוריה
+- פילטר אטרקציות: `.indexOf('אטרקציות')` על `cat` — לא על `type` — מונע הצגת מסעדות/קינוחים community
 - תג "✅ כבר בלוז" גם ברשימת הקרובים
 
 #### Light Theme v7 (2026-07-18)
