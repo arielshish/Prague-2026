@@ -3030,9 +3030,11 @@ function selectDay(i) { currentDay = i; renderDays(); }
   // Pointer Events are immune to draggable="true" interference on iOS Safari.
   var _tx = 0, _ty = 0, _lx = 0, _ly = 0, _pid = null;
   document.addEventListener('pointerdown', function(e) {
-    if (e.pointerType === 'mouse') return; // desktop mouse — skip
-    var card = document.getElementById('dayCard');
-    if (!card || !card.contains(e.target)) return;
+    if (e.pointerType === 'mouse') return;
+    var section = document.getElementById('days');
+    if (!section || !section.contains(e.target)) return;
+    var btns = document.getElementById('dayButtons');
+    if (btns && btns.contains(e.target)) return;
     _tx = _lx = e.clientX;
     _ty = _ly = e.clientY;
     _pid = e.pointerId;
