@@ -404,6 +404,7 @@
 <!-- Firebase SDK (compat mode) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
 <script>
 // Firebase init for GitHub Pages (non-GAS) persistence
 var _fbApp = null;
@@ -1729,6 +1730,39 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
     </div>
   </section>
 
+  <!-- ═══ LOCATION TAB ═══ -->
+  <section id="location" class="tab">
+    <div style="margin-bottom:14px;">
+      <h2 style="font-size:20px;font-weight:900;">📍 איפה אנחנו עכשיו?</h2>
+      <p style="font-size:12px;color:rgba(30,41,59,0.55);margin-top:4px;">מיקומכם מול כל האטרקציות, המסעדות ותחנות הלוז</p>
+    </div>
+    <!-- Map container -->
+    <div style="background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.07);margin-bottom:14px;">
+      <div id="locationMap" style="width:100%;height:300px;"></div>
+      <div style="padding:10px 14px;display:flex;gap:14px;flex-wrap:wrap;border-top:1px solid rgba(0,0,0,0.08);">
+        <span style="font-size:11px;font-weight:700;color:rgba(30,41,59,0.55);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:#F4634A;border-radius:50%;display:inline-block;"></span>בלוז שלנו</span>
+        <span style="font-size:11px;font-weight:700;color:rgba(30,41,59,0.55);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:#2563EB;border-radius:50%;display:inline-block;"></span>מסעדות</span>
+        <span style="font-size:11px;font-weight:700;color:rgba(30,41,59,0.55);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:#16a34a;border-radius:50%;display:inline-block;"></span>אטרקציות</span>
+        <span style="font-size:11px;font-weight:700;color:rgba(30,41,59,0.55);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:#9333ea;border-radius:50%;display:inline-block;"></span>אתם כאן</span>
+      </div>
+    </div>
+    <!-- Status + locate button -->
+    <div id="locationStatus" style="background:#fff;border-radius:14px;padding:12px 16px;margin-bottom:12px;box-shadow:0 1px 6px rgba(0,0,0,0.05);display:flex;align-items:center;justify-content:space-between;gap:10px;">
+      <div id="locationStatusText" style="font-size:12px;color:rgba(30,41,59,0.55);">לחץ כדי לאתר את המיקום שלך</div>
+      <button id="btnLocate" onclick="locateMe()" style="background:#F4634A;color:#fff;border:none;border-radius:12px;padding:9px 16px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;font-family:'Rubik',Arial,sans-serif;flex-shrink:0;">📍 אתרו אותי</button>
+    </div>
+    <!-- Filter strip -->
+    <div style="display:flex;gap:7px;overflow-x:auto;margin-bottom:14px;padding-bottom:2px;scrollbar-width:none;">
+      <button onclick="filterNearby('all')" id="lf-all" class="cat-chip" style="border-color:#F4634A;color:#F4634A;white-space:nowrap;">הכל</button>
+      <button onclick="filterNearby('schedule')" id="lf-schedule" class="cat-chip" style="white-space:nowrap;">📅 הלוז שלנו</button>
+      <button onclick="filterNearby('restaurant')" id="lf-restaurant" class="cat-chip" style="white-space:nowrap;">🍽 מסעדות</button>
+      <button onclick="filterNearby('community')" id="lf-community" class="cat-chip" style="white-space:nowrap;">🎟 אטרקציות</button>
+      <button onclick="filterNearby('photo')" id="lf-photo" class="cat-chip" style="white-space:nowrap;">📷 צילום</button>
+    </div>
+    <!-- Nearby list -->
+    <div id="nearbyPlacesList"></div>
+  </section>
+
   <!-- ═══ REMINDERS TAB ═══ -->
   <div id="reminders" class="tab">
     <!-- Header -->
@@ -1761,12 +1795,13 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
   </div>
 
   <!-- ═══ NAV ═══ -->
-  <nav style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);min-height:76px;padding-bottom:env(safe-area-inset-bottom,0px);background:rgba(255,255,255,0.95);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-top:1px solid rgba(0,0,0,0.10);z-index:50;display:grid;grid-template-columns:repeat(7,1fr);">
+  <nav style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);min-height:76px;padding-bottom:env(safe-area-inset-bottom,0px);background:rgba(255,255,255,0.95);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-top:1px solid rgba(0,0,0,0.10);z-index:50;display:grid;grid-template-columns:repeat(8,1fr);">
     <button id="nav-home" class="nav-item active"><span class="nav-icon">🏠</span><span class="nav-label">ראשי</span></button>
     <button id="nav-days" class="nav-item"><span class="nav-icon">📅</span><span class="nav-label">ימים</span></button>
     <button id="nav-shopping" class="nav-item"><span class="nav-icon">🛍️</span><span class="nav-label">קניות</span></button>
     <button id="nav-expenses" class="nav-item"><span class="nav-icon">💰</span><span class="nav-label">הוצאות</span></button>
     <button id="nav-flights" class="nav-item"><span class="nav-icon">✈️</span><span class="nav-label">טיסות</span></button>
+    <button id="nav-location" class="nav-item"><span class="nav-icon">📍</span><span class="nav-label">מיקום</span></button>
     <button id="nav-pack" class="nav-item"><span class="nav-icon">🧳</span><span class="nav-label">ציוד</span></button>
     <button onclick="openTab('reminders')" id="nav-reminders" class="nav-item"><span class="nav-icon">🔔</span><span class="nav-label">תזכורות</span></button>
   </nav>
@@ -3170,7 +3205,7 @@ function isGas() {
 // ═══════════════════════════════════════════
 //  NAVIGATION
 // ═══════════════════════════════════════════
-var ALL_TABS = ['home','days','shopping','expenses','flights','restaurants','pack','info','guides','community','history','photodiary','lang','reminders'];
+var ALL_TABS = ['home','days','shopping','expenses','flights','restaurants','pack','info','guides','community','history','photodiary','lang','reminders','location'];
 
 function openTab(id) {
   ALL_TABS.forEach(function(name) {
@@ -3186,6 +3221,7 @@ function openTab(id) {
   if (id === 'restaurants') renderRestaurants();
   if (id === 'shopping') renderShopping();
   if (id === 'reminders') initReminders();
+  if (id === 'location') renderLocationTab();
 }
 
 // ═══════════════════════════════════════════
@@ -4170,7 +4206,9 @@ function renderRestaurants() {
     }
     var _inDaysR = findItemInDays(r.name);
     var schedBadge = _inDaysR ? ('✅ יום ' + _inDaysR.dayNum + ' · ' + (_inDaysR.time||'')) : '';
-    html += '<div style="background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:20px;padding:18px;margin-bottom:10px;box-shadow:0 3px 10px rgba(0,0,0,0.08);">' +
+    html += '<div style="background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:20px;overflow:hidden;margin-bottom:10px;box-shadow:0 3px 10px rgba(0,0,0,0.08);">' +
+      restaurantImgHtml(r) +
+      '<div style="padding:14px 18px 18px;">' +
       '<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">' +
       '<span style="font-size:30px;line-height:1;flex-shrink:0;margin-top:3px;">' + r.icon + '</span>' +
       '<div style="flex:1;">' +
@@ -4191,7 +4229,7 @@ function renderRestaurants() {
         '<a href="' + r.mapUrl + '" target="_blank" rel="noopener" style="flex:1;display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:11px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;">🗺️ ניווט</a>' +
         '<button data-rest-icon="' + (r.icon||'🍽️') + '" data-rest-name="' + esc(r.name) + '" data-rest-desc="' + esc((r.desc||'').substring(0,120).replace(/\n/g,' ')) + '" class="restAddStopBtn" style="flex:1;background:' + (_inDaysR ? 'rgba(244,99,74,0.13)' : 'rgba(244,99,74,0.12)') + ';border:1.5px solid rgba(244,99,74,0.3);color:#C2410C;border-radius:13px;padding:11px;font-weight:800;font-size:12px;cursor:pointer;font-family:Rubik,Arial,sans-serif;">' + (_inDaysR ? '✏️ עדכן' : '📅 הוסף תחנה') + '</button>' +
       '</div>' +
-    '</div>';
+    '</div></div>';
   });
   list.innerHTML = html;
   list.querySelectorAll('.restAddStopBtn').forEach(function(btn) {
@@ -4314,6 +4352,279 @@ function renderPhotoSpots() {
 // ═══════════════════════════════════════════
 var PACK_STATE = null; // [{cat, items:[{id,text,done}]}]
 var _packAddingCat = null; // שם קטגוריה שאליה מוסיפים פריט, null = קטגוריה חדשה
+
+// ═══════════════════════════════════════════
+//  LOCATION TAB — מיקום ותמונות
+// ═══════════════════════════════════════════
+
+// קואורדינטות לכל מקום (lat, lng)
+var PLACE_COORDS = {
+  // ── מסעדות ──
+  'המזללה':                      [50.0897, 14.4180],
+  'Café Savoy':                  [50.0859, 14.4063],
+  'U Fleků — פאב מ-1499':       [50.0826, 14.4195],
+  'Lokál Dlouhááá':              [50.0891, 14.4231],
+  'Výtopna':                     [50.0815, 14.4274],
+  'Mistral Café':                [50.0886, 14.4184],
+  'Las Adelitas':                [50.0923, 14.4356],
+  'Pasta Fresca':                [50.0873, 14.4208],
+  'Vapiano':                     [50.0889, 14.4246],
+  'Gran Fierro':                 [50.0779, 14.4368],
+  'Kantýna':                     [50.0793, 14.4304],
+  'Čestr':                       [50.0758, 14.4348],
+  'Lokál Korunní':               [50.0749, 14.4378],
+  'יפו פראג — Jaffa Prague':    [50.0820, 14.4299],
+  'Mango — מסעדה אסייתית':      [50.0855, 14.4240],
+  'Yammi Sushi House':           [50.0790, 14.4343],
+  'Little Chimney — קריוטוש דובאי': [50.0862, 14.4110],
+  'קריוטוש כשר':                 [50.0904, 14.4180],
+  'Café Imperial':               [50.0918, 14.4318],
+  'Café Louvre':                 [50.0802, 14.4246],
+  // ── קהילה/אטרקציות ──
+  'פסל קפקא המסתובב':            [50.0892, 14.4228],
+  'גלרית Lumia — מוזיאון האורות': [50.0888, 14.4254],
+  'מוזיאון האשליות':             [50.0880, 14.4210],
+  'מוזיאון החושים':              [50.0875, 14.4213],
+  'גן החיות של פראג':            [50.1173, 14.4075],
+  'בית הכנסת הגדול — Staronová synagoga': [50.0903, 14.4184],
+  'מצודת פראג':                  [50.0908, 14.4003],
+  'שייט בוולטאווה':              [50.0900, 14.4155],
+  'Aquapalace Prague':           [50.0218, 14.5536],
+  'בריכת Šutka':                 [50.1308, 14.4338],
+  'Level — משחקייה':             [50.0812, 14.4274],
+  'שמורת Adršpach':              [50.6231, 16.1075],
+  'לונה פארק — Lunapark Holešovice': [50.1051, 14.4375],
+  'מוזיאון הלגו — LEGO Museum Prague': [50.0877, 14.4225],
+  'מזרקת Křižík':                [50.1021, 14.4075],
+  'Rabit':                       [50.0880, 14.4215],
+  'כריך פסטו — שוק האיכרים':    [50.0762, 14.4340],
+  // ── נקודות צילום ──
+  'גשר קרל':                     [50.0865, 14.4115],
+  'מגדל הגשר (Old Town Bridge Tower)': [50.0868, 14.4123],
+  'ויישהראד — Vyšehrad':        [50.0643, 14.4181],
+  'גן המלכה — Stromovka':       [50.1065, 14.4172],
+  'לטנה (Letná Park)':           [50.0963, 14.4147],
+  // ── קניות ──
+  'Palladium':                   [50.0882, 14.4334],
+};
+
+// תמונות לפי שם (Wikimedia Commons — עם fallback לגרדיאנט)
+var PLACE_IMGS = {
+  'גשר קרל':              'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Prague_-_Charles_Bridge_from_tower_crop.jpg/640px-Prague_-_Charles_Bridge_from_tower_crop.jpg',
+  'מגדל הגשר (Old Town Bridge Tower)': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Prague_-_Old_Town_Bridge_Tower.jpg/640px-Prague_-_Old_Town_Bridge_Tower.jpg',
+  'מצודת פראג':           'https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Prague_castle_from_Lesser_Town_Bridge_Tower.jpg/640px-Prague_castle_from_Lesser_Town_Bridge_Tower.jpg',
+  'ויישהראד — Vyšehrad': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Vysehrad_church.jpg/640px-Vysehrad_church.jpg',
+  'Café Savoy':           'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Caf%C3%A9_Savoy_-_panoramio.jpg/640px-Caf%C3%A9_Savoy_-_panoramio.jpg',
+  'U Fleků — פאב מ-1499':'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/U_fleku_prague.jpg/640px-U_fleku_prague.jpg',
+  'גן החיות של פראג':     'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Prague_zoo.jpg/640px-Prague_zoo.jpg',
+  'לטנה (Letná Park)':    'https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Letna_metronome_Prague.jpg/640px-Letna_metronome_Prague.jpg',
+};
+
+// צבעי גרדיאנט fallback לכל טיפוס
+var TYPE_GRAD = {
+  restaurant: ['#c0392b','#8e1010'],
+  community:  ['#1a237e','#283593'],
+  photo:      ['#01579b','#0277bd'],
+  dessert:    ['#880e4f','#6a1b4d'],
+  shop:       ['#1b5e20','#2e7d32'],
+};
+
+// Haversine — מרחק בק"מ בין שתי נקודות
+function haversine(lat1,lng1,lat2,lng2) {
+  var R=6371, dLat=(lat2-lat1)*Math.PI/180, dLng=(lng2-lng1)*Math.PI/180;
+  var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+var _leafletMap = null;
+var _userLat = null, _userLng = null;
+var _nearbyFilter = 'all';
+var _nearbyAll = [];
+
+function renderLocationTab() {
+  // אתחול מפה פעם אחת
+  setTimeout(function() {
+    if (!window.L) return;
+    if (!_leafletMap) {
+      _leafletMap = L.map('locationMap', {zoomControl:false}).setView([50.0875, 14.4213], 14);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution:'© OpenStreetMap',
+        maxZoom:19
+      }).addTo(_leafletMap);
+      L.control.zoom({position:'bottomright'}).addTo(_leafletMap);
+      addMapMarkers();
+    } else {
+      _leafletMap.invalidateSize();
+    }
+  }, 80);
+  renderNearbyList();
+}
+
+function makePinIcon(color) {
+  if (!window.L) return null;
+  return L.divIcon({
+    html: '<div style="width:14px;height:14px;background:'+color+';border:2.5px solid #fff;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.3);"></div>',
+    iconSize:[14,14], iconAnchor:[7,7], className:''
+  });
+}
+
+function addMapMarkers() {
+  if (!_leafletMap || !window.L) return;
+  var catColor = { restaurant:'#2563EB', community:'#16a34a', photo:'#9333ea', dessert:'#e879f9', shop:'#f59e0b' };
+  var daysState = getDaysState();
+  var scheduledNames = {};
+  daysState.forEach(function(d) { (d.stops||[]).forEach(function(s){ scheduledNames[s.name]=true; }); });
+
+  ALL_PLACES.forEach(function(p) {
+    var coords = PLACE_COORDS[p.name];
+    if (!coords) return;
+    var isScheduled = scheduledNames[p.name];
+    var color = isScheduled ? '#F4634A' : (catColor[p.type] || '#64748B');
+    var icon = makePinIcon(color);
+    if (!icon) return;
+    var marker = L.marker(coords, {icon:icon}).addTo(_leafletMap);
+    marker.bindPopup(
+      '<div style="direction:rtl;font-family:\'Rubik\',Arial,sans-serif;min-width:160px;">' +
+      '<div style="font-size:13px;font-weight:800;margin-bottom:3px;">' + p.icon + ' ' + p.name + '</div>' +
+      (p.desc ? '<div style="font-size:11px;color:#64748B;line-height:1.4;">' + (p.desc.substring(0,80)) + '…</div>' : '') +
+      (isScheduled ? '<div style="margin-top:6px;font-size:11px;color:#16a34a;font-weight:700;">✅ בלוז</div>' : '') +
+      '</div>', {maxWidth:200, direction:'rtl'}
+    );
+  });
+}
+
+function locateMe() {
+  var statusEl = document.getElementById('locationStatusText');
+  var btn = document.getElementById('btnLocate');
+  if (!navigator.geolocation) {
+    statusEl.textContent = '⚠️ דפדפן זה לא תומך באיתור מיקום';
+    return;
+  }
+  statusEl.textContent = '⌛ מאתר מיקום…';
+  btn.disabled = true;
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    _userLat = pos.coords.latitude;
+    _userLng = pos.coords.longitude;
+    btn.disabled = false;
+    statusEl.textContent = '✅ מיקום עודכן — ' + _userLat.toFixed(4) + ', ' + _userLng.toFixed(4);
+    // הוסף פין לאתם כאן
+    if (_leafletMap && window.L) {
+      var youIcon = L.divIcon({
+        html:'<div style="width:18px;height:18px;background:#9333ea;border:3px solid #fff;border-radius:50%;box-shadow:0 0 0 4px rgba(147,51,234,0.25);"></div>',
+        iconSize:[18,18],iconAnchor:[9,9],className:''
+      });
+      L.marker([_userLat,_userLng],{icon:youIcon,zIndexOffset:1000})
+        .bindPopup('<div style="font-weight:800;color:#9333ea;">📍 אתם כאן</div>')
+        .addTo(_leafletMap)
+        .openPopup();
+      _leafletMap.setView([_userLat,_userLng], 15, {animate:true});
+    }
+    renderNearbyList();
+  }, function(err) {
+    btn.disabled = false;
+    statusEl.textContent = '⚠️ לא ניתן לאתר: ' + (err.code===1 ? 'אין הרשאה' : 'שגיאת GPS');
+  }, {timeout:10000, enableHighAccuracy:true});
+}
+
+function filterNearby(cat) {
+  _nearbyFilter = cat;
+  ['all','schedule','restaurant','community','photo'].forEach(function(k) {
+    var el = document.getElementById('lf-' + k);
+    if (!el) return;
+    el.style.borderColor = k===cat ? '#F4634A' : '';
+    el.style.color = k===cat ? '#F4634A' : '';
+  });
+  renderNearbyList();
+}
+
+function renderNearbyList() {
+  var container = document.getElementById('nearbyPlacesList');
+  if (!container) return;
+  var daysState = getDaysState();
+  var scheduledNames = {};
+  daysState.forEach(function(d) { (d.stops||[]).forEach(function(s){ scheduledNames[s.name]={day:d.title,time:s.time}; }); });
+
+  // בנה רשימה עם מרחקים
+  var items = [];
+  ALL_PLACES.forEach(function(p) {
+    if (!PLACE_COORDS[p.name]) return;
+    var coords = PLACE_COORDS[p.name];
+    var dist = (_userLat !== null) ? haversine(_userLat, _userLng, coords[0], coords[1]) : null;
+    var inDays = scheduledNames[p.name] || null;
+    var effType = inDays ? 'schedule' : p.type;
+    items.push({p:p, coords:coords, dist:dist, inDays:inDays, effType:effType});
+  });
+
+  // סנן
+  var filtered = items.filter(function(it) {
+    if (_nearbyFilter === 'all') return true;
+    if (_nearbyFilter === 'schedule') return !!it.inDays;
+    return it.p.type === _nearbyFilter;
+  });
+
+  // מיין: קרוב → רחוק, ואם אין GPS — לפי שם
+  filtered.sort(function(a,b) {
+    if (a.dist !== null && b.dist !== null) return a.dist - b.dist;
+    if (a.dist !== null) return -1;
+    if (b.dist !== null) return 1;
+    return a.p.name.localeCompare(b.p.name);
+  });
+
+  if (!filtered.length) {
+    container.innerHTML = '<div style="text-align:center;padding:30px;color:rgba(30,41,59,0.4);font-size:13px;">אין מקומות בקטגוריה זו</div>';
+    return;
+  }
+
+  var typeColor = { restaurant:'#2563EB', community:'#16a34a', photo:'#9333ea', dessert:'#e879f9', shop:'#f59e0b', schedule:'#F4634A' };
+  var typeLabel = { restaurant:'מסעדה', community:'אטרקציה', photo:'צילום', dessert:'קינוח', shop:'קניות', schedule:'בלוז' };
+
+  var html = '';
+  filtered.forEach(function(it) {
+    var p = it.p;
+    var grad = TYPE_GRAD[p.type] || ['#475569','#334155'];
+    var imgUrl = PLACE_IMGS[p.name] || '';
+    var distStr = it.dist !== null ? (it.dist < 1 ? Math.round(it.dist*1000)+'מ\'' : it.dist.toFixed(1)+'ק"מ') : '';
+    var walkMin = it.dist !== null ? Math.ceil(it.dist / 0.08) : 0; // ~80מ לדקה
+    var effType = it.inDays ? 'schedule' : p.type;
+    var catClr = typeColor[effType] || '#64748B';
+    var catLbl = typeLabel[effType] || p.type;
+    var desc = (p.desc || p.tips || '').substring(0, 90);
+
+    html += '<div style="background:#fff;border-radius:16px;padding:13px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.05);display:flex;align-items:center;gap:12px;">' +
+      // thumbnail
+      '<div style="width:60px;height:60px;border-radius:12px;overflow:hidden;flex-shrink:0;position:relative;background:linear-gradient(135deg,'+grad[0]+','+grad[1]+');display:flex;align-items:center;justify-content:center;">' +
+        '<span style="font-size:26px;position:relative;z-index:1;">' + p.icon + '</span>' +
+        (imgUrl ? '<img src="'+imgUrl+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="this.remove()" loading="lazy">' : '') +
+      '</div>' +
+      // info
+      '<div style="flex:1;min-width:0;">' +
+        '<div style="font-size:14px;font-weight:800;color:#1E293B;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(p.name) + '</div>' +
+        (desc ? '<div style="font-size:11px;color:rgba(30,41,59,0.55);line-height:1.4;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">' + esc(desc) + '</div>' : '') +
+        '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
+          '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:' + catClr + '18;color:' + catClr + ';">' + catLbl + '</span>' +
+          (distStr ? '<span style="font-size:10px;font-weight:700;color:rgba(30,41,59,0.5);">🚶 '+distStr+(walkMin?(' · '+walkMin+'ד\''):'')+'</span>' : '') +
+          (it.inDays ? '<span style="font-size:10px;font-weight:700;color:#16a34a;background:rgba(22,163,74,0.10);padding:2px 8px;border-radius:20px;margin-right:auto;">✅ '+it.inDays.day+(it.inDays.time?' · '+it.inDays.time:'')+'</span>' : '') +
+        '</div>' +
+      '</div>' +
+      // nav button
+      (p.mapUrl ? '<a href="'+p.mapUrl+'" target="_blank" rel="noopener" style="flex-shrink:0;width:34px;height:34px;background:rgba(244,99,74,0.10);border-radius:10px;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:16px;" title="נווט">🗺️</a>' : '') +
+    '</div>';
+  });
+  container.innerHTML = html;
+}
+
+// ─────────────────────────────────────────
+//  תמונות בכרטיסי מסעדות — helper
+// ─────────────────────────────────────────
+function restaurantImgHtml(r) {
+  var grad = TYPE_GRAD[r.type] || TYPE_GRAD['restaurant'];
+  var imgUrl = PLACE_IMGS[r.name] || '';
+  return '<div style="position:relative;height:150px;overflow:hidden;border-radius:0;background:linear-gradient(135deg,'+grad[0]+','+grad[1]+');display:flex;align-items:center;justify-content:center;">' +
+    '<span style="font-size:52px;position:relative;z-index:1;">' + r.icon + '</span>' +
+    (imgUrl ? '<img src="'+imgUrl+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;" onerror="this.remove()" loading="lazy">' : '') +
+    '<div style="position:absolute;inset:0;z-index:3;background:linear-gradient(transparent 40%,rgba(0,0,0,0.45));"></div>' +
+  '</div>';
+}
 
 function getDefaultPackCats() {
   return JSON.parse(JSON.stringify(PACK_CATS.map(function(c) {
@@ -5549,7 +5860,8 @@ document.addEventListener('DOMContentLoaded', function() {
     'btnNewPhoto':          function() { openPhotoModal(null); },
     'btnShareAll':          function() { shareAllPhotos(); },
     'btnSavePhoto':         function() { savePhotoEntry(); },
-    'nav-reminders':        function() { openTab('reminders'); }
+    'nav-reminders':        function() { openTab('reminders'); },
+    'nav-location':         function() { openTab('location'); }
   };
 
   Object.keys(btnMap).forEach(function(id) {
@@ -6488,5 +6800,6 @@ function openPhotoViewer(id) {
 }
 
 </script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 </body>
 </html>
