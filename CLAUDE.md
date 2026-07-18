@@ -93,6 +93,16 @@ var PHOTO_SPOTS = ALL_PLACES.filter(p => p.type==='photo');
 - realtime listener (`appdata/main` onSnapshot) מקשיב ל-`total_budget` ומעדכן `renderBudget()` מיידית
 - הוסרה קריאה מתה ל-`appdata/budget.categories` ב-`syncBudgetFromFirebase()`
 
+#### תמונות + טאב מיקום (2026-07-18)
+- **תמונות מסעדות**: כרטיסי מסעדה עם תמונה 150px — gradient+emoji fallback, Wikimedia Commons אם קיים ב-PLACE_IMGS
+- `restaurantImgHtml(r)` — helper שמחזיר HTML של תמונה עם onerror fallback
+- `PLACE_IMGS` — lookup לפי שם מקום → URL תמונה (Wikimedia Commons)
+- `PLACE_COORDS` — קואורדינטות [lat,lng] ל-40+ מקומות בפראג
+- **טאב מיקום** (`location`) — מפת Leaflet+OpenStreetMap, כפתור "📍 אתרו אותי" (Geolocation API)
+- Pins צבעוניים: כתום=בלוז, כחול=מסעדות, ירוק=אטרקציות, סגול=אתם כאן
+- רשימת מקומות קרובים ממוינת לפי מרחק Haversine + פילטר קטגוריה
+- תג "✅ כבר בלוז" גם ברשימת הקרובים
+
 #### Light Theme v7 (2026-07-18)
 - **עיצוב בהיר שולט** — לבן (`#ffffff`) בכרטיסים, מודאלים, nav, sidebar
 - **body/html**: `#F7F3EE` / `#FAF7F4` gradient (במקום beige כהה)
