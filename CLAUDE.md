@@ -93,6 +93,18 @@ var PHOTO_SPOTS = ALL_PLACES.filter(p => p.type==='photo');
 - realtime listener (`appdata/main` onSnapshot) מקשיב ל-`total_budget` ומעדכן `renderBudget()` מיידית
 - הוסרה קריאה מתה ל-`appdata/budget.categories` ב-`syncBudgetFromFirebase()`
 
+#### Light Theme v7 (2026-07-18)
+- **עיצוב בהיר שולט** — לבן (`#ffffff`) בכרטיסים, מודאלים, nav, sidebar
+- **body/html**: `#F7F3EE` / `#FAF7F4` gradient (במקום beige כהה)
+- **`--c-surface`**: `#F7F3EE` (עדכון טוקן)
+- **טיסות**: שני כרטיסי הטיסה (הלוך/חזור) שוכתבו לגמרי — רקע לבן עם border צבעוני (`rgba(244,99,74,0.18)` / `rgba(59,130,246,0.18)`)
+- **כדורי ימים (day pills)**: כדורים לא-פעילים עכשיו `#ffffff` עם border דק (במקום `rgba(0,0,0,0.08)`)
+- **מודאלים (bottom sheets)**: כולם `#ffffff` (במקום `#F5EFE6` beige)
+- **Nav + sidebar**: `rgba(255,255,255,0.95)` backdrop (במקום `rgba(237,228,216,0.97)`)
+- **login screen**: `#FAF7F4` (במקום `#EDE4D8`)
+- **header**: **נשאר כהה בכוונה** — skyline של פראג בלילה כ-accent עיצובי
+- **גבולות**: `rgba(255,255,255,0.14/0.15)` → `rgba(0,0,0,0.10)` (replace_all — גבולות לבנים היו בלתי נראים על רקע לבן)
+
 #### Premium UI — Design System v6 (2026-07-18)
 - **Phase 0**: CSS Design System — `:root` tokens (`--c-primary`, `--c-card`, `--r-card`, `--s-card`, `--t-fast` etc.), keyframes (`fadeSlideUp`, `scaleIn`, `skeletonPulse`), DS classes (`.ds-badge-{red,amber,green,blue,gray}`, `.ds-chip`, `.ds-fab`, `.ds-stat`, `.ds-section-hdr`, `.skeleton`, `.btn-primary` gradient, `.btn-ghost`)
 - **Phase 1**: Bottom nav — `<button class="nav-item">` with `.nav-icon` / `.nav-label` children; `openTab()` toggles `.active` class (CSS handles color + scale + backdrop-blur pill)
