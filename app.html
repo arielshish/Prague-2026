@@ -4642,6 +4642,7 @@ function addMapMarkers() {
 }
 
 function showMapNavDialog(p, coords) {
+  try {
   var existing = document.getElementById('mapNavDialog');
   if (existing) existing.remove();
 
@@ -4763,6 +4764,7 @@ function showMapNavDialog(p, coords) {
     '</div>';
 
   document.body.appendChild(overlay);
+  } catch(e) { console.error('[showMapNavDialog] error for', p && p.name, e); }
 }
 
 function locateMe() {
@@ -4831,6 +4833,10 @@ function renderNearbyList() {
   var filtered = items.filter(function(it) {
     if (_nearbyFilter === 'all') return true;
     if (_nearbyFilter === 'schedule') return !!it.inDays;
+    // 'community' filter = only actual attractions (cat contains 'אטרקציות')
+    if (_nearbyFilter === 'community') {
+      return it.p.type === 'community' && (it.p.cat || '').indexOf('אטרקציות') !== -1;
+    }
     return it.p.type === _nearbyFilter;
   });
 
@@ -4852,6 +4858,7 @@ function renderNearbyList() {
 
   var html = '';
   filtered.forEach(function(it) {
+    try {
     var p = it.p;
     var grad = TYPE_GRAD[p.type] || ['#475569','#334155'];
     var imgUrl = PLACE_IMGS[p.name] || '';
@@ -4860,9 +4867,11 @@ function renderNearbyList() {
     var effType = it.inDays ? 'schedule' : p.type;
     var catClr = typeColor[effType] || '#64748B';
     var catLbl = typeLabel[effType] || p.type;
-    var desc = (p.desc || p.tips || '').substring(0, 90);
+    var _tipStr = Array.isArray(p.tips) ? p.tips.join(' | ') : (p.tips || '');
+    var desc = String(p.desc || _tipStr || '').substring(0, 90);
 
     var apIdx = ALL_PLACES.indexOf(p);
+    if (apIdx === -1) return; // defensive: skip items not in ALL_PLACES
     var c0 = it.coords[0], c1 = it.coords[1];
     html += '<div onclick="_openNearbyDialog(' + apIdx + ',' + c0 + ',' + c1 + ')" ' +
       'style="background:#fff;border-radius:16px;padding:13px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.05);display:flex;align-items:center;gap:12px;cursor:pointer;-webkit-tap-highlight-color:rgba(0,0,0,0.04);">' +
@@ -4884,12 +4893,19 @@ function renderNearbyList() {
       // arrow indicator
       '<div style="flex-shrink:0;width:28px;height:28px;background:rgba(244,99,74,0.10);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;">›</div>' +
     '</div>';
+    } catch(e) { console.error('[renderNearbyList] item error', it && it.p && it.p.name, e); }
   });
   container.innerHTML = html;
 }
 
 function _openNearbyDialog(apIdx, lat, lng) {
-  showMapNavDialog(ALL_PLACES[apIdx], [lat, lng]);
+  try {
+    var p = ALL_PLACES[apIdx];
+    if (!p) { console.warn('[location] _openNearbyDialog: invalid apIdx', apIdx); return; }
+    showMapNavDialog(p, [lat, lng]);
+  } catch(e) {
+    console.error('[location] _openNearbyDialog error', apIdx, e);
+  }
 }
 
 // ─────────────────────────────────────────
