@@ -3027,39 +3027,33 @@ function loadDaysFromSheets(silent) {
 function selectDay(i) { currentDay = i; renderDays(); }
 
 (function initDaySwipe() {
-  // Use document-level listeners to bypass iOS Safari draggable interference.
-  var _tx = 0, _ty = 0, _lx = 0, _ly = 0, _active = false;
-  function _onStart(e) {
+  // Pointer Events are immune to draggable="true" interference on iOS Safari.
+  var _tx = 0, _ty = 0, _lx = 0, _ly = 0, _pid = null;
+  document.addEventListener('pointerdown', function(e) {
+    if (e.pointerType === 'mouse') return; // desktop mouse — skip
     var card = document.getElementById('dayCard');
-    if (!card) return;
-    var t = e.touches ? e.touches[0] : null;
-    if (!t) return;
-    if (!card.contains(e.target)) return;
-    _tx = _lx = t.clientX;
-    _ty = _ly = t.clientY;
-    _active = true;
-  }
-  function _onMove(e) {
-    if (!_active || !e.touches) return;
-    _lx = e.touches[0].clientX;
-    _ly = e.touches[0].clientY;
-  }
-  function _onEnd(e) {
-    if (!_active) return;
-    _active = false;
-    var cx = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientX : _lx;
-    var cy = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientY : _ly;
-    var dx = cx - _tx;
-    var dy = cy - _ty;
+    if (!card || !card.contains(e.target)) return;
+    _tx = _lx = e.clientX;
+    _ty = _ly = e.clientY;
+    _pid = e.pointerId;
+  });
+  document.addEventListener('pointermove', function(e) {
+    if (e.pointerId !== _pid) return;
+    _lx = e.clientX;
+    _ly = e.clientY;
+  });
+  function _finish(e) {
+    if (e.pointerId !== _pid) return;
+    _pid = null;
+    var dx = _lx - _tx;
+    var dy = _ly - _ty;
     if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
     var total = getDaysState().length;
     var next = currentDay + (dx < 0 ? 1 : -1);
     if (next >= 1 && next <= total) selectDay(next);
   }
-  document.addEventListener('touchstart', _onStart, { passive: true });
-  document.addEventListener('touchmove', _onMove, { passive: true });
-  document.addEventListener('touchend', _onEnd, { passive: true });
-  document.addEventListener('touchcancel', _onEnd, { passive: true });
+  document.addEventListener('pointerup', _finish);
+  document.addEventListener('pointercancel', _finish);
 })();
 
 function renderDays() {
