@@ -35,7 +35,7 @@ GitHub Pages: `arielshish.github.io/Prague-2026/app.html`
 | `saveAddCommunityStop()` | ~3712 | שומר COMMUNITY → DAYS (כולל google/duration/who) |
 | `openAddCommunityStop(idx)` | ~3693 | modal להוספת תחנה |
 
-## פיצ'רים קיימים (עדכון 2026-07-18 — גרסה 2)
+## פיצ'רים קיימים (עדכון 2026-07-18 — גרסה 3)
 
 ### ציוני Google ב-DAYS
 - תחנות ב-DAYS מציגות ⭐ ציון, משך, ו"מתאים ל"
@@ -56,10 +56,15 @@ GitHub Pages: `arielshish.github.io/Prague-2026/app.html`
 - קוד: `var _fb = COMMUNITY.find(c=>c.name===s.name) || RESTAURANTS.find(r=>r.name===s.name) || {};`
 
 ### Swipe ימינה/שמאלה בין ימים
-- `initDaySwipe()` IIFE מוזרק בתוך `renderDays()` אחרי בניית ה-HTML
-- מאזין על `section#days` (לא `#dayCard`) בגלל `draggable="true"` שמיירט touches ב-iOS Safari
-- `touchcancel` handler לאיפוס `_active`
-- threshold: `|dx| >= 50` ו-`|dx| > |dy|`
+- `initDaySwipe()` IIFE — listeners על `document` (לא section/card) לעקיפת draggable-iOS
+- `touchmove` מעדכן `_lx/_ly` — מיקום אחרון תמיד זמין
+- `touchcancel` מבצע סווייפ (לא מבטל) — פותר בעיית draggable ב-iOS Safari
+- threshold: `|dx| >= 40` ו-`|dx| > |dy| * 1.2`
+
+### סינכרון תגים בזמן אמת
+- `refreshScheduleBadges()` (~line 2971) — מזהה טאב פעיל ומרנדר Community/Restaurants/Reminders
+- נקראת מ-`saveDaysState()` — כלומר אחרי כל הוספה, מחיקה, הזזה
+- `openTab('community')` קורא `renderCommunity()` — תגים עדכניים בכל כניסה לטאב
 
 ## כללי עבודה קריטיים
 
