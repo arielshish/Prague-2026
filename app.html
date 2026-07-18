@@ -3155,7 +3155,13 @@ function renderDays() {
         (d.mapUrl ? '<a href="' + d.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:12px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;margin-top:14px;">🗺️ מסלול מלא במפה</a>' : '') +
       '</div>' +
       '<div class="day-timeline-col">' +
-        '<div style="font-size:11px;font-weight:800;color:#F4634A;letter-spacing:0.5px;text-transform:uppercase;margin:0 0 6px;">🧭 מסלול היום</div>' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin:0 0 6px;">' +
+          '<div style="font-size:11px;font-weight:800;color:#F4634A;letter-spacing:0.5px;text-transform:uppercase;">🧭 מסלול היום</div>' +
+          '<div style="display:flex;gap:6px;">' +
+            '<button id="dayPrevBtn" onclick="(function(){var n=currentDay-1;if(n>=1)selectDay(n);})()" style="background:rgba(244,99,74,0.08);border:1px solid rgba(244,99,74,0.2);border-radius:8px;width:30px;height:30px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#F4634A;font-family:\'Rubik\',Arial,sans-serif;transition:opacity 0.2s;">›</button>' +
+            '<button id="dayNextBtn" onclick="(function(){var t=getDaysState().length;var n=currentDay+1;if(n<=t)selectDay(n);})()" style="background:rgba(244,99,74,0.08);border:1px solid rgba(244,99,74,0.2);border-radius:8px;width:30px;height:30px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#F4634A;font-family:\'Rubik\',Arial,sans-serif;transition:opacity 0.2s;">‹</button>' +
+          '</div>' +
+        '</div>' +
         '<div style="background:rgba(244,99,74,0.06);border:1px solid rgba(244,99,74,0.15);border-radius:10px;padding:7px 10px;font-size:10px;color:rgba(30,41,59,0.5);line-height:1.6;margin-bottom:8px;text-align:right;">גרור תחנה לשינוי סדר · 🔼🔽 להעלות/להוריד · ↔ להעביר ליום אחר · ✕ להסיר</div>' +
         '<div style="padding-right:20px;border-right:2px dashed rgba(244,99,74,0.3);">' + stopsHtml + '</div>' +
         '<button onclick="openAddStop(' + (i-1) + ')" style="width:100%;background:rgba(0,0,0,0.04);border:1.5px dashed rgba(0,0,0,0.15);border-radius:13px;padding:10px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.5);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;margin:8px 0 12px;">➕ הוסף תחנה</button>' +
