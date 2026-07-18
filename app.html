@@ -1759,13 +1759,13 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
 
   <!-- ═══ NAV ═══ -->
   <nav style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);min-height:76px;padding-bottom:env(safe-area-inset-bottom,0px);background:rgba(237,228,216,0.97);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-top:1px solid rgba(0,0,0,0.10);z-index:50;display:grid;grid-template-columns:repeat(7,1fr);">
-    <button id="nav-home" style="border:0;background:transparent;color:#F4634A;font-size:9px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">🏠</span>ראשי</button>
-    <button id="nav-days" style="border:0;background:transparent;color:rgba(30,41,59,0.5);font-size:9px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">📅</span>ימים</button>
-    <button id="nav-shopping" style="border:0;background:transparent;color:rgba(30,41,59,0.5);font-size:9px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">🛍️</span>קניות</button>
-    <button id="nav-expenses" style="border:0;background:transparent;color:rgba(30,41,59,0.5);font-size:9px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">💰</span>הוצאות</button>
-    <button id="nav-flights" style="border:0;background:transparent;color:rgba(30,41,59,0.5);font-size:9px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">✈️</span>טיסות</button>
-    <button id="nav-pack" style="border:0;background:transparent;color:rgba(30,41,59,0.5);font-size:9px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">🧳</span>ציוד</button>
-    <button onclick="openTab('reminders')" id="nav-reminders" style="border:0;background:transparent;color:rgba(30,41,59,0.5);font-size:9px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;"><span style="font-size:19px;line-height:1.1;">🔔</span>תזכורות</button>
+    <button id="nav-home" class="nav-item active"><span class="nav-icon">🏠</span><span class="nav-label">ראשי</span></button>
+    <button id="nav-days" class="nav-item"><span class="nav-icon">📅</span><span class="nav-label">ימים</span></button>
+    <button id="nav-shopping" class="nav-item"><span class="nav-icon">🛍️</span><span class="nav-label">קניות</span></button>
+    <button id="nav-expenses" class="nav-item"><span class="nav-icon">💰</span><span class="nav-label">הוצאות</span></button>
+    <button id="nav-flights" class="nav-item"><span class="nav-icon">✈️</span><span class="nav-label">טיסות</span></button>
+    <button id="nav-pack" class="nav-item"><span class="nav-icon">🧳</span><span class="nav-label">ציוד</span></button>
+    <button onclick="openTab('reminders')" id="nav-reminders" class="nav-item"><span class="nav-icon">🔔</span><span class="nav-label">תזכורות</span></button>
   </nav>
 </div>
 
@@ -3174,7 +3174,7 @@ function openTab(id) {
     var sec = qs(name);
     if (sec) sec.className = sec.className.replace(' active','') + (name === id ? ' active' : '');
     var btn = qs('nav-' + name);
-    if (btn) btn.style.color = name === id ? '#F4634A' : 'rgba(30,41,59,0.55)';
+    if (btn) { btn.classList.toggle('active', name === id); btn.style.color = ''; }
   });
   if (id === 'expenses') { loadExpenses(); if (!window._expFirebaseLoaded) { window._expFirebaseLoaded = true; loadExpensesFromFirebase(); } syncBudgetFromSheets(); syncBudgetFromFirebase(); }
   if (id === 'days') { renderDays(); loadDaysFromSheets(); }
