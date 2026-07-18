@@ -3269,6 +3269,7 @@ function refreshScheduleBadges() {
   else if (active === 'restaurants' && typeof renderRestaurants === 'function') renderRestaurants();
   else if (active === 'shopping' && typeof renderShopping === 'function') renderShopping();
   else if (active === 'reminders' && typeof renderReminders === 'function') renderReminders();
+  else if (active === 'location' && typeof renderNearbyList === 'function') renderNearbyList();
 }
 
 function loadDaysFromSheets(silent) {
@@ -4518,8 +4519,12 @@ function initLeafletMap() {
   }
   initLeafletMap._tries = 0;
   if (_leafletMap) {
-    // מפה כבר קיימת — פשוט תקן גודל (הdiv היה מוסתר)
-    setTimeout(function() { _leafletMap.invalidateSize(); }, 100);
+    // מפה כבר קיימת — תקן גודל ורענן פינים לפי DAYS_STATE עדכני
+    setTimeout(function() {
+      _leafletMap.invalidateSize();
+      _leafletMap.eachLayer(function(l) { if (l instanceof L.Marker) _leafletMap.removeLayer(l); });
+      addMapMarkers();
+    }, 100);
     return;
   }
   var mapDiv = document.getElementById('locationMap');
@@ -5170,6 +5175,7 @@ function initRealtimeSync() {
             DAYS_STATE = remoteDays;
             localStorage.setItem('prague_days_v1', d.days_custom);
             renderDays();
+            refreshScheduleBadges();
             showSyncBadge('📅');
           }
         } catch(e) {}
