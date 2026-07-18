@@ -951,11 +951,11 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
       <button class="back-btn" id="btnBackExpenses">← ראשי</button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
-      <div style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.25);border-radius:18px;padding:15px;text-align:center;">
+      <div class="ds-stat" style="--stat-color:#F59E0B;">
         <div id="sumCzk" style="font-size:26px;font-weight:900;color:#F59E0B;line-height:1;">0</div>
         <div style="font-size:10px;color:rgba(30,41,59,0.5);margin-top:4px;font-weight:600;letter-spacing:1px;">CZK</div>
       </div>
-      <div style="background:rgba(244,99,74,0.12);border:1px solid rgba(244,99,74,0.25);border-radius:18px;padding:15px;text-align:center;">
+      <div class="ds-stat" style="--stat-color:#F4634A;">
         <div id="sumIls" style="font-size:26px;font-weight:900;color:#F4634A;line-height:1;">₪0</div>
         <div style="font-size:10px;color:rgba(30,41,59,0.5);margin-top:4px;font-weight:600;letter-spacing:1px;">שקלים</div>
       </div>
@@ -998,9 +998,8 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
     </div>
     <div style="display:flex;gap:8px;margin-bottom:14px;">
       <button id="btnAddExpense" class="btn-primary" style="flex:1;">➕ הוסף הוצאה</button>
-      <button onclick="closeExpense()" class="btn-ghost">ביטול</button>
-      <button id="btnRefreshExp" class="btn-ghost">🔄</button>
-      <button id="btnExportCsv" class="btn-ghost">CSV</button>
+      <button id="btnRefreshExp" class="btn-ghost" title="רענן">🔄</button>
+      <button id="btnExportCsv" class="btn-ghost" title="ייצוא CSV">📤</button>
     </div>
     <div id="expenseList" style="display:grid;gap:10px;"><p style="color:rgba(30,41,59,0.35);text-align:center;padding:28px 0;font-size:13px;">טוען...</p></div>
   </section>
