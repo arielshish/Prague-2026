@@ -2935,6 +2935,7 @@ function openTab(id) {
   if (id === 'pack') loadPack();
   if (id === 'community') renderCommunity();
   if (id === 'restaurants') renderRestaurants();
+  if (id === 'shopping') renderShopping();
   if (id === 'reminders') initReminders();
 }
 
@@ -2980,6 +2981,7 @@ function refreshScheduleBadges() {
   if (!active || active === 'days') return; // days is already re-rendered by its own callers
   if (active === 'community' && typeof renderCommunity === 'function') renderCommunity();
   else if (active === 'restaurants' && typeof renderRestaurants === 'function') renderRestaurants();
+  else if (active === 'shopping' && typeof renderShopping === 'function') renderShopping();
   else if (active === 'reminders' && typeof renderReminders === 'function') renderReminders();
 }
 
@@ -3859,15 +3861,24 @@ function renderShopping() {
   var grid = qs('shoppingGrid');
   if (!grid) return;
   grid.innerHTML = SHOPS.map(function(s, idx) {
+    var _inDays = findItemInDays(s.n);
+    var schedBadge = _inDays
+      ? '<div style="background:rgba(16,185,129,0.13);border:1px solid rgba(16,185,129,0.38);border-radius:10px;padding:5px 10px;font-size:11px;font-weight:800;color:#065F46;margin-bottom:10px;">✅ יום ' + _inDays.dayNum + ' · ' + esc(_inDays.time) + '</div>'
+      : '';
+    var addBtnStyle = _inDays
+      ? 'background:rgba(244,99,74,0.13);color:#C2410C;border:1.5px solid rgba(244,99,74,0.38);'
+      : 'background:rgba(244,99,74,0.15);border:1.5px solid rgba(244,99,74,0.35);color:#C2410C;';
+    var addBtnTxt = _inDays ? '✏️ עדכן' : '📅 הוסף למסלול';
     return '<div style="background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.16);border-radius:20px;padding:18px;box-shadow:0 8px 26px rgba(0,0,0,0.32);overflow:hidden;">' +
       '<div style="height:78px;border-radius:14px;background:linear-gradient(135deg,#0A1E38,#14305A);display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:14px;">' + s.e + '</div>' +
       '<div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:10px;"><div style="font-size:15px;font-weight:800;color:#1E293B;">' + esc(s.n) + '</div><div style="color:#F59E0B;font-size:11px;white-space:nowrap;">' + s.stars + '</div></div>' +
+      schedBadge +
       '<div style="font-size:12px;color:rgba(30,41,59,0.6);line-height:1.75;margin-bottom:10px;">⏰ ' + s.hours + '<br>🚇 ' + esc(s.metro) + '<br>⏱️ ' + esc(s.time) + '</div>' +
       '<div style="font-size:11px;color:rgba(30,41,59,0.45);margin-bottom:10px;">📦 ' + esc(s.brands) + '</div>' +
       '<div class="tip-pill" style="margin-bottom:12px;">💡 ' + esc(s.tip) + '</div>' +
       '<div style="display:flex;gap:8px;">' +
         '<a href="' + s.map + '" target="_blank" rel="noopener" style="flex:1;display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:12px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;">🗺️ ניווט</a>' +
-        '<button onclick="addShopToStop(' + idx + ')" style="flex:1;background:rgba(244,99,74,0.15);border:1.5px solid rgba(244,99,74,0.35);color:#C2410C;border-radius:13px;padding:12px;font-weight:800;font-size:12px;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">📅 הוסף למסלול</button>' +
+        '<button onclick="addShopToStop(' + idx + ')" style="flex:1;' + addBtnStyle + 'border-radius:13px;padding:12px;font-weight:800;font-size:12px;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">' + addBtnTxt + '</button>' +
       '</div>' +
       '</div>';
   }).join('');
