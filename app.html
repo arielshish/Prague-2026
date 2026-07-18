@@ -3012,30 +3012,39 @@ function loadDaysFromSheets(silent) {
 function selectDay(i) { currentDay = i; renderDays(); }
 
 (function initDaySwipe() {
-  // Attach to section#days (not #dayCard) — draggable=true on stops causes
-  // iOS Safari to swallow touch events before they reach the card element.
-  var section = document.getElementById('days');
-  if (!section) return;
-  var _tx = 0, _ty = 0, _active = false;
-  section.addEventListener('touchstart', function(e) {
+  // Use document-level listeners to bypass iOS Safari draggable interference.
+  var _tx = 0, _ty = 0, _lx = 0, _ly = 0, _active = false;
+  function _onStart(e) {
     var card = document.getElementById('dayCard');
-    if (!card || !card.contains(e.target)) return; // ignore touches on day-buttons header
-    _tx = e.touches[0].clientX;
-    _ty = e.touches[0].clientY;
+    if (!card) return;
+    var t = e.touches ? e.touches[0] : null;
+    if (!t) return;
+    if (!card.contains(e.target)) return;
+    _tx = _lx = t.clientX;
+    _ty = _ly = t.clientY;
     _active = true;
-  }, { passive: true });
-  section.addEventListener('touchcancel', function() { _active = false; }, { passive: true });
-  section.addEventListener('touchend', function(e) {
+  }
+  function _onMove(e) {
+    if (!_active || !e.touches) return;
+    _lx = e.touches[0].clientX;
+    _ly = e.touches[0].clientY;
+  }
+  function _onEnd(e) {
     if (!_active) return;
     _active = false;
-    var dx = e.changedTouches[0].clientX - _tx;
-    var dy = e.changedTouches[0].clientY - _ty;
-    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy)) return;
+    var cx = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientX : _lx;
+    var cy = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientY : _ly;
+    var dx = cx - _tx;
+    var dy = cy - _ty;
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
     var total = getDaysState().length;
-    // swipe left (dx < 0) = next day, swipe right (dx > 0) = prev day
     var next = currentDay + (dx < 0 ? 1 : -1);
     if (next >= 1 && next <= total) selectDay(next);
-  }, { passive: true });
+  }
+  document.addEventListener('touchstart', _onStart, { passive: true });
+  document.addEventListener('touchmove', _onMove, { passive: true });
+  document.addEventListener('touchend', _onEnd, { passive: true });
+  document.addEventListener('touchcancel', _onEnd, { passive: true });
 })();
 
 function renderDays() {
