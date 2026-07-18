@@ -82,6 +82,17 @@ var PHOTO_SPOTS = ALL_PLACES.filter(p => p.type==='photo');
 #### Fallback לנתוני Firestore ישנים (2026-07-18)
 - `renderDays()` ו-`showStopDetail()` — fallback ל-COMMUNITY/RESTAURANTS אם stop חסר google/duration/who
 
+#### חצי ניווט ימים (2026-07-18)
+- ‹ ו-› משני צידי שורת `#dayButtons` — ניווט מהיר בין ימים
+- `renderDays()` מעדכן opacity/pointerEvents — מתעמם ביום ראשון/אחרון
+- משלים את ה-swipe (לא מחליף)
+
+#### תיקון סנכרון תקציב (2026-07-18)
+- `saveTotalBudget()` כותב גם ל-`appdata/main.total_budget` (+ `appdata/budget.total` לתאימות)
+- `saveBudgetFromModal()` קורא ל-`saveTotalBudget()` גם בסביבת web (קודם רק GAS)
+- realtime listener (`appdata/main` onSnapshot) מקשיב ל-`total_budget` ומעדכן `renderBudget()` מיידית
+- הוסרה קריאה מתה ל-`appdata/budget.categories` ב-`syncBudgetFromFirebase()`
+
 #### מסד נתונים אחיד לתזמון (2026-07-18)
 - **`DAYS_STATE`** = מקור יחיד של אמת לכל תזמון תחנות (קהילה, מסעדות, קניות, צילום, קינוחים)
 - **`remindersSchedule`** = נשאר נפרד — תזכורות הן *משימות* לפני הטיול, לא תחנות ב-DAYS
