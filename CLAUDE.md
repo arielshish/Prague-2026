@@ -14,7 +14,7 @@
 
 ## מפת הפיצ'רים הקיימים ב-app.html
 
-> עדכון אחרון: 2026-07-18 (Premium UI v6)
+> עדכון אחרון: 2026-07-18 (גרסה 9 — Rich Map Dialog)
 
 ### מבנה נתונים מרכזי
 
@@ -92,6 +92,12 @@ var PHOTO_SPOTS = ALL_PLACES.filter(p => p.type==='photo');
 - `saveBudgetFromModal()` קורא ל-`saveTotalBudget()` גם בסביבת web (קודם רק GAS)
 - realtime listener (`appdata/main` onSnapshot) מקשיב ל-`total_budget` ומעדכן `renderBudget()` מיידית
 - הוסרה קריאה מתה ל-`appdata/budget.categories` ב-`syncBudgetFromFirebase()`
+
+#### דיאלוג מפה עשיר — Rich Map Dialog (2026-07-18 גרסה 9)
+- `showMapNavDialog(p, coords)` — scrollable bottom sheet בלחיצה על כל pin במפה
+- header: icon + שם + תג ✅ "כבר בלוז · יום X" אם ב-DAYS
+- מידע לפי type: community (desc/duration/google/who/how/booking/tips) | restaurant (badge/sub/desc/price/google) | dessert (sub/desc/tag/rating/price/where) | shop (stars/hours/metro/duration/brands/tip) | photo (sub/desc/rating/best/crowds/fee/tip)
+- כפתורי ניווט נעוצים בתחתית: Google Maps | Waze | 📍 מפה מקומית | סגור
 
 #### תמונות + טאב מיקום (2026-07-18)
 - **תמונות מסעדות**: כרטיסי מסעדה עם תמונה 150px — gradient+emoji fallback, Wikimedia Commons אם קיים ב-PLACE_IMGS

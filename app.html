@@ -4776,7 +4776,9 @@ function renderNearbyList() {
     var catLbl = typeLabel[effType] || p.type;
     var desc = (p.desc || p.tips || '').substring(0, 90);
 
-    html += '<div style="background:#fff;border-radius:16px;padding:13px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.05);display:flex;align-items:center;gap:12px;">' +
+    var apIdx = ALL_PLACES.indexOf(p);
+    html += '<div data-nearby-idx="' + apIdx + '" data-nearby-coords="' + it.coords[0] + ',' + it.coords[1] + '" ' +
+      'style="background:#fff;border-radius:16px;padding:13px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.05);display:flex;align-items:center;gap:12px;cursor:pointer;-webkit-tap-highlight-color:rgba(0,0,0,0.04);">' +
       // thumbnail
       '<div style="width:60px;height:60px;border-radius:12px;overflow:hidden;flex-shrink:0;position:relative;background:linear-gradient(135deg,'+grad[0]+','+grad[1]+');display:flex;align-items:center;justify-content:center;">' +
         '<span style="font-size:26px;position:relative;z-index:1;">' + p.icon + '</span>' +
@@ -4792,11 +4794,19 @@ function renderNearbyList() {
           (it.inDays ? '<span style="font-size:10px;font-weight:700;color:#16a34a;background:rgba(22,163,74,0.10);padding:2px 8px;border-radius:20px;margin-right:auto;">✅ '+it.inDays.day+(it.inDays.time?' · '+it.inDays.time:'')+'</span>' : '') +
         '</div>' +
       '</div>' +
-      // nav button
-      (p.mapUrl ? '<a href="'+p.mapUrl+'" target="_blank" rel="noopener" style="flex-shrink:0;width:34px;height:34px;background:rgba(244,99,74,0.10);border-radius:10px;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:16px;" title="נווט">🗺️</a>' : '') +
+      // arrow indicator
+      '<div style="flex-shrink:0;width:28px;height:28px;background:rgba(244,99,74,0.10);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;">›</div>' +
     '</div>';
   });
   container.innerHTML = html;
+  container.onclick = function(e) {
+    var card = e.target.closest('[data-nearby-idx]');
+    if (!card) return;
+    var idx = parseInt(card.getAttribute('data-nearby-idx'), 10);
+    var coordsParts = card.getAttribute('data-nearby-coords').split(',');
+    var coords = [parseFloat(coordsParts[0]), parseFloat(coordsParts[1])];
+    showMapNavDialog(ALL_PLACES[idx], coords);
+  };
 }
 
 // ─────────────────────────────────────────
