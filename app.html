@@ -4570,52 +4570,107 @@ function showMapNavDialog(p, coords) {
   var existing = document.getElementById('mapNavDialog');
   if (existing) existing.remove();
 
-  var daysState = getDaysState();
-  var schedInfo = null;
-  daysState.forEach(function(d) {
-    (d.stops||[]).forEach(function(s) {
-      if (s.name === p.name) schedInfo = {day: d.title, time: s.time};
-    });
-  });
-
+  var schedInfo = findItemInDays(p.name);
   var googleUrl = p.mapUrl || ('https://www.google.com/maps/search/' + encodeURIComponent(p.name + ' Prague'));
-  var localUrl = 'https://www.openstreetmap.org/?mlat=' + coords[0] + '&mlon=' + coords[1] + '&zoom=17';
   var wazeUrl = 'https://waze.com/ul?ll=' + coords[0] + ',' + coords[1] + '&navigate=yes';
+
+  // ── per-type rich info section ──
+  var infoHtml = '';
+  if (p.type === 'community') {
+    if (p.desc) infoHtml += '<div style="font-size:12px;color:rgba(30,41,59,0.72);line-height:1.75;margin-bottom:8px;">' + esc(p.desc) + '</div>';
+    var chips = '';
+    if (p.duration) chips += '<span style="background:rgba(99,102,241,0.12);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:#4F46E5;">⏱️ ' + esc(p.duration) + '</span> ';
+    if (p.google)   chips += '<span style="background:rgba(245,158,11,0.14);border:1px solid rgba(202,138,4,0.3);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:#92400E;">⭐ ' + esc(p.google) + ' Google</span> ';
+    if (p.who)      chips += '<span style="background:rgba(16,185,129,0.1);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:#065F46;">👨‍👩‍👧 ' + esc(p.who) + '</span> ';
+    if (chips) infoHtml += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">' + chips + '</div>';
+    if (p.how) infoHtml += '<div style="background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.18);border-radius:10px;padding:8px 11px;font-size:11px;color:#3730a3;margin-bottom:8px;">🚇 ' + esc(p.how) + '</div>';
+    if (p.booking) infoHtml += '<div style="background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);border-radius:10px;padding:8px 11px;font-size:11px;color:#4338CA;margin-bottom:8px;">🎟️ ' + esc(p.booking) + '</div>';
+    if (p.tips && p.tips.length) {
+      infoHtml += '<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:8px 11px;font-size:11px;color:#B45309;margin-bottom:8px;">';
+      p.tips.forEach(function(t){ infoHtml += '💡 ' + esc(t) + '<br>'; });
+      infoHtml += '</div>';
+    }
+  } else if (p.type === 'restaurant') {
+    var LEVEL_LABELS = ['','💰 זול','💰💰 בינוני','💰💰💰 יקר','💰💰💰💰 יוקרה'];
+    var LEVEL_COLORS = ['','rgba(5,150,105,0.12)','rgba(245,158,11,0.10)','rgba(239,68,68,0.10)','rgba(124,58,237,0.12)'];
+    var LEVEL_BORDER = ['','rgba(5,150,105,0.3)','rgba(245,158,11,0.3)','rgba(239,68,68,0.3)','rgba(124,58,237,0.3)'];
+    var LEVEL_TXT   = ['','#065F46','#92400E','#991B1B','#5B21B6'];
+    var lv = p.level || 1;
+    if (p.badge) infoHtml += '<div style="display:inline-block;background:' + (p.badgeClr||'#e2e8f0') + ';color:' + (p.badgeTxt||'#1e293b') + ';border-radius:999px;padding:3px 10px;font-size:10px;font-weight:800;margin-bottom:8px;">' + esc(p.badge) + '</div><br>';
+    if (p.sub)  infoHtml += '<div style="font-size:11px;color:rgba(30,41,59,0.5);margin-bottom:6px;">' + esc(p.sub) + '</div>';
+    if (p.desc) infoHtml += '<div style="font-size:12px;color:rgba(30,41,59,0.7);line-height:1.7;margin-bottom:8px;">' + esc(p.desc) + '</div>';
+    var chips2 = '';
+    if (p.level) chips2 += '<span style="background:' + LEVEL_COLORS[lv] + ';border:1px solid ' + LEVEL_BORDER[lv] + ';border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:' + LEVEL_TXT[lv] + ';">' + LEVEL_LABELS[lv] + '</span> ';
+    if (p.price) chips2 += '<span style="background:rgba(0,0,0,0.05);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:600;color:rgba(30,41,59,0.6);">🧾 ' + esc(p.price) + ' CZK</span> ';
+    if (p.google) chips2 += '<span style="background:rgba(254,240,138,0.5);border:1px solid rgba(202,138,4,0.3);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:#92400E;">⭐ ' + esc(p.google) + ' Google</span>';
+    if (chips2) infoHtml += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">' + chips2 + '</div>';
+  } else if (p.type === 'dessert') {
+    if (p.sub)  infoHtml += '<div style="font-size:11px;color:rgba(30,41,59,0.5);margin-bottom:6px;">' + esc(p.sub) + '</div>';
+    if (p.desc) infoHtml += '<div style="font-size:12px;color:rgba(30,41,59,0.7);line-height:1.7;margin-bottom:8px;">' + esc(p.desc) + '</div>';
+    var chips3 = '';
+    if (p.tag)    chips3 += '<span style="background:#fff;border-radius:999px;padding:3px 10px;font-size:10px;font-weight:800;color:' + (p.tagClr||'#64748b') + ';">' + esc(p.tag) + '</span> ';
+    if (p.rating) chips3 += '<span style="font-size:13px;">' + p.rating + '</span> ';
+    if (p.price)  chips3 += '<span style="background:rgba(0,0,0,0.05);border-radius:8px;padding:4px 10px;font-size:11px;color:rgba(30,41,59,0.6);">🧾 ' + esc(p.price) + ' CZK</span> ';
+    if (p.where)  chips3 += '<span style="background:rgba(16,185,129,0.1);border-radius:8px;padding:4px 10px;font-size:11px;color:#065F46;">📍 ' + esc(p.where) + '</span>';
+    if (chips3) infoHtml += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">' + chips3 + '</div>';
+  } else if (p.type === 'shop') {
+    var chips4 = '';
+    if (p.stars)    chips4 += '<span style="color:#F59E0B;font-size:13px;">' + p.stars + '</span> ';
+    if (p.hours)    chips4 += '<span style="background:rgba(0,0,0,0.05);border-radius:8px;padding:4px 10px;font-size:11px;color:rgba(30,41,59,0.65);">⏰ ' + esc(p.hours) + '</span> ';
+    if (p.metro)    chips4 += '<span style="background:rgba(99,102,241,0.1);border-radius:8px;padding:4px 10px;font-size:11px;color:#4F46E5;">🚇 ' + esc(p.metro) + '</span> ';
+    if (p.duration) chips4 += '<span style="background:rgba(16,185,129,0.1);border-radius:8px;padding:4px 10px;font-size:11px;color:#065F46;">⏱️ ' + esc(p.duration) + '</span>';
+    if (chips4) infoHtml += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">' + chips4 + '</div>';
+    if (p.brands) infoHtml += '<div style="font-size:11px;color:rgba(30,41,59,0.5);margin-bottom:8px;">📦 ' + esc(p.brands) + '</div>';
+    if (p.tip)    infoHtml += '<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:8px 11px;font-size:11px;color:#B45309;margin-bottom:8px;">💡 ' + esc(p.tip) + '</div>';
+  } else if (p.type === 'photo') {
+    if (p.sub)  infoHtml += '<div style="font-size:11px;color:rgba(30,41,59,0.5);margin-bottom:6px;">' + esc(p.sub) + '</div>';
+    if (p.desc) infoHtml += '<div style="font-size:12px;color:rgba(30,41,59,0.7);line-height:1.7;margin-bottom:8px;">' + esc(p.desc) + '</div>';
+    var chips5 = '';
+    if (p.rating)  chips5 += '<span style="font-size:13px;">' + p.rating + '</span> ';
+    if (p.best)    chips5 += '<span style="background:rgba(99,102,241,0.12);border-radius:8px;padding:4px 10px;font-size:11px;color:#4F46E5;">🕐 ' + esc(p.best) + '</span> ';
+    if (p.crowds)  chips5 += '<span style="background:rgba(0,0,0,0.04);border-radius:8px;padding:4px 10px;font-size:11px;color:rgba(30,41,59,0.6);">👥 ' + esc(p.crowds) + '</span> ';
+    if (p.fee_txt) chips5 += '<span style="background:rgba(16,185,129,0.1);border-radius:8px;padding:4px 10px;font-size:11px;color:#065F46;">💳 ' + esc(p.fee_txt) + '</span>';
+    if (chips5) infoHtml += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">' + chips5 + '</div>';
+    if (p.tip) infoHtml += '<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:8px 11px;font-size:11px;color:#B45309;margin-bottom:8px;">💡 ' + esc(p.tip) + '</div>';
+  }
 
   var overlay = document.createElement('div');
   overlay.id = 'mapNavDialog';
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.45);display:flex;align-items:flex-end;justify-content:center;';
   overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
 
+  var c0 = coords[0], c1 = coords[1];
   overlay.innerHTML =
-    '<div style="background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:480px;padding:0 0 env(safe-area-inset-bottom,0);box-shadow:0 -4px 30px rgba(0,0,0,0.18);">' +
-      '<div style="width:40px;height:4px;background:#e2e8f0;border-radius:2px;margin:12px auto 0;"></div>' +
-      '<div style="padding:18px 20px 6px;direction:rtl;">' +
-        '<div style="font-size:20px;margin-bottom:2px;">' + p.icon + '</div>' +
-        '<div style="font-size:16px;font-weight:900;color:#1e293b;">' + esc(p.name) + '</div>' +
-        (p.sub ? '<div style="font-size:12px;color:#64748b;margin-top:2px;">' + esc(p.sub) + '</div>' : '') +
-        (schedInfo ? '<div style="margin-top:6px;font-size:12px;color:#16a34a;font-weight:700;">✅ ' + esc(schedInfo.day) + (schedInfo.time ? ' · ' + esc(schedInfo.time) : '') + '</div>' : '') +
+    '<div style="background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:480px;padding:0 0 env(safe-area-inset-bottom,0);box-shadow:0 -4px 30px rgba(0,0,0,0.18);max-height:85vh;display:flex;flex-direction:column;">' +
+      '<div style="width:40px;height:4px;background:#e2e8f0;border-radius:2px;margin:12px auto 0;flex-shrink:0;"></div>' +
+      '<div style="overflow-y:auto;flex:1;">' +
+        '<div style="padding:16px 20px 8px;direction:rtl;">' +
+          '<div style="font-size:26px;margin-bottom:4px;">' + p.icon + '</div>' +
+          '<div style="font-size:16px;font-weight:900;color:#1e293b;margin-bottom:2px;">' + esc(p.name) + '</div>' +
+          (schedInfo ? '<div style="margin-top:6px;display:inline-block;font-size:12px;color:#16a34a;font-weight:700;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:8px;padding:3px 9px;">✅ יום ' + schedInfo.dayNum + (schedInfo.time ? ' · ' + esc(schedInfo.time) : '') + '</div>' : '') +
+        '</div>' +
+        (infoHtml ? '<div style="padding:0 20px 10px;direction:rtl;">' + infoHtml + '</div>' : '') +
       '</div>' +
-      '<div style="padding:10px 16px 4px;direction:rtl;">' +
-        '<div style="font-size:12px;font-weight:700;color:#94a3b8;margin-bottom:8px;">🧭 לאן לנווט?</div>' +
-        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">' +
+      '<div style="padding:10px 16px 16px;direction:rtl;flex-shrink:0;border-top:1px solid rgba(0,0,0,0.07);">' +
+        '<div style="font-size:11px;font-weight:700;color:#94a3b8;margin-bottom:8px;">🧭 ניווט</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">' +
           '<a href="' + googleUrl + '" target="_blank" onclick="document.getElementById(\'mapNavDialog\').remove()" ' +
-            'style="display:flex;align-items:center;gap:10px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;padding:12px 14px;text-decoration:none;color:#1e293b;">' +
-            '<span style="font-size:22px;">🗺️</span>' +
-            '<div><div style="font-size:13px;font-weight:800;">Google Maps</div><div style="font-size:11px;color:#64748b;">ניווט מלא</div></div>' +
+            'style="display:flex;align-items:center;gap:8px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:13px;padding:11px 12px;text-decoration:none;color:#1e293b;">' +
+            '<span style="font-size:20px;">🗺️</span>' +
+            '<div><div style="font-size:12px;font-weight:800;">Google Maps</div><div style="font-size:10px;color:#64748b;">ניווט מלא</div></div>' +
           '</a>' +
           '<a href="' + wazeUrl + '" target="_blank" onclick="document.getElementById(\'mapNavDialog\').remove()" ' +
-            'style="display:flex;align-items:center;gap:10px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;padding:12px 14px;text-decoration:none;color:#1e293b;">' +
-            '<span style="font-size:22px;">🚗</span>' +
-            '<div><div style="font-size:13px;font-weight:800;">Waze</div><div style="font-size:11px;color:#64748b;">ניווט ברכב</div></div>' +
+            'style="display:flex;align-items:center;gap:8px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:13px;padding:11px 12px;text-decoration:none;color:#1e293b;">' +
+            '<span style="font-size:20px;">🚗</span>' +
+            '<div><div style="font-size:12px;font-weight:800;">Waze</div><div style="font-size:10px;color:#64748b;">ניווט ברכב</div></div>' +
           '</a>' +
         '</div>' +
-        '<button onclick="(function(){var d=document.getElementById(\'mapNavDialog\');if(d)d.remove();if(_leafletMap)_leafletMap.setView([' + coords[0] + ',' + coords[1] + '],17,{animate:true});})()" ' +
-          'style="width:100%;padding:13px;background:#F4634A;color:#fff;border:none;border-radius:14px;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:10px;">' +
+        '<button onclick="(function(){var d=document.getElementById(\'mapNavDialog\');if(d)d.remove();if(_leafletMap)_leafletMap.setView([' + c0 + ',' + c1 + '],17,{animate:true});})()" ' +
+          'style="width:100%;padding:12px;background:#F4634A;color:#fff;border:none;border-radius:13px;font-size:13px;font-weight:800;cursor:pointer;margin-bottom:8px;">' +
           '📍 הצג במפה המקומית' +
         '</button>' +
         '<button onclick="document.getElementById(\'mapNavDialog\').remove()" ' +
-          'style="width:100%;padding:11px;background:#f1f5f9;color:#64748b;border:none;border-radius:14px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:16px;">' +
+          'style="width:100%;padding:10px;background:#f1f5f9;color:#64748b;border:none;border-radius:13px;font-size:13px;font-weight:600;cursor:pointer;">' +
           'סגור' +
         '</button>' +
       '</div>' +
