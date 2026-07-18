@@ -4428,6 +4428,15 @@ function initRealtimeSync() {
           }
         } catch(e) {}
       }
+      if (d.total_budget != null) {
+        try {
+          var localTotal = localStorage.getItem('prague_total_budget');
+          if (String(d.total_budget) !== localTotal) {
+            localStorage.setItem('prague_total_budget', String(d.total_budget));
+            renderBudget();
+          }
+        } catch(e) {}
+      }
 
       // תזכורות שבוצעו
       if (d.remindersDone) {
@@ -4508,8 +4517,12 @@ function saveTotalBudget(val) {
   } else {
     try {
       ensureFirebaseAuth().then(function() {
-        getFirestoreDb().collection('appdata').doc('budget').set({ total: val, ts: Date.now() }, { merge: true })
+        var db = getFirestoreDb();
+        // שמור ב-appdata/budget (backward compat) וגם ב-appdata/main (כך הרצוא realtime listener יתפוס)
+        db.collection('appdata').doc('budget').set({ total: val, ts: Date.now() }, { merge: true })
           .catch(function(e) { console.warn('Firestore total budget save failed', e); });
+        db.collection('appdata').doc('main').set({ total_budget: val }, { merge: true })
+          .catch(function(e) { console.warn('Firestore main total_budget save failed', e); });
       });
     } catch(e) {}
   }
@@ -4522,12 +4535,8 @@ function syncBudgetFromFirebase(cb) {
       return getFirestoreDb().collection('appdata').doc('budget').get();
     }).then(function(doc) {
       if (doc.exists) {
-        if (doc.data().categories) {
-          try {
-            var cats = JSON.parse(doc.data().categories);
-            localStorage.setItem('prague_budget_v1', JSON.stringify(cats));
-          } catch(e) {}
-        }
+        // categories נשמרות ב-appdata/main — מכוסות ע"י syncBudgetFromSheets / realtime listener
+        // כאן רק total (שנשמר ב-appdata/budget)
         if (doc.data().total) {
           localStorage.setItem('prague_total_budget', String(doc.data().total));
         }
@@ -4737,7 +4746,7 @@ function saveBudgetFromModal() {
   renderBudget();
   toast('✅ תקציב עודכן!');
 
-  // שמור לשיטס
+  // שמור לשיטס / Firestore
   if (isGas()) {
     google.script.run
       .withSuccessHandler(function() { toast('☁️ סונכרן לגיליון!'); })
@@ -4746,6 +4755,8 @@ function saveBudgetFromModal() {
     google.script.run
       .withFailureHandler(function() {})
       .saveBudgetCategories(budget);
+  } else {
+    saveTotalBudget(totalVal);
   }
 }
 
