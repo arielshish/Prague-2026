@@ -1892,7 +1892,10 @@ function renderReminders() {
     else if (diffDays <= 14) { urgency = '🟡 ' + diffDays + ' ימים'; urgencyColor = '#B45309'; urgencyBg = 'rgba(180,83,9,0.10)'; }
     else { urgency = '🟢 ' + diffDays + ' ימים'; urgencyColor = '#059669'; urgencyBg = 'rgba(5,150,105,0.08)'; }
     var hasDetails = !!(r.details || r.tips || r.duration);
-    var schedInfo = (sched.day ? '📅 ' + sched.day : '📅 ' + r.day) + (sched.time ? ' · ⏰ ' + sched.time : '');
+    var _inDaysRem = findItemInDays(r.title);
+    var schedInfo = _inDaysRem
+      ? '✅ יום ' + _inDaysRem.dayNum + ' · ' + (_inDaysRem.time || '')
+      : (sched.day ? '📅 ' + sched.day : '📅 ' + r.day) + (sched.time ? ' · ⏰ ' + sched.time : '');
 
     return '<div style="background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:16px;padding:15px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.07);' + (done ? 'opacity:0.55;' : '') + (hasDetails ? 'cursor:pointer;' : '') + '" ' + (hasDetails ? 'onclick="showReminderDetail(\'' + r.id + '\')"' : '') + '>' +
       '<div style="display:flex;align-items:flex-start;gap:12px;">' +
@@ -1905,7 +1908,7 @@ function renderReminders() {
           '</div>' +
           '<div style="font-size:12px;color:rgba(30,41,59,0.6);margin-bottom:8px;">' + r.desc + '</div>' +
           (r.duration ? '<div style="font-size:11px;color:#0369A1;margin-bottom:6px;">' + r.duration + '</div>' : '') +
-          '<div style="font-size:11px;color:rgba(30,41,59,0.45);margin-bottom:10px;">' + schedInfo + ' · דדליין: ' + r.deadline.split('-').reverse().join('/') + '</div>' +
+          '<div style="font-size:11px;color:' + (_inDaysRem ? '#065F46' : 'rgba(30,41,59,0.45)') + ';font-weight:' + (_inDaysRem ? '700' : '400') + ';margin-bottom:10px;">' + schedInfo + ' · דדליין: ' + r.deadline.split('-').reverse().join('/') + '</div>' +
           '<div style="display:flex;gap:8px;flex-wrap:wrap;" onclick="event.stopPropagation()">' +
             '<button onclick="openEditReminderSchedule(\'' + r.id + '\')" style="background:rgba(16,185,129,0.10);color:#065F46;border:1px solid rgba(16,185,129,0.25);border-radius:8px;padding:4px 9px;font-size:11px;font-weight:700;cursor:pointer;font-family:Rubik,Arial,sans-serif;">⏰ עדכן זמן/יום</button>' +
             (r.url ? '<a href="' + r.url + '" target="_blank" style="background:rgba(99,102,241,0.10);color:#4338CA;border:1px solid rgba(99,102,241,0.25);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;font-family:Rubik,Arial,sans-serif;">🔗 לאתר ההזמנה</a>' : '') +
@@ -3039,7 +3042,12 @@ function renderDays() {
   var d = state[i - 1];
   var card = qs('dayCard');
   if (!card) return;
+  var _commAll = typeof COMMUNITY !== 'undefined' ? COMMUNITY : [];
+  var _restAll = typeof RESTAURANTS !== 'undefined' ? RESTAURANTS : [];
   var stopsHtml = (d.stops || []).map(function(s, si) {
+    var _fallback = _commAll.find(function(c){return c.name===s.name;}) || _restAll.find(function(r){return r.name===s.name;}) || {};
+    var _google = s.google || _fallback.google || '';
+    var _duration = s.duration || _fallback.duration || '';
     var hasDetails = !!(s.details || s.tips);
     var dayIdx = i - 1;
     return '<div onclick="showStopDetail(' + dayIdx + ',' + si + ')" ' +
@@ -3066,8 +3074,8 @@ function renderDays() {
         '</div>' +
         '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">' +
           '<span style="font-size:11px;color:rgba(30,41,59,0.5);">⏱️ ' + esc(s.time||'') + '</span>' +
-          (s.google ? '<span style="background:rgba(254,240,138,0.6);border:1px solid rgba(202,138,4,0.3);border-radius:8px;padding:2px 7px;font-size:10px;font-weight:700;color:#92400E;">⭐ ' + esc(s.google) + '</span>' : '') +
-          (s.duration ? '<span style="font-size:10px;color:rgba(30,41,59,0.4);">' + esc(s.duration) + '</span>' : '') +
+          (_google ? '<span style="background:rgba(254,240,138,0.6);border:1px solid rgba(202,138,4,0.3);border-radius:8px;padding:2px 7px;font-size:10px;font-weight:700;color:#92400E;">⭐ ' + esc(_google) + '</span>' : '') +
+          (_duration ? '<span style="font-size:10px;color:rgba(30,41,59,0.4);">' + esc(_duration) + '</span>' : '') +
         '</div>' +
         '<div style="font-size:12px;color:rgba(30,41,59,0.65);margin-bottom:8px;">' + esc(s.desc||'') + '</div>' +
         (s.mapUrl ? '<a href="' + s.mapUrl + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="nav-map-btn">🗺️ נווט</a>' : '') +
@@ -3103,6 +3111,13 @@ function renderDays() {
 function showStopDetail(dayIdx, stopIdx) {
   var s = (getDaysState()[dayIdx] || {stops:[]}).stops[stopIdx];
   if (!s) return;
+  var _commAll2 = typeof COMMUNITY !== 'undefined' ? COMMUNITY : [];
+  var _restAll2 = typeof RESTAURANTS !== 'undefined' ? RESTAURANTS : [];
+  var _fb2 = _commAll2.find(function(c){return c.name===s.name;}) || _restAll2.find(function(r){return r.name===s.name;}) || {};
+  s = Object.assign({}, s);
+  if (!s.google && _fb2.google) s.google = _fb2.google;
+  if (!s.duration && _fb2.duration) s.duration = _fb2.duration;
+  if (!s.who && _fb2.who) s.who = _fb2.who;
   var existing = document.getElementById('stopDetailOverlay');
   if (existing) existing.remove();
   var tipsHtml = (s.tips || []).map(function(t) {
@@ -3343,10 +3358,13 @@ function buildBankRemCards() {
     var card = document.createElement('button');
     card.type = 'button';
     card.style.cssText = 'flex-shrink:0;width:138px;background:rgba(251,191,36,0.08);border:1.5px solid rgba(251,191,36,0.25);border-radius:14px;padding:10px 11px;cursor:pointer;position:relative;text-align:right;font-family:Rubik,Arial,sans-serif;-webkit-tap-highlight-color:transparent;';
+    var _inDaysBankRem = findItemInDays(r.title);
     card.innerHTML =
       '<div style="font-size:22px;margin-bottom:4px;">' + (r.emoji||'📌') + '</div>' +
       '<div style="font-size:12px;font-weight:700;color:#1E293B;line-height:1.3;">' + (r.title||'') + '</div>' +
-      (r.deadline ? '<div style="margin-top:5px;padding:2px 6px;background:rgba(239,68,68,0.12);border-radius:6px;font-size:9px;font-weight:700;color:#DC2626;">⏳ ' + r.deadline + '</div>' : '');
+      (_inDaysBankRem
+        ? '<div style="margin-top:5px;padding:2px 6px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.35);border-radius:6px;font-size:9px;font-weight:700;color:#065F46;">✅ יום ' + _inDaysBankRem.dayNum + '</div>'
+        : (r.deadline ? '<div style="margin-top:5px;padding:2px 6px;background:rgba(239,68,68,0.12);border-radius:6px;font-size:9px;font-weight:700;color:#DC2626;">⏳ ' + r.deadline + '</div>' : ''));
     card.addEventListener('click', (function(rem) {
       return function() {
         try { showDayTimePicker(rem.emoji, rem.title, (rem.details||rem.desc||'').substring(0,120).replace(/\n/g,' ')); }
@@ -3661,6 +3679,13 @@ function renderCommunity() {
     var stars = p.google ? parseFloat(p.google) : 0;
     var starBar = '';
     for (var i=1;i<=5;i++) starBar += '<span style="color:'+(i<=Math.round(stars)?'#FCD34D':'rgba(255,255,255,0.2)')+'">★</span>';
+    var inDays = findItemInDays(p.name);
+    var schedBadgeHtml = inDays
+      ? '<div style="background:rgba(16,185,129,0.13);border:1px solid rgba(16,185,129,0.38);border-radius:10px;padding:5px 12px;font-size:11px;font-weight:800;color:#065F46;flex:1;">✅ יום ' + inDays.dayNum + ' · ' + esc(inDays.time) + '</div>'
+      : '<div style="font-size:11px;color:rgba(30,41,59,0.6);font-weight:700;">📅 הוספה ללו&quot;ז הימים:</div>';
+    var addBtnStyle = inDays
+      ? 'background:rgba(244,99,74,0.13);color:#C2410C;border:1.5px solid rgba(244,99,74,0.38);'
+      : 'background:#F4634A;color:white;border:none;';
     return '<div class="card" style="padding:16px;">' +
       '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px;">' +
         '<div style="flex:1;">' +
@@ -3681,9 +3706,9 @@ function renderCommunity() {
         '</div>' +
         (p.mapUrl ? '<a href="'+p.mapUrl+'" target="_blank" rel="noopener" style="flex-shrink:0;background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.25);border-radius:12px;padding:10px 12px;font-size:11px;font-weight:700;color:#065F46;text-decoration:none;text-align:center;line-height:1.3;">🗺️<br>נווט</a>' : '') +
       '</div>' +
-      '<div style="margin-top:12px;padding-top:12px;border-top:1px dashed rgba(30,41,59,0.1);display:flex;align-items:center;justify-content:space-between;">' +
-        '<div style="font-size:11px;color:rgba(30,41,59,0.6);font-weight:700;">📅 הוספה ללו"ז הימים:</div>' +
-        '<button onclick="openAddCommunityStop(' + COMMUNITY.indexOf(p) + ')" style="background:#F4634A;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">➕ הוסף ללו"ז</button>' +
+      '<div style="margin-top:12px;padding-top:12px;border-top:1px dashed rgba(30,41,59,0.1);display:flex;align-items:center;justify-content:space-between;gap:8px;">' +
+        schedBadgeHtml +
+        '<button onclick="openAddCommunityStop(' + COMMUNITY.indexOf(p) + ')" style="' + addBtnStyle + 'border-radius:10px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;flex-shrink:0;">' + (inDays ? '✏️ עדכן' : '➕ הוסף ללו&quot;ז') + '</button>' +
       '</div>' +
     '</div>';
   }).join('');
@@ -3811,7 +3836,8 @@ function renderRestaurants() {
       lastLevel = lv;
     }
     var sched = restaurantsSchedule[r.name] || {};
-    var schedBadge = sched.day ? ('📅 ' + sched.day + (sched.time ? ' · ⏰ ' + sched.time : '')) : '';
+    var _inDaysR = findItemInDays(r.name);
+    var schedBadge = _inDaysR ? ('✅ יום ' + _inDaysR.dayNum + ' · ' + (_inDaysR.time||'')) : (sched.day ? ('📅 ' + sched.day + (sched.time ? ' · ⏰ ' + sched.time : '')) : '');
     html += '<div style="background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:20px;padding:18px;margin-bottom:10px;box-shadow:0 3px 10px rgba(0,0,0,0.08);">' +
       '<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">' +
       '<span style="font-size:30px;line-height:1;flex-shrink:0;margin-top:3px;">' + r.icon + '</span>' +
@@ -3871,6 +3897,7 @@ function renderDesserts() {
   var lastLevel = 0, html = '';
   DESSERTS.forEach(function(d) {
     var lv = d.level || 1;
+    var _inDaysDes = findItemInDays(d.name);
     if (lv !== lastLevel) {
       html += '<div style="display:flex;align-items:center;gap:10px;margin:' + (lastLevel?'18px':'4px') + ' 0 10px;">' +
         '<div style="flex:1;height:1px;background:rgba(0,0,0,0.08);"></div>' +
@@ -3897,7 +3924,7 @@ function renderDesserts() {
       '<div style="background:rgba(0,0,0,0.04);border-radius:10px;padding:7px 11px;font-size:11px;color:rgba(30,41,59,0.5);margin-bottom:10px;">📍 ' + esc(d.where) + '</div>' +
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">' +
         '<a href="' + d.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:linear-gradient(90deg,#ec4899,#f97316);color:white;text-decoration:none;border-radius:12px;padding:10px;font-weight:800;font-size:12px;font-family:\'Rubik\',Arial,sans-serif;">🗺️ ניווט</a>' +
-        '<button onclick="openAddDessertStop(' + DESSERTS.indexOf(d) + ')" style="background:#F4634A;color:white;border:none;border-radius:12px;padding:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">➕ הוסף ללו"ז</button>' +
+        (_inDaysDes ? '<div style="background:rgba(16,185,129,0.13);border:1px solid rgba(16,185,129,0.38);border-radius:12px;padding:10px;font-size:11px;font-weight:800;color:#065F46;text-align:center;">✅ יום ' + _inDaysDes.dayNum + ' · ' + esc(_inDaysDes.time||'') + '</div>' : '<button onclick="openAddDessertStop(' + DESSERTS.indexOf(d) + ')" style="background:#F4634A;color:white;border:none;border-radius:12px;padding:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">➕ הוסף ללו&quot;ז</button>') +
       '</div>' +
     '</div>';
   });
@@ -3912,6 +3939,7 @@ function renderPhotoSpots() {
   var lastFree = null;
   PHOTO_SPOTS.forEach(function(s) {
     var isFree = s.fee === 0;
+    var _inDaysPhoto = findItemInDays(s.name);
     if (lastFree !== isFree) {
       var lbl = isFree ? '📸 חינם לחלוטין' : '🎟️ כניסה בתשלום';
       var clr = isFree ? '#6EE7B7' : '#FCD34D';
@@ -3942,7 +3970,7 @@ function renderPhotoSpots() {
       '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">' +
         '<a href="' + s.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:linear-gradient(90deg,#6366f1,#8b5cf6);color:white;text-decoration:none;border-radius:12px;padding:10px 4px;font-weight:800;font-size:11px;font-family:\'Rubik\',Arial,sans-serif;white-space:nowrap;">🗺️ ניווט</a>' +
         '<button onclick="openPhotoModal(PHOTO_SPOTS[' + PHOTO_SPOTS.indexOf(s) + '].name)" style="background:linear-gradient(135deg,rgba(236,72,153,0.25),rgba(168,85,247,0.25));border:1px solid rgba(236,72,153,0.35);border-radius:12px;padding:10px 4px;font-size:11px;font-weight:800;color:#9D174D;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;white-space:nowrap;">📷 צלם</button>' +
-        '<button onclick="openAddPhotoStop(' + PHOTO_SPOTS.indexOf(s) + ')" style="background:#F4634A;color:white;border:none;border-radius:12px;padding:10px 4px;font-size:11px;font-weight:800;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;white-space:nowrap;">➕ ללו"ז</button>' +
+        (_inDaysPhoto ? '<div style="background:rgba(16,185,129,0.13);border:1px solid rgba(16,185,129,0.38);border-radius:12px;padding:10px 4px;font-size:10px;font-weight:800;color:#065F46;text-align:center;white-space:nowrap;">✅ יום ' + _inDaysPhoto.dayNum + '</div>' : '<button onclick="openAddPhotoStop(' + PHOTO_SPOTS.indexOf(s) + ')" style="background:#F4634A;color:white;border:none;border-radius:12px;padding:10px 4px;font-size:11px;font-weight:800;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;white-space:nowrap;">➕ ללו&quot;ז</button>') +
       '</div>' +
     '</div>';
   });
