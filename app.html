@@ -4662,7 +4662,11 @@ function showMapNavDialog(p, coords) {
     if (p.booking) infoHtml += '<div style="background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);border-radius:10px;padding:8px 11px;font-size:11px;color:#4338CA;margin-bottom:8px;">🎟️ ' + esc(p.booking) + '</div>';
     if (p.tips && p.tips.length) {
       infoHtml += '<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:8px 11px;font-size:11px;color:#B45309;margin-bottom:8px;">';
-      p.tips.forEach(function(t){ infoHtml += '💡 ' + esc(t) + '<br>'; });
+      if (Array.isArray(p.tips)) {
+        p.tips.forEach(function(t){ infoHtml += '💡 ' + esc(t) + '<br>'; });
+      } else {
+        infoHtml += '💡 ' + esc(p.tips);
+      }
       infoHtml += '</div>';
     }
   } else if (p.type === 'restaurant') {
