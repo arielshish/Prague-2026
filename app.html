@@ -3022,12 +3022,16 @@ function loadDaysFromSheets(silent) {
 function selectDay(i) { currentDay = i; renderDays(); }
 
 (function initDaySwipe() {
-  // Pointer Events are immune to draggable="true" interference on iOS Safari.
+  // touch-action:pan-y tells Android Chrome "vertical scroll is yours, horizontal is mine"
+  // preventing pointercancel before the 40px threshold on Android.
+  var section = document.getElementById('days');
+  if (section) section.style.touchAction = 'pan-y';
+
   var _tx = 0, _ty = 0, _lx = 0, _ly = 0, _pid = null;
   document.addEventListener('pointerdown', function(e) {
     if (e.pointerType === 'mouse') return;
-    var section = document.getElementById('days');
-    if (!section || !section.contains(e.target)) return;
+    var sec = document.getElementById('days');
+    if (!sec || !sec.contains(e.target)) return;
     var btns = document.getElementById('dayButtons');
     if (btns && btns.contains(e.target)) return;
     _tx = _lx = e.clientX;
