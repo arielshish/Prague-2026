@@ -4728,7 +4728,7 @@ function renderNearbyList() {
   if (!container) return;
   var daysState = getDaysState();
   var scheduledNames = {};
-  daysState.forEach(function(d) { (d.stops||[]).forEach(function(s){ scheduledNames[s.name]={day:d.title,time:s.time}; }); });
+  daysState.forEach(function(d,i) { (d.stops||[]).forEach(function(s){ scheduledNames[s.name]={dayNum:d.dayNum||(i+1),day:d.title,time:s.time}; }); });
 
   // בנה רשימה עם מרחקים
   var items = [];
@@ -4791,7 +4791,7 @@ function renderNearbyList() {
         '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
           '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:' + catClr + '18;color:' + catClr + ';">' + catLbl + '</span>' +
           (distStr ? '<span style="font-size:10px;font-weight:700;color:rgba(30,41,59,0.5);">🚶 '+distStr+(walkMin?(' · '+walkMin+'ד\''):'')+'</span>' : '') +
-          (it.inDays ? '<span style="font-size:10px;font-weight:700;color:#16a34a;background:rgba(22,163,74,0.10);padding:2px 8px;border-radius:20px;margin-right:auto;">✅ '+it.inDays.day+(it.inDays.time?' · '+it.inDays.time:'')+'</span>' : '') +
+          (it.inDays ? '<span style="font-size:10px;font-weight:700;color:#16a34a;background:rgba(22,163,74,0.10);padding:2px 8px;border-radius:20px;margin-right:auto;">✅ יום '+it.inDays.dayNum+(it.inDays.time?' · '+it.inDays.time:'')+'</span>' : '') +
         '</div>' +
       '</div>' +
       // arrow indicator
