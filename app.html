@@ -3011,6 +3011,25 @@ function loadDaysFromSheets(silent) {
 
 function selectDay(i) { currentDay = i; renderDays(); }
 
+(function initDaySwipe() {
+  var el = document.getElementById('dayCard');
+  if (!el) return;
+  var _tx = 0, _ty = 0;
+  el.addEventListener('touchstart', function(e) {
+    _tx = e.touches[0].clientX;
+    _ty = e.touches[0].clientY;
+  }, { passive: true });
+  el.addEventListener('touchend', function(e) {
+    var dx = e.changedTouches[0].clientX - _tx;
+    var dy = e.changedTouches[0].clientY - _ty;
+    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy)) return; // too short or more vertical
+    var total = getDaysState().length;
+    // swipe left (dx < 0) = next day, swipe right (dx > 0) = prev day
+    var next = currentDay + (dx < 0 ? 1 : -1);
+    if (next >= 1 && next <= total) selectDay(next);
+  }, { passive: true });
+})();
+
 function renderDays() {
   var state = getDaysState();
   var i = currentDay || 1;
