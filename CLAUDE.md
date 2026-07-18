@@ -100,9 +100,10 @@ var PHOTO_SPOTS = ALL_PLACES.filter(p => p.type==='photo');
 - `saveSchedules()` שומר רק `remindersSchedule`
 
 ### כללי עבודה
-- **לפני שינוי גדול**: `git tag backup-<תיאור>-<תאריך>` + push
+- **לפני כל שינוי — גדול או קטן**: `git tag backup-<תיאור>-$(date +%Y%m%d-%H%M)` + push. אין יוצאים מן הכלל.
+- **סדר קבוע**: tag לפני → שינוי → commit + push → עדכן CLAUDE.md → עדכן skill
 - **branch**: `claude/unknown-session-xpa0pr` → PR → merge ל-`main`
-- **אחרי כל פיצ'ר**: עדכן סעיף זה + skill ב-`.claude/skills/prague-2026.md`
+- **אחרי כל שינוי**: עדכן סעיף זה + skill ב-`.claude/skills/prague-2026.md`
 - **ציוני Google**: אימות רק מ-top-rated.online / TripAdvisor — לא להמציא
 
 ## איך לערוך את האפליקציה
