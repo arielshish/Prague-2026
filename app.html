@@ -16,7 +16,260 @@
   @keyframes sheetUp{from{transform:translateY(60px);opacity:0}to{transform:none;opacity:1}}
   @keyframes riverDrift{0%,100%{transform:translateX(0)}50%{transform:translateX(-6px)}}
   @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @keyframes skeletonPulse{0%,100%{opacity:0.5}50%{opacity:1}}
+  @keyframes fadeSlideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  @keyframes scaleIn{from{opacity:0;transform:scale(0.94)}to{opacity:1;transform:scale(1)}}
+
+  /* ══════════════════════════════════════════
+     DESIGN SYSTEM — Prague 2026 v5
+     ══════════════════════════════════════════ */
+  :root{
+    /* Colors */
+    --c-primary:#F4634A;
+    --c-primary-soft:rgba(244,99,74,0.10);
+    --c-primary-mid:rgba(244,99,74,0.22);
+    --c-surface:#F5EFE6;
+    --c-card:#FFFFFF;
+    --c-text-1:#1E293B;
+    --c-text-2:rgba(30,41,59,0.60);
+    --c-text-3:rgba(30,41,59,0.38);
+    --c-border:rgba(0,0,0,0.08);
+    --c-border-strong:rgba(0,0,0,0.13);
+    --c-success:#10B981;
+    --c-success-soft:rgba(16,185,129,0.10);
+    --c-warn:#F59E0B;
+    --c-warn-soft:rgba(245,158,11,0.10);
+    --c-danger:#EF4444;
+    --c-danger-soft:rgba(239,68,68,0.08);
+
+    /* Radius */
+    --r-card:22px;
+    --r-btn:13px;
+    --r-pill:100px;
+    --r-chip:10px;
+    --r-sm:8px;
+
+    /* Shadows */
+    --s-card:0 2px 12px rgba(0,0,0,0.07),0 1px 3px rgba(0,0,0,0.05);
+    --s-card-hover:0 8px 28px rgba(0,0,0,0.11),0 2px 6px rgba(0,0,0,0.06);
+    --s-float:0 12px 40px rgba(0,0,0,0.14),0 4px 12px rgba(0,0,0,0.08);
+    --s-primary:0 6px 20px rgba(244,99,74,0.30);
+    --s-primary-lg:0 10px 32px rgba(244,99,74,0.38);
+
+    /* Spacing */
+    --sp-xs:4px; --sp-sm:8px; --sp-md:14px;
+    --sp-lg:20px; --sp-xl:28px;
+
+    /* Transitions */
+    --ease-spring:cubic-bezier(0.34,1.56,0.64,1);
+    --ease-out:cubic-bezier(0.16,1,0.3,1);
+    --t-fast:0.15s;
+    --t-base:0.22s;
+    --t-slow:0.35s;
+  }
+
+  /* ── Global resets ── */
   *{box-sizing:border-box;margin:0;padding:0;}
+
+  /* ── Tap feedback on all interactive elements ── */
+  button,a,[role=button]{
+    -webkit-tap-highlight-color:transparent;
+    transition:transform var(--t-fast) var(--ease-out),
+               opacity var(--t-fast) var(--ease-out),
+               box-shadow var(--t-base) var(--ease-out);
+  }
+  button:active,[role=button]:active{transform:scale(0.96);opacity:0.88;}
+  a:active{opacity:0.75;}
+
+  /* ── Card system ── */
+  .card{
+    background:var(--c-card);
+    border:1px solid var(--c-border);
+    border-radius:var(--r-card);
+    padding:18px;
+    margin-bottom:12px;
+    box-shadow:var(--s-card);
+    transition:box-shadow var(--t-base) var(--ease-out);
+  }
+
+  /* ── DS Section header ── */
+  .ds-section-hdr{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:14px;
+  }
+  .ds-section-hdr-title{
+    font-size:11px;font-weight:800;
+    color:var(--c-primary);
+    letter-spacing:0.6px;text-transform:uppercase;
+  }
+
+  /* ── DS Stat tile ── */
+  .ds-stat{
+    background:var(--c-primary-soft);
+    border:1px solid var(--c-primary-mid);
+    border-radius:16px;
+    padding:14px 16px;
+    display:flex;flex-direction:column;gap:3px;
+  }
+  .ds-stat-label{font-size:10px;font-weight:700;color:var(--c-text-2);letter-spacing:0.5px;}
+  .ds-stat-value{font-size:26px;font-weight:900;color:var(--c-primary);line-height:1;}
+  .ds-stat-sub{font-size:10px;font-weight:600;color:var(--c-text-3);}
+
+  /* ── DS Priority pills ── */
+  .ds-badge{display:inline-flex;align-items:center;gap:4px;
+    padding:3px 9px;border-radius:var(--r-pill);
+    font-size:10px;font-weight:700;letter-spacing:0.3px;}
+  .ds-badge-red{background:var(--c-danger-soft);color:var(--c-danger);border:1px solid rgba(239,68,68,0.18);}
+  .ds-badge-amber{background:var(--c-warn-soft);color:#B45309;border:1px solid rgba(245,158,11,0.22);}
+  .ds-badge-green{background:var(--c-success-soft);color:#065F46;border:1px solid rgba(16,185,129,0.20);}
+  .ds-badge-blue{background:rgba(59,130,246,0.08);color:#1E40AF;border:1px solid rgba(59,130,246,0.18);}
+  .ds-badge-gray{background:rgba(0,0,0,0.05);color:var(--c-text-2);border:1px solid var(--c-border);}
+
+  /* ── DS Chip (filter) ── */
+  .ds-chip{
+    display:inline-flex;align-items:center;gap:5px;
+    padding:6px 13px;border-radius:var(--r-pill);
+    font-size:12px;font-weight:700;
+    background:rgba(0,0,0,0.05);
+    color:var(--c-text-2);
+    border:1px solid transparent;
+    cursor:pointer;white-space:nowrap;
+    transition:all var(--t-fast) var(--ease-out);
+  }
+  .ds-chip.active,.ds-chip[data-active=true]{
+    background:var(--c-primary-soft);
+    color:var(--c-primary);
+    border-color:var(--c-primary-mid);
+  }
+
+  /* ── Buttons ── */
+  .btn-primary{
+    background:linear-gradient(135deg,#F4634A,#e8522e);
+    color:#fff;border:0;border-radius:var(--r-btn);
+    padding:13px 18px;font-weight:800;font-size:13px;
+    cursor:pointer;font-family:'Rubik',Arial,sans-serif;
+    box-shadow:var(--s-primary);
+    letter-spacing:0.2px;
+  }
+  .btn-primary:active{transform:scale(0.96);box-shadow:0 4px 12px rgba(244,99,74,0.22);}
+
+  .btn-ghost{
+    background:rgba(0,0,0,0.04);color:var(--c-text-2);
+    border:1px solid var(--c-border-strong);
+    border-radius:var(--r-btn);padding:12px 14px;
+    font-weight:700;font-size:13px;cursor:pointer;
+    font-family:'Rubik',Arial,sans-serif;
+  }
+
+  /* ── FAB ── */
+  .ds-fab{
+    position:fixed;bottom:82px;left:16px;
+    width:52px;height:52px;border-radius:50%;
+    background:linear-gradient(135deg,#F4634A,#e8522e);
+    color:#fff;border:0;font-size:24px;
+    box-shadow:var(--s-primary-lg);
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    z-index:60;
+    transition:transform var(--t-fast) var(--ease-spring),
+               box-shadow var(--t-base) var(--ease-out);
+    animation:scaleIn 0.3s var(--ease-spring) both;
+  }
+  .ds-fab:active{transform:scale(0.90);}
+
+  /* ── Priority border (cards) ── */
+  .priority-high{border-right:3px solid var(--c-danger)!important;}
+  .priority-med{border-right:3px solid var(--c-warn)!important;}
+  .priority-done{opacity:0.55;}
+
+  /* ── Skeleton ── */
+  .skeleton{
+    background:linear-gradient(90deg,rgba(0,0,0,0.06) 25%,rgba(0,0,0,0.10) 50%,rgba(0,0,0,0.06) 75%);
+    background-size:200% 100%;
+    animation:shimmer 1.4s infinite;
+    border-radius:8px;
+  }
+
+  /* ── Back button ── */
+  .back-btn{
+    background:rgba(0,0,0,0.05);
+    border:1px solid var(--c-border-strong);
+    border-radius:10px;padding:7px 12px;
+    font-size:11px;font-weight:700;
+    color:var(--c-text-2);cursor:pointer;
+    font-family:'Rubik',Arial,sans-serif;white-space:nowrap;
+  }
+
+  /* ── Cat chip (legacy compat) ── */
+  .cat-chip{
+    background:rgba(0,0,0,0.05);border:1px solid var(--c-border);
+    border-radius:var(--r-pill);padding:6px 13px;
+    font-size:12px;font-weight:700;color:rgba(30,41,59,0.8);
+    cursor:pointer;font-family:'Rubik',Arial,sans-serif;
+    transition:all var(--t-fast) var(--ease-out);
+  }
+  .cat-chip.active,.cat-chip[data-active=true]{
+    background:var(--c-primary-soft);color:var(--c-primary);
+    border-color:var(--c-primary-mid);
+  }
+
+  /* ── Nav map button ── */
+  .nav-map-btn{
+    display:inline-block;background:rgba(56,189,248,0.10);
+    color:#0369A1;border:1px solid rgba(56,189,248,0.25);
+    border-radius:9px;padding:5px 12px;
+    font-size:11px;font-weight:700;text-decoration:none;
+    font-family:'Rubik',Arial,sans-serif;
+    transition:all var(--t-fast) var(--ease-out);
+  }
+
+  /* ── Tip pill ── */
+  .tip-pill{
+    background:var(--c-warn-soft);
+    border:1px solid rgba(245,158,11,0.25);
+    border-radius:10px;padding:7px 11px;
+    font-size:11px;color:#92400E;
+  }
+
+  /* ── Bottom nav premium ── */
+  nav.mobile-nav{
+    position:fixed;bottom:0;left:0;right:0;
+    background:rgba(255,255,255,0.92);
+    backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+    border-top:1px solid rgba(0,0,0,0.07);
+    box-shadow:0 -4px 24px rgba(0,0,0,0.09);
+    z-index:50;
+    display:flex;justify-content:space-around;align-items:center;
+    padding:8px 4px calc(8px + env(safe-area-inset-bottom,0px));
+    height:calc(64px + env(safe-area-inset-bottom,0px));
+  }
+  .nav-item{
+    display:flex;flex-direction:column;align-items:center;
+    gap:2px;padding:6px 10px;border-radius:14px;
+    border:0;background:transparent;cursor:pointer;
+    font-family:'Rubik',Arial,sans-serif;
+    min-width:44px;min-height:44px;justify-content:center;
+    transition:transform var(--t-fast) var(--ease-spring),
+               background var(--t-fast) var(--ease-out);
+  }
+  .nav-item .nav-icon{font-size:22px;line-height:1;transition:transform var(--t-fast) var(--ease-spring);}
+  .nav-item .nav-label{font-size:9px;font-weight:700;color:var(--c-text-3);letter-spacing:0.3px;}
+  .nav-item.active{background:var(--c-primary-soft);}
+  .nav-item.active .nav-icon{transform:scale(1.18);}
+  .nav-item.active .nav-label{color:var(--c-primary);font-weight:800;}
+
+  /* ── Card entrance animation ── */
+  .card{animation:fadeSlideUp var(--t-slow) var(--ease-out) both;}
+
+  /* ── Collapsible section ── */
+  .ds-collapse-content{
+    overflow:hidden;
+    transition:max-height var(--t-slow) var(--ease-out),
+               opacity var(--t-base) var(--ease-out);
+    max-height:0;opacity:0;
+  }
+  .ds-collapse-content.open{max-height:600px;opacity:1;}
+
   body{background:#F5EFE6;direction:rtl;text-align:right;font-family:\'Rubik\',Arial,sans-serif;color:#1E293B;overflow-x:hidden;-webkit-text-size-adjust:100%;}
   html{overflow-x:hidden;background:#F5EFE6;}
   input,textarea,select{font-size:16px!important;}
