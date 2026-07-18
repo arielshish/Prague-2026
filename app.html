@@ -4713,6 +4713,9 @@ function showMapNavDialog(p, coords) {
     if (p.tip) infoHtml += '<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:8px 11px;font-size:11px;color:#B45309;margin-bottom:8px;">💡 ' + esc(p.tip) + '</div>';
   }
 
+  // שמור נתוני המקום ב-global כדי להימנע מבעיות escaping ב-onclick
+  window._mapNavPlace = p;
+
   var overlay = document.createElement('div');
   overlay.id = 'mapNavDialog';
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.45);display:flex;align-items:flex-end;justify-content:center;';
@@ -4744,7 +4747,7 @@ function showMapNavDialog(p, coords) {
             '<div><div style="font-size:12px;font-weight:800;">Waze</div><div style="font-size:10px;color:#64748b;">ניווט ברכב</div></div>' +
           '</a>' +
         '</div>' +
-        '<button onclick="(function(){var d=document.getElementById(\'mapNavDialog\');if(d)d.remove();openAddCustomStop(\'place\',{emoji:\'' + (p.icon||'📍') + '\',name:\'' + (p.name||'').replace(/'/g,"\\'").replace(/"/g,'\\"') + '\',desc:\'' + ((p.desc||'').substring(0,120).replace(/'/g,"\\'").replace(/\n/g,' ')) + '\'})})()" ' +
+        '<button onclick="(function(){var d=document.getElementById(\'mapNavDialog\');if(d)d.remove();var mp=window._mapNavPlace||{};openAddCustomStop(\'place\',{emoji:mp.icon||\'📍\',name:mp.name||\'\',desc:(mp.desc||mp.sub||\'\').substring(0,120),booking:mp.booking||\'\',mapUrl:mp.mapUrl||\'\',duration:mp.duration||\'\',who:mp.who||\'\',google:mp.google||\'\'});})()" ' +
           'style="width:100%;padding:12px;background:' + (schedInfo ? 'rgba(244,99,74,0.12)' : '#F4634A') + ';color:' + (schedInfo ? '#C2410C' : '#fff') + ';border:' + (schedInfo ? '1.5px solid rgba(244,99,74,0.35)' : 'none') + ';border-radius:13px;font-size:13px;font-weight:800;cursor:pointer;margin-bottom:8px;">' +
           (schedInfo ? '✏️ עדכן בלוז' : '➕ הוסף ללוז') +
         '</button>' +
