@@ -405,6 +405,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
 <script>
 // Firebase init for GitHub Pages (non-GAS) persistence
 var _fbApp = null;
@@ -4457,22 +4458,36 @@ var _nearbyFilter = 'all';
 var _nearbyAll = [];
 
 function renderLocationTab() {
-  // אתחול מפה פעם אחת
-  setTimeout(function() {
-    if (!window.L) return;
-    if (!_leafletMap) {
-      _leafletMap = L.map('locationMap', {zoomControl:false}).setView([50.0875, 14.4213], 14);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution:'© OpenStreetMap',
-        maxZoom:19
-      }).addTo(_leafletMap);
-      L.control.zoom({position:'bottomright'}).addTo(_leafletMap);
-      addMapMarkers();
-    } else {
-      _leafletMap.invalidateSize();
-    }
-  }, 80);
   renderNearbyList();
+  initLeafletMap();
+}
+
+function initLeafletMap() {
+  // אם Leaflet עוד לא נטען — מנסה שוב עד 10 שניות
+  if (!window.L) {
+    var _tries = (initLeafletMap._tries = (initLeafletMap._tries || 0) + 1);
+    if (_tries > 50) return; // timeout
+    return setTimeout(initLeafletMap, 200);
+  }
+  initLeafletMap._tries = 0;
+  if (_leafletMap) {
+    // מפה כבר קיימת — פשוט תקן גודל (הdiv היה מוסתר)
+    setTimeout(function() { _leafletMap.invalidateSize(); }, 100);
+    return;
+  }
+  var mapDiv = document.getElementById('locationMap');
+  if (!mapDiv) return;
+  _leafletMap = L.map('locationMap', {zoomControl: false}).setView([50.0875, 14.4213], 14);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
+    maxZoom: 19
+  }).addTo(_leafletMap);
+  L.control.zoom({position: 'bottomright'}).addTo(_leafletMap);
+  // תקן גודל אחרי ש-section נהיה visible
+  setTimeout(function() {
+    _leafletMap.invalidateSize();
+    addMapMarkers();
+  }, 150);
 }
 
 function makePinIcon(color) {
@@ -6815,6 +6830,5 @@ function openPhotoViewer(id) {
 }
 
 </script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 </body>
 </html>
