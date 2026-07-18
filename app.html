@@ -3054,7 +3054,11 @@ function renderDays() {
             '<button onclick="event.stopPropagation();deleteStop(' + dayIdx + ',' + si + ')" style="background:rgba(239,68,68,0.10);border:none;border-radius:6px;padding:2px 5px;font-size:10px;color:#991B1B;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;line-height:1;">✕</button>' +
           '</div>' +
         '</div>' +
-        '<div style="font-size:11px;color:rgba(30,41,59,0.5);margin-bottom:6px;">⏱️ ' + esc(s.time||'') + '</div>' +
+        '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">' +
+          '<span style="font-size:11px;color:rgba(30,41,59,0.5);">⏱️ ' + esc(s.time||'') + '</span>' +
+          (s.google ? '<span style="background:rgba(254,240,138,0.6);border:1px solid rgba(202,138,4,0.3);border-radius:8px;padding:2px 7px;font-size:10px;font-weight:700;color:#92400E;">⭐ ' + esc(s.google) + '</span>' : '') +
+          (s.duration ? '<span style="font-size:10px;color:rgba(30,41,59,0.4);">' + esc(s.duration) + '</span>' : '') +
+        '</div>' +
         '<div style="font-size:12px;color:rgba(30,41,59,0.65);margin-bottom:8px;">' + esc(s.desc||'') + '</div>' +
         (s.mapUrl ? '<a href="' + s.mapUrl + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="nav-map-btn">🗺️ נווט</a>' : '') +
       '</div></div></div>';
@@ -3104,11 +3108,17 @@ function showStopDetail(dayIdx, stopIdx) {
     '<div style="position:relative;background:#F5EFE6;border-radius:24px 24px 0 0;padding:24px 20px 36px;width:min(430px,100%);max-height:88vh;overflow-y:auto;animation:sheetUp 0.28s ease both;">' +
     '<div style="width:40px;height:4px;background:rgba(0,0,0,0.15);border-radius:2px;margin:0 auto 18px;"></div>' +
     '<button onclick="document.getElementById(\'stopDetailOverlay\').remove();" style="position:absolute;top:16px;left:16px;background:rgba(0,0,0,0.06);border:none;color:rgba(30,41,59,0.6);font-size:18px;width:34px;height:34px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;line-height:1;">✕</button>' +
-    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">' +
+    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">' +
       '<div style="font-size:36px;">' + (s.emoji||'📍') + '</div>' +
-      '<div><div style="font-size:17px;font-weight:900;color:#1E293B;line-height:1.2;">' + esc(s.name) + '</div>' +
-      '<div style="font-size:12px;color:rgba(30,41,59,0.5);margin-top:3px;">⏱️ ' + esc(s.time||'') + '</div></div>' +
+      '<div style="flex:1;min-width:0;"><div style="font-size:17px;font-weight:900;color:#1E293B;line-height:1.2;">' + esc(s.name) + '</div>' +
+      '<div style="font-size:12px;color:rgba(30,41,59,0.5);margin-top:3px;">⏱️ ' + esc(s.time||'') + (s.duration ? ' · ' + esc(s.duration) : '') + '</div></div>' +
     '</div>' +
+    ((s.google || s.who) ?
+      '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">' +
+        (s.google ? '<span style="background:rgba(254,240,138,0.6);border:1px solid rgba(202,138,4,0.3);border-radius:10px;padding:5px 12px;font-size:12px;font-weight:700;color:#92400E;">⭐ ' + esc(s.google) + ' Google</span>' : '') +
+        (s.who ? '<span style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:10px;padding:5px 12px;font-size:11px;color:#4338CA;">' + esc(s.who) + '</span>' : '') +
+      '</div>'
+    : '') +
     (s.details ? '<div style="background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:14px;padding:14px;margin-bottom:14px;font-size:13px;color:rgba(30,41,59,0.8);line-height:1.65;">' + esc(s.details) + '</div>' : '') +
     (s.details2 ? '<div style="background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.3);border-radius:14px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:#92400E;line-height:1.6;">📋 ' + esc(s.details2) + '</div>' : '') +
     (s.booking ? '<div style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:14px;padding:12px 14px;margin-bottom:14px;">' +
@@ -3718,16 +3728,19 @@ function saveAddCommunityStop(recIdx) {
   var rec = COMMUNITY[recIdx];
   if (!rec) return;
 
+  var tipsArr = [];
+  if (rec.tips) { var tStr = typeof rec.tips === 'string' ? rec.tips : rec.tips.join(' | '); if (tStr) tipsArr.push(tStr); }
+  if (rec.who) tipsArr.push('👥 מתאים ל: ' + rec.who);
   var stop = {
     emoji: rec.icon || '📍',
     name: rec.name,
     time: val || '🌅 בוקר',
     desc: rec.desc || '',
-    details: '🚇 איך להגיע: ' + (rec.how || '') + (rec.tips ? '\n💡 טיפ: ' + rec.tips : ''),
-    tips: [
-      'דירוג גוגל: ' + (rec.google || '—'),
-      'פייסבוק: ' + (rec.fb || '—')
-    ],
+    google: rec.google || '',
+    duration: rec.duration || '',
+    who: rec.who || '',
+    details: rec.how ? '🚇 ' + rec.how : '',
+    tips: tipsArr,
     booking: rec.booking || 'ללא צורך.',
     mapUrl: rec.mapUrl || ''
   };
