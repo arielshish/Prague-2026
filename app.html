@@ -2933,6 +2933,7 @@ function openTab(id) {
   if (id === 'expenses') { loadExpenses(); if (!window._expFirebaseLoaded) { window._expFirebaseLoaded = true; loadExpensesFromFirebase(); } syncBudgetFromSheets(); syncBudgetFromFirebase(); }
   if (id === 'days') { renderDays(); loadDaysFromSheets(); }
   if (id === 'pack') loadPack();
+  if (id === 'community') renderCommunity();
   if (id === 'restaurants') renderRestaurants();
   if (id === 'reminders') initReminders();
 }
@@ -2955,6 +2956,8 @@ function getDaysState() {
 function saveDaysState() {
   var json = JSON.stringify(DAYS_STATE);
   localStorage.setItem('prague_days_v1', json);
+  // refresh badges on whichever tab is currently visible
+  refreshScheduleBadges();
   if (isGas()) {
     google.script.run
       .withSuccessHandler(function(r) { if (r && r.ok) toast('☁️ ימים סונכרנו!'); })
@@ -2966,6 +2969,18 @@ function saveDaysState() {
     getFirestoreDb().collection('appdata').doc('main').set({ days_custom: json }, { merge: true })
       .catch(function(err) { window._lastFirebaseError = err; console.warn('saveDaysState Firebase error', err); });
   });
+}
+
+function refreshScheduleBadges() {
+  // Re-render whichever tab is active so "already in schedule" badges stay in sync.
+  var active = ALL_TABS.find(function(name) {
+    var sec = qs(name);
+    return sec && sec.className && sec.className.indexOf('active') !== -1;
+  });
+  if (!active || active === 'days') return; // days is already re-rendered by its own callers
+  if (active === 'community' && typeof renderCommunity === 'function') renderCommunity();
+  else if (active === 'restaurants' && typeof renderRestaurants === 'function') renderRestaurants();
+  else if (active === 'reminders' && typeof renderReminders === 'function') renderReminders();
 }
 
 function loadDaysFromSheets(silent) {
