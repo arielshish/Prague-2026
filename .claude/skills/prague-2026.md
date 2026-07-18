@@ -12,13 +12,25 @@ GitHub Pages: `arielshish.github.io/Prague-2026/app.html`
 ## מבנה נתונים
 
 ```javascript
-// אטרקציות — COMMUNITY[]
-{ cat, icon, name, fb, google, desc, booking, duration, tips, who, how, mapUrl }
+// ── ALL_PLACES[] — מקור יחיד (שורה ~2383) ──
+// type:'shop'       → {icon, name, stars, hours, metro, duration, brands, tip, mapUrl}
+// type:'restaurant' → {icon, name, level, sub, desc, price, badge, badgeClr, badgeTxt, google, mapUrl}
+// type:'dessert'    → {icon, name, level, sub, desc, price, rating, tag, tagClr, where, mapUrl}
+// type:'community'  → {icon, name, cat, fb, google, desc, booking, duration, tips, who, how, mapUrl}
+// type:'photo'      → {icon, name, fee, sub, desc, best, crowds, fee_txt, rating, tip, mapUrl}
 
-// מסעדות — RESTAURANTS[]
-{ level, icon, name, sub, desc, price, badge, badgeClr, badgeTxt, google, mapUrl }
+// Computed views (שורה ~2843):
+var COMMUNITY   = ALL_PLACES.filter(p => p.type==='community');  // 47 פריטים
+var RESTAURANTS = ALL_PLACES.filter(p => p.type==='restaurant'); // 25 פריטים
+var SHOPS       = ALL_PLACES.filter(p => p.type==='shop');       // 8 פריטים
+var DESSERTS    = ALL_PLACES.filter(p => p.type==='dessert');    // 13 פריטים
+var PHOTO_SPOTS = ALL_PLACES.filter(p => p.type==='photo');      // 12 פריטים
 
-// לוז — DAYS[]  (stops עם שדות מלאים)
+// נפרדים — לא חלק מ-ALL_PLACES:
+// REMINDERS[] (שורה ~1560) — משימות לפני הטיול
+// DAYS[]      (שורה ~2163) — לוז בסיס (מוחלף ע"י DAYS_STATE מ-Firestore)
+
+// לוז — DAYS_STATE stops:
 { emoji, name, time, desc, details, tips, booking, mapUrl, google, duration, who }
 ```
 
@@ -32,10 +44,13 @@ GitHub Pages: `arielshish.github.io/Prague-2026/app.html`
 | `showStopDetail()` | ~3089 | popup פרטי תחנה |
 | `renderCommunity()` | ~3649 | בנק אטרקציות |
 | `renderRestaurants()` | ~3794 | מסעדות |
+| `renderShopping()` | ~3847 | קניות (SHOPS) |
+| `renderDesserts()` | ~3946 | קינוחים (DESSERTS) |
+| `renderPhotoSpots()` | ~3991 | נקודות צילום (PHOTO_SPOTS) |
 | `saveAddCommunityStop()` | ~3712 | שומר COMMUNITY → DAYS (כולל google/duration/who) |
 | `openAddCommunityStop(idx)` | ~3693 | modal להוספת תחנה |
 
-## פיצ'רים קיימים (עדכון 2026-07-18 — גרסה 3)
+## פיצ'רים קיימים (עדכון 2026-07-18 — גרסה 4)
 
 ### ציוני Google ב-DAYS
 - תחנות ב-DAYS מציגות ⭐ ציון, משך, ו"מתאים ל"
@@ -56,11 +71,18 @@ GitHub Pages: `arielshish.github.io/Prague-2026/app.html`
 - פועל ב: `renderDays()`, `showStopDetail()`
 - קוד: `var _fb = COMMUNITY.find(c=>c.name===s.name) || RESTAURANTS.find(r=>r.name===s.name) || {};`
 
+### ALL_PLACES — איחוד מסד נתוני מקומות (2026-07-18)
+- מערך יחיד `ALL_PLACES[]` (~שורה 2383) מכיל 105 פריטים עם `type` field
+- **computed views** מ-ALL_PLACES: COMMUNITY, RESTAURANTS, SHOPS, DESSERTS, PHOTO_SPOTS
+- שדות SHOPS נורמלו: `e→icon`, `n→name`, `map→mapUrl`, `time→duration`
+- כל render functions ממשיכות לעבוד ללא שינוי (קוראות ל-computed views)
+- REMINDERS[] ו-DAYS[] נשארים נפרדים
+
 ### Swipe ימינה/שמאלה בין ימים
-- `initDaySwipe()` IIFE — listeners על `document` (לא section/card) לעקיפת draggable-iOS
-- `touchmove` מעדכן `_lx/_ly` — מיקום אחרון תמיד זמין
-- `touchcancel` מבצע סווייפ (לא מבטל) — פותר בעיית draggable ב-iOS Safari
+- `initDaySwipe()` IIFE — Pointer Events API (לא Touch Events) — חסין מ-draggable-iOS
+- listeners על `document`, מסנן `section#days`, מוציא `#dayButtons`
 - threshold: `|dx| >= 40` ו-`|dx| > |dy| * 1.2`
+- `pointercancel` מבצע סווייפ — פותר iOS Safari draggable interference
 
 ### מסד נתונים אחיד (2026-07-18)
 - **`DAYS_STATE`** = מקור יחיד לכל תזמון (קהילה, מסעדות, קניות, צילום, קינוחים)
