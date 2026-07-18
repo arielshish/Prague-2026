@@ -636,7 +636,11 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
         <button class="back-btn" id="btnBackDays">← ראשי</button>
       </div>
     </div>
-    <div id="dayButtons" style="display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+      <button id="dayPrevBtn" onclick="(function(){var t=getDaysState().length;var n=currentDay-1;if(n>=1)selectDay(n);})()" style="flex-shrink:0;background:#ffffff;border:1px solid rgba(30,41,59,0.12);border-radius:10px;width:36px;height:36px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#1E293B;font-family:'Rubik',Arial,sans-serif;transition:opacity 0.2s;">›</button>
+      <div id="dayButtons" style="flex:1;display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
+      <button id="dayNextBtn" onclick="(function(){var t=getDaysState().length;var n=currentDay+1;if(n<=t)selectDay(n);})()" style="flex-shrink:0;background:#ffffff;border:1px solid rgba(30,41,59,0.12);border-radius:10px;width:36px;height:36px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#1E293B;font-family:'Rubik',Arial,sans-serif;transition:opacity 0.2s;">‹</button>
+    </div>
     <div id="dayCard" class="card"></div>
   </section>
 
@@ -1801,7 +1805,7 @@ function addReminderToStop(id) {
 function addShopToStop(idx) {
   var s = SHOPS[idx];
   if (!s) return;
-  showDayTimePicker(s.e, s.n, (s.tip || '').substring(0, 120).replace(/\n/g, ' '));
+  showDayTimePicker(s.icon, s.name, (s.tip || '').substring(0, 120).replace(/\n/g, ' '));
 }
 
 function initReminders() {
@@ -2375,214 +2379,215 @@ var DAYS = [
    mapUrl:'https://www.google.com/maps/dir/Comfort+Hotel+Prague+City+East/Vaclav+Havel+Airport+Prague'}
 ];
 
-var SHOPS = [
-  {e:'🛍️',n:'Primark Wenceslas Square',stars:'★★★★★',hours:'09:00–21:00',metro:'מטרו A/C — Můstek',time:'~20 דק׳',brands:'ביגוד, ילדים, בית, מזוודות',tip:'להגיע בבוקר — עמוס מאוד בצהריים.',map:'https://www.google.com/maps/search/Primark+Wenceslas+Square+Prague'},
-  {e:'🏬',n:'Palladium',stars:'★★★★★',hours:'09:00–21:00',metro:'מטרו B — Náměstí Republiky',time:'~25 דק׳',brands:'~180 חנויות, Albert, Sephora',tip:'מעולה לשילוב עם העיר העתיקה.',map:'https://www.google.com/maps/place/Palladium+shopping+centre,+Prague'},
-  {e:'🏢',n:'Westfield Chodov',stars:'★★★★☆',hours:'09:00–21:00',metro:'מטרו C — Chodov',time:'~35–45 דק׳',brands:'~300 חנויות: Zara, Mango, Reserved',tip:'הקניון הגדול ביותר — ליום גשם.',map:'https://www.google.com/maps/search/Westfield+Chodov+Prague'},
-  {e:'🏷️',n:'Fashion Arena Outlet',stars:'★★★★☆',hours:'10:00–20:00',metro:'מטרו A → Depo Hostivař + Bus',time:'~45–60 דק׳',brands:"Nike, Adidas, Tommy Hilfiger, Calvin Klein",tip:'מציאות מותגים — שווה חצי יום.',map:'https://www.google.com/maps/search/Fashion+Arena+Prague+Outlet'},
-  {e:'🧸',n:'Hamleys + LEGO Store',stars:'★★★★★',hours:'10:00–20:00',metro:'מרכז — קרוב ל-Můstek',time:'הליכה מ-Primark',brands:'צעצועים, LEGO, הצגות חינמיות',tip:'לשלב אחרי Primark.',map:'https://www.google.com/maps/search/Hamleys+Prague+LEGO+Store'},
-  {e:'🛒',n:'Nový Smíchov',stars:'★★★★☆',hours:'09:00–21:00',metro:'מטרו B — Anděl',time:'~30 דק׳',brands:'אופנה, Tesco, אוכל',tip:'מצוין וקרוב למרכז העיר — מומלץ מישראלים שחזרו.',map:'https://www.google.com/maps/search/Novy+Smichov+Prague'},
-  {e:'🍫',n:'Albert Supermarket — Chodov',stars:'★★★★☆',hours:'07:00–22:00',metro:'מטרו C — Chodov',time:'~40 דק׳',brands:'סופר ענק בקומה מינוס 1 בחודוב',tip:'מקום מעולה לקנות שוקולדים לארץ במחיר שפוי!',map:'https://www.google.com/maps/search/Albert+supermarket+Chodov+Prague'}
-];
+// ═══════════════════════════════════════════
+//  ALL_PLACES — מקור יחיד לכל האטרקציות, מסעדות, קניות, קינוחים ונקודות צילום
+//  type: 'shop' | 'restaurant' | 'dessert' | 'community' | 'photo'
+//  REMINDERS[] ו-DAYS[] נשארים נפרדים
+// ═══════════════════════════════════════════
+var ALL_PLACES = [
 
-// level: 1=💰 עד 1,000 CZK | 2=💰💰 1,000–2,000 | 3=💰💰💰 2,000–3,500 | 4=💰💰💰💰 3,500+
-var RESTAURANTS = [
+// ── SHOPS (type:'shop') ──────────────────────────────────────────────────────
+  {type:'shop',icon:'🛍️',name:'Primark Wenceslas Square',stars:'★★★★★',hours:'09:00–21:00',metro:'מטרו A/C — Můstek',duration:'~20 דק׳',brands:'ביגוד, ילדים, בית, מזוודות',tip:'להגיע בבוקר — עמוס מאוד בצהריים.',mapUrl:'https://www.google.com/maps/search/Primark+Wenceslas+Square+Prague'},
+  {type:'shop',icon:'🏬',name:'Palladium',stars:'★★★★★',hours:'09:00–21:00',metro:'מטרו B — Náměstí Republiky',duration:'~25 דק׳',brands:'~180 חנויות, Albert, Sephora',tip:'מעולה לשילוב עם העיר העתיקה.',mapUrl:'https://www.google.com/maps/place/Palladium+shopping+centre,+Prague'},
+  {type:'shop',icon:'🏢',name:'Westfield Chodov',stars:'★★★★☆',hours:'09:00–21:00',metro:'מטרו C — Chodov',duration:'~35–45 דק׳',brands:'~300 חנויות: Zara, Mango, Reserved',tip:'הקניון הגדול ביותר — ליום גשם.',mapUrl:'https://www.google.com/maps/search/Westfield+Chodov+Prague'},
+  {type:'shop',icon:'🏷️',name:'Fashion Arena Outlet',stars:'★★★★☆',hours:'10:00–20:00',metro:'מטרו A → Depo Hostivař + Bus',duration:'~45–60 דק׳',brands:'Nike, Adidas, Tommy Hilfiger, Calvin Klein',tip:'מציאות מותגים — שווה חצי יום.',mapUrl:'https://www.google.com/maps/search/Fashion+Arena+Prague+Outlet'},
+  {type:'shop',icon:'🧸',name:'Hamleys + LEGO Store',stars:'★★★★★',hours:'10:00–20:00',metro:'מרכז — קרוב ל-Můstek',duration:'הליכה מ-Primark',brands:'צעצועים, LEGO, הצגות חינמיות',tip:'לשלב אחרי Primark.',mapUrl:'https://www.google.com/maps/search/Hamleys+Prague+LEGO+Store'},
+  {type:'shop',icon:'🛒',name:'Nový Smíchov',stars:'★★★★☆',hours:'09:00–21:00',metro:'מטרו B — Anděl',duration:'~30 דק׳',brands:'אופנה, Tesco, אוכל',tip:'מצוין וקרוב למרכז העיר — מומלץ מישראלים שחזרו.',mapUrl:'https://www.google.com/maps/search/Novy+Smichov+Prague'},
+  {type:'shop',icon:'🍫',name:'Albert Supermarket — Chodov',stars:'★★★★☆',hours:'07:00–22:00',metro:'מטרו C — Chodov',duration:'~40 דק׳',brands:'סופר ענק בקומה מינוס 1 בחודוב',tip:'מקום מעולה לקנות שוקולדים לארץ במחיר שפוי!',mapUrl:'https://www.google.com/maps/search/Albert+supermarket+Chodov+Prague'},
+
+// ── RESTAURANTS (type:'restaurant') — level: 1=💰 עד 1,000 CZK | 2=💰💰 1,000–2,000 | 3=💰💰💰 2,000–3,500 | 4=💰💰💰💰 3,500+ ──
   // ── ✡️ כשר / מומלץ מקומיים ──────────────────────────
-  {level:1,icon:'✡️',name:'המזללה',sub:'מסעדה כשרה — ילדים עפו עליה!',
+  {type:'restaurant',level:1,icon:'✡️',name:'המזללה',sub:'מסעדה כשרה — ילדים עפו עליה!',
    desc:'מסעדה כשרה שמשפחות ישראליות חוזרות אליה שוב ושוב. אוכל מעולה, אווירה ישראלית, הילדים אהבו. המלצה חמה מקבוצות ישראליות.',
    price:'80–150 CZK למנה',badge:'✡️ כשר',badgeClr:'rgba(5,150,105,0.25)',badgeTxt:'#6EE7B7',
    google:'4.5',mapUrl:'https://www.google.com/maps/search/HaMazlela+kosher+Prague'},
-  {level:1,icon:'🥐',name:'קריוטוש כשר',sub:'הכי טוב לפי המלצות מהשטח!',
+  {type:'restaurant',level:1,icon:'🥐',name:'קריוטוש כשר',sub:'הכי טוב לפי המלצות מהשטח!',
    desc:'קריוטוש (Trdelník) כשר — מאפה גליל צ׳כי חם עם מילויים. לפי כל המלצות ישראליות שחזרו מפראג — הכי טעים! שווה טעימה חובה.',
    price:'80–120 CZK',badge:'⭐ חובה',badgeClr:'rgba(245,158,11,0.22)',badgeTxt:'#FCD34D',
    google:'4.3',mapUrl:'https://www.google.com/maps/search/kosher+Trdelnik+Prague'},
-  {level:1,icon:'🌸',name:'מאפה פרג',sub:'רק טרי! פגז פרג מפוצץ',
+  {type:'restaurant',level:1,icon:'🌸',name:'מאפה פרג',sub:'רק טרי! פגז פרג מפוצץ',
    desc:'המאפה הצ׳כי הכי מיוחד — בצק ממולא פרג מרוסק בשפע. לקנות רק כשטרי! לא טרי — לא שווה. תשאלו בכל מאפייה "makový závin" (מאקובי זאוין).',
    price:'40–80 CZK',badge:'🇨🇿 מקומי',badgeClr:'rgba(16,185,129,0.2)',badgeTxt:'#6EE7B7',
    mapUrl:'https://www.google.com/maps/search/makový+závin+Prague'},
-  {level:1,icon:'🍕',name:'Vapiano',sub:'פיצות ופסטות — חזרו פעמיים!',
+  {type:'restaurant',level:1,icon:'🍕',name:'Vapiano',sub:'פיצות ופסטות — חזרו פעמיים!',
    desc:'רשת איטלקית איכותית עם מטבח פתוח. פסטה, פיצה ושרות מעולה. משפחת שיש חזרה פעמיים — המלצה חמה. קרוב למרכז.',
    price:'350–600 CZK',badge:'⭐⭐ מנוסה',badgeClr:'rgba(244,99,74,0.22)',badgeTxt:'#FCA5A5',
    google:'4.3',mapUrl:'https://www.google.com/maps/search/Vapiano+Prague'},
-  {level:2,icon:'🍽️',name:'יפו פראג — Jaffa Prague',sub:'אוכל טעים — מומלץ מהשטח',
+  {type:'restaurant',level:2,icon:'🍽️',name:'יפו פראג — Jaffa Prague',sub:'אוכל טעים — מומלץ מהשטח',
    desc:'מסעדה ישראלית/מזרח תיכונית בפראג. אוכל טעים, אווירה נעימה. המלצה מישראלים שחזרו מהטיול לאוגוסט 2026.',
    price:'250–500 CZK',badge:'מומלץ',badgeClr:'rgba(139,92,246,0.22)',badgeTxt:'#C084FC',
    google:'4.3',mapUrl:'https://www.google.com/maps/search/Jaffa+Prague+restaurant'},
-  {level:1,icon:'🥐',name:'Little Chimney — קריוטוש דובאי',sub:'ממש ליד גשר קארל — נוף + טעם!',
+  {type:'restaurant',level:1,icon:'🥐',name:'Little Chimney — קריוטוש דובאי',sub:'ממש ליד גשר קארל — נוף + טעם!',
    desc:'קריוטוש בסגנון דובאי עם גלידת פיסטוק — מאוד טעים! נמצא ממש ליד גשר קארל, מושלם לשבת בשעות הערב עם נוף לנהר. הקריוטוש ברובע היהודי יותר טוב אבל המיקום כאן מנצח.',
    price:'120–180 CZK',badge:'📍 גשר קארל',badgeClr:'rgba(245,158,11,0.22)',badgeTxt:'#FCD34D',
    google:'4.2',mapUrl:'https://www.google.com/maps/search/Little+Chimney+Prague+Charles+Bridge'},
-  {level:2,icon:'🍜',name:'Mango — מסעדה אסייתית',sub:'מנות טעימות, מחירים הוגנים',
+  {type:'restaurant',level:2,icon:'🍜',name:'Mango — מסעדה אסייתית',sub:'מנות טעימות, מחירים הוגנים',
    desc:'מסעדה אסייתית מומלצת מאוד. מנות טעימות מאוד, מחירים הוגנים. המלצה חמה מישראלים שחזרו — מסעדה שכדאי לשלב.',
    price:'200–400 CZK',badge:'⭐⭐ מומלץ',badgeClr:'rgba(244,99,74,0.22)',badgeTxt:'#FCA5A5',
    google:'4.3',mapUrl:'https://www.google.com/maps/search/Mango+restaurant+Prague'},
-  {level:2,icon:'🍣',name:'Yammi Sushi House',sub:'סושי טעים מאוד בפראג',
+  {type:'restaurant',level:2,icon:'🍣',name:'Yammi Sushi House',sub:'סושי טעים מאוד בפראג',
    desc:'מסעדת סושי שמשפחות ישראליות ממליצות עליה בחום. מנות טעימות מאוד. קרוב לקניון פלדיום — טוב לשלב אחרי קניות.',
    price:'300–500 CZK',badge:'🍣 סושי',badgeClr:'rgba(8,145,178,0.22)',badgeTxt:'#67E8F9',
    google:'4.2',mapUrl:'https://www.google.com/maps/search/Yammi+Sushi+House+Prague'},
   // ── 💰 זול ──────────────────────────────────────────
-  {level:1,icon:'🚂',name:'Výtopna',sub:'גימיק נחמד — חובה להזמין שבועות מראש!',
+  {type:'restaurant',level:1,icon:'🚂',name:'Výtopna',sub:'גימיק נחמד — חובה להזמין שבועות מראש!',
    desc:'רכבות צעצוע נוסעות על פסים ומביאות אוכל ושתייה לשולחן — חוויה בלתי נשכחת לילדים! האוכל עצמו בינוני (המבורגרים, בשרים, תפריט ילדים), אבל הגימיק שווה את הביקור. ממש בכיכר ואצלב. מלא תמיד — להזמין שבועות מראש!',
    price:'700–1,000 CZK',badge:'🔴 הזמינו שבועות מראש',badgeClr:'rgba(220,38,38,0.22)',badgeTxt:'#FCA5A5',
    google:'4.1',mapUrl:'https://www.google.com/maps/search/Vytopna+Railway+Restaurant+Prague'},
-  {level:1,icon:'👨‍👩‍👧',name:'Mistral Café',sub:'הכי פמילי-פרנדלי בפראג',
+  {type:'restaurant',level:1,icon:'👨‍👩‍👧',name:'Mistral Café',sub:'הכי פמילי-פרנדלי בפראג',
    desc:'פינת משחקים לילדים, תפריט עשיר, אוכל טעים ובמחיר מצוין. קרוב לרובע היהודי. מנות בקר, דגים וצמחוני. מנוחת צהריים מושלמת.',
    price:'800–1,200 CZK',badge:'⭐⭐ ילדים',badgeClr:'rgba(5,150,105,0.22)',badgeTxt:'#6EE7B7',
    google:'4.5',mapUrl:'https://www.google.com/maps/search/Mistral+Cafe+Prague+Valentinska'},
   // ── 💰💰 בינוני ──────────────────────────────────────
-  {level:1,icon:'🍝',name:'Pasta Fresca',sub:'פסטה טרייה במקום — חובה להזמין!',
+  {type:'restaurant',level:1,icon:'🍝',name:'Pasta Fresca',sub:'פסטה טרייה במקום — חובה להזמין!',
    desc:'איטלקית איכותית מאוד — פסטות טריות שנעשות במקום, ריזוטו מדהים, אווירה חמימה שמזכירה מרתף יין. אחת המסעדות הכי מומלצות בעיר העתיקה. מתאים מאוד למשפחות.',
    price:'350–650 CZK',badge:'🔴 הזמינו מראש',badgeClr:'rgba(239,68,68,0.22)',badgeTxt:'#FCA5A5',
    google:'4.4',mapUrl:'https://www.google.com/maps/search/Pasta+Fresca+Celetna+Prague'},
-  {level:2,icon:'🍺',name:'U Fleků — פאב מ-1499',sub:'הפאב הכי היסטורי בפראג — חצר + תזמורת חיה',
+  {type:'restaurant',level:2,icon:'🍺',name:'U Fleků — פאב מ-1499',sub:'הפאב הכי היסטורי בפראג — חצר + תזמורת חיה',
    desc:'ברוא מאז 1499 — הפאב העתיק ביותר בפראג! מבשלים on-site בירה שחורה (tmavé pivo) מתכון מ-500 שנה. חצר גדולה עם תזמורת חיה, אווירה מדהימה. קרוב לרובע היהודי ולגשר קארל. חוויה שלא תמצאו בשום מקום אחר בעולם.',
    price:'800–1,200 CZK',badge:'🍺 מ-1499',badgeClr:'rgba(146,64,14,0.3)',badgeTxt:'#FCD34D',
    google:'3.5',mapUrl:'https://www.google.com/maps/search/U+Fleku+Prague+brewery+pub'},
-  {level:2,icon:'🍺',name:'Lokál Dlouhááá',sub:'שניצל + ביר צ\'כי — Dlouhá 33',
+  {type:'restaurant',level:2,icon:'🍺',name:'Lokál Dlouhááá',sub:'שניצל + ביר צ\'כי — Dlouhá 33',
    desc:'אוכל צ\'כי מסורתי, אותנטי ושוקק חיים. שניצל מעולה, גבינה מטוגנת לילדים, ובירה פלסנר טרייה מהחבית. הסניף הכי מפורסם של רשת Lokál — ברחוב Dlouhá בעיר העתיקה. מומלץ להזמין מראש בשעות ערב.',
    price:'800–1,200 CZK',badge:'📞 מומלץ להזמין',badgeClr:'rgba(8,145,178,0.22)',badgeTxt:'#67E8F9',
    google:'4.4',mapUrl:'https://www.google.com/maps/search/Lokal+Dlouha+33+Prague'},
-  {level:2,icon:'🍺',name:'Lokál Korunní',sub:'ביר פאב צ׳כי אמיתי — Vinohrady',
+  {type:'restaurant',level:2,icon:'🍺',name:'Lokál Korunní',sub:'ביר פאב צ׳כי אמיתי — Vinohrady',
    desc:'המסעדה הצ׳כית הכי אותנטית. מלאה מקומיים, אפס תיירים. svíčková = בקר בציר שמנת עם קנדרלי — המנה הצ׳כית הקלאסית. פילסנר מהחבית.',
    price:'900–1,300 CZK',badge:'⭐⭐ מקומי',badgeClr:'rgba(8,145,178,0.22)',badgeTxt:'#67E8F9',
    google:'3.9',mapUrl:'https://www.google.com/maps/search/Lokal+Korunni+Prague'},
-  {level:2,icon:'🏛️',name:'Kantýna',sub:'קצביה+מסעדה בארמון Art Nouveau',
+  {type:'restaurant',level:2,icon:'🏛️',name:'Kantýna',sub:'קצביה+מסעדה בארמון Art Nouveau',
    desc:'בוחרים את הנתח בקצביה, שוקלים ומגריל על המקום. טרטר בקר — הטוב ביותר בפראג. הבניין לשעבר בנק מרשים. קהל מקומי-עסקי בלבד.',
    price:'900–1,400 CZK',badge:'⭐⭐ מומלץ',badgeClr:'rgba(245,158,11,0.22)',badgeTxt:'#FCD34D',
    google:'4.6',mapUrl:'https://www.google.com/maps/search/Kantyna+Prague+Politickych+veznu'},
-  {level:2,icon:'☕',name:'Café Savoy',sub:'קפה וינאי קלאסי — ליד קמפה',
+  {type:'restaurant',level:2,icon:'☕',name:'Café Savoy',sub:'קפה וינאי קלאסי — ליד קמפה',
    desc:'קפה וינאי מהמאה ה-19. עיצוב מרהיב, בוקר או אחה"צ איטי. קרואסאן מהסוג הטוב, קפה מעולה. מתאים לאחרי טיול בקמפה.',
    price:'900–1,400 CZK',badge:'קלאסי',badgeClr:'rgba(146,64,14,0.3)',badgeTxt:'#FCD34D',
    google:'4.2',mapUrl:'https://www.google.com/maps/search/Cafe+Savoy+Prague'},
-  {level:2,icon:'🥩',name:'Gran Fierro',sub:'סטייקהאוס ארגנטינאי',
+  {type:'restaurant',level:2,icon:'🥩',name:'Gran Fierro',sub:'סטייקהאוס ארגנטינאי',
    desc:'בקר ארגנטינאי איכותי. Ribeye / Tenderloin / ללא חזיר. אווירה נעימה, מתאים למשפחה. מגוון נתחים, שירות טוב.',
    price:'1,200–1,800 CZK',badge:'⭐ בשר',badgeClr:'rgba(244,99,74,0.22)',badgeTxt:'#F4634A',
    google:'4.5',mapUrl:'https://www.google.com/maps/search/Gran+Fierro+Prague'},
-  {level:2,icon:'🔥',name:'Čestr',sub:'בקר צ׳כי dry-aged — Vinohrady | ⚠️ לאמת שפתוח לפני ביקור',
+  {type:'restaurant',level:2,icon:'🔥',name:'Čestr',sub:'בקר צ׳כי dry-aged — Vinohrady | ⚠️ לאמת שפתוח לפני ביקור',
    desc:'בשר מגזע "český strakatý skot" צ׳כי מקומי, מיושן ומגריל על פחם. תפריט מציג כל נתח על דיאגרמת פרה. קהל מקומי לחלוטין. חלופה מקומית ל-Gran Fierro. ⚠️ דווח כסגור זמנית באפריל 2026 — מומלץ לאמת לפני ביקור.',
    price:'1,500–2,000 CZK',badge:'⚠️ לאמת שפתוח',badgeClr:'rgba(245,158,11,0.22)',badgeTxt:'#FCD34D',
    google:'4.4',mapUrl:'https://www.google.com/maps/search/Cestr+Prague+Legerova'},
-  {level:1,icon:'🌮',name:'Las Adelitas',sub:'מקסיקנית אותנטית — ילדים מתים עליה!',
+  {type:'restaurant',level:1,icon:'🌮',name:'Las Adelitas',sub:'מקסיקנית אותנטית — ילדים מתים עליה!',
    desc:'מקסיקנית שמחה וצבעונית — טאקוס, קסדייה, נאצ\'וס ואווירה שילדים אוהבים. אחד הסניפים המרכזיים ברחוב Petrská. ללא חזיר ברוב המנות. אווירה כיפית ועליזה.',
    price:'400–700 CZK',badge:'🌮 ילדים אוהבים',badgeClr:'rgba(245,158,11,0.22)',badgeTxt:'#FCD34D',
    google:'4.5',mapUrl:'https://www.google.com/maps/search/Las+Adelitas+Prague+Petrska'},
-  {level:1,icon:'🍔',name:'Manifesto Market — Anděl',sub:'פוד קורט בקונטיינרים — ללא הזמנה',
+  {type:'restaurant',level:1,icon:'🍔',name:'Manifesto Market — Anděl',sub:'פוד קורט בקונטיינרים — ללא הזמנה',
    desc:'מתחם אוכל רחוב מוקפד ומעוצב ממכולות צבעוניות. מגוון ענק של סגנונות אוכל מכל העולם — בורגרים, אסייתי, פיצה ועוד. מוזיקה, אורות, אווירה קלילה. מושלם לערב כיפי בלי לשבת במסעדה רשמית.',
    price:'250–500 CZK לאדם',badge:'✅ ללא הזמנה',badgeClr:'rgba(16,185,129,0.22)',badgeTxt:'#6EE7B7',
    google:'4.4',mapUrl:'https://www.google.com/maps/search/Manifesto+Market+Andel+Prague'},
   // ── 💰💰💰 יקר ──────────────────────────────────────
-  {level:3,icon:'🏛️',name:'Café Imperial',sub:'מסעדת שף בארמון Art Nouveau — חובה להזמין',
+  {type:'restaurant',level:3,icon:'🏛️',name:'Café Imperial',sub:'מסעדת שף בארמון Art Nouveau — חובה להזמין',
    desc:'מסעדה היסטורית מפוארת בתוך מבנה Art Nouveau עוצר נשימה — קרמיקה על כל הקירות והתקרה. מגישה ארוחות ברמת מסעדת שף באווירה נינוחה. מושלם לארוחת ערב מיוחדת. Na Poříčí 15.',
    price:'1,500–2,500 CZK',badge:'🔴 הזמינו מראש',badgeClr:'rgba(124,58,237,0.22)',badgeTxt:'#C084FC',
    google:'4.6',mapUrl:'https://www.google.com/maps/search/Cafe+Imperial+Prague+Na+Porici'},
-  {level:3,icon:'🌉',name:'Mlýnec',sub:'נוף לגשר קארל — ערב מיוחד',
+  {type:'restaurant',level:3,icon:'🌉',name:'Mlýnec',sub:'נוף לגשר קארל — ערב מיוחד',
    desc:'מיקום מדהים ממש מול גשר קארל ונהר וולטבה. אוכל אירופאי מודרני. לערב רומנטי או ספיישל. לשמור לסיום הטיול.',
    price:'1,800–2,800 CZK',badge:'נוף',badgeClr:'rgba(29,78,216,0.22)',badgeTxt:'#93C5FD',
    google:'4.7',mapUrl:'https://www.google.com/maps/search/Mlynec+Prague'},
-  {level:3,icon:'🦑',name:'Aromi',sub:'דגים ופירות ים — מישלן Bib Gourmand',
+  {type:'restaurant',level:3,icon:'🦑',name:'Aromi',sub:'דגים ופירות ים — מישלן Bib Gourmand',
    desc:'הכי טוב לדגים בפראג. איטלקי עם פירות ים טריים, אוקטופוס בגריל, ריזוטו ים, פסטה עם כמהין. המלצת מישלן. ב-Vinohrady, רחוק מתיירים. הזמינו מקום מראש.',
    price:'2,500–3,500 CZK',badge:'⭐⭐ מישלן',badgeClr:'rgba(124,58,237,0.22)',badgeTxt:'#C084FC',
    google:'4.3',mapUrl:'https://www.google.com/maps/search/Aromi+Prague+Namesti+Miru'},
   // ── 💰💰💰💰 יוקרה ────────────────────────────────────
-  {level:4,icon:'👑',name:'George Prime Steak',sub:'הערב החגיגי — הכי "וואו" בפראג',
+  {type:'restaurant',level:4,icon:'👑',name:'George Prime Steak',sub:'הערב החגיגי — הכי "וואו" בפראג',
    desc:'סטייקהאוס יוקרתי. dry-aged beef מהמדרגה הראשונה. לערב אחרון של הטיול או חגיגה. היקר מכולם — אבל חוויה בלתי נשכחת.',
    price:'2,500–3,500 CZK',badge:'👑 פרמיום',badgeClr:'rgba(124,58,237,0.22)',badgeTxt:'#C084FC',
-   google:'4.6',mapUrl:'https://www.google.com/maps/search/George+Prime+Steak+Prague'}
-];
+   google:'4.6',mapUrl:'https://www.google.com/maps/search/George+Prime+Steak+Prague'},
 
-// level: 1=💰 עד 100 CZK | 2=💰💰 100–250 | 3=💰💰💰 250–500
-var DESSERTS = [
-  {level:1,icon:'🍦',name:'Angelato',sub:'גלידה איטלקית אמנותית — מקומיים בלבד',
+// ── DESSERTS (type:'dessert') — level: 1=💰 עד 100 CZK | 2=💰💰 100–250 | 3=💰💰💰 250–500 ──
+  {type:'dessert',level:1,icon:'🍦',name:'Angelato',sub:'גלידה איטלקית אמנותית — מקומיים בלבד',
    desc:'גלידה טרייה יומית ללא תוספים מלאכותיים. טעמים מטורפים: פיסטוק, גבינת פרמזן, סרפדים, רוברב. פתוחה מ-2007. שני סניפים — ממש ליד המרכז.',
    price:'50–90 CZK לכדור',rating:'⭐⭐⭐⭐⭐',tag:'מקומי ✨',tagClr:'#6EE7B7',
    where:'Rytířská (עיר עתיקה) + Újezd (מלה סטרנה)',
    mapUrl:'https://www.google.com/maps/search/Angelato+Prague'},
-  {level:1,icon:'🍦',name:'Puro Gelato',sub:'גלידה טהורה — 3 סניפים שכונתיים',
+  {type:'dessert',level:1,icon:'🍦',name:'Puro Gelato',sub:'גלידה טהורה — 3 סניפים שכונתיים',
    desc:'"פורו" = טהור. רכיבים נקיים, ללא גלידה מלאכותית. מאוד אהוב על ידי מקומיים ב-Karlín ו-Vršovice.',
    price:'50–90 CZK לכדור',rating:'⭐⭐⭐⭐⭐',tag:'מקומי ✨',tagClr:'#6EE7B7',
    where:'Výtoň / Karlín / Vršovice',
    mapUrl:'https://www.google.com/maps/search/Puro+Gelato+Prague'},
-  {level:1,icon:'🎂',name:'Kus Koláče',sub:'קולאצ׳ה — מוכרים לפני הצהריים!',
+  {type:'dessert',level:1,icon:'🎂',name:'Kus Koláče',sub:'קולאצ׳ה — מוכרים לפני הצהריים!',
    desc:'מתמחים בקולאצ׳ה הצ׳כי הקלאסי — בצק שמרים עגול עם גבינה/פרגית/ריבה. מקומיים עומדים בתור. מגיעים בבוקר — מאוחר יותר נגמר.',
    price:'40–70 CZK ליחידה',rating:'⭐⭐⭐⭐⭐',tag:'אייקוני 🇨🇿',tagClr:'#FCD34D',
    where:'מרכז פראג — בדקו כתובת עדכנית',
    mapUrl:'https://www.google.com/maps/search/Kus+Kolace+Prague'},
-  {level:1,icon:'🍰',name:'Ovocný Světozor',sub:'מדובניק הזול ביותר בפראג',
+  {type:'dessert',level:1,icon:'🍰',name:'Ovocný Světozor',sub:'מדובניק הזול ביותר בפראג',
    desc:'רשת בתי קפה של שרות עצמי — 12 סניפים. מדובניק (עוגת דבש בציר שמנת קרמל) כאן עולה פי 3 פחות מבתי קפה תיירותיים. חובה לנסות.',
    price:'100–200 CZK לאדם',rating:'⭐⭐⭐⭐½',tag:'מוסד מקומי',tagClr:'#FCD34D',
    where:'12 סניפים — Vinohradská, Vodičkova, Holešovice ועוד',
    mapUrl:'https://www.google.com/maps/search/Ovocny+Svetozor+Prague'},
-  {level:1,icon:'🥐',name:'Pekárna Praktika',sub:'מאפייה אמנותית עם טחנת קמח פנימית',
+  {type:'dessert',level:1,icon:'🥐',name:'Pekárna Praktika',sub:'מאפייה אמנותית עם טחנת קמח פנימית',
    desc:'הבעלים טוחן גרגרים ישירות מחוות צ׳כיות קטנות. קולאצ׳ה מקמח שיפון — ייחודי בפראג. לחם שאור, בוכטי. אהוב על שפים ומקומיים.',
    price:'30–80 CZK למאפה',rating:'⭐⭐⭐⭐⭐',tag:'אמנותי 🌾',tagClr:'#6EE7B7',
    where:'Vinohrady / Vršovice',
    mapUrl:'https://www.google.com/maps/search/Pekarna+Praktika+Prague'},
-  {level:2,icon:'🍮',name:'Cukrárna Myšák',sub:'קונדיטוריה היסטורית — עיר חדשה',
+  {type:'dessert',level:2,icon:'🍮',name:'Cukrárna Myšák',sub:'קונדיטוריה היסטורית — עיר חדשה',
    desc:'מוסד פראגי אמיתי. וונצ׳קי (אקלר שמנת), לסקוניקי (עוגיות מרנג), שטרודל תפוחים עם שמנת כפולה. מתכונים קלאסיים, רכיבים איכותיים.',
    price:'150–300 CZK לאדם',rating:'⭐⭐⭐⭐½',tag:'היסטורי',tagClr:'#93C5FD',
    where:'ליד כיכר וצסלב, עיר חדשה',
    mapUrl:'https://www.google.com/maps/search/Cukrarna+Mysak+Prague'},
-  {level:2,icon:'🍰',name:'Erhartova Cukrárna',sub:'קונדיטוריה מ-1937 — Vinohrady',
+  {type:'dessert',level:2,icon:'🍰',name:'Erhartova Cukrárna',sub:'קונדיטוריה מ-1937 — Vinohrady',
    desc:'פתוחה מ-1937. 10–20 עוגות שונות יומיות — הכל עשוי ביד. וונצ׳קי, עוגות עונתיות, שוקולדים. דירוג גוגל 4.3. מגיע להזמין מקום.',
    price:'200–300 CZK לאדם',rating:'⭐⭐⭐⭐½',tag:'1937 ✨',tagClr:'#C084FC',
    where:'Vinohradská 125, Vinohrady',
    mapUrl:'https://www.google.com/maps/search/Erhartova+Cukrarna+Prague'},
-  {level:2,icon:'🍫',name:'Steiner & Kovarik',sub:'שוקולד צ׳כי — פרס Great Taste',
+  {type:'dessert',level:2,icon:'🍫',name:'Steiner & Kovarik',sub:'שוקולד צ׳כי — פרס Great Taste',
    desc:'מייצרים שוקולד מהאפונה (bean-to-bar) מאז 2005. זכו בפרס Great Taste 2015. טעמים: שפן מריינאה, מוקה, ניל. 6 חנויות בפראג. מתנה מושלמת.',
    price:'150–400 CZK לקופסה',rating:'⭐⭐⭐⭐⭐',tag:'פרס 🏆',tagClr:'#FCD34D',
    where:'6 חנויות בפראג — steinerkovarik.com',
    mapUrl:'https://www.google.com/maps/search/Steiner+Kovarik+Prague+Chocolate'},
-  {level:1,icon:'🐰',name:'Rabit',sub:'גלידה + מקרון — מדורגת גבוה!',
+  {type:'dessert',level:1,icon:'🐰',name:'Rabit',sub:'גלידה + מקרון — מדורגת גבוה!',
    desc:'מקום מקומי לגלידה ומקרון איכותיים. ממוקם ליד העיר העתיקה. שווה עצירה בין אטרקציות. המלצה חמה ממטיילים ישראלים.',
    price:'80–150 CZK',rating:'⭐⭐⭐⭐½',tag:'מקומי ⭐',tagClr:'#86EFAC',
    where:'עיר העתיקה',
    mapUrl:'https://www.google.com/maps/search/Rabit+ice+cream+Prague'},
-  {level:1,icon:'🍑',name:'Černá Madona',sub:'קינוחי פירות — יפים וטעימים!',
+  {type:'dessert',level:1,icon:'🍑',name:'Černá Madona',sub:'קינוחי פירות — יפים וטעימים!',
    desc:'מקום מיוחד לקינוחי פירות. המנות יפות ויצירתיות, טעימות מאוד. ממוקם ברובע העיר העתיקה. מומלץ מאוד למי שאוהב קינוחי פירות.',
    price:'100–200 CZK',rating:'⭐⭐⭐⭐⭐',tag:'חובה 🍑',tagClr:'#FCD34D',
    where:'עיר העתיקה — Old Town',
    mapUrl:'https://www.google.com/maps/search/Černá+madona+Prague+cafe'},
-  {level:1,icon:'⚠️',name:'Trdelník (טרדלניק)',sub:'מלכודת תיירים — מה לדעת',
+  {type:'dessert',level:1,icon:'⚠️',name:'Trdelník (טרדלניק)',sub:'מלכודת תיירים — מה לדעת',
    desc:'עוגת ארובה — לא אוכל צ׳כי אמיתי (מקורו רומניה/סלובקיה). מקומיים לא אוכלים. הגרסה עם גלידה עולה 150–200 CZK ותיירים זורקים חצי. אם בכל זאת — תאכלו רק טרי ועם קינמון פשוט.',
    price:'80–200 CZK',rating:'⭐⭐ (נסיון אינסטגרם בלבד)',tag:'⚠️ תיירותי',tagClr:'#FCA5A5',
    where:'כל העיר העתיקה',
-   mapUrl:'https://www.google.com/maps/search/Trdlo+Prague'}
-];
+   type:'dessert',mapUrl:'https://www.google.com/maps/search/Trdlo+Prague'},
 
-// ═══ COMMUNITY RECOMMENDATIONS ═══
-var COMMUNITY = [
+// ── COMMUNITY (type:'community') ──────────────────────────────────────────────────────
   // ── 🍽️ מסעדות ──
-  {cat:'🍽️ מסעדות', icon:'✡️', name:'המזללה', fb:'⭐⭐⭐⭐⭐', google:'4.5', desc:'מסעדה כשרה שמשפחות ישראליות חוזרות אליה. אוכל מעולה, אווירה ישראלית.',
+  {type:'community',cat:'🍽️ מסעדות', icon:'✡️', name:'המזללה', fb:'⭐⭐⭐⭐⭐', google:'4.5', desc:'מסעדה כשרה שמשפחות ישראליות חוזרות אליה. אוכל מעולה, אווירה ישראלית.',
    how:'מטרו A → Staroměstská + 5 דק׳ הליכה לרובע היהודי', mapUrl:'https://www.google.com/maps/search/HaMazlela+kosher+Prague'},
-  {cat:'🍽️ מסעדות', icon:'🥐', name:'קריוטוש כשר — רובע יהודי', fb:'⭐⭐⭐⭐⭐', google:'4.6', desc:'הכי טעים לפי כולם! קריוטוש כשר חם עם מילויים. עדיף על Little Chimney לדעת הקהילה.',
+  {type:'community',cat:'🍽️ מסעדות', icon:'🥐', name:'קריוטוש כשר — רובע יהודי', fb:'⭐⭐⭐⭐⭐', google:'4.6', desc:'הכי טעים לפי כולם! קריוטוש כשר חם עם מילויים. עדיף על Little Chimney לדעת הקהילה.',
    how:'מטרו A → Staroměstská + 5 דק׳ לרובע היהודי', mapUrl:'https://www.google.com/maps/search/kosher+Trdelnik+Jewish+Quarter+Prague'},
-  {cat:'🍽️ מסעדות', icon:'🥐', name:'Little Chimney', fb:'⭐⭐⭐⭐', google:'4.4', desc:'קריוטוש דובאי עם גלידת פיסטוק — מאוד טעים! ממש ליד גשר קארל, נוף מהמם.',
+  {type:'community',cat:'🍽️ מסעדות', icon:'🥐', name:'Little Chimney', fb:'⭐⭐⭐⭐', google:'4.4', desc:'קריוטוש דובאי עם גלידת פיסטוק — מאוד טעים! ממש ליד גשר קארל, נוף מהמם.',
    how:'הליכה מגשר קארל — צד מאלה סטרנה, 2 דק׳', mapUrl:'https://www.google.com/maps/search/Little+Chimney+Prague+Charles+Bridge'},
-  {cat:'🍽️ מסעדות', icon:'🍜', name:'Mango — מסעדה אסייתית', fb:'⭐⭐⭐⭐⭐', google:'4.3', desc:'מנות אסייתיות טעימות מאוד במחירים הוגנים. מומלץ מאוד מהשטח.',
+  {type:'community',cat:'🍽️ מסעדות', icon:'🍜', name:'Mango — מסעדה אסייתית', fb:'⭐⭐⭐⭐⭐', google:'4.3', desc:'מנות אסייתיות טעימות מאוד במחירים הוגנים. מומלץ מאוד מהשטח.',
    how:'מטרו A/B → Můstek + 5 דק׳ הליכה', mapUrl:'https://www.google.com/maps/search/Mango+restaurant+Prague+center'},
-  {cat:'🍽️ מסעדות', icon:'🍣', name:'Yammi Sushi House', fb:'⭐⭐⭐⭐⭐', google:'4.4', desc:'סושי טעים מאוד בפראג. ממוקם ליד קניון פלדיום.',
+  {type:'community',cat:'🍽️ מסעדות', icon:'🍣', name:'Yammi Sushi House', fb:'⭐⭐⭐⭐⭐', google:'4.4', desc:'סושי טעים מאוד בפראג. ממוקם ליד קניון פלדיום.',
    how:'מטרו B → Náměstí Republiky + 3 דק׳', mapUrl:'https://www.google.com/maps/search/Yammi+Sushi+House+Prague'},
-  {cat:'🍽️ מסעדות', icon:'🍕', name:'Vapiano', fb:'⭐⭐⭐⭐', google:'4.1', desc:'פיצות ופסטות איכותיות עם מטבח פתוח. משפחה ישראלית חזרה פעמיים!',
+  {type:'community',cat:'🍽️ מסעדות', icon:'🍕', name:'Vapiano', fb:'⭐⭐⭐⭐', google:'4.1', desc:'פיצות ופסטות איכותיות עם מטבח פתוח. משפחה ישראלית חזרה פעמיים!',
    how:'מטרו A/B → Můstek, מרכז העיר', mapUrl:'https://www.google.com/maps/search/Vapiano+Prague'},
-  {cat:'🍽️ מסעדות', icon:'🚂', name:'Výtopna', fb:'⭐⭐⭐⭐', google:'3.9', desc:'רכבות צעצוע מביאות אוכל ושתייה לשולחן — חוויה בלתי נשכחת לילדים! אוכל בינוני. חובה להזמין שבועות מראש — מלא תמיד!',
+  {type:'community',cat:'🍽️ מסעדות', icon:'🚂', name:'Výtopna', fb:'⭐⭐⭐⭐', google:'3.9', desc:'רכבות צעצוע מביאות אוכל ושתייה לשולחן — חוויה בלתי נשכחת לילדים! אוכל בינוני. חובה להזמין שבועות מראש — מלא תמיד!',
    how:'מטרו A/C → Václavské náměstí — ממש בכיכר', mapUrl:'https://www.google.com/maps/search/Vytopna+Railway+Restaurant+Prague'},
-  {cat:'🍽️ מסעדות', icon:'🍺', name:'U Fleků — פאב מ-1499', fb:'⭐⭐⭐⭐⭐', google:'3.5', desc:'הפאב העתיק ביותר בפראג — ברוא ומבשל on-site מאז 1499! בירה שחורה מתכון ייחודי, חצר גדולה עם תזמורת חיה. קרוב לרובע היהודי. חוויה היסטורית שלא תשכחו.',
+  {type:'community',cat:'🍽️ מסעדות', icon:'🍺', name:'U Fleků — פאב מ-1499', fb:'⭐⭐⭐⭐⭐', google:'3.5', desc:'הפאב העתיק ביותר בפראג — ברוא ומבשל on-site מאז 1499! בירה שחורה מתכון ייחודי, חצר גדולה עם תזמורת חיה. קרוב לרובע היהודי. חוויה היסטורית שלא תשכחו.',
    how:'מטרו B → Národní třída + 5 דק׳ הליכה | Křemencova 11', mapUrl:'https://www.google.com/maps/search/U+Fleku+Prague+brewery+pub'},
-  {cat:'🍽️ מסעדות', icon:'🏛️', name:'Café Imperial', fb:'⭐⭐⭐⭐⭐', google:'4.5', desc:'מסעדת שף בתוך בניין Art Nouveau עוצר נשימה — קרמיקה על כל הקירות. רמת ארוחה מיוחדת. Na Poříčí 15. חובה להזמין מראש.',
+  {type:'community',cat:'🍽️ מסעדות', icon:'🏛️', name:'Café Imperial', fb:'⭐⭐⭐⭐⭐', google:'4.5', desc:'מסעדת שף בתוך בניין Art Nouveau עוצר נשימה — קרמיקה על כל הקירות. רמת ארוחה מיוחדת. Na Poříčí 15. חובה להזמין מראש.',
    how:'מטרו B → náměstí Republiky + 5 דק׳ הליכה', mapUrl:'https://www.google.com/maps/search/Cafe+Imperial+Prague'},
-  {cat:'🍽️ מסעדות', icon:'🌮', name:'Las Adelitas', fb:'⭐⭐⭐⭐⭐', google:'4.4', desc:'מקסיקנית אותנטית, שמחה וצבעונית — טאקוס, קסדייה, נאצ\'וס. אווירה שילדים מתים עליה! Petrská 23. מומלץ להזמין בשעות ערב.',
+  {type:'community',cat:'🍽️ מסעדות', icon:'🌮', name:'Las Adelitas', fb:'⭐⭐⭐⭐⭐', google:'4.4', desc:'מקסיקנית אותנטית, שמחה וצבעונית — טאקוס, קסדייה, נאצ\'וס. אווירה שילדים מתים עליה! Petrská 23. מומלץ להזמין בשעות ערב.',
    how:'מטרו B → náměstí Republiky + 7 דק׳ הליכה', mapUrl:'https://www.google.com/maps/search/Las+Adelitas+Prague'},
   // ── 🍦 קינוחים ──
-  {cat:'🍦 קינוחים', icon:'🐰', name:'Rabit', fb:'⭐⭐⭐⭐⭐', google:'4.6', desc:'גלידה ומקרון איכותיים. עצירה מומלצת בין אטרקציות העיר העתיקה.',
+  {type:'community',cat:'🍦 קינוחים', icon:'🐰', name:'Rabit', fb:'⭐⭐⭐⭐⭐', google:'4.6', desc:'גלידה ומקרון איכותיים. עצירה מומלצת בין אטרקציות העיר העתיקה.',
    how:'הליכה מכיכר השעון — 3 דק׳', mapUrl:'https://www.google.com/maps/search/Rabit+ice+cream+Prague'},
-  {cat:'🍦 קינוחים', icon:'🍑', name:'Černá Madona', fb:'⭐⭐⭐⭐⭐', google:'4.5', desc:'קינוחי פירות יפים וטעימים. מיוחד ומרשים. חובה למי שאוהב קינוחי פירות.',
+  {type:'community',cat:'🍦 קינוחים', icon:'🍑', name:'Černá Madona', fb:'⭐⭐⭐⭐⭐', google:'4.5', desc:'קינוחי פירות יפים וטעימים. מיוחד ומרשים. חובה למי שאוהב קינוחי פירות.',
    how:'מטרו B → náměstí Republiky + 5 דק׳', mapUrl:'https://www.google.com/maps/search/Černá+madona+Prague'},
-  {cat:'🍦 קינוחים', icon:'🌸', name:'מאפה פרג — מאקובי זאוין', fb:'⭐⭐⭐⭐⭐', google:'4.4', desc:'המאפה הצ׳כי הכי מיוחד. לקנות רק טרי! שאלו "makový závin" בכל מאפייה.',
+  {type:'community',cat:'🍦 קינוחים', icon:'🌸', name:'מאפה פרג — מאקובי זאוין', fb:'⭐⭐⭐⭐⭐', google:'4.4', desc:'המאפה הצ׳כי הכי מיוחד. לקנות רק טרי! שאלו "makový závin" בכל מאפייה.',
    how:'בכל מאפייה בעיר — עיר עתיקה, מאלה סטרנה', mapUrl:'https://www.google.com/maps/search/bakery+Prague+Old+Town'},
-  {cat:'🍦 קינוחים', icon:'🥪', name:'כריך פסטו — שוק האיכרים', fb:'⭐⭐⭐⭐⭐', google:'4.5', desc:'הכריך המפורסם של שוק האיכרים. חובה! שימו לב — המיקום עשוי להשתנות.',
+  {type:'community',cat:'🍦 קינוחים', icon:'🥪', name:'כריך פסטו — שוק האיכרים', fb:'⭐⭐⭐⭐⭐', google:'4.5', desc:'הכריך המפורסם של שוק האיכרים. חובה! שימו לב — המיקום עשוי להשתנות.',
    how:'מטרו B → náměstí Republiky, בדקו מיקום עדכני של השוק', mapUrl:'https://www.google.com/maps/search/Prague+farmers+market+Naplavka'},
   // ── 🎟️ אטרקציות ──
-  {cat:'🎟️ אטרקציות', icon:'🐱', name:'פסל קפקא המסתובב', fb:'⭐⭐⭐⭐', google:'4.4',
+  {type:'community',cat:'🎟️ אטרקציות', icon:'🐱', name:'פסל קפקא המסתובב', fb:'⭐⭐⭐⭐', google:'4.4',
    desc:'פסל ברונזה ענק של 11 מטר מאת הפסל דוד černý (אומן הפרובוקציות הכי מפורסם בצ׳כיה). הפסל מורכב מ-42 שכבות מסתובבות באופן עצמאי — כל שנייה הוא נראה אחרת. ממוקם ברחבת מרכז הקניות Quadrio ב-Nové Město. עצירה של 10 דקות שאי אפשר לפספס — גם המרכז פתוח אם רוצים Sephora או Pepco.',
    booking:'✅ אין צורך בהזמנה — חינם וזמין 24/7',
    duration:'⏱️ 10–20 דקות',
@@ -2590,7 +2595,7 @@ var COMMUNITY = [
    who:'👨‍👩‍👧‍👦 כל הגילאים | ⚡ מהיר — נהדר בדרך לאטרקציה אחרת',
    how:'מטרו A/C → Václavské náměstí + 3 דק׳ הליכה', mapUrl:'https://www.google.com/maps/search/Kafka+rotating+head+Prague'},
 
-  {cat:'🎟️ אטרקציות', icon:'🎨', name:'גלרית Lumia — מוזיאון האורות', fb:'⭐⭐⭐⭐⭐', google:'4.5',
+  {type:'community',cat:'🎟️ אטרקציות', icon:'🎨', name:'גלרית Lumia — מוזיאון האורות', fb:'⭐⭐⭐⭐⭐', google:'4.5',
    desc:'מוזיאון אמנות דיגיטלי אימרסיבי עם 10+ חדרים שלמים של הקרנות אורות ענקיות, מוזיקה ותנועה. לא סתם תמונות — אתה בתוך היצירה. ילדים יכולים לרוץ ולרקוד בתוך האמנות. ליד הכניסה יש מוזיאון פלדה (Steel Museum) שנותנים עליו 20% הנחה אחרי כניסה ל-Lumia.',
    booking:'🎟️ מומלץ לקנות Online מראש — galerie-lumia.com | ~350–450 CZK לאדם | הנחה לילדים',
    duration:'⏱️ 45–75 דקות',
@@ -2598,7 +2603,7 @@ var COMMUNITY = [
    who:'👧🧒 ילדים מתים עליו | 🤳 צלמי אינסטגרם | 👨‍👩‍👧‍👦 מוצלח לכל המשפחה',
    how:'מטרו B → náměstí Republiky + 5 דק׳', mapUrl:'https://www.google.com/maps/search/Galerie+Lumia+Prague'},
 
-  {cat:'🎟️ אטרקציות', icon:'🌀', name:'מוזיאון האשליות', fb:'⭐⭐⭐⭐⭐', google:'4.4',
+  {type:'community',cat:'🎟️ אטרקציות', icon:'🌀', name:'מוזיאון האשליות', fb:'⭐⭐⭐⭐⭐', google:'4.4',
    desc:'מוזיאון קטן ומרוכז עם ~30 חדרים ומייצגים של אשליות אופטיות — חדר הולוגרמה, קיר כוח הכבידה, חדר לא סוקלידי שגורם לסחרחורת. מה שמייחד: יש מדריכים בכל חדר שעוזרים לצלם תמונות בפוזות מדהימות שנראות בלתי אפשריות. ממש לב העיר העתיקה.',
    booking:'🎟️ לקנות Online — museumofillusions.cz | ~350 CZK מבוגר, ~250 ילד | בקיץ עמוס — להזמין!',
    duration:'⏱️ 60–90 דקות',
@@ -2606,7 +2611,7 @@ var COMMUNITY = [
    who:'👧 ילדים מגיל 6+ | 🤳 מוצלח מאוד לתמונות | 👨‍👩‍👧‍👦 כיף משפחתי',
    how:'מטרו A → Staroměstská + 5 דק׳ בעיר העתיקה', mapUrl:'https://www.google.com/maps/search/Museum+of+Illusions+Prague'},
 
-  {cat:'🎟️ אטרקציות', icon:'🪄', name:'מוזיאון החושים', fb:'⭐⭐⭐⭐', google:'4.2',
+  {type:'community',cat:'🎟️ אטרקציות', icon:'🪄', name:'מוזיאון החושים', fb:'⭐⭐⭐⭐', google:'4.2',
    desc:'מוזיאון שמגרה את כל 5 החושים — תאי חשכה מלאה עם אפקטי מגע, מנהרות ריחות, חדרי קול ותדרים נסתרים. קצר יותר ממוזיאון האשליות (40–60 דק׳) אבל חוויה שונה לגמרי. ממוקם ממש ליד Primark — נוח לשלב ביום קניות.',
    booking:'🎟️ אפשר לקנות במקום — ~350 CZK | אין חובה להזמין מראש',
    duration:'⏱️ 40–60 דקות',
@@ -2614,7 +2619,7 @@ var COMMUNITY = [
    who:'👦👧 ילדים מגיל 8+ | 🧠 מסקרן לכל הגילאים',
    how:'מטרו A/C → Václavské náměstí, ליד Primark', mapUrl:'https://www.google.com/maps/search/Museum+of+Senses+Prague'},
 
-  {cat:'🎟️ אטרקציות', icon:'🦁', name:'גן החיות של פראג', fb:'⭐⭐⭐⭐⭐', google:'4.8',
+  {type:'community',cat:'🎟️ אטרקציות', icon:'🦁', name:'גן החיות של פראג', fb:'⭐⭐⭐⭐⭐', google:'4.8',
    desc:'מדורג Top 7 בעולם — 58 הקטאר, 5,000 בעלי חיים, 700 מינים. אזורי נושא: ג׳ונגל אינדונזי, ערבות אפריקניות, יער גורילות. רכבל כסאות פנורמי (40 CZK) על הגן. ניתן לתכנן לפי זמני האכלה — ג׳ירפות, פילים, פינגווינים. כניסה: שער תחתון (מהאוטובוס) או שער עליון (מהרכבל).',
    booking:'🎟️ חובה לקנות Online — zoopraha.cz | 300 CZK מבוגר, 200 ילד | ביוגוסט מאוד עמוס — לא לפספס!',
    duration:'⏱️ 4–6 שעות (יום שלם מומלץ)',
@@ -2622,7 +2627,7 @@ var COMMUNITY = [
    who:'🧒 ילדים עד גיל 15 מתים עליו | 👨‍👩‍👧‍👦 יום משפחתי מושלם',
    how:'מטרו C → Nádraží Holešovice + אוטובוס 112 עד הכניסה', mapUrl:'https://www.google.com/maps/search/Prague+Zoo'},
 
-  {cat:'🎟️ אטרקציות', icon:'✡️', name:'בית הכנסת הגדול — Staronová synagoga', fb:'⭐⭐⭐⭐⭐', google:'4.7',
+  {type:'community',cat:'🎟️ אטרקציות', icon:'✡️', name:'בית הכנסת הגדול — Staronová synagoga', fb:'⭐⭐⭐⭐⭐', google:'4.7',
    desc:'בית הכנסת הגדול (Staronová synagoga / "הישנה-חדשה") הוא בית הכנסת הפועל הקדום ביותר בעולם — נבנה בין 1270–1280! עדיין פעיל. ארכיטקטורה גותית מרהיבה, אווירה מיסטית מימי הביניים. לצדו הרובע היהודי המלא (Josefov) עם 6 בתי כנסת, בית עלמין עתיק, ומוזיאון יהודי. הרובע היהודי הוא אחד השמורים הטובים ביותר בעולם — לא לפספס!',
    booking:'🎟️ כרטיס לרובע יהודי (כולל כל בתי הכנסת): jewishmuseum.cz | ~500 CZK | לקנות Online מראש — עמוס מאוד בקיץ! בית הכנסת הישן-חדש נפרד: ~200 CZK',
    duration:'⏱️ 90 דקות–3 שעות (לפי כמה בתי כנסת ורוצים לראות)',
@@ -2630,7 +2635,7 @@ var COMMUNITY = [
    who:'👨‍👩‍👧‍👦 חשוב להכיר את ההיסטוריה | 📚 להכין ילדים לסיפור של הרובע לפני הביקור',
    how:'מטרו A → Staroměstská + 5 דק׳ הליכה לרובע היהודי', mapUrl:'https://www.google.com/maps/search/Old+New+Synagogue+Prague+Jewish+Quarter'},
 
-  {cat:'🎟️ אטרקציות', icon:'🏰', name:'מצודת פראג', fb:'⭐⭐⭐⭐', google:'4.5',
+  {type:'community',cat:'🎟️ אטרקציות', icon:'🏰', name:'מצודת פראג', fb:'⭐⭐⭐⭐', google:'4.5',
    desc:'המצודה הגדולה בעולם לפי גינס — 70,000 מ"ר! מכילה: קתדרלת סנט ויטוס (גותית מרהיבה, 14ה מאה), ארמון המלך הבוהמי, הכנסייה הרומנסקית, וסמטת הזהב — רחוב קטן ומרתק עם בתי נפחים, שריוניות וחרבות. מה שמרשים הכי הרבה הוא הנוף מבחוץ — מגן ה-Royal Garden ומגשר קרל מתחת.',
    booking:'🎟️ כרטיס Circuit B (מספיק) — 350 CZK מבוגר, 200 ילד | Online: hrad.cz | ביוגוסט תורים של שעה! לבוא לפני 9:00',
    duration:'⏱️ 2–4 שעות',
@@ -2638,7 +2643,7 @@ var COMMUNITY = [
    who:'👨‍👩‍👧‍👦 כל הגילאים | 📚 מעניין יותר עם הסבר היסטורי — מומלץ עם מדריך',
    how:'טראם 22 → Pražský hrad (כניסה עליונה) או Malostranské náměstí', mapUrl:'https://www.google.com/maps/search/Prague+Castle'},
 
-  {cat:'🎟️ אטרקציות', icon:'🚤', name:'שייט בוולטאווה', fb:'⭐⭐⭐⭐⭐', google:'4.6',
+  {type:'community',cat:'🎟️ אטרקציות', icon:'🚤', name:'שייט בוולטאווה', fb:'⭐⭐⭐⭐⭐', google:'4.6',
    desc:'שייט על נהר הוולטאווה — הנהר שחוצה את פראג ועליו נמצאים גשר קרל, האי Střelecký, והנוף המפורסם על הגגות האדומים. אפשרויות: שייט יום (60 דק׳, אחהצ), שייט שקיעה (60–90 דק׳, 20:00) עם שמש זהובה על המצודה — הכי מרשים. חברת prague-venice.cz מומלצת.',
    booking:'🎟️ מומלץ להזמין מראש — prague-venice.cz | ~350 CZK לאדם | שייט שקיעה עמוס יותר',
    duration:'⏱️ 60–90 דקות',
@@ -2646,7 +2651,7 @@ var COMMUNITY = [
    who:'👨‍👩‍👧‍👦 כל הגילאים | 💑 רומנטי בשקיעה | 📸 נוף הכי טוב על העיר',
    how:'טראם לרציף 4 (Čechův most / Náměstí Jana Palacha)', mapUrl:'https://www.google.com/maps/search/Prague+boat+cruise+pier+4'},
 
-  {cat:'🎟️ אטרקציות', icon:'🏊', name:'Aquapalace Prague', fb:'⭐⭐⭐⭐⭐', google:'4.4',
+  {type:'community',cat:'🎟️ אטרקציות', icon:'🏊', name:'Aquapalace Prague', fb:'⭐⭐⭐⭐⭐', google:'4.4',
    desc:'פארק מים פנים מהגדולים באירופה המרכזית — 15,000 מ"ר של מים. כולל: 8 מגלשות מים (כולל ספירל וקמיקזה), בריכת גלים ענקית, גקוזי עם בועות, נהרות זרימה, בריכה חיצונית חמה, אזור ילדים עם מגלשות קטנות, ספא ועיסויים. לפחות יום שלם בקלות.',
    booking:'🎟️ לקנות Online מראש — aquapalace.cz | ~700 CZK מבוגר, ~500 ילד | בסופ"ש הנחה 10% באתר',
    duration:'⏱️ 5–8 שעות (יום שלם)',
@@ -2654,7 +2659,7 @@ var COMMUNITY = [
    who:'🧒 גיל 4+ | 👨‍👩‍👧‍👦 יום משפחתי מושלם בחום | אין מגבלת גיל',
    how:'מטרו C → Opatov + אוטובוס 363 ישר לפתח הפארק', mapUrl:'https://www.google.com/maps/search/Aquapalace+Prague'},
 
-  {cat:'🎟️ אטרקציות', icon:'🏊', name:'בריכת Šutka', fb:'⭐⭐⭐⭐⭐', google:'4.3',
+  {type:'community',cat:'🎟️ אטרקציות', icon:'🏊', name:'בריכת Šutka', fb:'⭐⭐⭐⭐⭐', google:'4.3',
    desc:'המתחם בריכות הפתוח הכי פופולרי בפראג בקיץ — שלוש בריכות חיצוניות: בריכת 50מ׳ עם 3 קרשי קפיצה (1מ׳/3מ׳/5מ׳), בריכת ילדים רדודה עם ממטרות, ובריכת מגלשות. מדשאות גדולות לשכיבה, מינ-גולף, ומסעדה. חוויה צ׳כית מקומית אמיתית — לא תיירותי!',
    booking:'✅ אין הזמנה מראש — כניסה במקום ~150 CZK | פתוח יוני–אוגוסט, 10:00–20:00',
    duration:'⏱️ 3–5 שעות',
@@ -2662,7 +2667,7 @@ var COMMUNITY = [
    who:'🧒 ילדים מגיל 3+ | 🏊 לאוהבי שחייה אמיתיים | 💰 הכי משתלם',
    how:'מטרו C → Střížkov + אוטובוס 200 כמה תחנות', mapUrl:'https://www.google.com/maps/search/Sutka+pool+Prague'},
 
-  {cat:'🎟️ אטרקציות', icon:'🎮', name:'Level — משחקייה', fb:'⭐⭐⭐⭐⭐', google:'4.4',
+  {type:'community',cat:'🎟️ אטרקציות', icon:'🎮', name:'Level — משחקייה', fb:'⭐⭐⭐⭐⭐', google:'4.4',
    desc:'משחקייה אינטראקטיבית ענקית על 3 קומות בלב העיר העתיקה — מאות משחקי ארקייד קלאסיים, מכונות VR, פינבול, איירהוקי, Dance Dance Revolution, ומשחקי ירי. מחיר לפי שעה — ילדים לא רוצים לצאת! נהדר לשעות ערב אחרי יום מלא.',
    booking:'✅ אין הזמנה מראש — כרטיס שעה ~300 CZK לאדם | שעתיים ~500 CZK | פתוח עד 22:00',
    duration:'⏱️ 1–3 שעות',
@@ -2670,7 +2675,7 @@ var COMMUNITY = [
    who:'👦👧 ילדים מגיל 6+ | 🧑 מתבגרים מתים עליו | 🌙 אידיאלי לערב',
    how:'מטרו B → náměstí Republiky, ממוקם בעיר העתיקה', mapUrl:'https://www.google.com/maps/search/Level+gaming+Prague'},
 
-  {cat:'🎟️ אטרקציות', icon:'🏔️', name:'שמורת Adršpach', fb:'⭐⭐⭐⭐⭐', google:'4.8',
+  {type:'community',cat:'🎟️ אטרקציות', icon:'🏔️', name:'שמורת Adršpach', fb:'⭐⭐⭐⭐⭐', google:'4.8',
    desc:'פארק לאומי של "עיר סלעים" — מגדלי אבן חולות ענקיים (עד 100מ׳ גובה), שבילים צרים בין מצוקים, מפלים, ואגם ירוק שקט שאפשר לשוט עליו בסירות קטנות (20 CZK). שני חלקים: Adršpach (יפה יותר) ו-Teplice (גדול יותר). טיול הליכה של 3–4 שעות בחלק הבסיסי.',
    booking:'🚂 כרטיס רכבת: cd.cz | ~200–250 CZK הלוך-חזור | כניסה לשמורה ~200 CZK | להזמין רכבת מראש בעונת קיץ!',
    duration:'⏱️ יום שלם (יציאה 7:00, חזרה 20:00)',
@@ -2678,7 +2683,7 @@ var COMMUNITY = [
    who:'🥾 אוהבי טבע והליכה | 👦 ילדים מגיל 8+ | 🌄 הנוף הכי מרהיב בסביבה',
    how:'רכבת מ-Praha hlavní nádraží → Adršpach ~3 שעות', mapUrl:'https://www.google.com/maps/search/Adrsbach+rock+city'},
 
-  {cat:'🎟️ אטרקציות', icon:'🎡', name:'לונה פארק — Lunapark Holešovice', fb:'⭐⭐⭐⭐', google:'4.1',
+  {type:'community',cat:'🎟️ אטרקציות', icon:'🎡', name:'לונה פארק — Lunapark Holešovice', fb:'⭐⭐⭐⭐', google:'4.1',
    desc:'פארק שעשועים מסורתי וסוחף בשכונת Holešovice — גלגל ענק (נוף על פראג!), רכבת הרים, בית עקומות, מכוניות התנגשות, ירי בקני, ומגוון מתקנים לילדים ולמבוגרים. פתוח מאי–ספטמבר. קטנוני יותר מפארקים אמריקאיים אבל האווירה נוסטלגית ומקסימה — חוויה צ׳כית מקומית אמיתית.',
    booking:'✅ אין הזמנה מראש — כניסה חינם, מתקנים בנפרד ~50–100 CZK כל אחד | גלגל ענק: ~80 CZK',
    duration:'⏱️ 1.5–3 שעות',
@@ -2686,7 +2691,7 @@ var COMMUNITY = [
    who:'👦👧 ילדים כל הגילאים | 👨‍👩‍👧‍👦 חוויה קצרה ומשמחת | 🌇 יפה בשעות הערב עם האורות',
    how:'מטרו C → Holešovice + הליכה 10 דק׳ לשטח Výstaviště', mapUrl:'https://www.google.com/maps/search/Lunapark+Holesovice+Prague'},
 
-  {cat:'🎟️ אטרקציות', icon:'🧱', name:'מוזיאון הלגו — LEGO Museum Prague', fb:'⭐⭐⭐⭐⭐', google:'4.5',
+  {type:'community',cat:'🎟️ אטרקציות', icon:'🧱', name:'מוזיאון הלגו — LEGO Museum Prague', fb:'⭐⭐⭐⭐⭐', google:'4.5',
    desc:'המוזיאון הגדול ביותר לאוסף לגו בעולם — 3 קומות עם מאות מודלים ייחודיים: ערים שלמות בלגו, דמויות Star Wars, אנימציה ואמנות, ואיזור בנייה חופשית לילדים. ה-LEGO Store הצמוד מאפשר לבחור לבנים בודדות ולבנות קופסה מותאמת אישית — חוויה שלא תמצאו בכל מקום! שונה לחלוטין מ-Hamleys.',
    booking:'🎟️ מומלץ לקנות Online — legoland.cz | ~350 CZK מבוגר, ~250 ילד | הנחה לקומבו עם Disney Museum',
    duration:'⏱️ 60–90 דקות',
@@ -2694,7 +2699,7 @@ var COMMUNITY = [
    who:'👦👧 ילדים מגיל 4+ | 🧒 עד גיל 14 מתים עליו | 👨 גם מבוגרים אוהבי לגו',
    how:'מטרו A/C → Václavské náměstí + 3 דק׳ הליכה', mapUrl:'https://www.google.com/maps/search/LEGO+Museum+Prague'},
 
-  {cat:'🎟️ אטרקציות', icon:'⛲', name:'מזרקת Křižík', fb:'⭐⭐⭐⭐⭐', google:'4.7',
+  {type:'community',cat:'🎟️ אטרקציות', icon:'⛲', name:'מזרקת Křižík', fb:'⭐⭐⭐⭐⭐', google:'4.7',
    desc:'מזרקה מוזיקלית היסטורית מ-1891 עם 50 מנורות צבעוניות ו-3,000 אפקטי מים — ספקטקל של 45 דק׳. מופעים כל ערב בין מאי לאוקטובר: תוכניות קלאסיות, אופרה, דובסטפ, ומוזיקת פופ. ממוקמת בשטח התערוכה Výstaviště. אפשר לשבת ביציע מקורה (כרטיס) או לצפות חינם מהחוץ.',
    booking:'🎟️ מושבים ביציע ~150 CZK | כניסה חינם לצפייה מרחוק | krizikova-fontana.cz — ללוח מופעים',
    duration:'⏱️ 45–60 דקות',
@@ -2702,141 +2707,146 @@ var COMMUNITY = [
    who:'👨‍👩‍👧‍👦 כל הגילאים | 🌙 ערב | 💸 חינם מרחוק — אחת האטרקציות הכי משתלמות',
    how:'טראם 5/12/15 → Výstaviště (כ-15 דק׳ מהמרכז)', mapUrl:'https://www.google.com/maps/search/Krizikova+Fountain+Prague+Vystaviste'},
   // ── 🛍️ קניות ──
-  {cat:'🛍️ קניות', icon:'🛍️', name:'Primark — וצסלב', fb:'⭐⭐⭐⭐⭐', google:'4.3', desc:'ביגוד, ילדים, בית, מזוודות. להגיע בבוקר לפני ההמון. ממש בלב הפרסטיז׳ה.',
+  {type:'community',cat:'🛍️ קניות', icon:'🛍️', name:'Primark — וצסלב', fb:'⭐⭐⭐⭐⭐', google:'4.3', desc:'ביגוד, ילדים, בית, מזוודות. להגיע בבוקר לפני ההמון. ממש בלב הפרסטיז׳ה.',
    how:'מטרו A/C → Václavské náměstí, צעד אחד', mapUrl:'https://www.google.com/maps/search/Primark+Wenceslas+Square+Prague'},
-  {cat:'🛍️ קניות', icon:'🏬', name:'Palladium', fb:'⭐⭐⭐⭐⭐', google:'4.3', desc:'~180 חנויות, Albert סופר. לשלב עם ביקור בעיר העתיקה הצמודה.',
+  {type:'community',cat:'🛍️ קניות', icon:'🏬', name:'Palladium', fb:'⭐⭐⭐⭐⭐', google:'4.3', desc:'~180 חנויות, Albert סופר. לשלב עם ביקור בעיר העתיקה הצמודה.',
    how:'מטרו B → náměstí Republiky — ממול לתחנה', mapUrl:'https://www.google.com/maps/place/Palladium+Prague'},
-  {cat:'🛍️ קניות', icon:'🏢', name:'Westfield Chodov', fb:'⭐⭐⭐⭐', google:'4.2', desc:'~300 חנויות: Zara, Mango, Reserved. הקניון הגדול ביותר — ליום גשם/חום.',
+  {type:'community',cat:'🛍️ קניות', icon:'🏢', name:'Westfield Chodov', fb:'⭐⭐⭐⭐', google:'4.2', desc:'~300 חנויות: Zara, Mango, Reserved. הקניון הגדול ביותר — ליום גשם/חום.',
    how:'מטרו C → Chodov — הקניון ממש מעל התחנה', mapUrl:'https://www.google.com/maps/search/Westfield+Chodov+Prague'},
-  {cat:'🛍️ קניות', icon:'🍫', name:'Albert Supermarket — Chodov', fb:'⭐⭐⭐⭐⭐', google:'4.1', desc:'סופר ענק בקומה -1 בחודוב. מחירים שפויים על שוקולדים לארץ. חובה לפני הטיסה!',
+  {type:'community',cat:'🛍️ קניות', icon:'🍫', name:'Albert Supermarket — Chodov', fb:'⭐⭐⭐⭐⭐', google:'4.1', desc:'סופר ענק בקומה -1 בחודוב. מחירים שפויים על שוקולדים לארץ. חובה לפני הטיסה!',
    how:'מטרו C → Chodov, קומה -1 של Westfield Chodov', mapUrl:'https://www.google.com/maps/search/Albert+supermarket+Chodov+Prague'},
-  {cat:'🛍️ קניות', icon:'🛒', name:'Nový Smíchov', fb:'⭐⭐⭐⭐', google:'4.1', desc:'קניון פופולרי בצד השני של הנהר. סופרמרקט Tesco נוח ומשתלם. קרוב למרכז. שעות: 09:00–21:00.',
+  {type:'community',cat:'🛍️ קניות', icon:'🛒', name:'Nový Smíchov', fb:'⭐⭐⭐⭐', google:'4.1', desc:'קניון פופולרי בצד השני של הנהר. סופרמרקט Tesco נוח ומשתלם. קרוב למרכז. שעות: 09:00–21:00.',
    how:'מטרו B → Anděl — ממש על הקניון. Plzeňská 8', mapUrl:'https://www.google.com/maps/search/Novy+Smichov+Prague'},
-  {cat:'🛍️ קניות', icon:'🏙️', name:'שדרת Na Příkopě', fb:'⭐⭐⭐⭐', google:'4.4', desc:'השאנז אליזה של פראג — מרכז קניות יוקרתי עם רשתות אירופאיות. שעות: 09:00–21:00.',
+  {type:'community',cat:'🛍️ קניות', icon:'🏙️', name:'שדרת Na Příkopě', fb:'⭐⭐⭐⭐', google:'4.4', desc:'השאנז אליזה של פראג — מרכז קניות יוקרתי עם רשתות אירופאיות. שעות: 09:00–21:00.',
    how:'מטרו A/B → Můstek — היציאה לכיוון Na Příkopě', mapUrl:'https://www.google.com/maps/search/Na+Prikope+Prague+shopping'},
-  {cat:'🛍️ קניות', icon:'💎', name:'Parizska Street — רחוב פריז', fb:'⭐⭐⭐⭐⭐', google:'4.6', desc:'רחוב הבוטיקים היוקרתיים — Dior, Louis Vuitton, Hermès. יפהפה לסיבוב ערב גם ללא קנייה.',
+  {type:'community',cat:'🛍️ קניות', icon:'💎', name:'Parizska Street — רחוב פריז', fb:'⭐⭐⭐⭐⭐', google:'4.6', desc:'רחוב הבוטיקים היוקרתיים — Dior, Louis Vuitton, Hermès. יפהפה לסיבוב ערב גם ללא קנייה.',
    how:'מטרו A → Staroměstská + 2 דק׳ הליכה צפונה', mapUrl:'https://www.google.com/maps/search/Parizska+Street+Prague'},
-  {cat:'🛍️ קניות', icon:'🏺', name:'Nerudova Street', fb:'⭐⭐⭐⭐', google:'4.5', desc:'רחוב קניות מיוחד מהמאה ה-16 — חנויות מקומיות, גלריות, מזכרות אמנותיות. בדרך למצודה.',
+  {type:'community',cat:'🛍️ קניות', icon:'🏺', name:'Nerudova Street', fb:'⭐⭐⭐⭐', google:'4.5', desc:'רחוב קניות מיוחד מהמאה ה-16 — חנויות מקומיות, גלריות, מזכרות אמנותיות. בדרך למצודה.',
    how:'טראם 22 → Malostranské náměstí + עלייה ברגל', mapUrl:'https://www.google.com/maps/search/Nerudova+Street+Prague'},
   // ── 🎟️ אטרקציות חדשות ──
-  {cat:'🎟️ אטרקציות', icon:'🎢', name:'Majaland Prague', fb:'⭐⭐⭐⭐⭐', google:'4.5',
+  {type:'community',cat:'🎟️ אטרקציות', icon:'🎢', name:'Majaland Prague', fb:'⭐⭐⭐⭐⭐', google:'4.5',
    desc:'פארק שעשועים מקורה לילדים — מושלם לימי גשם או חום קיצוני! יש כאן מגלשות, רכבות, מתקני טיפוס, אזורי VR ומנהרות. בנוי בתוך בניין ענק, ממוזג, אין תלות מזג אוויר. מאוד מומלץ לילדים עד גיל 12.',
    booking:'🎟️ מומלץ להזמין Online מראש — majaland.cz | ~400 CZK לילד, ~300 CZK למבוגר',
    duration:'⏱️ 3–5 שעות',
    tips:'🌧️ מושלם ליום גשם! יש מסעדה בפנים. להביא גרביים אנטי-החלקה.',
    who:'🧒 ילדים עד גיל 12 | 👨‍👩‍👧‍👦 יום משפחתי מקורה',
    how:'מטרו A → Rajská zahrada + 10 דק׳ הליכה | או Bolt', mapUrl:'https://www.google.com/maps/search/Majaland+Prague'},
-  {cat:'🎟️ אטרקציות', icon:'🎬', name:'Karel Zeman Museum', fb:'⭐⭐⭐⭐⭐', google:'4.6',
+  {type:'community',cat:'🎟️ אטרקציות', icon:'🎬', name:'Karel Zeman Museum', fb:'⭐⭐⭐⭐⭐', google:'4.6',
    desc:'מוזיאון קסם קולנועי אינטראקטיבי! Karel Zeman היה פיוניר האנימציה והאפקטים המיוחדים של צ\'כיה. המוזיאון מציג את הסרטים שלו עם תפאורות שאפשר להיכנס אליהן ולצלם — ילדים (ומבוגרים) שוכחים מה זמן. יחודי לפראג.',
    booking:'🎟️ museumkarlazeman.cz | ~200 CZK מבוגר, ~150 CZK ילד | קטן ולא עמוס — אפשר בלי הזמנה',
    duration:'⏱️ 60–90 דקות',
    tips:'📸 להביא סוללה מלאה — הרבה תמונות. קרוב מאוד לגשר קארל.',
    who:'👧🧒 ילדים מגיל 6+ | 🎨 אוהבי קולנוע ואנימציה',
    how:'מטרו A → Staroměstská + 8 דק׳ הליכה לכיוון מלה סטרנה', mapUrl:'https://www.google.com/maps/search/Karel+Zeman+Museum+Prague'},
-  {cat:'🎟️ אטרקציות', icon:'⚽', name:'Fortuna Arena — סיור אצטדיון Slavia', fb:'⭐⭐⭐⭐', google:'4.5',
+  {type:'community',cat:'🎟️ אטרקציות', icon:'⚽', name:'Fortuna Arena — סיור אצטדיון Slavia', fb:'⭐⭐⭐⭐', google:'4.5',
    desc:'סיור מרתק מאחורי הקלעים של אצטדיון Slavia Prague — אחד הקבוצות המפורסמות בצ\'כיה. רואים את חדרי ההלבשה, הדשא, האצטדיון מבפנים. חסידי כדורגל — חובה! גם לילדים שלא מכירים — חוויה יחידה. מרחק 5 דקות בטרם מהמלון!',
    booking:'🎟️ slavia.cz — לבדוק לוח סיורים | ~200–300 CZK | לפעמים ניתן להצטרף בלי הזמנה',
    duration:'⏱️ 60–90 דקות',
    tips:'⚽ לבדוק שאין משחק באותו יום — ביום משחק הסיורים מבוטלים. תחנת טרם Solidarita — דקה מהמלון!',
    who:'👦 ילדים אוהבי ספורט | ⚽ חסידי כדורגל',
    how:'טרם → תחנת Solidarita (דקה הליכה מהמלון!) → 2 תחנות לכיוון Hostivař', mapUrl:'https://www.google.com/maps/search/Fortuna+Arena+Slavia+Prague+stadium+tour'},
-  {cat:'🎟️ אטרקציות', icon:'🍔', name:'Manifesto Market — Anděl', fb:'⭐⭐⭐⭐⭐', google:'4.5',
+  {type:'community',cat:'🎟️ אטרקציות', icon:'🍔', name:'Manifesto Market — Anděl', fb:'⭐⭐⭐⭐⭐', google:'4.5',
    desc:'פוד קורט מגניב בקונטיינרים צבעוניים בשכונת Anděl — אווירה הכי "היפסטרית" בפראג. מגוון ענק של אוכל מהעולם: בורגרים, אסייתי, פיצה, ועוד. מושב בחוץ, אורות חגיגיים, אווירה כיפית. מושלם לארוחת ערב בסגנון שונה ואכילה בחוץ.',
    booking:'✅ ללא הזמנה — הגיעו ובחרו! | שעות: 11:00–22:00 בימי חול, עד 23:00 בסופ"ש',
    duration:'⏱️ 60–90 דקות',
    tips:'🌆 כיף יותר בערב עם האורות. קרוב לקניון Nový Smíchov — אפשר לשלב.',
    who:'👨‍👩‍👧‍👦 כל הגילאים | 🌙 אידיאלי לארוחת ערב כיפית',
    how:'מטרו B → Anděl + 3 דק׳ הליכה', mapUrl:'https://www.google.com/maps/search/Manifesto+Market+Andel+Prague'},
-  {cat:'🎟️ אטרקציות', icon:'🦕', name:'DinoPark Harfa', fb:'⭐⭐⭐⭐⭐', google:'4.4',
+  {type:'community',cat:'🎟️ אטרקציות', icon:'🦕', name:'DinoPark Harfa', fb:'⭐⭐⭐⭐⭐', google:'4.4',
    desc:'פארק דינוזאורים ענק עם 80+ רובוטים בגודל טבעי שזזים ומשמיעים קולות! יש VR, קולנוע 4D, שלדים ענקיים ואזורי חפירה. אחד המבדרים הכי מיוחדים לילדים בפראג — ילדים בגיל 9 פשוט נגעלים וגם משתגעים. יש גם מסלול ציד קלקרים.',
    booking:'🎟️ dinoparkharfa.cz | ~380 CZK ילד, ~280 CZK מבוגר | מומלץ Online מראש בסופ"ש',
    duration:'⏱️ 2–3 שעות',
    tips:'💡 מומלץ להגיע בבוקר — פחות עמוס. יש אוכל בפנים. טבעי ומקורה — טוב גם ביום גשם.',
    who:'🦕 ילדים גיל 5–12 | 👨‍👩‍👧‍👦 מיוחד לילדה בת 9!',
    how:'מטרו C → Střížkov + 8 דק׳ הליכה | או Bolt', mapUrl:'https://www.google.com/maps/search/DinoPark+Harfa+Prague'},
-  {cat:'🎟️ אטרקציות', icon:'🎭', name:'Black Light Theatre — Ta Fantastika', fb:'⭐⭐⭐⭐', google:'4.3',
+  {type:'community',cat:'🎟️ אטרקציות', icon:'🎭', name:'Black Light Theatre — Ta Fantastika', fb:'⭐⭐⭐⭐', google:'4.3',
    desc:'מופע אור UV קסום — "Aspects of Alice" — שחקנים לבושים שחור הופכים לבלתי נראים ורק הבובות והתפאורה הצבעונית דולקות. חוויה קסומה שנראית כמו קרקס אנימציה. מתאים לילדים שאוהבים תיאטרון וקסמים. ברחוב Karlova 8, ליד גשר קארל.',
    booking:'🎟️ tafantastika.cz | ~450–600 CZK | חובה להזמין מראש — מקומות מוגבלים!',
    duration:'⏱️ 75–90 דקות',
    tips:'🌈 ממש ליד גשר קארל — אפשר לשלב. יש מספר הצגות ביום — לבדוק לוח.',
    who:'👧 ילדים גיל 7+ | 🎨 אוהבי קסמים ותיאטרון',
    how:'מטרו A → Staroměstská + 5 דק׳ הליכה | טרם 22 → Malostranské náměstí + 3 דק׳', mapUrl:'https://www.google.com/maps/search/Ta+Fantastika+Black+Light+Theatre+Prague'},
-  {cat:'🎟️ אטרקציות', icon:'🪞', name:'מבוך המראות — Petřín', fb:'⭐⭐⭐⭐', google:'3.7',
+  {type:'community',cat:'🎟️ אטרקציות', icon:'🪞', name:'מבוך המראות — Petřín', fb:'⭐⭐⭐⭐', google:'3.7',
    desc:'מבוך מראות היסטורי מ-1891 על גבעת פטז׳ין — חדר מראות מצחיקות (מראות מעוותות), מסדרון מראות אינסוף, ודיורמה גדולה של קרב פראג. ילדים (ומבוגרים!) מתחרפנים במראות המשובשות. ⚠️ רכבל הפוניקולר סגור לשיפוצים עד סוף 2026 — עלייה ברגל (~20 דק׳) או טרם 22.',
    booking:'🎟️ muzeumprahy.cz | ~150 CZK לאדם | ניתן לקנות בכניסה',
    duration:'⏱️ 30–45 דקות',
    tips:'⚠️ רכבל פוניקולר סגור עד סוף 2026 — עלו ברגל או טרם 22. ניתן לשלב עם מגדל פטז׳ין ליד.',
    who:'🪞 ילדים כל גיל | 👨‍👩‍👧‍👦 כיף משפחתי קצר',
    how:'טרם 22 → Újezd → עלייה ברגל לגבעה (~20 דק׳) | אין פוניקולר עד סוף 2026', mapUrl:'https://www.google.com/maps/search/Petrin+Mirror+Maze+Prague'},
-  {cat:'🎟️ אטרקציות', icon:'🧑‍🔬', name:'המוזיאון הטכני הלאומי', fb:'⭐⭐⭐⭐', google:'4.6',
+  {type:'community',cat:'🎟️ אטרקציות', icon:'🧑‍🔬', name:'המוזיאון הטכני הלאומי', fb:'⭐⭐⭐⭐', google:'4.6',
    desc:'מוזיאון ענק עם מטוסים, רכבות, מכוניות קלאסיות, אופנועים — כולם תלויים ועומדים מהתקרה. לילדים מתוחכמים בגיל 9 זה פשוט גן עדן. יש גם אסטרונומיה, פוטוגרפיה ומדע. אחד המוזיאונים הכי שווים בפראג. תחת גיל 10 — כניסה חינם!',
    booking:'🎟️ ntm.cz | ~200 CZK מבוגר | ילד עד גיל 10 חינם! | ניתן לקנות בכניסה',
    duration:'⏱️ 2–3 שעות',
    tips:'🌧️ מושלם ליום גשם! קרוב לשכונת Letná. לא צפוף בשעות הבוקר.',
    who:'🧒 ילדים 8+ | 🚂 אוהבי מדע וטכנולוגיה | 🌧️ חלופה לגשם',
    how:'טרם 1/8/25/26 → Letenské náměstí + 5 דק׳ הליכה | מטרו A → Hradčanská + 15 דק׳', mapUrl:'https://www.google.com/maps/search/National+Technical+Museum+Prague'},
-  {cat:'🎟️ אטרקציות', icon:'🎯', name:'Escape Room — TheRoom Prague', fb:'⭐⭐⭐⭐⭐', google:'4.7',
+  {type:'community',cat:'🎟️ אטרקציות', icon:'🎯', name:'Escape Room — TheRoom Prague', fb:'⭐⭐⭐⭐⭐', google:'4.7',
    desc:'חדרי בריחה ברמה גבוהה מאוד — יש חדרים מתאימים לגיל 8+ במיוחד לילדים. TheRoom Prague ידוע בעיצוב מרהיב ובחוויה הכי איכותית בפראג. מצוין כפעילות ערב כיפית לכל המשפחה. בוחרים חדר לפי רמת קושי.',
    booking:'🎟️ theroom.cz | ~600–900 CZK לקבוצה (עד 5 אנשים) | חובה להזמין מראש!',
    duration:'⏱️ 60–75 דקות',
    tips:'🌙 מושלם לערב — מה לעשות אחרי ארוחת ערב. לבחור חדר ברמת קושי קלה/בינונית עם ילדים.',
    who:'👧 ילדים 8+ | 🌙 פעילות ערב משפחתית | 🎉 חוויה שלא שוכחים',
-   how:'תלוי בסניף — לבדוק כתובת ב-theroom.cz | רוב הסניפים במרכז העיר', mapUrl:'https://www.google.com/maps/search/TheRoom+Escape+Room+Prague'}
-];
+   how:'תלוי בסניף — לבדוק כתובת ב-theroom.cz | רוב הסניפים במרכז העיר', mapUrl:'https://www.google.com/maps/search/TheRoom+Escape+Room+Prague'},
 
-// photo spots sorted cheap→expensive (by entrance fee)
-var PHOTO_SPOTS = [
-  {fee:0,icon:'🌉',name:'גשר קארל',sub:'#1 האייקוני של פראג',
+// ── PHOTO_SPOTS (type:'photo') — sorted cheap→expensive ──────────────────────────────────
+  {type:'photo',fee:0,icon:'🌉',name:'גשר קארל',sub:'#1 האייקוני של פראג',
    desc:'30 פסלי ברוק, פראג קאסל ברקע, השתקפויות בנהר. הקסם האמיתי: הגיעו לפני 5:30 בבוקר — הגשר כמעט ריק, ערפל על הפסלים.',
    best:'זריחה (~5:00 בקיץ)',crowds:'קיצוני בצהריים / ריק בשחר',fee_txt:'חינם',rating:'⭐⭐⭐⭐⭐',
    tip:'צלמו מצד מלה סטרנה חזרה לכיוון מגדל העיר העתיקה — הנוף הזה מרהיב יותר מהצד השני.',
    mapUrl:'https://www.google.com/maps/search/Charles+Bridge+Prague'},
-  {fee:0,icon:'🌿',name:'פארק לטנה (Letná)',sub:'נקודת התצפית של המקומיים',
+  {type:'photo',fee:0,icon:'🌿',name:'פארק לטנה (Letná)',sub:'נקודת התצפית של המקומיים',
    desc:'תצפית הנסתרת שתיירים מפספסים. עם עדשת טלה 70–200 מ"מ: גשר קארל + המטרונום הענק + 4 גשרים בפריים אחד. המקומיים באים לכאן, תיירים הולכים לפטז׳ין.',
    best:'אחה"צ / שעת הזהב',crowds:'נמוכות — מקומיים בלבד',fee_txt:'חינם',rating:'⭐⭐⭐⭐⭐',
    tip:'גן נסתר. המטרונום הענק (מקום פסל סטלין לשעבר) — רקע דרמטי מושלם.',
    mapUrl:'https://www.google.com/maps/search/Letna+Park+Viewpoint+Prague'},
-  {fee:0,icon:'🏘️',name:'רחוב נובי סבט',sub:'הרחוב הקסום שאף תייר לא מוצא',
+  {type:'photo',fee:0,icon:'🏘️',name:'רחוב נובי סבט',sub:'הרחוב הקסום שאף תייר לא מוצא',
    desc:'רחוב מהמאה ה-17 עם בקתות קטנות צבועות — נראה כמו אגדת ילדים. אחד מהמקומות הפחות מצולמים בפראג למרות שהוא מדהים. קרוב לטירה אבל תיירים עוברים בלי לשים לב.',
    best:'בוקר מוקדם (לפני 9)',crowds:'נמוכות מאוד',fee_txt:'חינם',rating:'⭐⭐⭐⭐⭐',
    tip:'אביב — פרחים מסביב לבקתות. סתיו — עלים זהובים. בחורף עם שלג — לא מהעולם הזה.',
    mapUrl:'https://www.google.com/maps/search/Novy+Svet+Street+Prague+Hradcany'},
-  {fee:0,icon:'🦚',name:'גן ולנשטיין',sub:'גן בארוק נסתר — טווסים חופשיים',
+  {type:'photo',fee:0,icon:'🦚',name:'גן ולנשטיין',sub:'גן בארוק נסתר — טווסים חופשיים',
    desc:'גן בארוק מהמאה ה-17 עם לוג׳יה מקושתת מרהיבה (Sala Terrena). פסל ברונזה, מזרקה, וטווסים שמסתובבים חופשי. כמעט לא מוזכר במדריכי תיירים.',
    best:'בוקר ימי חול',crowds:'נמוכות מאוד — מקומיים בלבד',fee_txt:'חינם',rating:'⭐⭐⭐⭐⭐',
    tip:'צלמו דרך הקשתות של ה-Sala Terrena — פריים מושלם. פתוח אפריל–אוקטובר.',
    mapUrl:'https://www.google.com/maps/search/Wallenstein+Garden+Prague+Mala+Strana'},
-  {fee:0,icon:'🎨',name:'חומת לנון',sub:'גרפיטי שמשתנה בכל ביקור',
+  {type:'photo',fee:0,icon:'🎨',name:'חומת לנון',sub:'גרפיטי שמשתנה בכל ביקור',
    desc:"קיר שמתחלף תמיד — ציטוטים, ציורים, שירה. כל ביקור שונה. ממש ליד מלה סטרנה.",
    best:'לפני 9 בבוקר',crowds:'גבוהות בצהריים / ריק בשחר',fee_txt:'חינם',rating:'⭐⭐⭐⭐',
    tip:'שעת הכחול עם אור הפנסים על הקיר הצבעוני — צילום מנצח.',
    mapUrl:'https://www.google.com/maps/search/Lennon+Wall+Prague'},
-  {fee:0,icon:'🏛️',name:'רחובות מלה סטרנה',sub:'ריצוף אבנים ופנסים בחצות',
+  {type:'photo',fee:0,icon:'🏛️',name:'רחובות מלה סטרנה',sub:'ריצוף אבנים ופנסים בחצות',
    desc:'Thunovská, Nerudova — רחובות צרים עם חזיתות בארוק ופנסי גז. אחרי גשם: השתקפויות מהחלומות. הפנסים נשארים דולקים עד ~8 בבוקר.',
    best:'זריחה / אחרי גשם',crowds:'נמוכות בבוקר',fee_txt:'חינם',rating:'⭐⭐⭐⭐½',
    tip:"חפשו את 'רחוב הטריפיק ליט' — הנתיב הצר של 50 ס\"מ שמוסדר ברמזור. צילום אייקוני.",
    mapUrl:'https://www.google.com/maps/search/Nerudova+Street+Prague'},
-  {fee:0,icon:'🏔️',name:'ויישהראד — שביל המצוק',sub:'תצפית נסתרת על הוולטבה',
+  {type:'photo',fee:0,icon:'🏔️',name:'ויישהראד — שביל המצוק',sub:'תצפית נסתרת על הוולטבה',
    desc:'שביל לאורך חומת המבצר מצד הנהר — נוף פתוח לכיוון הטירה ועיר העתיקה. כמעט אף תייר. מקומיים עם כלבים ורצים.',
    best:'שקיעה (צפייה צפונה)',crowds:'נמוכות מאוד',fee_txt:'חינם',rating:'⭐⭐⭐⭐½',
    tip:'הצמוד בית הקברות הגותי/Art Nouveau — ציורי מאוד לצילום.',
    mapUrl:'https://www.google.com/maps/search/Vysehrad+Prague+cliff+walk'},
-  {fee:150,icon:'📚',name:'מנזר סטרהוב — ספרייה',sub:'הספרייה הכי מצולמת באירופה',
+  {type:'photo',fee:150,icon:'📚',name:'מנזר סטרהוב — ספרייה',sub:'הספרייה הכי מצולמת באירופה',
    desc:'שתי אולמות קריאה בארוקיות מהמאה ה-17 — בין הפנימים היפים ביותר ביבשת. חובה לעדשה רחבה. גם לטרס חיצוני — פנורמה על הטירה והעיר.',
    best:'פתיחה בבוקר',crowds:'בינוניות',fee_txt:'~150 CZK לספרייה',rating:'⭐⭐⭐⭐½',
    tip:'עדשה 15–35 מ"מ חובה לאולמות הפנימיים. הטרס בחינם — לא כולם יודעים.',
    mapUrl:'https://www.google.com/maps/search/Strahov+Monastery+Library+Prague'},
-  {fee:250,icon:'🗼',name:'מגדל פטז׳ין',sub:'360° — הנוף הרחב ביותר בפראג',
+  {type:'photo',fee:250,icon:'🗼',name:'מגדל פטז׳ין',sub:'360° — הנוף הרחב ביותר בפראג',
    desc:'נקודת התצפית הגבוהה ביותר. פנורמה מלאה: גשר קארל, טירה, עיר עתיקה. מגיעים ברכבל (כרטיס חשמלית) מתחנת Újezd.',
    best:'בוקר / אחה"צ (הימנעו מערפל קיצי)',crowds:'בינוניות — פחות מגשר קארל',fee_txt:'250 CZK + 150 CZK מעלית',rating:'⭐⭐⭐⭐½',
    tip:'שלבו עם מנזר סטרהוב (5 דקות הליכה) — כפל שווה.',
    mapUrl:'https://www.google.com/maps/search/Petrin+Tower+Prague'},
-  {fee:300,icon:'🕰️',name:'שעון אסטרונומי — מגדל',sub:'פנורמה + שעון אייקוני',
+  {type:'photo',fee:300,icon:'🕰️',name:'שעון אסטרונומי — מגדל',sub:'פנורמה + שעון אייקוני',
    desc:'השעון האסטרונומי מ-1410 — פסל האפוסטולים כל שעה בדיוק. עלייה למגדל: פנורמה על גגות העיר העתיקה, כנסיית טין, כיכר.',
    best:'9 בבוקר (פתיחה)',crowds:'גבוהות בצהריים — נמוכות בפתיחה',fee_txt:'~300 CZK מגדל (50% הנחה בשעה הראשונה)',rating:'⭐⭐⭐⭐⭐',
    tip:'2 דקות אחרי שהאפוסטולים מסיימים — הקהל מתפזר, אז מצלמים את השעון נקי.',
-   mapUrl:'https://www.google.com/maps/search/Astronomical+Clock+Prague+Old+Town+Hall'}
+   type:'photo',mapUrl:'https://www.google.com/maps/search/Astronomical+Clock+Prague+Old+Town+Hall'}
 ];
+
+// ── Computed views from ALL_PLACES ──────────────────────────────────────────────────────────
+var COMMUNITY   = ALL_PLACES.filter(function(p){ return p.type==='community'; });
+var RESTAURANTS = ALL_PLACES.filter(function(p){ return p.type==='restaurant'; });
+var SHOPS       = ALL_PLACES.filter(function(p){ return p.type==='shop'; });
+var DESSERTS    = ALL_PLACES.filter(function(p){ return p.type==='dessert'; });
+var PHOTO_SPOTS = ALL_PLACES.filter(function(p){ return p.type==='photo'; });
 
 var PACK_CATS = [
   {cat:'מסמכים 📄',items:[
@@ -3016,12 +3026,16 @@ function loadDaysFromSheets(silent) {
 function selectDay(i) { currentDay = i; renderDays(); }
 
 (function initDaySwipe() {
-  // Pointer Events are immune to draggable="true" interference on iOS Safari.
+  // touch-action:pan-y tells Android Chrome "vertical scroll is yours, horizontal is mine"
+  // preventing pointercancel before the 40px threshold on Android.
+  var section = document.getElementById('days');
+  if (section) section.style.touchAction = 'pan-y';
+
   var _tx = 0, _ty = 0, _lx = 0, _ly = 0, _pid = null;
   document.addEventListener('pointerdown', function(e) {
     if (e.pointerType === 'mouse') return;
-    var section = document.getElementById('days');
-    if (!section || !section.contains(e.target)) return;
+    var sec = document.getElementById('days');
+    if (!sec || !sec.contains(e.target)) return;
     var btns = document.getElementById('dayButtons');
     if (btns && btns.contains(e.target)) return;
     _tx = _lx = e.clientX;
@@ -3075,6 +3089,11 @@ function renderDays() {
   btnContainer.querySelectorAll('button[data-day]').forEach(function(btn) {
     btn.addEventListener('click', function() { selectDay(Number(this.getAttribute('data-day'))); });
   });
+  // עדכן חצי ניווט
+  var total = state.length;
+  var prev = qs('dayPrevBtn'), next = qs('dayNextBtn');
+  if (prev) { var atFirst = i <= 1; prev.style.opacity = atFirst ? '0.3' : '1'; prev.style.pointerEvents = atFirst ? 'none' : ''; }
+  if (next) { var atLast = i >= total; next.style.opacity = atLast ? '0.3' : '1'; next.style.pointerEvents = atLast ? 'none' : ''; }
   var d = state[i - 1];
   var card = qs('dayCard');
   if (!card) return;
@@ -3391,7 +3410,7 @@ function switchBankTab(tab) {
     foodItems.concat(commFood).forEach(function(x){ if (!seen[x.name]){ seen[x.name]=1; merged.push(x); } });
     buildBankCards(merged, 'icon', 'name', 'desc', 'how');
   } else if (tab === 'shop') {
-    var shopItems = (typeof SHOPS !== 'undefined' ? SHOPS : []).map(function(s){ return {icon:s.e,name:s.n,desc:s.tip||'',how:s.metro||''}; });
+    var shopItems = (typeof SHOPS !== 'undefined' ? SHOPS : []).map(function(s){ return {icon:s.icon,name:s.name,desc:s.tip||'',how:s.metro||''}; });
     buildBankCards(shopItems, 'icon', 'name', 'desc', 'how');
   } else if (tab === 'rem') {
     buildBankRemCards();
@@ -3848,7 +3867,7 @@ function renderShopping() {
   var grid = qs('shoppingGrid');
   if (!grid) return;
   grid.innerHTML = SHOPS.map(function(s, idx) {
-    var _inDays = findItemInDays(s.n);
+    var _inDays = findItemInDays(s.name);
     var schedBadge = _inDays
       ? '<div style="background:rgba(16,185,129,0.13);border:1px solid rgba(16,185,129,0.38);border-radius:10px;padding:5px 10px;font-size:11px;font-weight:800;color:#065F46;margin-bottom:10px;">✅ יום ' + _inDays.dayNum + ' · ' + esc(_inDays.time) + '</div>'
       : '';
@@ -3857,14 +3876,14 @@ function renderShopping() {
       : 'background:rgba(244,99,74,0.15);border:1.5px solid rgba(244,99,74,0.35);color:#C2410C;';
     var addBtnTxt = _inDays ? '✏️ עדכן' : '📅 הוסף למסלול';
     return '<div style="background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.16);border-radius:20px;padding:18px;box-shadow:0 8px 26px rgba(0,0,0,0.32);overflow:hidden;">' +
-      '<div style="height:78px;border-radius:14px;background:linear-gradient(135deg,#0A1E38,#14305A);display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:14px;">' + s.e + '</div>' +
-      '<div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:10px;"><div style="font-size:15px;font-weight:800;color:#1E293B;">' + esc(s.n) + '</div><div style="color:#F59E0B;font-size:11px;white-space:nowrap;">' + s.stars + '</div></div>' +
+      '<div style="height:78px;border-radius:14px;background:linear-gradient(135deg,#0A1E38,#14305A);display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:14px;">' + s.icon + '</div>' +
+      '<div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:10px;"><div style="font-size:15px;font-weight:800;color:#1E293B;">' + esc(s.name) + '</div><div style="color:#F59E0B;font-size:11px;white-space:nowrap;">' + s.stars + '</div></div>' +
       schedBadge +
-      '<div style="font-size:12px;color:rgba(30,41,59,0.6);line-height:1.75;margin-bottom:10px;">⏰ ' + s.hours + '<br>🚇 ' + esc(s.metro) + '<br>⏱️ ' + esc(s.time) + '</div>' +
+      '<div style="font-size:12px;color:rgba(30,41,59,0.6);line-height:1.75;margin-bottom:10px;">⏰ ' + s.hours + '<br>🚇 ' + esc(s.metro) + '<br>⏱️ ' + esc(s.duration) + '</div>' +
       '<div style="font-size:11px;color:rgba(30,41,59,0.45);margin-bottom:10px;">📦 ' + esc(s.brands) + '</div>' +
       '<div class="tip-pill" style="margin-bottom:12px;">💡 ' + esc(s.tip) + '</div>' +
       '<div style="display:flex;gap:8px;">' +
-        '<a href="' + s.map + '" target="_blank" rel="noopener" style="flex:1;display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:12px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;">🗺️ ניווט</a>' +
+        '<a href="' + s.mapUrl + '" target="_blank" rel="noopener" style="flex:1;display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:12px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;">🗺️ ניווט</a>' +
         '<button onclick="addShopToStop(' + idx + ')" style="flex:1;' + addBtnStyle + 'border-radius:13px;padding:12px;font-weight:800;font-size:12px;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">' + addBtnTxt + '</button>' +
       '</div>' +
       '</div>';
@@ -4418,6 +4437,15 @@ function initRealtimeSync() {
           }
         } catch(e) {}
       }
+      if (d.total_budget != null) {
+        try {
+          var localTotal = localStorage.getItem('prague_total_budget');
+          if (String(d.total_budget) !== localTotal) {
+            localStorage.setItem('prague_total_budget', String(d.total_budget));
+            renderBudget();
+          }
+        } catch(e) {}
+      }
 
       // תזכורות שבוצעו
       if (d.remindersDone) {
@@ -4498,8 +4526,12 @@ function saveTotalBudget(val) {
   } else {
     try {
       ensureFirebaseAuth().then(function() {
-        getFirestoreDb().collection('appdata').doc('budget').set({ total: val, ts: Date.now() }, { merge: true })
+        var db = getFirestoreDb();
+        // שמור ב-appdata/budget (backward compat) וגם ב-appdata/main (כך הרצוא realtime listener יתפוס)
+        db.collection('appdata').doc('budget').set({ total: val, ts: Date.now() }, { merge: true })
           .catch(function(e) { console.warn('Firestore total budget save failed', e); });
+        db.collection('appdata').doc('main').set({ total_budget: val }, { merge: true })
+          .catch(function(e) { console.warn('Firestore main total_budget save failed', e); });
       });
     } catch(e) {}
   }
@@ -4512,12 +4544,8 @@ function syncBudgetFromFirebase(cb) {
       return getFirestoreDb().collection('appdata').doc('budget').get();
     }).then(function(doc) {
       if (doc.exists) {
-        if (doc.data().categories) {
-          try {
-            var cats = JSON.parse(doc.data().categories);
-            localStorage.setItem('prague_budget_v1', JSON.stringify(cats));
-          } catch(e) {}
-        }
+        // categories נשמרות ב-appdata/main — מכוסות ע"י syncBudgetFromSheets / realtime listener
+        // כאן רק total (שנשמר ב-appdata/budget)
         if (doc.data().total) {
           localStorage.setItem('prague_total_budget', String(doc.data().total));
         }
@@ -4727,7 +4755,7 @@ function saveBudgetFromModal() {
   renderBudget();
   toast('✅ תקציב עודכן!');
 
-  // שמור לשיטס
+  // שמור לשיטס / Firestore
   if (isGas()) {
     google.script.run
       .withSuccessHandler(function() { toast('☁️ סונכרן לגיליון!'); })
@@ -4736,6 +4764,8 @@ function saveBudgetFromModal() {
     google.script.run
       .withFailureHandler(function() {})
       .saveBudgetCategories(budget);
+  } else {
+    saveTotalBudget(totalVal);
   }
 }
 
