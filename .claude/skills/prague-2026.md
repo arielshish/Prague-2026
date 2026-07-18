@@ -48,6 +48,7 @@ GitHub Pages: `arielshish.github.io/Prague-2026/app.html`
 - **REMINDERS** (`renderReminders()`): schedInfo ירוק עם "✅ יום X · שעה" אם ב-DAYS
 - **PHOTO SPOTS** (`renderPhotoSpots()`): כפתור ➕ מוחלף בתג ✅ יום X
 - **DESSERTS** (`renderDesserts()`): אותו דפוס
+- **SHOPPING** (`renderShopping()`): תג ירוק + כפתור "✏️ עדכן"; `openTab('shopping')` ו-`refreshScheduleBadges()` מכסים גם אותו
 - **מודל הוסף תחנה** (`buildBankCards()`): כרטיסים מורחבים עם שם, תיאור (80 תווים), ⭐ ציון, משך, תג הזמנה, ותג "כבר בלוז"
 
 ### Fallback לנתוני Firestore ישנים

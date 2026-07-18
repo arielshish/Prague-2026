@@ -45,6 +45,10 @@
 - `buildBankCards()`: כרטיסי בנק מורחבים עם תיאור, ⭐, משך, תג הזמנה, ותג "כבר בלוז"
 - מבוסס על `findItemInDays()` — תמיד live מ-Firestore
 
+#### תג "כבר בלוז" — קניות (2026-07-18)
+- `renderShopping()`: תג ירוק "✅ יום X · שעה" + כפתור "✏️ עדכן" כשחנות כבר ב-DAYS
+- `openTab('shopping')` + `refreshScheduleBadges()` מכסים גם shopping
+
 #### סינכרון תגים בזמן אמת (2026-07-18)
 - `saveDaysState()` קוראת ל-`refreshScheduleBadges()` — מרנדרת מחדש את הטאב הפעיל מיד עם כל שמירה
 - `openTab('community')` מרנדר `renderCommunity()` — תגים תמיד עדכניים בכניסה לטאב
