@@ -2933,6 +2933,7 @@ function openTab(id) {
   if (id === 'expenses') { loadExpenses(); if (!window._expFirebaseLoaded) { window._expFirebaseLoaded = true; loadExpensesFromFirebase(); } syncBudgetFromSheets(); syncBudgetFromFirebase(); }
   if (id === 'days') { renderDays(); loadDaysFromSheets(); }
   if (id === 'pack') loadPack();
+  if (id === 'community') renderCommunity();
   if (id === 'restaurants') renderRestaurants();
   if (id === 'reminders') initReminders();
 }
@@ -2955,6 +2956,8 @@ function getDaysState() {
 function saveDaysState() {
   var json = JSON.stringify(DAYS_STATE);
   localStorage.setItem('prague_days_v1', json);
+  // refresh badges on whichever tab is currently visible
+  refreshScheduleBadges();
   if (isGas()) {
     google.script.run
       .withSuccessHandler(function(r) { if (r && r.ok) toast('☁️ ימים סונכרנו!'); })
@@ -2966,6 +2969,18 @@ function saveDaysState() {
     getFirestoreDb().collection('appdata').doc('main').set({ days_custom: json }, { merge: true })
       .catch(function(err) { window._lastFirebaseError = err; console.warn('saveDaysState Firebase error', err); });
   });
+}
+
+function refreshScheduleBadges() {
+  // Re-render whichever tab is active so "already in schedule" badges stay in sync.
+  var active = ALL_TABS.find(function(name) {
+    var sec = qs(name);
+    return sec && sec.className && sec.className.indexOf('active') !== -1;
+  });
+  if (!active || active === 'days') return; // days is already re-rendered by its own callers
+  if (active === 'community' && typeof renderCommunity === 'function') renderCommunity();
+  else if (active === 'restaurants' && typeof renderRestaurants === 'function') renderRestaurants();
+  else if (active === 'reminders' && typeof renderReminders === 'function') renderReminders();
 }
 
 function loadDaysFromSheets(silent) {
@@ -3012,30 +3027,33 @@ function loadDaysFromSheets(silent) {
 function selectDay(i) { currentDay = i; renderDays(); }
 
 (function initDaySwipe() {
-  // Attach to section#days (not #dayCard) — draggable=true on stops causes
-  // iOS Safari to swallow touch events before they reach the card element.
-  var section = document.getElementById('days');
-  if (!section) return;
-  var _tx = 0, _ty = 0, _active = false;
-  section.addEventListener('touchstart', function(e) {
+  // Pointer Events are immune to draggable="true" interference on iOS Safari.
+  var _tx = 0, _ty = 0, _lx = 0, _ly = 0, _pid = null;
+  document.addEventListener('pointerdown', function(e) {
+    if (e.pointerType === 'mouse') return; // desktop mouse — skip
     var card = document.getElementById('dayCard');
-    if (!card || !card.contains(e.target)) return; // ignore touches on day-buttons header
-    _tx = e.touches[0].clientX;
-    _ty = e.touches[0].clientY;
-    _active = true;
-  }, { passive: true });
-  section.addEventListener('touchcancel', function() { _active = false; }, { passive: true });
-  section.addEventListener('touchend', function(e) {
-    if (!_active) return;
-    _active = false;
-    var dx = e.changedTouches[0].clientX - _tx;
-    var dy = e.changedTouches[0].clientY - _ty;
-    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy)) return;
+    if (!card || !card.contains(e.target)) return;
+    _tx = _lx = e.clientX;
+    _ty = _ly = e.clientY;
+    _pid = e.pointerId;
+  });
+  document.addEventListener('pointermove', function(e) {
+    if (e.pointerId !== _pid) return;
+    _lx = e.clientX;
+    _ly = e.clientY;
+  });
+  function _finish(e) {
+    if (e.pointerId !== _pid) return;
+    _pid = null;
+    var dx = _lx - _tx;
+    var dy = _ly - _ty;
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
     var total = getDaysState().length;
-    // swipe left (dx < 0) = next day, swipe right (dx > 0) = prev day
     var next = currentDay + (dx < 0 ? 1 : -1);
     if (next >= 1 && next <= total) selectDay(next);
-  }, { passive: true });
+  }
+  document.addEventListener('pointerup', _finish);
+  document.addEventListener('pointercancel', _finish);
 })();
 
 function renderDays() {

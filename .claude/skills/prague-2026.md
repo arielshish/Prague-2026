@@ -35,16 +35,36 @@ GitHub Pages: `arielshish.github.io/Prague-2026/app.html`
 | `saveAddCommunityStop()` | ~3712 | שומר COMMUNITY → DAYS (כולל google/duration/who) |
 | `openAddCommunityStop(idx)` | ~3693 | modal להוספת תחנה |
 
-## פיצ'רים קיימים (עדכון 2026-07-18)
+## פיצ'רים קיימים (עדכון 2026-07-18 — גרסה 3)
 
 ### ציוני Google ב-DAYS
 - תחנות ב-DAYS מציגות ⭐ ציון, משך, ו"מתאים ל"
 - `showStopDetail()` popup — chips של ציון + who
 - `saveAddCommunityStop()` מעביר google/duration/who אוטומטית
 
-### תג "כבר בלוז"
+### תג "כבר בלוז" — בכל הטאבים
 - **COMMUNITY**: תג ירוק "✅ יום X · שעה" + כפתור "✏️ עדכן" כשהפריט כבר ב-DAYS
 - **RESTAURANTS**: תג זהה מ-`findItemInDays()` (live מ-Firestore)
+- **REMINDERS** (`renderReminders()`): schedInfo ירוק עם "✅ יום X · שעה" אם ב-DAYS
+- **PHOTO SPOTS** (`renderPhotoSpots()`): כפתור ➕ מוחלף בתג ✅ יום X
+- **DESSERTS** (`renderDesserts()`): אותו דפוס
+- **מודל הוסף תחנה** (`buildBankCards()`): כרטיסים מורחבים עם שם, תיאור (80 תווים), ⭐ ציון, משך, תג הזמנה, ותג "כבר בלוז"
+
+### Fallback לנתוני Firestore ישנים
+- תחנות שנשמרו לפני הוספת שדות google/duration/who — מקבלות fallback מ-COMMUNITY/RESTAURANTS בזמן render
+- פועל ב: `renderDays()`, `showStopDetail()`
+- קוד: `var _fb = COMMUNITY.find(c=>c.name===s.name) || RESTAURANTS.find(r=>r.name===s.name) || {};`
+
+### Swipe ימינה/שמאלה בין ימים
+- `initDaySwipe()` IIFE — listeners על `document` (לא section/card) לעקיפת draggable-iOS
+- `touchmove` מעדכן `_lx/_ly` — מיקום אחרון תמיד זמין
+- `touchcancel` מבצע סווייפ (לא מבטל) — פותר בעיית draggable ב-iOS Safari
+- threshold: `|dx| >= 40` ו-`|dx| > |dy| * 1.2`
+
+### סינכרון תגים בזמן אמת
+- `refreshScheduleBadges()` (~line 2971) — מזהה טאב פעיל ומרנדר Community/Restaurants/Reminders
+- נקראת מ-`saveDaysState()` — כלומר אחרי כל הוספה, מחיקה, הזזה
+- `openTab('community')` קורא `renderCommunity()` — תגים עדכניים בכל כניסה לטאב
 
 ## כללי עבודה קריטיים
 

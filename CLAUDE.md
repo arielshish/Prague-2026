@@ -39,8 +39,24 @@
 
 #### תג "כבר בלוז" (2026-07-18)
 - `renderCommunity()`: אם פריט כבר ב-DAYS → תג ירוק **"✅ יום X · שעה"** + כפתור משתנה ל-**"✏️ עדכן"**
-- `renderRestaurants()`: מציג תג זהה אם מסעדה קיימת ב-DAYS (בנוסף ל-`restaurantsSchedule`)
+- `renderRestaurants()`: תג זהה אם מסעדה קיימת ב-DAYS
+- `renderReminders()`: schedInfo ירוק "✅ יום X · שעה" אם ב-DAYS
+- `renderPhotoSpots()` / `renderDesserts()`: כפתור ➕ מוחלף בתג ✅
+- `buildBankCards()`: כרטיסי בנק מורחבים עם תיאור, ⭐, משך, תג הזמנה, ותג "כבר בלוז"
 - מבוסס על `findItemInDays()` — תמיד live מ-Firestore
+
+#### סינכרון תגים בזמן אמת (2026-07-18)
+- `saveDaysState()` קוראת ל-`refreshScheduleBadges()` — מרנדרת מחדש את הטאב הפעיל מיד עם כל שמירה
+- `openTab('community')` מרנדר `renderCommunity()` — תגים תמיד עדכניים בכניסה לטאב
+- כיסוי מלא: הוסף → תג מופיע מיד; מחק/הזז → תג נעלם מיד בכל טאב פעיל
+
+#### Swipe ימינה/שמאלה בין ימים (2026-07-18)
+- `initDaySwipe()` IIFE — listeners על `document` (לא `#dayCard`) לעקיפת `draggable` ב-iOS Safari
+- `touchmove` מעדכן מיקום אחרון; `touchcancel` מבצע סווייפ (לא מבטל)
+- threshold: `|dx| >= 40` ו-`|dx| > |dy| * 1.2`
+
+#### Fallback לנתוני Firestore ישנים (2026-07-18)
+- `renderDays()` ו-`showStopDetail()` — fallback ל-COMMUNITY/RESTAURANTS אם stop חסר google/duration/who
 
 ### כללי עבודה
 - **לפני שינוי גדול**: `git tag backup-<תיאור>-<תאריך>` + push
