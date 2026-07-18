@@ -28,7 +28,7 @@
     --c-primary:#F4634A;
     --c-primary-soft:rgba(244,99,74,0.10);
     --c-primary-mid:rgba(244,99,74,0.22);
-    --c-surface:#F5EFE6;
+    --c-surface:#F7F3EE;
     --c-card:#FFFFFF;
     --c-text-1:#1E293B;
     --c-text-2:rgba(30,41,59,0.60);
@@ -270,13 +270,13 @@
   }
   .ds-collapse-content.open{max-height:600px;opacity:1;}
 
-  body{background:#F5EFE6;direction:rtl;text-align:right;font-family:\'Rubik\',Arial,sans-serif;color:#1E293B;overflow-x:hidden;-webkit-text-size-adjust:100%;}
-  html{overflow-x:hidden;background:#F5EFE6;}
+  body{background:#F7F3EE;direction:rtl;text-align:right;font-family:\'Rubik\',Arial,sans-serif;color:#1E293B;overflow-x:hidden;-webkit-text-size-adjust:100%;}
+  html{overflow-x:hidden;background:#F7F3EE;}
   input,textarea,select{font-size:16px!important;}
   button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
   button:hover,button:focus{outline:none;filter:none;opacity:1;}
   a:hover,a:focus{outline:none;}
-  #app{width:min(430px,100%);min-height:100vh;margin:0 auto;background:linear-gradient(180deg,#EDE4D8 0%,#E8DFD2 50%,#E2D8CA 100%);position:relative;overflow-x:hidden;padding-bottom:90px;}
+  #app{width:min(430px,100%);min-height:100vh;margin:0 auto;background:linear-gradient(180deg,#FAF7F4 0%,#F7F3EE 50%,#F4F0EB 100%);position:relative;overflow-x:hidden;padding-bottom:90px;}
   .tab{display:none;padding:14px 14px 0;animation:rise 0.25s ease both;}
   .tab.active{display:block;}
 
@@ -481,7 +481,7 @@ function openAddCustomStop(type, data) {
   }).join('');
 
   overlay.innerHTML =
-    '<div style="position:relative;background:#F5EFE6;border-radius:24px 24px 0 0;padding:22px 20px 36px;width:min(680px,100%);z-index:1;direction:rtl;font-family:\'Rubik\',Arial,sans-serif;">' +
+    '<div style="position:relative;background:#ffffff;border-radius:24px 24px 0 0;padding:22px 20px 36px;width:min(680px,100%);z-index:1;direction:rtl;font-family:\'Rubik\',Arial,sans-serif;">' +
     '<div style="font-size:15px;font-weight:900;color:#1E293B;margin-bottom:14px;">➕ הוספת תחנה — ' + (data.emoji||'📍') + ' ' + esc(data.name) + '</div>' +
     '<div style="font-size:11px;font-weight:700;color:rgba(30,41,59,0.5);margin-bottom:8px;">📅 בחר יום בטיול</div>' +
     '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;" id="editStopDayBtns">' + dayBtns + '</div>' +
@@ -610,7 +610,7 @@ function showDayFullPrompt(dayIdx, addedStopName) {
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;';
   
   overlay.innerHTML = 
-    '<div style="background:#F5EFE6;border-radius:24px;padding:24px;width:100%;max-width:420px;box-shadow:0 10px 30px rgba(0,0,0,0.3);direction:rtl;font-family:\'Rubik\',Arial,sans-serif;border:1px solid rgba(0,0,0,0.06);">' +
+    '<div style="background:#ffffff;border-radius:24px;padding:24px;width:100%;max-width:420px;box-shadow:0 10px 30px rgba(0,0,0,0.2);direction:rtl;font-family:\'Rubik\',Arial,sans-serif;border:1px solid rgba(0,0,0,0.07);">' +
       '<div style="font-size:36px;text-align:center;margin-bottom:12px;">⚠️</div>' +
       '<h3 style="font-size:16px;font-weight:900;color:#1E293B;text-align:center;margin-bottom:10px;">יום ' + d.id + ' עמוס מאוד!</h3>' +
       '<p style="font-size:13px;color:rgba(30,41,59,0.7);text-align:center;line-height:1.6;margin-bottom:20px;">' +
@@ -670,7 +670,7 @@ function showRebalanceDayModal(dayIdx) {
   }).join('');
 
   overlay.innerHTML = 
-    '<div style="background:#F5EFE6;border-radius:24px 24px 0 0;padding:22px 20px 36px;width:100%;max-width:min(680px,100%);direction:rtl;font-family:\'Rubik\',Arial,sans-serif;box-sizing:border-box;max-height:85vh;display:flex;flex-direction:column;">' +
+    '<div style="background:#ffffff;border-radius:24px 24px 0 0;padding:22px 20px 36px;width:100%;max-width:min(680px,100%);direction:rtl;font-family:\'Rubik\',Arial,sans-serif;box-sizing:border-box;max-height:85vh;display:flex;flex-direction:column;">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-shrink:0;">' +
         '<div style="font-size:15px;font-weight:900;color:#1E293B;">🔀 איזון עומסים — יום ' + d.id + ' (' + d.stops.length + ' תחנות)</div>' +
         '<button id="btnCloseRebalance" style="background:rgba(0,0,0,0.06);border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;color:#64748B;">✕</button>' +
@@ -771,7 +771,7 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
 }
 
 </script>
-<div id="loginScreen" style="position:fixed;inset:0;background:#EDE4D8;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:32px;">
+<div id="loginScreen" style="position:fixed;inset:0;background:#FAF7F4;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:32px;">
   <div style="font-size:56px;">🏰</div>
   <div style="font-size:26px;font-weight:900;color:#1E293B;font-family:\'Rubik\',Arial,sans-serif;">פראג 2026</div>
   <div style="font-size:14px;color:rgba(30,41,59,0.55);font-family:\'Rubik\',Arial,sans-serif;">משפחת שיש</div>
@@ -896,7 +896,7 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
   <!-- מודל הוספת תחנה ליום -->
   <div id="addStopModal" style="display:none;position:fixed;inset:0;z-index:80;align-items:flex-end;justify-content:center;">
     <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);" id="addStopOverlay"></div>
-    <div style="position:relative;background:#F5EFE6;border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:min(680px,100%);z-index:1;">
+    <div style="position:relative;background:#ffffff;border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:min(680px,100%);z-index:1;">
       <h2 id="addStopTitle" style="margin:0 0 12px;font-size:17px;font-weight:900;color:#1E293B;">➕ הוסף תחנה</h2>
       <div style="display:flex;gap:6px;margin-bottom:10px;">
         <button id="bankTabAttr" onclick="switchBankTab('attr')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(244,99,74,0.25);color:#F4634A;font-weight:700;font-size:10px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🎟️ אטרקציות</button>
@@ -929,7 +929,7 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
   <!-- מודל העברת תחנה ליום אחר -->
   <div id="moveStopModal" style="display:none;position:fixed;inset:0;z-index:80;align-items:flex-end;justify-content:center;">
     <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);" id="moveStopOverlay"></div>
-    <div style="position:relative;background:#F5EFE6;border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:min(680px,100%);z-index:1;">
+    <div style="position:relative;background:#ffffff;border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:min(680px,100%);z-index:1;">
       <h2 style="margin:0 0 14px;font-size:17px;font-weight:900;color:#1E293B;">↔️ העבר לאיזה יום?</h2>
       <div id="moveDayPicker" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;"></div>
     </div>
@@ -964,7 +964,7 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
     <div style="background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.09);border-radius:20px;padding:16px;margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
         <div style="font-size:13px;font-weight:800;color:#1E293B;">📊 תקציב מול בפועל</div>
-        <button id="btnEditBudget" onclick="openBudgetModal()" style="background:#ffffff;border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:4px 10px;font-size:11px;font-weight:700;color:rgba(30,41,59,0.75);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">✏️ ערוך</button>
+        <button id="btnEditBudget" onclick="openBudgetModal()" style="background:#ffffff;border:1px solid rgba(0,0,0,0.10);border-radius:10px;padding:4px 10px;font-size:11px;font-weight:700;color:rgba(30,41,59,0.75);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">✏️ ערוך</button>
       </div>
       <!-- כרטיס סיכום גדול -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
@@ -1007,10 +1007,10 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
   <!-- מודל עריכת תקציב -->
   <div id="budgetModal" style="display:none;position:fixed;inset:0;z-index:80;align-items:flex-end;justify-content:center;">
     <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);pointer-events:none;" id="budgetOverlay"></div>
-    <div style="position:relative;background:#F5EFE6;border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:min(680px,100%);z-index:1;max-height:85vh;overflow-y:auto;">
+    <div style="position:relative;background:#ffffff;border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:min(680px,100%);z-index:1;max-height:85vh;overflow-y:auto;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
         <h2 style="margin:0;font-size:18px;font-weight:900;color:#1E293B;">✏️ עריכת תקציב</h2>
-        <button onclick="closeBudgetModal()" style="background:#ffffff;border:1px solid rgba(255,255,255,0.14);border-radius:10px;padding:6px 13px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.65);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">ביטול</button>
+        <button onclick="closeBudgetModal()" style="background:#ffffff;border:1px solid rgba(0,0,0,0.10);border-radius:10px;padding:6px 13px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.65);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">ביטול</button>
       </div>
       <div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);border-radius:14px;padding:14px;margin-bottom:16px;">
         <div style="font-size:11px;font-weight:700;color:#B45309;margin-bottom:8px;letter-spacing:0.5px;">💰 תקציב כולל לטיול (₪)</div>
@@ -1020,7 +1020,7 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
       <div id="budgetInputs" style="display:grid;gap:10px;margin-bottom:16px;"></div>
       <button id="btnAddBudgetCat" onclick="(function(){var b=loadBudget();b.push({cat:'קטגוריה חדשה',ils:0});saveBudget(b);openBudgetModal();})()" style="width:100%;background:#ffffff;border:1px dashed rgba(255,255,255,0.2);border-radius:13px;padding:11px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.65);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;margin-bottom:14px;">➕ הוסף קטגוריה</button>
       <div style="display:flex;gap:10px;">
-        <button onclick="closeBudgetModal()" style="flex:1;background:#ffffff;border:1px solid rgba(255,255,255,0.14);border-radius:13px;padding:14px;font-size:14px;font-weight:700;color:rgba(30,41,59,0.65);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">ביטול</button>
+        <button onclick="closeBudgetModal()" style="flex:1;background:#ffffff;border:1px solid rgba(0,0,0,0.10);border-radius:13px;padding:14px;font-size:14px;font-weight:700;color:rgba(30,41,59,0.65);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">ביטול</button>
         <button id="btnSaveBudget" onclick="saveBudgetFromModalAndInvalidate()" style="flex:2;background:#F4634A;color:white;border:0;border-radius:13px;padding:14px;font-size:15px;font-weight:900;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">💾 שמור</button>
       </div>
     </div>
@@ -1051,47 +1051,49 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
       <span class="ds-chip" style="background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.22);color:#92400E;">🏁 להגיע לשדה 3h מוקדם (חוץ לארץ)</span>
     </div>
     <div class="flights-grid">
-    <div style="background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.16);border-radius:20px;overflow:hidden;margin-bottom:14px;">
-      <div style="background:linear-gradient(135deg,#F4634A,#d6a54a);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;">
-        <div style="font-size:16px;font-weight:900;color:white;">הלוך לפראג</div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.85);">Smart Wings · QS1287</div>
+    <!-- כרטיס הלוך -->
+    <div style="background:#fff;border:1px solid rgba(244,99,74,0.18);border-radius:20px;overflow:hidden;margin-bottom:14px;box-shadow:0 2px 12px rgba(244,99,74,0.10);">
+      <div style="background:linear-gradient(135deg,rgba(244,99,74,0.10),rgba(244,99,74,0.05));border-bottom:1px solid rgba(244,99,74,0.15);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-size:16px;font-weight:900;color:#1E293B;">✈️ הלוך לפראג</div>
+        <span class="ds-badge ds-badge-red" style="font-size:10px;">Smart Wings · QS1287</span>
       </div>
       <div style="padding:18px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
           <div style="text-align:center;"><div style="font-size:28px;font-weight:900;color:#1E293B;line-height:1;">TLV</div><div style="font-size:17px;font-weight:700;color:#F4634A;margin-top:3px;">05:35</div><div style="font-size:11px;color:rgba(30,41,59,0.5);">נתב"ג</div></div>
-          <div style="flex:1;text-align:center;padding:0 8px;"><div style="border-top:2px dashed rgba(255,255,255,0.18);margin-bottom:4px;"></div><span style="font-size:18px;">✈️</span><div style="font-size:10px;color:rgba(30,41,59,0.45);">4h 10m</div></div>
+          <div style="flex:1;text-align:center;padding:0 8px;"><div style="border-top:2px dashed rgba(244,99,74,0.25);margin-bottom:4px;"></div><span style="font-size:18px;">✈️</span><div style="font-size:10px;color:rgba(30,41,59,0.45);">4h 10m</div></div>
           <div style="text-align:center;"><div style="font-size:28px;font-weight:900;color:#1E293B;line-height:1;">PRG</div><div style="font-size:17px;font-weight:700;color:#F59E0B;margin-top:3px;">08:45</div><div style="font-size:11px;color:rgba(30,41,59,0.5);">רוזינה</div></div>
         </div>
-        <div style="border-top:1px dashed rgba(255,255,255,0.14);padding-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-          <div><div style="font-size:10px;color:rgba(30,41,59,0.5);text-transform:uppercase;margin-bottom:3px;">תאריך</div><div style="font-size:12px;font-weight:600;color:#1E293B;">8 אוגוסט 2026 (שבת)</div></div>
-          <div><div style="font-size:10px;color:rgba(30,41,59,0.5);text-transform:uppercase;margin-bottom:3px;">מחלקה</div><div style="font-size:12px;font-weight:600;color:#1E293B;">Economy</div></div>
+        <div style="border-top:1px solid rgba(0,0,0,0.06);padding-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+          <div><div style="font-size:10px;color:rgba(30,41,59,0.45);text-transform:uppercase;margin-bottom:3px;">תאריך</div><div style="font-size:12px;font-weight:700;color:#1E293B;">8 אוגוסט 2026 (שבת)</div></div>
+          <div><div style="font-size:10px;color:rgba(30,41,59,0.45);text-transform:uppercase;margin-bottom:3px;">מחלקה</div><div style="font-size:12px;font-weight:700;color:#1E293B;">Economy</div></div>
         </div>
-        <div style="border-top:1px dashed rgba(255,255,255,0.14);padding-top:10px;display:grid;gap:4px;">
-          <div style="font-size:10px;color:rgba(30,41,59,0.5);text-transform:uppercase;margin-bottom:4px;">נוסעים</div>
-          <div style="font-size:12px;font-weight:600;color:rgba(241,245,249,0.82);">👤 Ariel Shish <span style="color:rgba(30,41,59,0.5);font-weight:400;">(מבוגר)</span></div>
-          <div style="font-size:12px;font-weight:600;color:rgba(241,245,249,0.82);">👤 Mariana Shish <span style="color:rgba(30,41,59,0.5);font-weight:400;">(מבוגרת)</span></div>
-          <div style="font-size:12px;font-weight:600;color:rgba(241,245,249,0.82);">👧 Adi Yasmin Shish <span style="color:rgba(30,41,59,0.5);font-weight:400;">(ילדה)</span></div>
+        <div style="border-top:1px solid rgba(0,0,0,0.06);padding-top:10px;display:grid;gap:5px;">
+          <div style="font-size:10px;color:rgba(30,41,59,0.45);text-transform:uppercase;margin-bottom:2px;">נוסעים</div>
+          <div style="font-size:12px;font-weight:600;color:#1E293B;">👤 Ariel Shish <span style="color:rgba(30,41,59,0.45);font-weight:400;">(מבוגר)</span></div>
+          <div style="font-size:12px;font-weight:600;color:#1E293B;">👤 Mariana Shish <span style="color:rgba(30,41,59,0.45);font-weight:400;">(מבוגרת)</span></div>
+          <div style="font-size:12px;font-weight:600;color:#1E293B;">👧 Adi Yasmin Shish <span style="color:rgba(30,41,59,0.45);font-weight:400;">(ילדה)</span></div>
         </div>
       </div>
-      <div style="background:rgba(0,0,0,0.22);padding:11px 18px;border-top:1px dashed rgba(255,255,255,0.10);font-size:12px;font-weight:600;color:rgba(30,41,59,0.6);">⚠️ לוודא טרמינל בנתב"ג לפני ההגעה</div>
+      <div style="background:rgba(244,99,74,0.05);padding:10px 18px;border-top:1px solid rgba(244,99,74,0.12);font-size:12px;font-weight:600;color:#92400E;">⚠️ לוודא טרמינל בנתב"ג לפני ההגעה</div>
     </div>
-    <div style="background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.16);border-radius:20px;overflow:hidden;margin-bottom:14px;">
-      <div style="background:linear-gradient(135deg,#173554,#244b70);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;">
-        <div style="font-size:16px;font-weight:900;color:white;">חזור לתל אביב</div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.85);">Smart Wings · QS1286</div>
+    <!-- כרטיס חזור -->
+    <div style="background:#fff;border:1px solid rgba(59,130,246,0.18);border-radius:20px;overflow:hidden;margin-bottom:14px;box-shadow:0 2px 12px rgba(59,130,246,0.08);">
+      <div style="background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(59,130,246,0.04));border-bottom:1px solid rgba(59,130,246,0.12);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-size:16px;font-weight:900;color:#1E293B;">✈️ חזור לתל אביב</div>
+        <span class="ds-badge ds-badge-blue" style="font-size:10px;">Smart Wings · QS1286</span>
       </div>
       <div style="padding:18px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
           <div style="text-align:center;"><div style="font-size:28px;font-weight:900;color:#1E293B;line-height:1;">PRG</div><div style="font-size:17px;font-weight:700;color:#F4634A;margin-top:3px;">23:45</div><div style="font-size:11px;color:rgba(30,41,59,0.5);">רוזינה</div></div>
-          <div style="flex:1;text-align:center;padding:0 8px;"><div style="border-top:2px dashed rgba(255,255,255,0.18);margin-bottom:4px;"></div><span style="font-size:18px;">✈️</span><div style="font-size:10px;color:rgba(30,41,59,0.45);">3h 50m</div></div>
+          <div style="flex:1;text-align:center;padding:0 8px;"><div style="border-top:2px dashed rgba(59,130,246,0.3);margin-bottom:4px;"></div><span style="font-size:18px;">✈️</span><div style="font-size:10px;color:rgba(30,41,59,0.45);">3h 50m</div></div>
           <div style="text-align:center;"><div style="font-size:28px;font-weight:900;color:#1E293B;line-height:1;">TLV</div><div style="font-size:17px;font-weight:700;color:#F59E0B;margin-top:3px;">04:35<sup style="font-size:10px;">+1</sup></div><div style="font-size:11px;color:rgba(30,41,59,0.5);">נתב"ג</div></div>
         </div>
-        <div style="border-top:1px dashed rgba(255,255,255,0.14);padding-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          <div><div style="font-size:10px;color:rgba(30,41,59,0.5);text-transform:uppercase;margin-bottom:3px;">המראה</div><div style="font-size:12px;font-weight:600;color:#1E293B;">15 אוגוסט (שבת)</div></div>
-          <div><div style="font-size:10px;color:rgba(30,41,59,0.5);text-transform:uppercase;margin-bottom:3px;">נחיתה</div><div style="font-size:12px;font-weight:600;color:#F59E0B;">16 אוגוסט (ראשון)</div></div>
+        <div style="border-top:1px solid rgba(0,0,0,0.06);padding-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div><div style="font-size:10px;color:rgba(30,41,59,0.45);text-transform:uppercase;margin-bottom:3px;">המראה</div><div style="font-size:12px;font-weight:700;color:#1E293B;">15 אוגוסט (שבת)</div></div>
+          <div><div style="font-size:10px;color:rgba(30,41,59,0.45);text-transform:uppercase;margin-bottom:3px;">נחיתה</div><div style="font-size:12px;font-weight:700;color:#1E293B;">16 אוגוסט (ראשון) <span style="color:#F59E0B;">+1</span></div></div>
         </div>
       </div>
-      <div style="background:rgba(0,0,0,0.22);padding:11px 18px;border-top:1px dashed rgba(255,255,255,0.10);font-size:12px;font-weight:600;color:rgba(30,41,59,0.6);">💡 הגעה לארץ לפנות בוקר (16 אוגוסט)</div>
+      <div style="background:rgba(59,130,246,0.05);padding:10px 18px;border-top:1px solid rgba(59,130,246,0.10);font-size:12px;font-weight:600;color:#1E40AF;">💡 הגעה לארץ לפנות בוקר (16 אוגוסט)</div>
     </div>
     </div>
   </section>
@@ -1134,7 +1136,7 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
   <!-- מודל הוספת פריט/קטגוריה לצ'ק-ליסט -->
   <div id="packItemModal" style="display:none;position:fixed;inset:0;z-index:80;align-items:flex-end;justify-content:center;">
     <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);" id="packItemOverlay"></div>
-    <div style="position:relative;background:#F5EFE6;border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:min(680px,100%);z-index:1;">
+    <div style="position:relative;background:#ffffff;border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:min(680px,100%);z-index:1;">
       <h2 id="packItemTitle" style="margin:0 0 16px;font-size:17px;font-weight:900;color:#1E293B;">➕ הוסף פריט</h2>
       <input id="packItemText" type="text" placeholder="שם הפריט..." style="width:100%;background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:13px;padding:13px 14px;font-size:15px;color:#1E293B;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:12px;">
       <button id="btnSavePackItem" class="btn-primary" style="width:100%;">✅ הוסף</button>
@@ -1243,7 +1245,7 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
       <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:18px;padding:16px;">
         <div style="font-size:14px;font-weight:700;color:#1E293B;margin-bottom:7px;">⚙️ מחשבון שער המרה</div>
         <div style="font-size:12px;color:rgba(241,245,249,0.42);margin-bottom:10px;">כמה קרונות בשקל אחד</div>
-        <input id="rate" type="number" step="0.01" value="6.4" style="width:100%;background:#ffffff;border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:12px 14px;font-size:14px;color:#1E293B;font-family:\'Rubik\',Arial,sans-serif;direction:ltr;box-sizing:border-box;margin-bottom:6px;">
+        <input id="rate" type="number" step="0.01" value="6.4" style="width:100%;background:#ffffff;border:1px solid rgba(0,0,0,0.10);border-radius:12px;padding:12px 14px;font-size:14px;color:#1E293B;font-family:\'Rubik\',Arial,sans-serif;direction:ltr;box-sizing:border-box;margin-bottom:6px;">
         <div id="rateStatus" style="font-size:11px;color:rgba(30,41,59,0.45);margin-bottom:10px;min-height:16px;"></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
           <button id="btnSaveRate" class="btn-ghost" style="font-size:12px;padding:10px;">💾 שמור ידני</button>
@@ -1638,7 +1640,7 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
   <!-- מודל תיוג תמונה -->
   <div id="photoTagModal" style="display:none;position:fixed;inset:0;z-index:90;align-items:flex-end;justify-content:center;">
     <div style="position:absolute;inset:0;background:rgba(0,0,0,0.7);" id="photoTagOverlay"></div>
-    <div style="position:relative;background:#F5EFE6;border-radius:28px 28px 0 0;padding:22px 20px 36px;width:100%;max-width:min(680px,100%);z-index:1;max-height:90vh;overflow-y:auto;">
+    <div style="position:relative;background:#ffffff;border-radius:28px 28px 0 0;padding:22px 20px 36px;width:100%;max-width:min(680px,100%);z-index:1;max-height:90vh;overflow-y:auto;">
       <h2 style="margin:0 0 14px;font-size:17px;font-weight:900;color:#1E293B;">📷 תמונה חדשה</h2>
       <!-- תצוגה מקדימה -->
       <div id="photoPreviewWrap" style="background:rgba(0,0,0,0.04);border:1px dashed rgba(255,255,255,0.2);border-radius:16px;height:200px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;overflow:hidden;cursor:pointer;" onclick="qs('photoFileInput').click()">
@@ -1759,7 +1761,7 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
   </div>
 
   <!-- ═══ NAV ═══ -->
-  <nav style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);min-height:76px;padding-bottom:env(safe-area-inset-bottom,0px);background:rgba(237,228,216,0.97);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-top:1px solid rgba(0,0,0,0.10);z-index:50;display:grid;grid-template-columns:repeat(7,1fr);">
+  <nav style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);min-height:76px;padding-bottom:env(safe-area-inset-bottom,0px);background:rgba(255,255,255,0.95);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-top:1px solid rgba(0,0,0,0.10);z-index:50;display:grid;grid-template-columns:repeat(7,1fr);">
     <button id="nav-home" class="nav-item active"><span class="nav-icon">🏠</span><span class="nav-label">ראשי</span></button>
     <button id="nav-days" class="nav-item"><span class="nav-icon">📅</span><span class="nav-label">ימים</span></button>
     <button id="nav-shopping" class="nav-item"><span class="nav-icon">🛍️</span><span class="nav-label">קניות</span></button>
@@ -1777,7 +1779,7 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
     <div style="width:34px;height:4px;background:rgba(255,255,255,0.18);border-radius:2px;margin:0 auto 14px;"></div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
       <h2 id="expenseTitle" style="margin:0;font-size:18px;font-weight:900;color:#1E293B;">➕ הוסף הוצאה</h2>
-      <button onclick="closeExpense()" style="background:#ffffff;border:1px solid rgba(255,255,255,0.14);border-radius:10px;padding:6px 13px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.65);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">ביטול</button>
+      <button onclick="closeExpense()" style="background:#ffffff;border:1px solid rgba(0,0,0,0.10);border-radius:10px;padding:6px 13px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.65);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">ביטול</button>
     </div>
     <!-- שם -->
     <input id="expName" type="text" placeholder="🔍 חפש או הקלד חופשי..." oninput="filterExpNameList(this.value)" style="width:100%;background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:13px;padding:13px 14px;font-size:15px;color:#1E293B;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:8px;">
@@ -1797,7 +1799,7 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
 
 
 <!-- TOAST -->
-<div id="toast" style="display:none;position:fixed;top:54px;left:50%;transform:translateX(-50%);background:rgba(2,7,14,0.96);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,0.15);color:#1E293B;padding:11px 20px;border-radius:14px;z-index:100;font-weight:600;font-size:13px;white-space:nowrap;box-shadow:0 6px 22px rgba(0,0,0,0.45);font-family:\'Rubik\',Arial,sans-serif;"></div>
+<div id="toast" style="display:none;position:fixed;top:54px;left:50%;transform:translateX(-50%);background:rgba(2,7,14,0.96);backdrop-filter:blur(18px);border:1px solid rgba(0,0,0,0.10);color:#1E293B;padding:11px 20px;border-radius:14px;z-index:100;font-weight:600;font-size:13px;white-space:nowrap;box-shadow:0 6px 22px rgba(0,0,0,0.45);font-family:\'Rubik\',Arial,sans-serif;"></div>
 
 <script>
 // ═══════════════════════════════════════════
@@ -1934,7 +1936,7 @@ function showDayTimePicker(emoji, name, desc) {
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:10002;display:flex;align-items:flex-end;justify-content:center;';
 
   var panel = document.createElement('div');
-  panel.style.cssText = 'background:#F5EFE6;border-radius:24px 24px 0 0;padding:22px 18px 36px;width:100%;max-width:480px;direction:rtl;font-family:Rubik,Arial,sans-serif;max-height:85vh;overflow-y:auto;box-shadow:0 -4px 30px rgba(0,0,0,0.4);';
+  panel.style.cssText = 'background:#ffffff;border-radius:24px 24px 0 0;padding:22px 18px 36px;width:100%;max-width:480px;direction:rtl;font-family:Rubik,Arial,sans-serif;max-height:85vh;overflow-y:auto;box-shadow:0 -4px 30px rgba(0,0,0,0.4);';
 
   var header = document.createElement('div');
   header.style.cssText = 'font-size:15px;font-weight:900;color:#1E293B;margin-bottom:16px;text-align:center;';
@@ -2182,7 +2184,7 @@ function showReminderDetail(id) {
   overlay.id = 'reminderDetailOverlay';
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:9999;display:flex;align-items:flex-end;justify-content:center;';
   var panel = document.createElement('div');
-  panel.style.cssText = 'background:#F5EFE6;border-radius:22px 22px 0 0;padding:22px 20px 32px;width:100%;max-width:min(680px,100%);box-shadow:0 -4px 30px rgba(0,0,0,0.5);direction:rtl;font-family:Rubik,Arial,sans-serif;max-height:82vh;overflow-y:auto;';
+  panel.style.cssText = 'background:#ffffff;border-radius:22px 22px 0 0;padding:22px 20px 32px;width:100%;max-width:min(680px,100%);box-shadow:0 -4px 30px rgba(0,0,0,0.5);direction:rtl;font-family:Rubik,Arial,sans-serif;max-height:82vh;overflow-y:auto;';
 
   var priorityColors = { critical:'#DC2626', important:'#B45309', logistics:'#0369A1' };
   var priorityLabels = { critical:'🔴 דחוף', important:'🟡 חשוב', logistics:'🔵 לוגיסטיקה' };
@@ -2267,7 +2269,7 @@ function _openScheduleModal(type, key, title, sched) {
   }).join('');
 
   overlay.innerHTML =
-    '<div style="background:#F5EFE6;border-radius:22px 22px 0 0;padding:22px 18px 36px;width:100%;max-width:min(680px,100%);direction:rtl;font-family:Rubik,Arial,sans-serif;">' +
+    '<div style="background:#ffffff;border-radius:22px 22px 0 0;padding:22px 18px 36px;width:100%;max-width:min(680px,100%);direction:rtl;font-family:Rubik,Arial,sans-serif;">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">' +
         '<div style="font-size:15px;font-weight:900;color:#1E293B;">⏰ זמן ויום — ' + title + '</div>' +
         '<button onclick="document.getElementById(\'scheduleEditOverlay\').remove()" style="background:rgba(0,0,0,0.06);border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;color:#64748B;">✕</button>' +
@@ -3327,12 +3329,13 @@ function renderDays() {
         dateShort = m[0] + '/' + (mn ? months[mn] : (m[1]||''));
       }
     }
-    return '<button data-day="' + (idx+1) + '" style="min-width:42px;border:0;border-radius:12px;padding:6px 8px;background:' +
-      (a ? '#F4634A' : 'rgba(0,0,0,0.08)') + ';color:' + (a ? 'white' : 'rgba(30,41,59,0.7)') +
+    return '<button data-day="' + (idx+1) + '" style="min-width:42px;border:' +
+      (a ? '0' : '1px solid rgba(0,0,0,0.10)') + ';border-radius:12px;padding:6px 8px;background:' +
+      (a ? '#F4634A' : '#ffffff') + ';color:' + (a ? 'white' : 'rgba(30,41,59,0.65)') +
       ';font-weight:800;font-size:13px;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;flex-shrink:0;box-shadow:' +
-      (a ? '0 4px 12px rgba(244,99,74,0.32)' : 'none') + ';line-height:1.2;display:flex;flex-direction:column;align-items:center;gap:1px;">' +
+      (a ? '0 4px 12px rgba(244,99,74,0.32)' : '0 1px 3px rgba(0,0,0,0.06)') + ';line-height:1.2;display:flex;flex-direction:column;align-items:center;gap:1px;">' +
       '<span>' + (idx+1) + '</span>' +
-      (dateShort ? '<span style="font-size:9px;font-weight:600;opacity:' + (a ? '0.9' : '0.55') + ';">' + dateShort + '</span>' : '') +
+      (dateShort ? '<span style="font-size:9px;font-weight:600;opacity:' + (a ? '0.9' : '0.5') + ';">' + dateShort + '</span>' : '') +
       '</button>';
   }).join('');
   var d = state[i - 1];
@@ -3429,16 +3432,16 @@ function showStopDetail(dayIdx, stopIdx) {
   var existing = document.getElementById('stopDetailOverlay');
   if (existing) existing.remove();
   var tipsHtml = (s.tips || []).map(function(t) {
-    return '<div style="display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.06);">' +
+    return '<div style="display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px solid rgba(0,0,0,0.06);">' +
       '<span style="color:#B45309;flex-shrink:0;">💡</span>' +
-      '<span style="font-size:13px;color:rgba(30,41,59,0.85);">' + esc(t) + '</span></div>';
+      '<span style="font-size:13px;color:rgba(30,41,59,0.75);">' + esc(t) + '</span></div>';
   }).join('');
   var overlay = document.createElement('div');
   overlay.id = 'stopDetailOverlay';
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:3000;display:flex;align-items:flex-end;justify-content:center;';
   overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
   overlay.innerHTML =
-    '<div style="position:relative;background:#F5EFE6;border-radius:24px 24px 0 0;padding:24px 20px 36px;width:min(430px,100%);max-height:88vh;overflow-y:auto;animation:sheetUp 0.28s ease both;">' +
+    '<div style="position:relative;background:#ffffff;border-radius:24px 24px 0 0;padding:24px 20px 36px;width:min(430px,100%);max-height:88vh;overflow-y:auto;animation:sheetUp 0.28s ease both;">' +
     '<div style="width:40px;height:4px;background:rgba(0,0,0,0.15);border-radius:2px;margin:0 auto 18px;"></div>' +
     '<button onclick="document.getElementById(\'stopDetailOverlay\').remove();" style="position:absolute;top:16px;left:16px;background:rgba(0,0,0,0.06);border:none;color:rgba(30,41,59,0.6);font-size:18px;width:34px;height:34px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;line-height:1;">✕</button>' +
     '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">' +
@@ -3538,7 +3541,7 @@ function showAttrDetail(attr, iconKey, nameKey, descKey, howKey, existing) {
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:9999;display:flex;align-items:flex-end;justify-content:center;';
 
   var panel = document.createElement('div');
-  panel.style.cssText = 'background:#F5EFE6;border-radius:22px 22px 0 0;padding:22px 20px 32px;width:100%;max-width:min(680px,100%);box-shadow:0 -4px 30px rgba(0,0,0,0.5);direction:rtl;font-family:Rubik,Arial,sans-serif;max-height:80vh;overflow-y:auto;';
+  panel.style.cssText = 'background:#ffffff;border-radius:22px 22px 0 0;padding:22px 20px 32px;width:100%;max-width:min(680px,100%);box-shadow:0 -4px 30px rgba(0,0,0,0.5);direction:rtl;font-family:Rubik,Arial,sans-serif;max-height:80vh;overflow-y:auto;';
 
   // Build content HTML (no interactive buttons here)
   var existingRow = existing
@@ -3737,7 +3740,7 @@ function openEditStopTime(dayIdx, stopIdx) {
   }).join('');
 
   overlay.innerHTML =
-    '<div style="position:relative;background:#F5EFE6;border-radius:24px 24px 0 0;padding:22px 20px 36px;width:min(680px,100%);z-index:1;direction:rtl;font-family:Rubik,Arial,sans-serif;">' +
+    '<div style="position:relative;background:#ffffff;border-radius:24px 24px 0 0;padding:22px 20px 36px;width:min(680px,100%);z-index:1;direction:rtl;font-family:Rubik,Arial,sans-serif;">' +
     '<div style="font-size:15px;font-weight:900;color:#1E293B;margin-bottom:14px;">⏰ ' + (s.emoji||'📍') + ' ' + esc(s.name) + '</div>' +
     '<div style="font-size:11px;font-weight:700;color:rgba(30,41,59,0.5);margin-bottom:8px;">📅 העבר ליום</div>' +
     '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;" id="editStopDayBtns">' + dayBtns + '</div>' +
@@ -4053,7 +4056,7 @@ function openAddCommunityStop(recIdx) {
   }).join('');
 
   overlay.innerHTML =
-    '<div style="position:relative;background:#F5EFE6;border-radius:24px 24px 0 0;padding:22px 20px 36px;width:min(680px,100%);z-index:1;direction:rtl;font-family:\'Rubik\',Arial,sans-serif;">' +
+    '<div style="position:relative;background:#ffffff;border-radius:24px 24px 0 0;padding:22px 20px 36px;width:min(680px,100%);z-index:1;direction:rtl;font-family:\'Rubik\',Arial,sans-serif;">' +
     '<div style="font-size:15px;font-weight:900;color:#1E293B;margin-bottom:14px;">➕ הוספת תחנה — ' + (rec.icon||'📍') + ' ' + esc(rec.name) + '</div>' +
     '<div style="font-size:11px;font-weight:700;color:rgba(30,41,59,0.5);margin-bottom:8px;">📅 בחר יום בטיול</div>' +
     '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;" id="editStopDayBtns">' + dayBtns + '</div>' +
@@ -4273,7 +4276,7 @@ function renderPhotoSpots() {
       var clr = isFree ? '#6EE7B7' : '#FCD34D';
       html += '<div style="display:flex;align-items:center;gap:10px;margin:' + (lastFree!==null?'18px':'4px') + ' 0 10px;">' +
         '<div style="flex:1;height:1px;background:rgba(0,0,0,0.08);"></div>' +
-        '<div style="font-size:11px;font-weight:800;color:' + clr + ';background:rgba(0,0,0,0.04);border:1px solid rgba(255,255,255,0.15);border-radius:999px;padding:3px 12px;white-space:nowrap;">' + lbl + '</div>' +
+        '<div style="font-size:11px;font-weight:800;color:' + clr + ';background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.10);border-radius:999px;padding:3px 12px;white-space:nowrap;">' + lbl + '</div>' +
         '<div style="flex:1;height:1px;background:rgba(0,0,0,0.08);"></div></div>';
       lastFree = isFree;
     }
@@ -5036,14 +5039,14 @@ function renderExpenses() {
     return;
   }
   list.innerHTML = EXPENSES.map(function(e) {
-    return '<div style="background:rgba(0,0,0,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:16px;padding:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;">' +
+    return '<div style="background:rgba(0,0,0,0.07);border:1px solid rgba(0,0,0,0.10);border-radius:16px;padding:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;">' +
       '<div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:13px;color:#1E293B;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(e.name) + '</div>' +
       '<div style="font-size:11px;color:rgba(30,41,59,0.4);">' + (e.note ? esc(e.note) + ' · ' : '') + (e.date || '') + '</div></div>' +
       '<div style="text-align:left;direction:ltr;flex-shrink:0;">' +
       '<div style="font-weight:800;font-size:13px;color:#F59E0B;">' + Number(e.czk || 0).toLocaleString() + ' CZK</div>' +
       '<div style="font-size:12px;color:#F4634A;margin-bottom:6px;">₪' + Number(e.ils || 0).toLocaleString() + '</div>' +
       '<div style="display:flex;gap:5px;">' +
-      '<button data-edit-id="' + e.id + '" class="expEditBtn" style="background:rgba(0,0,0,0.07);color:rgba(241,245,249,0.72);border:1px solid rgba(255,255,255,0.14);border-radius:8px;padding:4px 9px;font-size:10px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">ערוך</button>' +
+      '<button data-edit-id="' + e.id + '" class="expEditBtn" style="background:rgba(0,0,0,0.07);color:rgba(241,245,249,0.72);border:1px solid rgba(0,0,0,0.10);border-radius:8px;padding:4px 9px;font-size:10px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">ערוך</button>' +
       '<button data-del-id="' + e.id + '" class="expDelBtn" style="background:rgba(244,99,74,0.11);color:#F4634A;border:1px solid rgba(244,99,74,0.2);border-radius:8px;padding:4px 9px;font-size:10px;font-weight:700;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">מחק</button>' +
       '</div></div></div>';
   }).join('');
@@ -5626,7 +5629,7 @@ function initDesktopLayout() {
   // Create sidebar
   var sidebar = document.createElement('div');
   sidebar.id = 'deskSidebar';
-  sidebar.style.cssText = 'position:fixed;top:0;right:calc(50% + 470px - 960px/2 + 0px);width:190px;height:100vh;background:rgba(237,228,216,0.97);border-left:1px solid rgba(0,0,0,0.10);display:flex;flex-direction:column;padding:24px 10px 16px;gap:4px;z-index:40;overflow-y:auto;direction:rtl;backdrop-filter:blur(12px);';
+  sidebar.style.cssText = 'position:fixed;top:0;right:calc(50% + 470px - 960px/2 + 0px);width:190px;height:100vh;background:rgba(255,255,255,0.95);border-left:1px solid rgba(0,0,0,0.10);display:flex;flex-direction:column;padding:24px 10px 16px;gap:4px;z-index:40;overflow-y:auto;direction:rtl;backdrop-filter:blur(12px);';
 
   var navItems = [
     { id:'home',       icon:'🏠', label:'ראשי' },
