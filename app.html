@@ -4560,14 +4560,68 @@ function addMapMarkers() {
     var icon = makePinIcon(color);
     if (!icon) return;
     var marker = L.marker(coords, {icon:icon}).addTo(_leafletMap);
-    marker.bindPopup(
-      '<div style="direction:rtl;font-family:\'Rubik\',Arial,sans-serif;min-width:160px;">' +
-      '<div style="font-size:13px;font-weight:800;margin-bottom:3px;">' + p.icon + ' ' + p.name + '</div>' +
-      (p.desc ? '<div style="font-size:11px;color:#64748B;line-height:1.4;">' + (p.desc.substring(0,80)) + '…</div>' : '') +
-      (isScheduled ? '<div style="margin-top:6px;font-size:11px;color:#16a34a;font-weight:700;">✅ בלוז</div>' : '') +
-      '</div>', {maxWidth:200, direction:'rtl'}
-    );
+    marker.on('click', (function(place, coord) {
+      return function() { showMapNavDialog(place, coord); };
+    })(p, coords));
   });
+}
+
+function showMapNavDialog(p, coords) {
+  var existing = document.getElementById('mapNavDialog');
+  if (existing) existing.remove();
+
+  var daysState = getDaysState();
+  var schedInfo = null;
+  daysState.forEach(function(d) {
+    (d.stops||[]).forEach(function(s) {
+      if (s.name === p.name) schedInfo = {day: d.title, time: s.time};
+    });
+  });
+
+  var googleUrl = p.mapUrl || ('https://www.google.com/maps/search/' + encodeURIComponent(p.name + ' Prague'));
+  var localUrl = 'https://www.openstreetmap.org/?mlat=' + coords[0] + '&mlon=' + coords[1] + '&zoom=17';
+  var wazeUrl = 'https://waze.com/ul?ll=' + coords[0] + ',' + coords[1] + '&navigate=yes';
+
+  var overlay = document.createElement('div');
+  overlay.id = 'mapNavDialog';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.45);display:flex;align-items:flex-end;justify-content:center;';
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+
+  overlay.innerHTML =
+    '<div style="background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:480px;padding:0 0 env(safe-area-inset-bottom,0);box-shadow:0 -4px 30px rgba(0,0,0,0.18);">' +
+      '<div style="width:40px;height:4px;background:#e2e8f0;border-radius:2px;margin:12px auto 0;"></div>' +
+      '<div style="padding:18px 20px 6px;direction:rtl;">' +
+        '<div style="font-size:20px;margin-bottom:2px;">' + p.icon + '</div>' +
+        '<div style="font-size:16px;font-weight:900;color:#1e293b;">' + esc(p.name) + '</div>' +
+        (p.sub ? '<div style="font-size:12px;color:#64748b;margin-top:2px;">' + esc(p.sub) + '</div>' : '') +
+        (schedInfo ? '<div style="margin-top:6px;font-size:12px;color:#16a34a;font-weight:700;">✅ ' + esc(schedInfo.day) + (schedInfo.time ? ' · ' + esc(schedInfo.time) : '') + '</div>' : '') +
+      '</div>' +
+      '<div style="padding:10px 16px 4px;direction:rtl;">' +
+        '<div style="font-size:12px;font-weight:700;color:#94a3b8;margin-bottom:8px;">🧭 לאן לנווט?</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">' +
+          '<a href="' + googleUrl + '" target="_blank" onclick="document.getElementById(\'mapNavDialog\').remove()" ' +
+            'style="display:flex;align-items:center;gap:10px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;padding:12px 14px;text-decoration:none;color:#1e293b;">' +
+            '<span style="font-size:22px;">🗺️</span>' +
+            '<div><div style="font-size:13px;font-weight:800;">Google Maps</div><div style="font-size:11px;color:#64748b;">ניווט מלא</div></div>' +
+          '</a>' +
+          '<a href="' + wazeUrl + '" target="_blank" onclick="document.getElementById(\'mapNavDialog\').remove()" ' +
+            'style="display:flex;align-items:center;gap:10px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;padding:12px 14px;text-decoration:none;color:#1e293b;">' +
+            '<span style="font-size:22px;">🚗</span>' +
+            '<div><div style="font-size:13px;font-weight:800;">Waze</div><div style="font-size:11px;color:#64748b;">ניווט ברכב</div></div>' +
+          '</a>' +
+        '</div>' +
+        '<button onclick="(function(){var d=document.getElementById(\'mapNavDialog\');if(d)d.remove();if(_leafletMap)_leafletMap.setView([' + coords[0] + ',' + coords[1] + '],17,{animate:true});})()" ' +
+          'style="width:100%;padding:13px;background:#F4634A;color:#fff;border:none;border-radius:14px;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:10px;">' +
+          '📍 הצג במפה המקומית' +
+        '</button>' +
+        '<button onclick="document.getElementById(\'mapNavDialog\').remove()" ' +
+          'style="width:100%;padding:11px;background:#f1f5f9;color:#64748b;border:none;border-radius:14px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:16px;">' +
+          'סגור' +
+        '</button>' +
+      '</div>' +
+    '</div>';
+
+  document.body.appendChild(overlay);
 }
 
 function locateMe() {
