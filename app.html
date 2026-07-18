@@ -4688,8 +4688,12 @@ function showMapNavDialog(p, coords) {
             '<div><div style="font-size:12px;font-weight:800;">Waze</div><div style="font-size:10px;color:#64748b;">ניווט ברכב</div></div>' +
           '</a>' +
         '</div>' +
+        '<button onclick="(function(){var d=document.getElementById(\'mapNavDialog\');if(d)d.remove();openAddCustomStop(\'place\',{emoji:\'' + (p.icon||'📍') + '\',name:\'' + (p.name||'').replace(/'/g,"\\'").replace(/"/g,'\\"') + '\',desc:\'' + ((p.desc||'').substring(0,120).replace(/'/g,"\\'").replace(/\n/g,' ')) + '\'})})()" ' +
+          'style="width:100%;padding:12px;background:' + (schedInfo ? 'rgba(244,99,74,0.12)' : '#F4634A') + ';color:' + (schedInfo ? '#C2410C' : '#fff') + ';border:' + (schedInfo ? '1.5px solid rgba(244,99,74,0.35)' : 'none') + ';border-radius:13px;font-size:13px;font-weight:800;cursor:pointer;margin-bottom:8px;">' +
+          (schedInfo ? '✏️ עדכן בלוז' : '➕ הוסף ללוז') +
+        '</button>' +
         '<button onclick="(function(){var d=document.getElementById(\'mapNavDialog\');if(d)d.remove();if(_leafletMap)_leafletMap.setView([' + c0 + ',' + c1 + '],17,{animate:true});})()" ' +
-          'style="width:100%;padding:12px;background:#F4634A;color:#fff;border:none;border-radius:13px;font-size:13px;font-weight:800;cursor:pointer;margin-bottom:8px;">' +
+          'style="width:100%;padding:11px;background:rgba(244,99,74,0.08);color:#F4634A;border:1px solid rgba(244,99,74,0.2);border-radius:13px;font-size:12px;font-weight:800;cursor:pointer;margin-bottom:8px;">' +
           '📍 הצג במפה המקומית' +
         '</button>' +
         '<button onclick="document.getElementById(\'mapNavDialog\').remove()" ' +
@@ -4800,7 +4804,8 @@ function renderNearbyList() {
     var desc = (p.desc || p.tips || '').substring(0, 90);
 
     var apIdx = ALL_PLACES.indexOf(p);
-    html += '<div data-nearby-idx="' + apIdx + '" data-nearby-coords="' + it.coords[0] + ',' + it.coords[1] + '" ' +
+    var c0 = it.coords[0], c1 = it.coords[1];
+    html += '<div onclick="_openNearbyDialog(' + apIdx + ',' + c0 + ',' + c1 + ')" ' +
       'style="background:#fff;border-radius:16px;padding:13px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.05);display:flex;align-items:center;gap:12px;cursor:pointer;-webkit-tap-highlight-color:rgba(0,0,0,0.04);">' +
       // thumbnail
       '<div style="width:60px;height:60px;border-radius:12px;overflow:hidden;flex-shrink:0;position:relative;background:linear-gradient(135deg,'+grad[0]+','+grad[1]+');display:flex;align-items:center;justify-content:center;">' +
@@ -4822,14 +4827,10 @@ function renderNearbyList() {
     '</div>';
   });
   container.innerHTML = html;
-  container.onclick = function(e) {
-    var card = e.target.closest('[data-nearby-idx]');
-    if (!card) return;
-    var idx = parseInt(card.getAttribute('data-nearby-idx'), 10);
-    var coordsParts = card.getAttribute('data-nearby-coords').split(',');
-    var coords = [parseFloat(coordsParts[0]), parseFloat(coordsParts[1])];
-    showMapNavDialog(ALL_PLACES[idx], coords);
-  };
+}
+
+function _openNearbyDialog(apIdx, lat, lng) {
+  showMapNavDialog(ALL_PLACES[apIdx], [lat, lng]);
 }
 
 // ─────────────────────────────────────────
