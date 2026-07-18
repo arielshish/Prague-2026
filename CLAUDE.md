@@ -14,7 +14,7 @@
 
 ## מפת הפיצ'רים הקיימים ב-app.html
 
-> עדכון אחרון: 2026-07-18
+> עדכון אחרון: 2026-07-18 (Premium UI v6)
 
 ### מבנה נתונים מרכזי
 
@@ -92,6 +92,15 @@ var PHOTO_SPOTS = ALL_PLACES.filter(p => p.type==='photo');
 - `saveBudgetFromModal()` קורא ל-`saveTotalBudget()` גם בסביבת web (קודם רק GAS)
 - realtime listener (`appdata/main` onSnapshot) מקשיב ל-`total_budget` ומעדכן `renderBudget()` מיידית
 - הוסרה קריאה מתה ל-`appdata/budget.categories` ב-`syncBudgetFromFirebase()`
+
+#### Premium UI — Design System v6 (2026-07-18)
+- **Phase 0**: CSS Design System — `:root` tokens (`--c-primary`, `--c-card`, `--r-card`, `--s-card`, `--t-fast` etc.), keyframes (`fadeSlideUp`, `scaleIn`, `skeletonPulse`), DS classes (`.ds-badge-{red,amber,green,blue,gray}`, `.ds-chip`, `.ds-fab`, `.ds-stat`, `.ds-section-hdr`, `.skeleton`, `.btn-primary` gradient, `.btn-ghost`)
+- **Phase 1**: Bottom nav — `<button class="nav-item">` with `.nav-icon` / `.nav-label` children; `openTab()` toggles `.active` class (CSS handles color + scale + backdrop-blur pill)
+- **Phase 2.1**: ימים — stop cards use DS tokens, numbered circle markers on timeline, time chip in primary color, `.ds-badge-amber` for Google rating, `.btn-primary` for "הוסף תחנה", `.ds-section-hdr` with stop count
+- **Phase 2.2**: תזכורות — priority right-border per card (red/amber/blue), urgency chips use `.ds-badge-*`, primary action uses `.btn-primary`, links use `.btn-ghost`
+- **Phase 2.3**: הוצאות — removed stray "ביטול" button; summary stats use `.ds-stat`; export button gets 📤 icon
+- **Phase 2.4**: ציוד — "איפוס" button moved from header to progress bar row (red-tinted), same ID for JS listener
+- **Phase 2.5**: טיסות — two info chips (check-in timing, airport arrival) above flight cards
 
 #### מסד נתונים אחיד לתזמון (2026-07-18)
 - **`DAYS_STATE`** = מקור יחיד של אמת לכל תזמון תחנות (קהילה, מסעדות, קניות, צילום, קינוחים)
