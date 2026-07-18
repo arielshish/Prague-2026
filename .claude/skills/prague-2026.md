@@ -62,6 +62,12 @@ GitHub Pages: `arielshish.github.io/Prague-2026/app.html`
 - `touchcancel` מבצע סווייפ (לא מבטל) — פותר בעיית draggable ב-iOS Safari
 - threshold: `|dx| >= 40` ו-`|dx| > |dy| * 1.2`
 
+### מסד נתונים אחיד (2026-07-18)
+- **`DAYS_STATE`** = מקור יחיד לכל תזמון (קהילה, מסעדות, קניות, צילום, קינוחים)
+- **`remindersSchedule`** = נפרד — משימות לפני הטיול בלבד
+- הוסר `restaurantsSchedule` + `openEditRestaurantSchedule` + `TRIP_DAYS` הישן
+- `saveSchedules()` → רק remindersSchedule
+
 ### סינכרון תגים בזמן אמת
 - `refreshScheduleBadges()` (~line 2971) — מזהה טאב פעיל ומרנדר Community/Restaurants/Reminders
 - נקראת מ-`saveDaysState()` — כלומר אחרי כל הוספה, מחיקה, הזזה

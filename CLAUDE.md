@@ -62,6 +62,12 @@
 #### Fallback לנתוני Firestore ישנים (2026-07-18)
 - `renderDays()` ו-`showStopDetail()` — fallback ל-COMMUNITY/RESTAURANTS אם stop חסר google/duration/who
 
+#### מסד נתונים אחיד לתזמון (2026-07-18)
+- **`DAYS_STATE`** = מקור יחיד של אמת לכל תזמון תחנות (קהילה, מסעדות, קניות, צילום, קינוחים)
+- **`remindersSchedule`** = נשאר נפרד — תזכורות הן *משימות* לפני הטיול, לא תחנות ב-DAYS
+- הוסר `restaurantsSchedule` + `openEditRestaurantSchedule` + כפתור "⏰ קבע זמן" הישן
+- `saveSchedules()` שומר רק `remindersSchedule`
+
 ### כללי עבודה
 - **לפני שינוי גדול**: `git tag backup-<תיאור>-<תאריך>` + push
 - **branch**: `claude/unknown-session-xpa0pr` → PR → merge ל-`main`
