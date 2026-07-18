@@ -17,30 +17,10 @@
 > עדכון אחרון: 2026-07-18
 
 ### מבנה נתונים מרכזי
-
-#### ALL_PLACES[] — מקור יחיד לכל האטרקציות (2026-07-18)
-```
-ALL_PLACES[] — 105 פריטים עם שדה type:
-  type:'shop'       → {icon, name, stars, hours, metro, duration, brands, tip, mapUrl}
-  type:'restaurant' → {icon, name, level, sub, desc, price, badge, badgeClr, badgeTxt, google, mapUrl}
-  type:'dessert'    → {icon, name, level, sub, desc, price, rating, tag, tagClr, where, mapUrl}
-  type:'community'  → {icon, name, cat, fb, google, desc, booking, duration, tips, who, how, mapUrl}
-  type:'photo'      → {icon, name, fee, sub, desc, best, crowds, fee_txt, rating, tip, mapUrl}
-```
-**Computed views** (נגז��ות מ-ALL_PLACES, read-only):
-```javascript
-var COMMUNITY   = ALL_PLACES.filter(p => p.type==='community');
-var RESTAURANTS = ALL_PLACES.filter(p => p.type==='restaurant');
-var SHOPS       = ALL_PLACES.filter(p => p.type==='shop');
-var DESSERTS    = ALL_PLACES.filter(p => p.type==='dessert');
-var PHOTO_SPOTS = ALL_PLACES.filter(p => p.type==='photo');
-```
-**נשארים נפרדים** (לא חלק מ-ALL_PLACES):
-- `REMINDERS[]` — משימות לפני הטיול לסימון ✅
-- `DAYS[]` — לוז בסיס ראשוני (מחליפו `DAYS_STATE` מ-Firestore)
-
-#### שדות תזמון
-- `getDaysState()` — מח��יר את מצב הימים הנוכחי (Firestore / local)
+- `COMMUNITY[]` — בנק אטרקציות: `{cat, icon, name, fb, google, desc, booking, duration, tips, who, how, mapUrl}`
+- `RESTAURANTS[]` — מסעדות: `{level, icon, name, sub, desc, price, badge, badgeClr, badgeTxt, google, mapUrl}`
+- `DAYS[]` — לוז ראשוני: ימים עם stops: `{emoji, name, time, desc, details, tips, booking, mapUrl, google, duration, who}`
+- `getDaysState()` — מחזיר את מצב הימים הנוכחי (Firestore / local)
 - `findItemInDays(name)` — מחזיר `{dayNum, dayTitle, time}` אם תחנה נמצאת ביום כלשהו, אחרת `null`
 
 ### טאבים ראשיים
@@ -82,17 +62,6 @@ var PHOTO_SPOTS = ALL_PLACES.filter(p => p.type==='photo');
 #### Fallback לנתוני Firestore ישנים (2026-07-18)
 - `renderDays()` ו-`showStopDetail()` — fallback ל-COMMUNITY/RESTAURANTS אם stop חסר google/duration/who
 
-#### חצי ניווט ימים (2026-07-18)
-- ‹ ו-› משני צידי שורת `#dayButtons` — ניווט מהיר בין ימים
-- `renderDays()` מעדכן opacity/pointerEvents — מתעמם ביום ראשון/אחרון
-- משלים את ה-swipe (לא מחליף)
-
-#### תיקון סנכרון תקציב (2026-07-18)
-- `saveTotalBudget()` כותב גם ל-`appdata/main.total_budget` (+ `appdata/budget.total` לתאימות)
-- `saveBudgetFromModal()` קורא ל-`saveTotalBudget()` גם בסביבת web (קודם רק GAS)
-- realtime listener (`appdata/main` onSnapshot) מקשיב ל-`total_budget` ומעדכן `renderBudget()` מיידית
-- הוסרה קריאה מתה ל-`appdata/budget.categories` ב-`syncBudgetFromFirebase()`
-
 #### מסד נתונים אחיד לתזמון (2026-07-18)
 - **`DAYS_STATE`** = מקור יחיד של אמת לכל תזמון תחנות (קהילה, מסעדות, קניות, צילום, קינוחים)
 - **`remindersSchedule`** = נשאר נפרד — תזכורות הן *משימות* לפני הטיול, לא תחנות ב-DAYS
@@ -100,10 +69,9 @@ var PHOTO_SPOTS = ALL_PLACES.filter(p => p.type==='photo');
 - `saveSchedules()` שומר רק `remindersSchedule`
 
 ### כללי עבודה
-- **לפני כל שינוי — גדול או קטן**: `git tag backup-<תיאור>-$(date +%Y%m%d-%H%M)` + push. אין יוצאים מן הכלל.
-- **סדר קבוע**: tag לפני → שינוי → commit + push → עדכן CLAUDE.md → עדכן skill
+- **לפני שינוי גדול**: `git tag backup-<תיאור>-<תאריך>` + push
 - **branch**: `claude/unknown-session-xpa0pr` → PR → merge ל-`main`
-- **אחרי כל שינוי**: עדכן סעיף זה + skill ב-`.claude/skills/prague-2026.md`
+- **אחרי כל פיצ'ר**: עדכן סעיף זה + skill ב-`.claude/skills/prague-2026.md`
 - **ציוני Google**: אימות רק מ-top-rated.online / TripAdvisor — לא להמציא
 
 ## איך לערוך את האפליקציה
