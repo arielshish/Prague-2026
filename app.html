@@ -3240,6 +3240,17 @@ function getDaysState() {
   return DAYS_STATE;
 }
 
+function timeOfDay(timeStr) {
+  if (!timeStr) return null;
+  var m = timeStr.match(/^(\d{1,2})[:\.](\d{2})/);
+  if (!m) return null;
+  var h = parseInt(m[1], 10);
+  if (h >= 5  && h < 12) return { label: 'בוקר',   emoji: '🌅' };
+  if (h >= 12 && h < 17) return { label: 'צהריים', emoji: '☀️' };
+  if (h >= 17 && h < 21) return { label: 'ערב',    emoji: '🌆' };
+  return { label: 'לילה', emoji: '🌙' };
+}
+
 function saveDaysState() {
   var json = JSON.stringify(DAYS_STATE);
   localStorage.setItem('prague_days_v1', json);
@@ -3269,7 +3280,14 @@ function refreshScheduleBadges() {
   else if (active === 'restaurants' && typeof renderRestaurants === 'function') renderRestaurants();
   else if (active === 'shopping' && typeof renderShopping === 'function') renderShopping();
   else if (active === 'reminders' && typeof renderReminders === 'function') renderReminders();
-  else if (active === 'location' && typeof renderNearbyList === 'function') renderNearbyList();
+  else if (active === 'location' && typeof renderNearbyList === 'function') {
+    renderNearbyList();
+    // רענן גם פינים במפה לפי DAYS_STATE עדכני
+    if (_leafletMap && window.L) {
+      _leafletMap.eachLayer(function(l) { if (l instanceof L.Marker) _leafletMap.removeLayer(l); });
+      addMapMarkers();
+    }
+  }
 }
 
 function loadDaysFromSheets(silent) {
@@ -3424,6 +3442,7 @@ function renderDays() {
         '</div>' +
         '<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:5px;">' +
           (s.time ? '<span style="display:inline-flex;align-items:center;gap:3px;background:var(--c-primary-soft,rgba(244,99,74,0.09));border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;color:var(--c-primary,#F4634A);">⏱️ ' + esc(s.time) + '</span>' : '') +
+          (function(){ var tod=timeOfDay(s.time); return tod ? '<span style="display:inline-flex;align-items:center;gap:2px;background:rgba(99,102,241,0.09);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;color:#4F46E5;">' + tod.emoji + ' ' + tod.label + '</span>' : ''; })() +
           (_google ? '<span class="ds-badge ds-badge-amber">⭐ ' + esc(_google) + '</span>' : '') +
           (_duration ? '<span style="font-size:10px;color:var(--c-text-3,rgba(30,41,59,0.38));background:rgba(0,0,0,0.04);border-radius:20px;padding:2px 7px;">⏳ ' + esc(_duration) + '</span>' : '') +
           (hasDetails ? '<span style="font-size:10px;color:var(--c-text-3);font-style:italic;">פרטים ›</span>' : '') +
@@ -3502,12 +3521,11 @@ function showStopDetail(dayIdx, stopIdx) {
       '<div style="flex:1;min-width:0;"><div style="font-size:17px;font-weight:900;color:#1E293B;line-height:1.2;">' + esc(s.name) + '</div>' +
       '<div style="font-size:12px;color:rgba(30,41,59,0.5);margin-top:3px;">⏱️ ' + esc(s.time||'') + (s.duration ? ' · ' + esc(s.duration) : '') + '</div></div>' +
     '</div>' +
-    ((s.google || s.who) ?
-      '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">' +
-        (s.google ? '<span style="background:rgba(254,240,138,0.6);border:1px solid rgba(202,138,4,0.3);border-radius:10px;padding:5px 12px;font-size:12px;font-weight:700;color:#92400E;">⭐ ' + esc(s.google) + ' Google</span>' : '') +
-        (s.who ? '<span style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:10px;padding:5px 12px;font-size:11px;color:#4338CA;">' + esc(s.who) + '</span>' : '') +
-      '</div>'
-    : '') +
+    '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">' +
+      (function(){ var tod=timeOfDay(s.time); return tod ? '<span style="background:rgba(99,102,241,0.10);border:1px solid rgba(99,102,241,0.2);border-radius:10px;padding:5px 12px;font-size:12px;font-weight:700;color:#4338CA;">' + tod.emoji + ' ' + tod.label + '</span>' : ''; })() +
+      (s.google ? '<span style="background:rgba(254,240,138,0.6);border:1px solid rgba(202,138,4,0.3);border-radius:10px;padding:5px 12px;font-size:12px;font-weight:700;color:#92400E;">⭐ ' + esc(s.google) + ' Google</span>' : '') +
+      (s.who ? '<span style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:5px 12px;font-size:11px;color:#065F46;">👨‍👩‍👧 ' + esc(s.who) + '</span>' : '') +
+    '</div>' +
     (s.details ? '<div style="background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:14px;padding:14px;margin-bottom:14px;font-size:13px;color:rgba(30,41,59,0.8);line-height:1.65;">' + esc(s.details) + '</div>' : '') +
     (s.details2 ? '<div style="background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.3);border-radius:14px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:#92400E;line-height:1.6;">📋 ' + esc(s.details2) + '</div>' : '') +
     (s.booking ? '<div style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:14px;padding:12px 14px;margin-bottom:14px;">' +
@@ -4652,7 +4670,7 @@ function showMapNavDialog(p, coords) {
         '<div style="padding:16px 20px 8px;direction:rtl;">' +
           '<div style="font-size:26px;margin-bottom:4px;">' + p.icon + '</div>' +
           '<div style="font-size:16px;font-weight:900;color:#1e293b;margin-bottom:2px;">' + esc(p.name) + '</div>' +
-          (schedInfo ? '<div style="margin-top:6px;display:inline-block;font-size:12px;color:#16a34a;font-weight:700;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:8px;padding:3px 9px;">✅ יום ' + schedInfo.dayNum + (schedInfo.time ? ' · ' + esc(schedInfo.time) : '') + '</div>' : '') +
+          (schedInfo ? '<div style="margin-top:6px;display:inline-block;font-size:12px;color:#16a34a;font-weight:700;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:8px;padding:3px 9px;">✅ יום ' + schedInfo.dayNum + (schedInfo.time ? ' · ' + esc(schedInfo.time) : '') + (function(){ var tod=timeOfDay(schedInfo.time); return tod ? ' · ' + tod.emoji + tod.label : ''; })() + '</div>' : '') +
         '</div>' +
         (infoHtml ? '<div style="padding:0 20px 10px;direction:rtl;">' + infoHtml + '</div>' : '') +
       '</div>' +
