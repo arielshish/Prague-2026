@@ -3012,17 +3012,25 @@ function loadDaysFromSheets(silent) {
 function selectDay(i) { currentDay = i; renderDays(); }
 
 (function initDaySwipe() {
-  var el = document.getElementById('dayCard');
-  if (!el) return;
-  var _tx = 0, _ty = 0;
-  el.addEventListener('touchstart', function(e) {
+  // Attach to section#days (not #dayCard) — draggable=true on stops causes
+  // iOS Safari to swallow touch events before they reach the card element.
+  var section = document.getElementById('days');
+  if (!section) return;
+  var _tx = 0, _ty = 0, _active = false;
+  section.addEventListener('touchstart', function(e) {
+    var card = document.getElementById('dayCard');
+    if (!card || !card.contains(e.target)) return; // ignore touches on day-buttons header
     _tx = e.touches[0].clientX;
     _ty = e.touches[0].clientY;
+    _active = true;
   }, { passive: true });
-  el.addEventListener('touchend', function(e) {
+  section.addEventListener('touchcancel', function() { _active = false; }, { passive: true });
+  section.addEventListener('touchend', function(e) {
+    if (!_active) return;
+    _active = false;
     var dx = e.changedTouches[0].clientX - _tx;
     var dy = e.changedTouches[0].clientY - _ty;
-    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy)) return; // too short or more vertical
+    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy)) return;
     var total = getDaysState().length;
     // swipe left (dx < 0) = next day, swipe right (dx > 0) = prev day
     var next = currentDay + (dx < 0 ? 1 : -1);
