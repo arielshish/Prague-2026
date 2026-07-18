@@ -1666,7 +1666,6 @@ var remindersFilter = 'all';
 var remindersDone = {};
 var remindersSchedule = {}; // { [id]: { day, time } }
 var _pendingAttrStop = null; // { emoji, name, desc } set before opening addStop overlay
-var restaurantsSchedule = {}; // { [name]: { day, time } }
 
 function showDayTimePicker(emoji, name, desc) {
   try {
@@ -1834,15 +1833,13 @@ function initReminders() {
         if (doc.exists && doc.data().remindersSchedule) {
           try { remindersSchedule = JSON.parse(doc.data().remindersSchedule); } catch(e) {}
         }
-        if (doc.exists && doc.data().restaurantsSchedule) {
-          try { restaurantsSchedule = JSON.parse(doc.data().restaurantsSchedule); } catch(e) {}
-        }
+
         renderReminders();
         checkOverdueReminders();
       }).catch(function() {
         try { remindersDone = JSON.parse(localStorage.getItem('prague_remindersDone') || '{}'); } catch(e) {}
         try { remindersSchedule = JSON.parse(localStorage.getItem('prague_remindersSchedule') || '{}'); } catch(e) {}
-        try { restaurantsSchedule = JSON.parse(localStorage.getItem('prague_restaurantsSchedule') || '{}'); } catch(e) {}
+
         renderReminders();
         checkOverdueReminders();
       });
@@ -1976,12 +1973,10 @@ function saveRemindersDoneLocal() {
 
 function saveSchedules() {
   var rj = JSON.stringify(remindersSchedule);
-  var rsj = JSON.stringify(restaurantsSchedule);
   localStorage.setItem('prague_remindersSchedule', rj);
-  localStorage.setItem('prague_restaurantsSchedule', rsj);
   try {
     ensureFirebaseAuth().then(function() {
-      getFirestoreDb().collection('appdata').doc('main').set({ remindersSchedule: rj, restaurantsSchedule: rsj }, { merge: true });
+      getFirestoreDb().collection('appdata').doc('main').set({ remindersSchedule: rj }, { merge: true });
     });
   } catch(e) {}
 }
@@ -1995,10 +1990,7 @@ function openEditReminderSchedule(id) {
   _openScheduleModal('reminder', id, r.title, sched);
 }
 
-function openEditRestaurantSchedule(name) {
-  var sched = restaurantsSchedule[name] || { day: '', time: '' };
-  _openScheduleModal('restaurant', name, name, sched);
-}
+
 
 function _openScheduleModal(type, key, title, sched) {
   var existing = document.getElementById('scheduleEditOverlay');
@@ -2062,13 +2054,8 @@ function _saveScheduleEdit(type, key) {
   var timeInput = document.getElementById('schedTimeInput');
   var time = timeInput.value.trim() || timeInput.dataset.partVal || '';
   var sched = { day: day, time: time };
-  if (type === 'reminder') {
-    remindersSchedule[key] = sched;
-    renderReminders();
-  } else {
-    restaurantsSchedule[key] = sched;
-    renderRestaurants();
-  }
+  remindersSchedule[key] = sched;
+  renderReminders();
   saveSchedules();
   document.getElementById('scheduleEditOverlay').remove();
   showToast('✅ נשמר!', 1800);
@@ -3906,9 +3893,8 @@ function renderRestaurants() {
       '</div>';
       lastLevel = lv;
     }
-    var sched = restaurantsSchedule[r.name] || {};
     var _inDaysR = findItemInDays(r.name);
-    var schedBadge = _inDaysR ? ('✅ יום ' + _inDaysR.dayNum + ' · ' + (_inDaysR.time||'')) : (sched.day ? ('📅 ' + sched.day + (sched.time ? ' · ⏰ ' + sched.time : '')) : '');
+    var schedBadge = _inDaysR ? ('✅ יום ' + _inDaysR.dayNum + ' · ' + (_inDaysR.time||'')) : '';
     html += '<div style="background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:20px;padding:18px;margin-bottom:10px;box-shadow:0 3px 10px rgba(0,0,0,0.08);">' +
       '<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">' +
       '<span style="font-size:30px;line-height:1;flex-shrink:0;margin-top:3px;">' + r.icon + '</span>' +
@@ -3927,9 +3913,8 @@ function renderRestaurants() {
         (schedBadge ? '<div style="font-size:11px;color:#065F46;background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.25);border-radius:9px;padding:4px 9px;">' + schedBadge + '</div>' : '') +
       '</div>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
-        '<button onclick="openEditRestaurantSchedule(\'' + r.name.replace(/'/g,"\\'") + '\')" style="background:rgba(16,185,129,0.10);color:#065F46;border:1px solid rgba(16,185,129,0.25);border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:Rubik,Arial,sans-serif;">⏰ קבע זמן</button>' +
         '<a href="' + r.mapUrl + '" target="_blank" rel="noopener" style="flex:1;display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:11px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;">🗺️ ניווט</a>' +
-        '<button data-rest-icon="' + (r.icon||'🍽️') + '" data-rest-name="' + esc(r.name) + '" data-rest-desc="' + esc((r.desc||'').substring(0,120).replace(/\n/g,' ')) + '" class="restAddStopBtn" style="flex:1;background:rgba(244,99,74,0.12);border:1.5px solid rgba(244,99,74,0.3);color:#C2410C;border-radius:13px;padding:11px;font-weight:800;font-size:12px;cursor:pointer;font-family:Rubik,Arial,sans-serif;">📅 הוסף תחנה</button>' +
+        '<button data-rest-icon="' + (r.icon||'🍽️') + '" data-rest-name="' + esc(r.name) + '" data-rest-desc="' + esc((r.desc||'').substring(0,120).replace(/\n/g,' ')) + '" class="restAddStopBtn" style="flex:1;background:' + (_inDaysR ? 'rgba(244,99,74,0.13)' : 'rgba(244,99,74,0.12)') + ';border:1.5px solid rgba(244,99,74,0.3);color:#C2410C;border-radius:13px;padding:11px;font-weight:800;font-size:12px;cursor:pointer;font-family:Rubik,Arial,sans-serif;">' + (_inDaysR ? '✏️ עדכן' : '📅 הוסף תחנה') + '</button>' +
       '</div>' +
     '</div>';
   });
