@@ -426,9 +426,13 @@ function getFirestoreDb() {
 }
 function ensureFirebaseAuth() {
   // arielshish.github.io נוסף ל-Firebase Authorized domains (7/08) — signInAnonymously אמור לעבוד עכשיו.
-  // עדיין עם timeout+fallback: אם זה תקוע/נכשל, ממשיכים בלי auth (Firestore rules פתוחים כרגע ממילא).
+  // עדיין עם timeout+fallback: אם זה תקוע/נכשל, ממשיכים בלי auth.
   if (_authReadyPromise) return _authReadyPromise;
   getFirestoreDb();
+  if (firebase.auth(_fbApp).currentUser) {
+    _authReadyPromise = Promise.resolve(true);
+    return _authReadyPromise;
+  }
   _authReadyPromise = Promise.race([
     firebase.auth(_fbApp).signInAnonymously().then(function() { return true; }),
     new Promise(function(resolve) { setTimeout(function() { resolve(false); }, 5000); })
@@ -437,19 +441,35 @@ function ensureFirebaseAuth() {
 }
 
 // Firebase Firestore polyfill — replaces GAS/JSONP backend
-var APP_PASSWORD = 'Shish2026';
+// OTP/כניסה: Firebase Email Link (passwordless) — מוגבל ל-4 כתובות המשפחה
+var FAMILY_EMAILS_ALLOWED = ['arielshish@gmail.com','maridubi3@gmail.com','adiyasminshish@gmail.com','ariel.mariana.shish@gmail.com'];
 var SESSION_KEY = 'prague_auth_ok';
+var EMAIL_FOR_SIGNIN_KEY = 'prague_email_for_signin';
 
-function doGoogleLogin() {
-  var input = document.getElementById('passwordInput');
-  var val = input ? input.value : '';
-  if (val === APP_PASSWORD) {
-    sessionStorage.setItem(SESSION_KEY, '1');
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-  } else {
-    showAuthError('סיסמה שגויה');
+function sendLoginLink() {
+  var input = document.getElementById('emailInput');
+  var email = input ? input.value.trim().toLowerCase() : '';
+  if (FAMILY_EMAILS_ALLOWED.indexOf(email) === -1) {
+    showAuthError('כתובת מייל לא מוכרת — רק בני משפחה יכולים להתחבר');
+    return;
   }
+  getFirestoreDb();
+  var btn = document.getElementById('btnSendLink');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ שולח...'; }
+  var actionCodeSettings = {
+    url: window.location.href.split('?')[0].split('#')[0],
+    handleCodeInApp: true
+  };
+  firebase.auth(_fbApp).sendSignInLinkToEmail(email, actionCodeSettings).then(function() {
+    window.localStorage.setItem(EMAIL_FOR_SIGNIN_KEY, email);
+    var form = document.getElementById('loginForm');
+    var sent = document.getElementById('loginSentMsg');
+    if (form) form.style.display = 'none';
+    if (sent) sent.style.display = 'block';
+  }).catch(function(err) {
+    if (btn) { btn.disabled = false; btn.textContent = '📧 שלח לי קישור כניסה'; }
+    showAuthError('שגיאה בשליחה: ' + (err && err.message || err));
+  });
 }
 
 function showAuthError(msg) {
@@ -457,18 +477,47 @@ function showAuthError(msg) {
   if (err) { err.textContent = msg; err.style.display = 'block'; }
 }
 
-// Check session on load — bypass login in GAS context
+function _showApp() {
+  var ls = document.getElementById('loginScreen');
+  var app = document.getElementById('app');
+  if (ls) ls.style.display = 'none';
+  if (app) app.style.display = 'block';
+}
+
+// Check session on load — bypass login in GAS context; complete email-link sign-in if returning from one
 (function() {
   var gasMode = typeof google !== 'undefined' && google.script && google.script.run;
-  if (gasMode || sessionStorage.getItem(SESSION_KEY) === '1') {
-    document.addEventListener('DOMContentLoaded', function() {
-      var ls = document.getElementById('loginScreen');
-      var app = document.getElementById('app');
-      if (ls) ls.style.display = 'none';
-      if (app) app.style.display = 'block';
+  if (gasMode) {
+    document.addEventListener('DOMContentLoaded', _showApp);
+    return;
+  }
+  getFirestoreDb();
+  var auth = firebase.auth(_fbApp);
+  if (auth.isSignInWithEmailLink(window.location.href)) {
+    var email = window.localStorage.getItem(EMAIL_FOR_SIGNIN_KEY);
+    if (!email) { email = window.prompt('נא להזין שוב את כתובת המייל לאישור הכניסה'); }
+    auth.signInWithEmailLink(email, window.location.href).then(function(result) {
+      var signedEmail = (result.user && result.user.email || '').toLowerCase();
+      window.localStorage.removeItem(EMAIL_FOR_SIGNIN_KEY);
+      history.replaceState(null, '', window.location.pathname);
+      if (FAMILY_EMAILS_ALLOWED.indexOf(signedEmail) === -1) {
+        auth.signOut();
+        document.addEventListener('DOMContentLoaded', function() { showAuthError('כתובת מייל לא מוכרת — רק בני משפחה יכולים להתחבר'); });
+        return;
+      }
+      sessionStorage.setItem(SESSION_KEY, '1');
+      document.addEventListener('DOMContentLoaded', _showApp);
+    }).catch(function(err) {
+      document.addEventListener('DOMContentLoaded', function() { showAuthError('הקישור לא תקין או שפג תוקפו — נסה שוב'); });
     });
+    return;
+  }
+  if (sessionStorage.getItem(SESSION_KEY) === '1') {
+    document.addEventListener('DOMContentLoaded', _showApp);
   }
 })();
+</script>
+<script>
 
 
 // Generic modal opener for adding ANY item as a stop in days (light mode)
@@ -781,10 +830,11 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
   <div style="font-size:56px;">🏰</div>
   <div style="font-size:26px;font-weight:900;color:#1E293B;font-family:\'Rubik\',Arial,sans-serif;">פראג 2026</div>
   <div style="font-size:14px;color:rgba(30,41,59,0.55);font-family:\'Rubik\',Arial,sans-serif;">משפחת שיש</div>
-  <div style="width:100%;max-width:280px;display:flex;flex-direction:column;gap:10px;">
-    <input id="passwordInput" type="password" placeholder="סיסמה" onkeydown="if(event.key==='Enter')doGoogleLogin()" style="width:100%;padding:14px 16px;border-radius:13px;border:1px solid rgba(255,255,255,0.2);background:#ffffff;color:#1E293B;font-size:16px;font-family:\'Rubik\',Arial,sans-serif;text-align:right;outline:none;">
-    <button onclick="doGoogleLogin()" style="width:100%;background:#F4634A;color:white;border:0;border-radius:13px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;box-shadow:0 4px 14px rgba(244,99,74,0.3);">כניסה 🔑</button>
+  <div id="loginForm" style="width:100%;max-width:280px;display:flex;flex-direction:column;gap:10px;">
+    <input id="emailInput" type="email" placeholder="כתובת מייל" onkeydown="if(event.key==='Enter')sendLoginLink()" style="width:100%;padding:14px 16px;border-radius:13px;border:1px solid rgba(255,255,255,0.2);background:#ffffff;color:#1E293B;font-size:16px;font-family:\'Rubik\',Arial,sans-serif;text-align:right;outline:none;direction:ltr;text-align:left;">
+    <button id="btnSendLink" onclick="sendLoginLink()" style="width:100%;background:#F4634A;color:white;border:0;border-radius:13px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;box-shadow:0 4px 14px rgba(244,99,74,0.3);">📧 שלח לי קישור כניסה</button>
   </div>
+  <div id="loginSentMsg" style="display:none;width:100%;max-width:280px;text-align:center;color:#1E293B;font-size:14px;font-family:\'Rubik\',Arial,sans-serif;line-height:1.6;">✅ נשלח קישור כניסה למייל שלך.<br>פתח את המייל ולחץ על הקישור כדי להיכנס.</div>
   <div id="loginError" style="color:#F87171;font-size:13px;font-family:\'Rubik\',Arial,sans-serif;display:none;"></div>
 </div>
 <div id="app" style="display:none">
