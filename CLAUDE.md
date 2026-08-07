@@ -145,8 +145,9 @@ var PHOTO_SPOTS = ALL_PLACES.filter(p => p.type==='photo');
 
 #### כניסה — OTP מספרי, בלי magic link (2026-08-07)
 - מסך הכניסה שולח קוד בן 6 ספרות למייל (`sendLoginCode()` → GAS `sendOtpCode` דרך JSONP) והמשתמש מקליד אותו (`verifyLoginCode()` → GAS `verifyOtpCode`) — **אין** לחיצה על קישור בכלל
-- מוגבל ל-4 מיילי המשפחה (`FAMILY_EMAILS_ALLOWED` בקליינט + `FAMILY_EMAILS` בשרת)
+- מוגבל ל-4 מיילי המשפחה — **בצד שרת בלבד** (`FAMILY_EMAILS` ב-`Code.gs`, repo פרטי). הקליינט לא מכיל רשימת מיילים — הוסרה מ-app.html מטעמי אבטחה (הייתה hardcoded ונגישה לכל מי שגולש ל-repo הציבורי); בצד קליינט נבדק רק שהמייל תקין בפורמט
 - הקוד עצמו + התוקף (10 דק') מנוהלים ב-GAS backend (`Prague-2026-backend/gas_project/Code.gs`) — לא ב-Firebase
+- כניסה מוצלחת (`verifyOtpCode`) מחזירה גם Firebase custom token — הקליינט קורא `signInWithCustomToken()` לפני הצגת האפליקציה. **קריטי**: בלי זה, הכניסה "מצליחה" אבל שום שמירה ל-DB לא עובדת (Firestore דוחה anonymous auth) — ראה `Prague-2026-backend/CLAUDE.md` → "Firebase custom token"
 - **הוחלף**: הגישה הקודמת דרך Firebase Email Link (`sendSignInLinkToEmail`) הוסרה — הייתה שבירה כשהקישור נפתח בדפדפן/מכשיר אחר מזה ששלח את הבקשה
 - דורש deploy נפרד ל-GAS backend (`clasp push && clasp deploy`) — ראה `Prague-2026-backend/CLAUDE.md`
 
