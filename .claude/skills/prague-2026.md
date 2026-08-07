@@ -19,13 +19,16 @@ Branch: `claude/unknown-session-xpa0pr` → PR → merge ל-`main`
 ### ALL_PLACES[] (~שורה 2675) — מקור יחיד לכל המקומות
 
 ```javascript
-// 105 פריטים עם שדה type:
+// פריטים עם שדה type:
 type:'shop'       → {icon, name, stars, hours, metro, duration, brands, tip, mapUrl}
 type:'restaurant' → {icon, name, level, sub, desc, price, badge, badgeClr, badgeTxt, google, mapUrl}
 type:'dessert'    → {icon, name, level, sub, desc, price, rating, tag, tagClr, where, mapUrl}
 type:'community'  → {icon, name, cat, fb, google, desc, booking, duration, tips, who, how, mapUrl}
 type:'photo'      → {icon, name, fee, sub, desc, best, crowds, fee_txt, rating, tip, mapUrl}
+type:'exchange'   → {icon, name, stars, hours, metro, duration, brands, tip, mapUrl} — נעצי "המרת כסף בטוחה" (2026-08-07, אותו schema כמו shop)
 ```
+
+**`exchange`**: קטגוריה חדשה בטאב מיקום בלבד (אין computed view ייעודי, כמו `photo`). כל מקום שממפה type→ערך (`TYPE_GRAD`, `catColor` ב-`addMapMarkers`, `typeColor`/`typeLabel` ב-`renderNearbyList`, בלוק ה-if ב-`showMapNavDialog`) חייב ערך ל-`exchange` אחרת נופל ל-fallback אפור/גנרי. **רק מקומות עם אימות אמיתי (דירוג גוגל + ביקורות עקביות משני מקורות עצמאיים לפחות)** — לא להוסיף על סמך מקור בודד או "נשמע בסדר" (זו הייתה הסיבה שלא נוסף נעץ לאזור ואצלב — מקור אחד המליץ, אותו חיפוש בדיוק הזהיר על 10-20% עמלה נסתרת שם).
 
 **⚠️ שדה `tips` ב-community**: תמיד **string** (לא array) — לעולם לא לקרוא `p.tips.forEach()` ישירות. תמיד `Array.isArray` guard.
 

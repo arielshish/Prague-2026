@@ -22,13 +22,15 @@
 
 #### ALL_PLACES[] — מקור יחיד לכל האטרקציות (2026-07-18)
 ```
-ALL_PLACES[] — 105 פריטים עם שדה type:
+ALL_PLACES[] — פריטים עם שדה type:
   type:'shop'       → {icon, name, stars, hours, metro, duration, brands, tip, mapUrl}
   type:'restaurant' → {icon, name, level, sub, desc, price, badge, badgeClr, badgeTxt, google, mapUrl}
   type:'dessert'    → {icon, name, level, sub, desc, price, rating, tag, tagClr, where, mapUrl}
   type:'community'  → {icon, name, cat, fb, google, desc, booking, duration, tips, who, how, mapUrl}
   type:'photo'      → {icon, name, fee, sub, desc, best, crowds, fee_txt, rating, tip, mapUrl}
+  type:'exchange'   → {icon, name, stars, hours, metro, duration, brands, tip, mapUrl} (2026-08-07, אותו schema כמו shop)
 ```
+`type:'exchange'` — נעצי "המרת כסף בטוחה" בטאב מיקום בלבד (אין לו computed view/טאב ייעודי, כמו photo). כל מקום שרוץ על ALL_PLACES/TYPE_GRAD/catColor/typeColor/typeLabel חייב לכלול ערך ל-`exchange` (ראה `renderNearbyList`, `addMapMarkers`, `showMapNavDialog` ב-app.html) — **רק מקומות שאומתו בפועל (דירוג גוגל/ביקורות עקביות משני מקורות לפחות)** — לא להוסיף דוכן רק כי הוא "נשמע בסדר" במקור בודד.
 **Computed views** (נגז��ות מ-ALL_PLACES, read-only):
 ```javascript
 var COMMUNITY   = ALL_PLACES.filter(p => p.type==='community');
