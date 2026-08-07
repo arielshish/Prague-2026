@@ -35,18 +35,32 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
 
           # Extract all http/https URLs from app.html (non-Google, non-Firebase, non-GAS)
+          # וגם מסננים החוצה URL templates (Leaflet {s}/{z}/{x}/{y}, JS template literals עם ${...})
+          # ו-nominatim (נבנה ב-JS ע"י string concatenation — 'reverse?lat=' + gps.lat + ... —
+          # ה-regex תופס רק עד המרכאה הסוגרת, כלומר '...lat=' חתוך; זה תמיד ייראה "שבור" בבדיקה
+          # הזו אבל עובד תקין בפועל ב-fetch() האמיתי) — אף פעם לא נועדו להיבדק כקישורים ליטרליים.
           grep -oP "https?://[^\s'\"<>)]+(?=[\s'\"<>)])" app.html \
-            | grep -v 'google\.\|gstatic\.\|googleapis\.\|firebase\|script\.google\.\|github\.io\|wa\.me\|fonts\.' \
+            | grep -v 'google\.\|gstatic\.\|googleapis\.\|firebase\|script\.google\.\|github\.io\|wa\.me\|fonts\.\|nominatim\.openstreetmap\.org' \
+            | grep -vP '\{[a-z]+\}|\$\{' \
             | sort -u > urls.txt
 
-          echo "Found $(wc -l < urls.txt) unique URLs to check"
+          # דומיינים שידועים כחוסמי-בוטים (403) או רגישים ל-CI (400 על thumbnails) אבל עובדים בדפדפן רגיל —
+          # נבדקים ומדווחים, אבל לא מפילים את ה-build.
+          grep -E 'upload\.wikimedia\.org|hrad\.cz' urls.txt > urls_soft.txt || true
+          grep -vE 'upload\.wikimedia\.org|hrad\.cz' urls.txt > urls_hard.txt || true
+
+          echo "Found $(wc -l < urls.txt) unique URLs to check ($(wc -l < urls_soft.txt) soft-checked, $(wc -l < urls_hard.txt) hard-checked)"
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Status | URL |" >> $GITHUB_STEP_SUMMARY
           echo "|--------|-----|" >> $GITHUB_STEP_SUMMARY
 
           FAIL=0
           while IFS= read -r url; do
+            [ -z "$url" ] && continue
+            # --retry עם --retry-all-errors: אתר יעד יחיד (prague-venice.cz) כבר נראה timeout חד-פעמי
+            # בריצה קודמת בלי שום שינוי בקוד — לא רוצים שרעש רשת חד-פעמי יפיל את כל ה-build.
             STATUS=$(curl -o /dev/null -s -w "%{http_code}" --max-time 10 -L \
+              --retry 2 --retry-delay 3 --retry-all-errors \
               -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
               "$url" 2>/dev/null || echo "ERR")
 
@@ -58,7 +72,25 @@ jobs:
               echo "| ❌ $STATUS | $url |" >> $GITHUB_STEP_SUMMARY
               FAIL=1
             fi
-          done < urls.txt
+          done < urls_hard.txt
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### בדיקה רכה (לא מפילה build — חסימת בוטים/CI ידועה)" >> $GITHUB_STEP_SUMMARY
+          echo "| Status | URL |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-----|" >> $GITHUB_STEP_SUMMARY
+          while IFS= read -r url; do
+            [ -z "$url" ] && continue
+            STATUS=$(curl -o /dev/null -s -w "%{http_code}" --max-time 10 -L \
+              -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
+              "$url" 2>/dev/null || echo "ERR")
+            if [[ "$STATUS" =~ ^(200|201|301|302|303|307|308)$ ]]; then
+              echo "✅ (soft) $STATUS — $url"
+              echo "| ✅ $STATUS | $url |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "⚠️ (soft, לא נכשל) $STATUS — $url"
+              echo "| ⚠️ $STATUS (לא נכשל) | $url |" >> $GITHUB_STEP_SUMMARY
+            fi
+          done < urls_soft.txt
 
           if [ $FAIL -eq 1 ]; then
             echo ""
