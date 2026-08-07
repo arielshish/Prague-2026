@@ -290,15 +290,29 @@ var _fb = COMMUNITY.find(c=>c.name===s.name) || RESTAURANTS.find(r=>r.name===s.n
 - `saveBudgetFromModal()` קורא תמיד ל-`saveTotalBudget()` גם בweb
 - realtime listener מקשיב ל-`total_budget`
 
-### כניסה — OTP מספרי (2026-08-07)
+### כניסה — OTP מספרי (2026-08-07, כולל תיקון Firestore custom token)
 **לא magic link.** קוד 6 ספרות שהמשתמש מקליד — אין תלות בלחיצה על קישור/בדפדפן ששלח את הבקשה.
-- `app.html` (~שורה 443): `sendLoginCode()` → `_gasJsonp('sendOtpCode',[email],cb)` → GAS שולח מייל עם קוד ומחזיר `{ok}` → מציג `#loginOtpForm`
-- `verifyLoginCode()` → `_gasJsonp('verifyOtpCode',[email,code],cb)` → אם `ok` → `sessionStorage[SESSION_KEY]='1'` → `_showApp()`
+- `app.html`: `sendLoginCode()` → `_gasJsonp('sendOtpCode',[email],cb)` → GAS שולח מייל עם קוד ומחזיר `{ok}` → מציג `#loginOtpForm`
+- `verifyLoginCode()` → `_gasJsonp('verifyOtpCode',[email,code],cb)` → אם `ok && token` → `firebase.auth(_fbApp).signInWithCustomToken(token)` → `sessionStorage[SESSION_KEY]='1'` → `_showApp()`
 - `_gasJsonp()` — helper JSONP כללי (script tag + callback global + timeout 20s), משתמש ב-`GAS_URL` המוגדר ליד `triggerReminderEmail` (מאותחל לפני שהמשתמש יכול ללחוץ כפתור — סדר טעינת `<script>` tags)
-- מוגבל ל-`FAMILY_EMAILS_ALLOWED` (4 מיילי המשפחה) — נבדק גם בקליינט (UX מיידי) וגם בשרת (`Code.gs`)
+- **בדיקת המיילים המורשים היא בצד שרת בלבד** (`FAMILY_EMAILS` ב-`Code.gs`) — הקליינט לא מכיל רשימת מיילים (הוסרה ב-2026-08-07 מטעמי אבטחה, ראה "אבטחה" למטה); בצד קליינט נבדק רק פורמט מייל
 - שרת: `sendOtpCode`/`verifyOtpCode` ב-`Prague-2026-backend/gas_project/Code.gs` — קוד + תפוגה (10 דק') ב-`PropertiesService`, חד-פעמי (נמחק אחרי אימות מוצלח), נחשף דרך `dispatch_()` הקיים
-- GAS mode (`isGas()`) לא מושפע — מדלג על כל מסך הכניסה כרגיל
+- GAS mode (`isGas()`) לא מושפע — מדלג על כל מסך הכניסה כרגיל, ולא נוגע ב-Firestore בכלל (`initRealtimeSync()` מתחיל ב-`if (isGas()) return;`)
 - **הוחלף**: הגישה הקודמת (Firebase `sendSignInLinkToEmail`/`signInWithEmailLink`, magic link) הוסרה לגמרי — הייתה שבירה כשהקישור נפתח בדפדפן/מכשיר אחר (למשל in-app browser של Gmail בנייד, ללא גישה ל-localStorage של הבקשה המקורית)
+
+#### באג קריטי שהתגלה + תוקן (2026-08-07): OTP "עבד" אבל שום דבר לא נשמר
+`verifyOtpCode` המקורי החזיר רק `{ok:true}` בלי ליצור session אמיתי ב-Firebase Auth. `ensureFirebaseAuth()`
+(שכל פונקציית שמירה/טעינה ב-app.html עוברת דרכה) נופלת ל-`signInAnonymously()` כשאין `currentUser` —
+וה-Firestore Rules דוחות anonymous auth (**אומת ישירות מול הפרויקט**: `signInAnonymously` + ניסיון קריאה
+מ-`appdata/main` → `403 PERMISSION_DENIED`). בזרימת ה-magic-link הישנה זה עבד כי `signInWithEmailLink`
+יצר `currentUser` אמיתי לפני שכל שאר האפליקציה הגיעה ל-`ensureFirebaseAuth()`. ה-OTP מעולם לא נגע
+ב-Firebase Auth SDK כלל — כניסה "הצליחה" (מסך התחלף) אבל כל כתיבה ל-DB נכשלה בשקט.
+
+**התיקון**: `verifyOtpCode` המוצלח יוצר עכשיו Firebase custom token (JWT חתום RS256 עם
+`Utilities.computeRsaSha256Signature`, פונקציה `createFirebaseCustomToken_()` ב-`Code.gs`) ומחזיר
+`{ok:true, token}`. הקליינט קורא `signInWithCustomToken(token)` לפני `_showApp()` — כניסה אמיתית,
+לא anonymous. דורש Script Property `FIREBASE_SERVICE_ACCOUNT_JSON` ב-GAS (ראה
+`Prague-2026-backend/CLAUDE.md` → "Firebase custom token").
 
 ### PLACE_IMGS — 35+ תמונות
 גשר קארל, לטנה, ויישהראד, מנזר סטרהוב, מגדל פטז'ין, גן ולנשטיין, חומת לנון, גן חיות, Aquapalace, Westfield Chodov, Café Savoy, U Fleků, ועוד.

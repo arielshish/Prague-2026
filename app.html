@@ -506,9 +506,15 @@ function verifyLoginCode() {
   var btn = document.getElementById('btnVerifyCode');
   if (btn) { btn.disabled = true; btn.textContent = '⏳ מאמת...'; }
   _gasJsonp('verifyOtpCode', [_otpEmail, code], function(result) {
-    if (result && result.ok) {
-      sessionStorage.setItem(SESSION_KEY, '1');
-      _showApp();
+    if (result && result.ok && result.token) {
+      getFirestoreDb();
+      firebase.auth(_fbApp).signInWithCustomToken(result.token).then(function() {
+        sessionStorage.setItem(SESSION_KEY, '1');
+        _showApp();
+      }).catch(function(err) {
+        if (btn) { btn.disabled = false; btn.textContent = '✅ אמת קוד'; }
+        showAuthError('הקוד אומת אך הכניסה נכשלה: ' + (err && err.message || err));
+      });
     } else {
       if (btn) { btn.disabled = false; btn.textContent = '✅ אמת קוד'; }
       showAuthError((result && result.error) || 'קוד שגוי');
