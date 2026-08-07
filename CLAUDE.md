@@ -31,6 +31,8 @@ ALL_PLACES[] — פריטים עם שדה type:
   type:'exchange'   → {icon, name, stars, hours, metro, duration, brands, tip, mapUrl} (2026-08-07, אותו schema כמו shop)
 ```
 `type:'exchange'` — נעצי "המרת כסף בטוחה" בטאב מיקום בלבד (אין לו computed view/טאב ייעודי, כמו photo). כל מקום שרוץ על ALL_PLACES/TYPE_GRAD/catColor/typeColor/typeLabel חייב לכלול ערך ל-`exchange` (ראה `renderNearbyList`, `addMapMarkers`, `showMapNavDialog` ב-app.html) — **רק מקומות שאומתו בפועל (דירוג גוגל/ביקורות עקביות משני מקורות לפחות)** — לא להוסיף דוכן רק כי הוא "נשמע בסדר" במקור בודד.
+
+**⚠️ לקח מ-2026-08-07**: המשתמש העלה שני קבצי `.docx` שנוצרו ב-ChatGPT עם "רשימות מאומתות" של דוכני חליפין (כולל "דוח אימות" עם מתודולוגיה נשמעת-רצינית). **שני הקבצים הכילו טעויות עובדתיות** — כולל אחת שכבר תפסתי בעצמי בחיפוש עצמאי (כתובת שנסגרה ב-2024, שהקובץ טען שעדיין פעילה). מסמך שנוצר ע"י LLM אחר, גם עם "מתודולוגיית אימות" מפורטת, **הוא לא מקור — הוא claim שצריך לאמת בעצמך** בדיוק כמו כל מקור בודד אחר. לעולם לא להטמיע רשימות "מאומתות" כאלה בלי לחפש כל שם+כתובת בעצמך.
 **Computed views** (נגז��ות מ-ALL_PLACES, read-only):
 ```javascript
 var COMMUNITY   = ALL_PLACES.filter(p => p.type==='community');

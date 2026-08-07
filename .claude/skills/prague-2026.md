@@ -30,6 +30,10 @@ type:'exchange'   → {icon, name, stars, hours, metro, duration, brands, tip, m
 
 **`exchange`**: קטגוריה חדשה בטאב מיקום בלבד (אין computed view ייעודי, כמו `photo`). כל מקום שממפה type→ערך (`TYPE_GRAD`, `catColor` ב-`addMapMarkers`, `typeColor`/`typeLabel` ב-`renderNearbyList`, בלוק ה-if ב-`showMapNavDialog`) חייב ערך ל-`exchange` אחרת נופל ל-fallback אפור/גנרי. **רק מקומות עם אימות אמיתי (דירוג גוגל + ביקורות עקביות משני מקורות עצמאיים לפחות)** — לא להוסיף על סמך מקור בודד או "נשמע בסדר" (זו הייתה הסיבה שלא נוסף נעץ לאזור ואצלב — מקור אחד המליץ, אותו חיפוש בדיוק הזהיר על 10-20% עמלה נסתרת שם).
 
+**3 המקומות הנוכחיים (2026-08-07)**: `eXchange s.r.o.` (Štefánikova, סמיחוב — הכתובת הישנה בקפרובה נסגרה 2/1/2024, אל תחזירו אותה!), `MI RYMAS EXCHANGE` (Václavské náměstí 19), `Praha Exchange` (Jindřišská 12). לכל אחד `tip` עם `\n\n` להפרדת פסקאות — לכן ה-div ב-`showMapNavDialog` לבלוק ה-`exchange` חייב `white-space:pre-line`, אחרת השורות מתמזגות.
+
+**⚠️ לקח קריטי**: קבצי `.docx`/מסמכים "מאומתים" שמישהו מעלה (גם עם "דוח אימות" רשמי-נשמע) **הם claim, לא מקור**. בסשן הזה שני קבצים כאלה (נוצרו ב-ChatGPT) הכילו טעויות — כולל אחת שכבר תפסתי בעצמי (כתובת שסגורה מ-2024 שהקובץ טען שעדיין פעילה). תמיד לחפש כל שם+כתובת בעצמך לפני הוספה ל-ALL_PLACES, גם אם המקור "נשמע" מבוסס.
+
 **⚠️ שדה `tips` ב-community**: תמיד **string** (לא array) — לעולם לא לקרוא `p.tips.forEach()` ישירות. תמיד `Array.isArray` guard.
 
 **Computed views** (~שורה 3133, read-only):

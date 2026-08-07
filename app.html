@@ -1051,6 +1051,8 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
       <span class="ds-chip" style="background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.22);color:#065F46;">💳 כרטיס (Wise/Revolut) או כספומט של בנק עדיף על החלפת מזומן</span>
       <span class="ds-chip" style="background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.22);color:#92400E;">⚠️ בכספומט/בקופה: לשלם תמיד ב-CZK ולסרב להמרה (DCC) — ההמרה האוטומטית יקרה יותר</span>
       <span class="ds-chip" style="background:rgba(239,68,68,0.10);border:1px solid rgba(239,68,68,0.22);color:#991B1B;">🚫 להימנע מדוכני "0% עמלה" והחלפת רחוב — העמלה מוסתרת בשער החליפין</span>
+      <span class="ds-chip" style="background:rgba(239,68,68,0.10);border:1px solid rgba(239,68,68,0.22);color:#991B1B;">🚫 ספציפית להימנע מ: Interchange ברחוב Mostecká (עמלה מתועדת ~30%) ומדוכן ההחלפה בטירת פראג</span>
+      <span class="ds-chip" style="background:rgba(8,145,178,0.10);border:1px solid rgba(8,145,178,0.22);color:#0E7490;">💱 מקומות מומלצים (מאומתים) מסומנים על המפה בטאב מיקום — קטגוריית "המרת כסף"</span>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
       <div class="ds-stat" style="--stat-color:#F59E0B;">
@@ -2775,8 +2777,10 @@ var DAYS = [
 // ═══════════════════════════════════════════
 var ALL_PLACES = [
 
-// ── המרת כסף בטוחה (type:'exchange') — מאומת: דירוג גוגל 4.6, ביקורות עקביות (לא דוכני "0% עמלה") ──
-  {type:'exchange',icon:'💱',name:'Exchange — Kaprova 14',stars:'★★★★★ (4.6 Google)',hours:'09:00–20:00 (חול) · 09:00–18:00 (סופ״ש)',metro:'מטרו A — Staroměstská',duration:'~10 דק׳',brands:'שער הוגן, ללא עמלה נסתרת — מאומת בביקורות גוגל ומקומיים',tip:'ליד כיכר העיר העתיקה, גשר קארל והרובע היהודי. להימנע מדוכני "0% עמלה" בכיכר עצמה/ואצלב/נא פשיקופה — שם השער בפועל גרוע למרות השלט. הכי בטוח בכלל: כספומט של בנק אמיתי (Česká spořitelna/ČSOB/Komerční banka), לשלם ב-CZK ולסרב להמרה אוטומטית (DCC).',mapUrl:'https://www.google.com/maps/search/Exchange+Kaprova+14+Prague'},
+// ── המרת כסף בטוחה (type:'exchange') — כל פריט אומת אישית (2+ מקורות עצמאיים), לא מתוך רשימות AI לא-מאומתות ──
+  {type:'exchange',icon:'💱',name:'eXchange s.r.o. — Štefánikova (סמיחוב)',stars:'4.4/5 · 47 ביקורות (Firmy.cz)',hours:'לוודא בכניסה — מקורות חלוקים בין 09:00–17:00 ל-09:00–20:00',metro:'מטרו B — Anděl',duration:'~10 דק׳ מ-Nový Smíchov',brands:'שער VIP קבוע, ללא הגבלת סכום, ללא עמלה — מאומת: Firmy.cz + אתר רשמי exchange.cz',tip:'⚠️ הכתובת הישנה (Kaprova 14, העיר העתיקה) נסגרה סופית ב-2/1/2024 — זו הכתובת הפעילה היחידה. ליד קניון Nový Smíchov.\n\n🚫 לאן לא ללכת: Interchange ברחוב Mostecká (ליד גשר קארל, מלה סטרנה) — תלונות מאומתות על עמלה אפקטיבית של כ-30%. דוכן ההחלפה בתוך/ליד טירת פראג. כל דוכן "0% עמלה" בכיכרות התיירותיות (העיר העתיקה, ואצלב, נא פשיקופה). כספומטי Euronet (כתום/צהוב).',mapUrl:'https://www.google.com/maps/search/Exchange+Stefanikova+23+Praha+5'},
+  {type:'exchange',icon:'💱',name:'MI RYMAS EXCHANGE — כיכר ואצלב',stars:'חברה רשומה רשמית (IČO 26171848)',hours:'לוודא בשלט בכניסה',metro:'מטרו A/B — Můstek',duration:'—',brands:'Václavské náměstí 19 — מומלץ במדריך פראג עצמאי (לא-תיירותי)',tip:'האזור עצמו ידוע גם בדוכני הונאה — לבדוק את השער המוצג בפועל לפני שמאשרים, גם כאן.\n\n🚫 לאן לא ללכת: Interchange ברחוב Mostecká — עמלה אפקטיבית ~30% (מתועד). דוכן ההחלפה בטירת פראג. דוכני "0% עמלה" בכיכר עצמה ובנא פשיקופה. כספומטי Euronet.',mapUrl:'https://www.google.com/maps/search/MI+RYMAS+EXCHANGE+Vaclavske+namesti+19+Prague'},
+  {type:'exchange',icon:'💱',name:'Praha Exchange — Jindřišská',stars:'ותיק 18+ שנה — מומלץ ב-3 מקורות עצמאיים',hours:'לוודא בשלט בכניסה',metro:'ליד התחנה המרכזית / כיכר ואצלב',duration:'—',brands:'ביקורות עקביות: "השער הכי טוב בפראג" — תורים ארוכים אך משתלם',tip:'Jindřišská 12 — קרוב לתחנה המרכזית ולמרכז העיר.\n\n🚫 לאן לא ללכת: Interchange ברחוב Mostecká — עמלה אפקטיבית ~30% (מתועד). דוכן ההחלפה בטירת פראג. דוכני "0% עמלה" בכיכרות התיירותיות. כספומטי Euronet.',mapUrl:'https://www.google.com/maps/search/Praha+Exchange+Jindrisska+12+Prague'},
 
 // ── SHOPS (type:'shop') ──────────────────────────────────────────────────────
   {type:'shop',icon:'🛍️',name:'Primark Wenceslas Square',stars:'★★★★★',hours:'09:00–21:00',metro:'מטרו A/C — Můstek',duration:'~20 דק׳',brands:'ביגוד, ילדים, בית, מזוודות',tip:'להגיע בבוקר — עמוס מאוד בצהריים.',mapUrl:'https://www.google.com/maps/search/Primark+Wenceslas+Square+Prague'},
@@ -4499,7 +4503,9 @@ var _packAddingCat = null; // שם קטגוריה שאליה מוסיפים פר
 // קואורדינטות לכל מקום (lat, lng)
 var PLACE_COORDS = {
   // ── המרת כסף ──
-  'Exchange — Kaprova 14':       [50.0882, 14.4176],
+  'eXchange s.r.o. — Štefánikova (סמיחוב)': [50.0743, 14.4036],
+  'MI RYMAS EXCHANGE — כיכר ואצלב':          [50.0814, 14.4275],
+  'Praha Exchange — Jindřišská':             [50.0851, 14.4297],
   // ── מסעדות ──
   'המזללה':                      [50.0897, 14.4180],
   'Café Savoy':                  [50.0859, 14.4063],
@@ -4817,7 +4823,7 @@ function showMapNavDialog(p, coords) {
     if (p.duration) chipsX += '<span style="background:rgba(16,185,129,0.1);border-radius:8px;padding:4px 10px;font-size:11px;color:#065F46;">⏱️ ' + esc(p.duration) + '</span>';
     if (chipsX) infoHtml += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">' + chipsX + '</div>';
     if (p.brands) infoHtml += '<div style="font-size:11px;color:rgba(30,41,59,0.5);margin-bottom:8px;">✅ ' + esc(p.brands) + '</div>';
-    if (p.tip)    infoHtml += '<div style="background:rgba(8,145,178,0.08);border:1px solid rgba(8,145,178,0.22);border-radius:10px;padding:8px 11px;font-size:11px;color:#0E7490;margin-bottom:8px;">💡 ' + esc(p.tip) + '</div>';
+    if (p.tip)    infoHtml += '<div style="background:rgba(8,145,178,0.08);border:1px solid rgba(8,145,178,0.22);border-radius:10px;padding:8px 11px;font-size:11px;color:#0E7490;margin-bottom:8px;white-space:pre-line;">💡 ' + esc(p.tip) + '</div>';
   } else if (p.type === 'photo') {
     if (p.sub)  infoHtml += '<div style="font-size:11px;color:rgba(30,41,59,0.5);margin-bottom:6px;">' + esc(p.sub) + '</div>';
     if (p.desc) infoHtml += '<div style="font-size:12px;color:rgba(30,41,59,0.7);line-height:1.7;margin-bottom:8px;">' + esc(p.desc) + '</div>';
