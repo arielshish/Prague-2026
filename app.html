@@ -404,6 +404,7 @@
 <!-- Firebase SDK (compat mode) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
 <script>
@@ -424,11 +425,14 @@ function getFirestoreDb() {
   return _fbDb;
 }
 function ensureFirebaseAuth() {
-  // דולג על auth — Firestore נגיש ישירות (rules: allow read, write: if true)
-  if (!_authReadyPromise) {
-    getFirestoreDb();
-    _authReadyPromise = Promise.resolve(true);
-  }
+  // arielshish.github.io נוסף ל-Firebase Authorized domains (7/08) — signInAnonymously אמור לעבוד עכשיו.
+  // עדיין עם timeout+fallback: אם זה תקוע/נכשל, ממשיכים בלי auth (Firestore rules פתוחים כרגע ממילא).
+  if (_authReadyPromise) return _authReadyPromise;
+  getFirestoreDb();
+  _authReadyPromise = Promise.race([
+    firebase.auth(_fbApp).signInAnonymously().then(function() { return true; }),
+    new Promise(function(resolve) { setTimeout(function() { resolve(false); }, 5000); })
+  ]).catch(function(err) { console.warn('Firebase anonymous auth failed', err); return false; });
   return _authReadyPromise;
 }
 
