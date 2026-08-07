@@ -441,40 +441,94 @@ function ensureFirebaseAuth() {
 }
 
 // Firebase Firestore polyfill — replaces GAS/JSONP backend
-// OTP/כניסה: Firebase Email Link (passwordless) — מוגבל ל-4 כתובות המשפחה
+// OTP/כניסה: קוד בן 6 ספרות נשלח דרך GAS (MailApp) ומאומת מול GAS — מוגבל ל-4 כתובות המשפחה
+// (לא magic link — אין תלות בלחיצה על קישור/דפדפן ששלח את הבקשה, רק הקלדת קוד)
+// GAS_URL מוגדר בהמשך הקובץ (ליד triggerReminderEmail) — נגיש כאן כי כל ה-<script> tags
+// בעמוד רצים ברצף לפני שהמשתמש יכול ללחוץ על כפתור, אז ה-var כבר מאותחל בזמן קריאה בפועל.
 var FAMILY_EMAILS_ALLOWED = ['arielshish@gmail.com','maridubi3@gmail.com','adiyasminshish@gmail.com','ariel.mariana.shish@gmail.com'];
 var SESSION_KEY = 'prague_auth_ok';
-var EMAIL_FOR_SIGNIN_KEY = 'prague_email_for_signin';
+var _otpEmail = '';
 
-function sendLoginLink() {
+function _gasJsonp(action, args, onDone) {
+  var script = document.createElement('script');
+  var cb = '_gasCb' + Date.now() + Math.floor(Math.random() * 1e6);
+  window[cb] = function(result) {
+    delete window[cb];
+    try { document.head.removeChild(script); } catch(e) {}
+    onDone(result);
+  };
+  setTimeout(function() {
+    if (window[cb]) {
+      delete window[cb];
+      try { document.head.removeChild(script); } catch(e) {}
+      onDone({ ok: false, error: 'תם הזמן — נסה שוב' });
+    }
+  }, 20000);
+  script.src = GAS_URL + '?action=' + action + '&args=' + encodeURIComponent(JSON.stringify(args)) + '&callback=' + cb;
+  document.head.appendChild(script);
+}
+
+function sendLoginCode() {
   var input = document.getElementById('emailInput');
   var email = input ? input.value.trim().toLowerCase() : '';
   if (FAMILY_EMAILS_ALLOWED.indexOf(email) === -1) {
     showAuthError('כתובת מייל לא מוכרת — רק בני משפחה יכולים להתחבר');
     return;
   }
-  getFirestoreDb();
+  showAuthError('');
   var btn = document.getElementById('btnSendLink');
   if (btn) { btn.disabled = true; btn.textContent = '⏳ שולח...'; }
-  var actionCodeSettings = {
-    url: window.location.href.split('?')[0].split('#')[0],
-    handleCodeInApp: true
-  };
-  firebase.auth(_fbApp).sendSignInLinkToEmail(email, actionCodeSettings).then(function() {
-    window.localStorage.setItem(EMAIL_FOR_SIGNIN_KEY, email);
-    var form = document.getElementById('loginForm');
-    var sent = document.getElementById('loginSentMsg');
-    if (form) form.style.display = 'none';
-    if (sent) sent.style.display = 'block';
-  }).catch(function(err) {
-    if (btn) { btn.disabled = false; btn.textContent = '📧 שלח לי קישור כניסה'; }
-    showAuthError('שגיאה בשליחה: ' + (err && err.message || err));
+  _gasJsonp('sendOtpCode', [email], function(result) {
+    if (btn) { btn.disabled = false; btn.textContent = '📧 שלח לי קוד כניסה'; }
+    if (result && result.ok) {
+      _otpEmail = email;
+      var form = document.getElementById('loginForm');
+      var otpForm = document.getElementById('loginOtpForm');
+      if (form) form.style.display = 'none';
+      if (otpForm) otpForm.style.display = 'flex';
+      var codeInput = document.getElementById('otpInput');
+      if (codeInput) { codeInput.value = ''; codeInput.focus(); }
+    } else {
+      showAuthError('שגיאה בשליחה: ' + (result && result.error || 'נסה שוב'));
+    }
   });
+}
+
+function verifyLoginCode() {
+  var input = document.getElementById('otpInput');
+  var code = input ? input.value.trim() : '';
+  if (!/^\d{6}$/.test(code)) {
+    showAuthError('הקוד צריך להיות 6 ספרות');
+    return;
+  }
+  showAuthError('');
+  var btn = document.getElementById('btnVerifyCode');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ מאמת...'; }
+  _gasJsonp('verifyOtpCode', [_otpEmail, code], function(result) {
+    if (result && result.ok) {
+      sessionStorage.setItem(SESSION_KEY, '1');
+      _showApp();
+    } else {
+      if (btn) { btn.disabled = false; btn.textContent = '✅ אמת קוד'; }
+      showAuthError((result && result.error) || 'קוד שגוי');
+    }
+  });
+}
+
+function backToEmailForm() {
+  var form = document.getElementById('loginForm');
+  var otpForm = document.getElementById('loginOtpForm');
+  if (otpForm) otpForm.style.display = 'none';
+  if (form) form.style.display = 'flex';
+  showAuthError('');
 }
 
 function showAuthError(msg) {
   var err = document.getElementById('loginError');
-  if (err) { err.textContent = msg; err.style.display = 'block'; }
+  if (!err) return;
+  if (!msg) { err.style.display = 'none'; err.textContent = ''; return; }
+  err.textContent = msg;
+  err.style.display = 'block';
 }
 
 function _showApp() {
@@ -484,35 +538,10 @@ function _showApp() {
   if (app) app.style.display = 'block';
 }
 
-// Check session on load — bypass login in GAS context; complete email-link sign-in if returning from one
+// Check session on load — bypass login in GAS context
 (function() {
   var gasMode = typeof google !== 'undefined' && google.script && google.script.run;
-  if (gasMode) {
-    document.addEventListener('DOMContentLoaded', _showApp);
-    return;
-  }
-  getFirestoreDb();
-  var auth = firebase.auth(_fbApp);
-  if (auth.isSignInWithEmailLink(window.location.href)) {
-    var email = window.localStorage.getItem(EMAIL_FOR_SIGNIN_KEY);
-    if (!email) { email = window.prompt('נא להזין שוב את כתובת המייל לאישור הכניסה'); }
-    auth.signInWithEmailLink(email, window.location.href).then(function(result) {
-      var signedEmail = (result.user && result.user.email || '').toLowerCase();
-      window.localStorage.removeItem(EMAIL_FOR_SIGNIN_KEY);
-      history.replaceState(null, '', window.location.pathname);
-      if (FAMILY_EMAILS_ALLOWED.indexOf(signedEmail) === -1) {
-        auth.signOut();
-        document.addEventListener('DOMContentLoaded', function() { showAuthError('כתובת מייל לא מוכרת — רק בני משפחה יכולים להתחבר'); });
-        return;
-      }
-      sessionStorage.setItem(SESSION_KEY, '1');
-      document.addEventListener('DOMContentLoaded', _showApp);
-    }).catch(function(err) {
-      document.addEventListener('DOMContentLoaded', function() { showAuthError('הקישור לא תקין או שפג תוקפו — נסה שוב'); });
-    });
-    return;
-  }
-  if (sessionStorage.getItem(SESSION_KEY) === '1') {
+  if (gasMode || sessionStorage.getItem(SESSION_KEY) === '1') {
     document.addEventListener('DOMContentLoaded', _showApp);
   }
 })();
@@ -831,10 +860,15 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
   <div style="font-size:26px;font-weight:900;color:#1E293B;font-family:\'Rubik\',Arial,sans-serif;">פראג 2026</div>
   <div style="font-size:14px;color:rgba(30,41,59,0.55);font-family:\'Rubik\',Arial,sans-serif;">משפחת שיש</div>
   <div id="loginForm" style="width:100%;max-width:280px;display:flex;flex-direction:column;gap:10px;">
-    <input id="emailInput" type="email" placeholder="כתובת מייל" onkeydown="if(event.key==='Enter')sendLoginLink()" style="width:100%;padding:14px 16px;border-radius:13px;border:1px solid rgba(255,255,255,0.2);background:#ffffff;color:#1E293B;font-size:16px;font-family:\'Rubik\',Arial,sans-serif;text-align:right;outline:none;direction:ltr;text-align:left;">
-    <button id="btnSendLink" onclick="sendLoginLink()" style="width:100%;background:#F4634A;color:white;border:0;border-radius:13px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;box-shadow:0 4px 14px rgba(244,99,74,0.3);">📧 שלח לי קישור כניסה</button>
+    <input id="emailInput" type="email" placeholder="כתובת מייל" onkeydown="if(event.key==='Enter')sendLoginCode()" style="width:100%;padding:14px 16px;border-radius:13px;border:1px solid rgba(255,255,255,0.2);background:#ffffff;color:#1E293B;font-size:16px;font-family:\'Rubik\',Arial,sans-serif;text-align:right;outline:none;direction:ltr;text-align:left;">
+    <button id="btnSendLink" onclick="sendLoginCode()" style="width:100%;background:#F4634A;color:white;border:0;border-radius:13px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;box-shadow:0 4px 14px rgba(244,99,74,0.3);">📧 שלח לי קוד כניסה</button>
   </div>
-  <div id="loginSentMsg" style="display:none;width:100%;max-width:280px;text-align:center;color:#1E293B;font-size:14px;font-family:\'Rubik\',Arial,sans-serif;line-height:1.6;">✅ נשלח קישור כניסה למייל שלך.<br>פתח את המייל ולחץ על הקישור כדי להיכנס.</div>
+  <div id="loginOtpForm" style="display:none;width:100%;max-width:280px;flex-direction:column;gap:10px;">
+    <div style="text-align:center;color:#1E293B;font-size:13px;font-family:\'Rubik\',Arial,sans-serif;line-height:1.5;">✅ נשלח קוד בן 6 ספרות למייל שלך.<br>הזן אותו כאן כדי להיכנס.</div>
+    <input id="otpInput" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="000000" onkeydown="if(event.key==='Enter')verifyLoginCode()" style="width:100%;padding:14px 16px;border-radius:13px;border:1px solid rgba(255,255,255,0.2);background:#ffffff;color:#1E293B;font-size:22px;letter-spacing:6px;text-align:center;font-family:\'Rubik\',Arial,sans-serif;outline:none;">
+    <button id="btnVerifyCode" onclick="verifyLoginCode()" style="width:100%;background:#F4634A;color:white;border:0;border-radius:13px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;box-shadow:0 4px 14px rgba(244,99,74,0.3);">✅ אמת קוד</button>
+    <button onclick="backToEmailForm()" style="width:100%;background:transparent;color:#1E293B;opacity:0.6;border:0;padding:6px;font-size:13px;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">↩️ מייל אחר / שלח קוד שוב</button>
+  </div>
   <div id="loginError" style="color:#F87171;font-size:13px;font-family:\'Rubik\',Arial,sans-serif;display:none;"></div>
 </div>
 <div id="app" style="display:none">
