@@ -1044,8 +1044,13 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
   <!-- ═══ EXPENSES ═══ -->
   <section id="expenses" class="tab">
     <div class="card card-hdr">
-      <div><h2 style="font-size:18px;font-weight:900;">💰 הוצאות</h2><p style="font-size:12px;color:rgba(30,41,59,0.55);margin-top:3px;">Google Sheets sync</p></div>
+      <div><h2 style="font-size:18px;font-weight:900;">💰 הוצאות</h2><p style="font-size:12px;color:rgba(30,41,59,0.55);margin-top:3px;">מסתנכן אוטומטית בין כל המכשירים</p></div>
       <button class="back-btn" id="btnBackExpenses">← ראשי</button>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+      <span class="ds-chip" style="background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.22);color:#065F46;">💳 כרטיס (Wise/Revolut) או כספומט של בנק עדיף על החלפת מזומן</span>
+      <span class="ds-chip" style="background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.22);color:#92400E;">⚠️ בכספומט/בקופה: לשלם תמיד ב-CZK ולסרב להמרה (DCC) — ההמרה האוטומטית יקרה יותר</span>
+      <span class="ds-chip" style="background:rgba(239,68,68,0.10);border:1px solid rgba(239,68,68,0.22);color:#991B1B;">🚫 להימנע מדוכני "0% עמלה" והחלפת רחוב — העמלה מוסתרת בשער החליפין</span>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
       <div class="ds-stat" style="--stat-color:#F59E0B;">
