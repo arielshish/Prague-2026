@@ -1815,8 +1815,8 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
 <!-- ═══ EXPENSE MODAL ═══ -->
 <div id="expenseModal" style="display:none;position:fixed;inset:0;z-index:80;align-items:flex-end;justify-content:center;">
   <div id="expModalBg" style="position:absolute;inset:0;background:rgba(2,7,14,0.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);"></div>
-  <div style="position:relative;width:min(430px,100%);background:#071220;border:1px solid rgba(0,0,0,0.09);border-top:1px solid rgba(255,255,255,0.22);border-radius:26px 26px 0 0;padding:22px 18px 36px;box-shadow:0 -24px 64px rgba(0,0,0,0.65);animation:sheetUp 0.3s ease both;direction:rtl;text-align:right;">
-    <div style="width:34px;height:4px;background:rgba(255,255,255,0.18);border-radius:2px;margin:0 auto 14px;"></div>
+  <div style="position:relative;width:min(430px,100%);background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-top:1px solid rgba(0,0,0,0.06);border-radius:26px 26px 0 0;padding:22px 18px 36px;box-shadow:0 -24px 64px rgba(0,0,0,0.25);animation:sheetUp 0.3s ease both;direction:rtl;text-align:right;">
+    <div style="width:34px;height:4px;background:rgba(0,0,0,0.15);border-radius:2px;margin:0 auto 14px;"></div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
       <h2 id="expenseTitle" style="margin:0;font-size:18px;font-weight:900;color:#1E293B;">➕ הוסף הוצאה</h2>
       <button onclick="closeExpense()" style="background:#ffffff;border:1px solid rgba(0,0,0,0.10);border-radius:10px;padding:6px 13px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.65);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">ביטול</button>
@@ -1827,7 +1827,7 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
     <div id="expCatChips" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;"></div>
     <input type="hidden" id="expCat" value="">
     <!-- רשימה נגללת -->
-    <div id="expNameList" style="max-height:200px;overflow-y:auto;-webkit-overflow-scrolling:touch;margin-bottom:10px;border:1px solid rgba(255,255,255,0.08);border-radius:14px;background:rgba(0,0,0,0.18);"></div>
+    <div id="expNameList" style="max-height:200px;overflow-y:auto;-webkit-overflow-scrolling:touch;margin-bottom:10px;border:1px solid rgba(0,0,0,0.08);border-radius:14px;background:rgba(0,0,0,0.03);"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
       <input id="expCzk" type="number" inputmode="decimal" placeholder="CZK" style="background:rgba(245,158,11,0.09);border:1px solid rgba(245,158,11,0.3);border-radius:13px;padding:13px 12px;font-size:15px;color:#F59E0B;font-family:\'Rubik\',Arial,sans-serif;direction:ltr;font-weight:700;box-sizing:border-box;width:100%;">
       <input id="expIls" type="number" inputmode="decimal" placeholder="₪" style="background:rgba(244,99,74,0.09);border:1px solid rgba(244,99,74,0.3);border-radius:13px;padding:13px 12px;font-size:15px;color:#F4634A;font-family:\'Rubik\',Arial,sans-serif;direction:ltr;font-weight:700;box-sizing:border-box;width:100%;">
@@ -1839,7 +1839,7 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
 
 
 <!-- TOAST -->
-<div id="toast" style="display:none;position:fixed;top:54px;left:50%;transform:translateX(-50%);background:rgba(2,7,14,0.96);backdrop-filter:blur(18px);border:1px solid rgba(0,0,0,0.10);color:#1E293B;padding:11px 20px;border-radius:14px;z-index:100;font-weight:600;font-size:13px;white-space:nowrap;box-shadow:0 6px 22px rgba(0,0,0,0.45);font-family:\'Rubik\',Arial,sans-serif;"></div>
+<div id="toast" style="display:none;position:fixed;top:54px;left:50%;transform:translateX(-50%);background:#ffffff;backdrop-filter:blur(18px);border:1px solid rgba(0,0,0,0.10);color:#1E293B;padding:11px 20px;border-radius:14px;z-index:100;font-weight:600;font-size:13px;white-space:nowrap;box-shadow:0 6px 22px rgba(0,0,0,0.18);font-family:\'Rubik\',Arial,sans-serif;"></div>
 
 <script>
 // ═══════════════════════════════════════════
@@ -5681,7 +5681,7 @@ function filterExpNameList(q) {
     return;
   }
   el.innerHTML = filtered.map(function(name) {
-    return '<button type="button" onclick="pickExpName(this)" data-val="'+name.replace(/"/g,'&quot;')+'" style="display:block;width:100%;text-align:right;background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,0.05);padding:10px 12px;font-size:13px;font-weight:600;color:#1E293B;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;">'+name+'</button>';
+    return '<button type="button" onclick="pickExpName(this)" data-val="'+name.replace(/"/g,'&quot;')+'" style="display:block;width:100%;text-align:right;background:transparent;border:0;border-bottom:1px solid rgba(0,0,0,0.06);padding:10px 12px;font-size:13px;font-weight:600;color:#1E293B;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;">'+name+'</button>';
   }).join('');
 }
 
@@ -5708,12 +5708,12 @@ function buildExpNameList() {
   _expAllItems = [];
   cats.forEach(function(cat) { _expAllItems = _expAllItems.concat(cat.items); });
 
-  var html = '<button type="button" onclick="qs(\'expName\').focus()" style="display:block;width:100%;text-align:right;background:rgba(244,99,74,0.08);border:0;border-bottom:1px solid rgba(255,255,255,0.08);padding:11px 12px;font-size:13px;font-weight:700;color:#991B1B;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;">✏️ כתב חופשי — הקלד בשדה למעלה</button>';
+  var html = '<button type="button" onclick="qs(\'expName\').focus()" style="display:block;width:100%;text-align:right;background:rgba(244,99,74,0.08);border:0;border-bottom:1px solid rgba(0,0,0,0.06);padding:11px 12px;font-size:13px;font-weight:700;color:#991B1B;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;">✏️ כתב חופשי — הקלד בשדה למעלה</button>';
   cats.forEach(function(cat) {
     if (!cat.items.length) return;
-    html += '<div style="padding:8px 10px 4px;font-size:10px;font-weight:800;color:rgba(30,41,59,0.45);letter-spacing:1px;text-transform:uppercase;position:sticky;top:0;background:rgba(7,18,32,0.95);">'+cat.label+'</div>';
+    html += '<div style="padding:8px 10px 4px;font-size:10px;font-weight:800;color:rgba(30,41,59,0.45);letter-spacing:1px;text-transform:uppercase;position:sticky;top:0;background:rgba(255,255,255,0.95);">'+cat.label+'</div>';
     cat.items.forEach(function(name) {
-      html += '<button type="button" onclick="pickExpName(this)" data-val="'+name.replace(/"/g,'&quot;')+'" style="display:block;width:100%;text-align:right;background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,0.05);padding:10px 12px;font-size:13px;font-weight:600;color:#1E293B;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;">'+name+'</button>';
+      html += '<button type="button" onclick="pickExpName(this)" data-val="'+name.replace(/"/g,'&quot;')+'" style="display:block;width:100%;text-align:right;background:transparent;border:0;border-bottom:1px solid rgba(0,0,0,0.06);padding:10px 12px;font-size:13px;font-weight:600;color:#1E293B;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;">'+name+'</button>';
     });
   });
   el.innerHTML = html;
