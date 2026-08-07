@@ -1,6 +1,6 @@
 # Prague 2026 — משפחת שיש (repo ציבורי — GitHub Pages בלבד)
 
-> עדכון אחרון: 2026-07-18 (גרסה 10 — תיקון טאב מיקום + PLACE_IMGS מורחב)
+> עדכון אחרון: 2026-08-07 (גרסה 11 — OTP מספרי במקום magic link)
 
 זהו repo **ציבורי בכוונה** (חייב להישאר public כדי ש-GitHub Pages יעבוד בחשבון חינמי).
 
@@ -16,7 +16,7 @@
 
 ## מפת הפיצ'רים הקיימים ב-app.html
 
-> עדכון אחרון: 2026-07-18 (גרסה 10 — תיקון טאב מיקום + PLACE_IMGS מורחב)
+> עדכון אחרון: 2026-08-07 (גרסה 11 — OTP מספרי במקום magic link)
 
 ### מבנה נתונים מרכזי
 
@@ -142,6 +142,13 @@ var PHOTO_SPOTS = ALL_PLACES.filter(p => p.type==='photo');
 - **`remindersSchedule`** = נשאר נפרד — תזכורות הן *משימות* לפני הטיול, לא תחנות ב-DAYS
 - הוסר `restaurantsSchedule` + `openEditRestaurantSchedule` + כפתור "⏰ קבע זמן" הישן
 - `saveSchedules()` שומר רק `remindersSchedule`
+
+#### כניסה — OTP מספרי, בלי magic link (2026-08-07)
+- מסך הכניסה שולח קוד בן 6 ספרות למייל (`sendLoginCode()` → GAS `sendOtpCode` דרך JSONP) והמשתמש מקליד אותו (`verifyLoginCode()` → GAS `verifyOtpCode`) — **אין** לחיצה על קישור בכלל
+- מוגבל ל-4 מיילי המשפחה (`FAMILY_EMAILS_ALLOWED` בקליינט + `FAMILY_EMAILS` בשרת)
+- הקוד עצמו + התוקף (10 דק') מנוהלים ב-GAS backend (`Prague-2026-backend/gas_project/Code.gs`) — לא ב-Firebase
+- **הוחלף**: הגישה הקודמת דרך Firebase Email Link (`sendSignInLinkToEmail`) הוסרה — הייתה שבירה כשהקישור נפתח בדפדפן/מכשיר אחר מזה ששלח את הבקשה
+- דורש deploy נפרד ל-GAS backend (`clasp push && clasp deploy`) — ראה `Prague-2026-backend/CLAUDE.md`
 
 ### כללי עבודה
 - **לפני כל שינוי — גדול או קטן**: `git tag backup-<תיאור>-$(date +%Y%m%d-%H%M)` + push. אין יוצאים מן הכלל.

@@ -5,7 +5,7 @@ description: ידע מעמיק על פרויקט Prague 2026 — app.html, מב�
 
 # Prague 2026 — מדריך מלא לעריכה
 
-> עדכון אחרון: 2026-07-18 (גרסה 10)
+> עדכון אחרון: 2026-08-07 (גרסה 11 — OTP מספרי במקום magic link)
 
 ## קובץ עיקרי
 `/home/user/Prague-2026/app.html` — קובץ HTML יחיד, RTL עברי, ~7100 שורות.
@@ -289,6 +289,16 @@ var _fb = COMMUNITY.find(c=>c.name===s.name) || RESTAURANTS.find(r=>r.name===s.n
 - `saveTotalBudget()` כותב ל-`appdata/main.total_budget` (+ `appdata/budget.total` legacy)
 - `saveBudgetFromModal()` קורא תמיד ל-`saveTotalBudget()` גם בweb
 - realtime listener מקשיב ל-`total_budget`
+
+### כניסה — OTP מספרי (2026-08-07)
+**לא magic link.** קוד 6 ספרות שהמשתמש מקליד — אין תלות בלחיצה על קישור/בדפדפן ששלח את הבקשה.
+- `app.html` (~שורה 443): `sendLoginCode()` → `_gasJsonp('sendOtpCode',[email],cb)` → GAS שולח מייל עם קוד ומחזיר `{ok}` → מציג `#loginOtpForm`
+- `verifyLoginCode()` → `_gasJsonp('verifyOtpCode',[email,code],cb)` → אם `ok` → `sessionStorage[SESSION_KEY]='1'` → `_showApp()`
+- `_gasJsonp()` — helper JSONP כללי (script tag + callback global + timeout 20s), משתמש ב-`GAS_URL` המוגדר ליד `triggerReminderEmail` (מאותחל לפני שהמשתמש יכול ללחוץ כפתור — סדר טעינת `<script>` tags)
+- מוגבל ל-`FAMILY_EMAILS_ALLOWED` (4 מיילי המשפחה) — נבדק גם בקליינט (UX מיידי) וגם בשרת (`Code.gs`)
+- שרת: `sendOtpCode`/`verifyOtpCode` ב-`Prague-2026-backend/gas_project/Code.gs` — קוד + תפוגה (10 דק') ב-`PropertiesService`, חד-פעמי (נמחק אחרי אימות מוצלח), נחשף דרך `dispatch_()` הקיים
+- GAS mode (`isGas()`) לא מושפע — מדלג על כל מסך הכניסה כרגיל
+- **הוחלף**: הגישה הקודמת (Firebase `sendSignInLinkToEmail`/`signInWithEmailLink`, magic link) הוסרה לגמרי — הייתה שבירה כשהקישור נפתח בדפדפן/מכשיר אחר (למשל in-app browser של Gmail בנייד, ללא גישה ל-localStorage של הבקשה המקורית)
 
 ### PLACE_IMGS — 35+ תמונות
 גשר קארל, לטנה, ויישהראד, מנזר סטרהוב, מגדל פטז'ין, גן ולנשטיין, חומת לנון, גן חיות, Aquapalace, Westfield Chodov, Café Savoy, U Fleků, ועוד.
