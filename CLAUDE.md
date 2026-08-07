@@ -150,6 +150,7 @@ var PHOTO_SPOTS = ALL_PLACES.filter(p => p.type==='photo');
 - כניסה מוצלחת (`verifyOtpCode`) מחזירה גם Firebase custom token — הקליינט קורא `signInWithCustomToken()` לפני הצגת האפליקציה. **קריטי**: בלי זה, הכניסה "מצליחה" אבל שום שמירה ל-DB לא עובדת (Firestore דוחה anonymous auth) — ראה `Prague-2026-backend/CLAUDE.md` → "Firebase custom token"
 - **הוחלף**: הגישה הקודמת דרך Firebase Email Link (`sendSignInLinkToEmail`) הוסרה — הייתה שבירה כשהקישור נפתח בדפדפן/מכשיר אחר מזה ששלח את הבקשה
 - דורש deploy נפרד ל-GAS backend (`clasp push && clasp deploy`) — ראה `Prague-2026-backend/CLAUDE.md`
+- **החלטה מודעת (2026-08-07)**: commit `3db2deb` בהיסטוריית `main` הציבורי עדיין מכיל את 4 מיילי המשפחה (הוסרו מה-קוד הנוכחי, לא מההיסטוריה). המשתמש נשאל אם לשכתב היסטוריה (`rebase`+`force-push`) כדי להסיר — **בחר במפורש שלא**, זה לא נתפס כמידע רגיש מספיק כדי להצדיק פעולת git הרסנית. **אל תיזום שכתוב היסטוריה על דעת עצמך** — זו החלטה שכבר התקבלה.
 
 ### כללי עבודה
 - **לפני כל שינוי — גדול או קטן**: `git tag backup-<תיאור>-$(date +%Y%m%d-%H%M)` + push. אין יוצאים מן הכלל.
