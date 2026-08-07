@@ -1859,6 +1859,7 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
       <button onclick="filterNearby('restaurant')" id="lf-restaurant" class="cat-chip" style="white-space:nowrap;">🍽 מסעדות</button>
       <button onclick="filterNearby('community')" id="lf-community" class="cat-chip" style="white-space:nowrap;">🎟 אטרקציות</button>
       <button onclick="filterNearby('photo')" id="lf-photo" class="cat-chip" style="white-space:nowrap;">📷 צילום</button>
+      <button onclick="filterNearby('exchange')" id="lf-exchange" class="cat-chip" style="white-space:nowrap;">💱 המרת כסף</button>
     </div>
     <!-- Nearby list -->
     <div id="nearbyPlacesList"></div>
@@ -2773,6 +2774,9 @@ var DAYS = [
 //  REMINDERS[] ו-DAYS[] נשארים נפרדים
 // ═══════════════════════════════════════════
 var ALL_PLACES = [
+
+// ── המרת כסף בטוחה (type:'exchange') — מאומת: דירוג גוגל 4.6, ביקורות עקביות (לא דוכני "0% עמלה") ──
+  {type:'exchange',icon:'💱',name:'Exchange — Kaprova 14',stars:'★★★★★ (4.6 Google)',hours:'09:00–20:00 (חול) · 09:00–18:00 (סופ״ש)',metro:'מטרו A — Staroměstská',duration:'~10 דק׳',brands:'שער הוגן, ללא עמלה נסתרת — מאומת בביקורות גוגל ומקומיים',tip:'ליד כיכר העיר העתיקה, גשר קארל והרובע היהודי. להימנע מדוכני "0% עמלה" בכיכר עצמה/ואצלב/נא פשיקופה — שם השער בפועל גרוע למרות השלט. הכי בטוח בכלל: כספומט של בנק אמיתי (Česká spořitelna/ČSOB/Komerční banka), לשלם ב-CZK ולסרב להמרה אוטומטית (DCC).',mapUrl:'https://www.google.com/maps/search/Exchange+Kaprova+14+Prague'},
 
 // ── SHOPS (type:'shop') ──────────────────────────────────────────────────────
   {type:'shop',icon:'🛍️',name:'Primark Wenceslas Square',stars:'★★★★★',hours:'09:00–21:00',metro:'מטרו A/C — Můstek',duration:'~20 דק׳',brands:'ביגוד, ילדים, בית, מזוודות',tip:'להגיע בבוקר — עמוס מאוד בצהריים.',mapUrl:'https://www.google.com/maps/search/Primark+Wenceslas+Square+Prague'},
@@ -4494,6 +4498,8 @@ var _packAddingCat = null; // שם קטגוריה שאליה מוסיפים פר
 
 // קואורדינטות לכל מקום (lat, lng)
 var PLACE_COORDS = {
+  // ── המרת כסף ──
+  'Exchange — Kaprova 14':       [50.0882, 14.4176],
   // ── מסעדות ──
   'המזללה':                      [50.0897, 14.4180],
   'Café Savoy':                  [50.0859, 14.4063],
@@ -4661,6 +4667,7 @@ var TYPE_GRAD = {
   photo:      ['#01579b','#0277bd'],
   dessert:    ['#880e4f','#6a1b4d'],
   shop:       ['#1b5e20','#2e7d32'],
+  exchange:   ['#0e7490','#155e75'],
 };
 
 // Haversine — מרחק בק"מ בין שתי נקודות
@@ -4722,7 +4729,7 @@ function makePinIcon(color) {
 
 function addMapMarkers() {
   if (!_leafletMap || !window.L) return;
-  var catColor = { restaurant:'#2563EB', community:'#16a34a', photo:'#9333ea', dessert:'#e879f9', shop:'#f59e0b' };
+  var catColor = { restaurant:'#2563EB', community:'#16a34a', photo:'#9333ea', dessert:'#e879f9', shop:'#f59e0b', exchange:'#0891B2' };
   var daysState = getDaysState();
   var scheduledNames = {};
   daysState.forEach(function(d) { (d.stops||[]).forEach(function(s){ scheduledNames[s.name]=true; }); });
@@ -4802,6 +4809,15 @@ function showMapNavDialog(p, coords) {
     if (chips4) infoHtml += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">' + chips4 + '</div>';
     if (p.brands) infoHtml += '<div style="font-size:11px;color:rgba(30,41,59,0.5);margin-bottom:8px;">📦 ' + esc(p.brands) + '</div>';
     if (p.tip)    infoHtml += '<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:8px 11px;font-size:11px;color:#B45309;margin-bottom:8px;">💡 ' + esc(p.tip) + '</div>';
+  } else if (p.type === 'exchange') {
+    var chipsX = '';
+    if (p.stars)    chipsX += '<span style="color:#F59E0B;font-size:13px;">' + p.stars + '</span> ';
+    if (p.hours)    chipsX += '<span style="background:rgba(0,0,0,0.05);border-radius:8px;padding:4px 10px;font-size:11px;color:rgba(30,41,59,0.65);">⏰ ' + esc(p.hours) + '</span> ';
+    if (p.metro)    chipsX += '<span style="background:rgba(99,102,241,0.1);border-radius:8px;padding:4px 10px;font-size:11px;color:#4F46E5;">🚇 ' + esc(p.metro) + '</span> ';
+    if (p.duration) chipsX += '<span style="background:rgba(16,185,129,0.1);border-radius:8px;padding:4px 10px;font-size:11px;color:#065F46;">⏱️ ' + esc(p.duration) + '</span>';
+    if (chipsX) infoHtml += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">' + chipsX + '</div>';
+    if (p.brands) infoHtml += '<div style="font-size:11px;color:rgba(30,41,59,0.5);margin-bottom:8px;">✅ ' + esc(p.brands) + '</div>';
+    if (p.tip)    infoHtml += '<div style="background:rgba(8,145,178,0.08);border:1px solid rgba(8,145,178,0.22);border-radius:10px;padding:8px 11px;font-size:11px;color:#0E7490;margin-bottom:8px;">💡 ' + esc(p.tip) + '</div>';
   } else if (p.type === 'photo') {
     if (p.sub)  infoHtml += '<div style="font-size:11px;color:rgba(30,41,59,0.5);margin-bottom:6px;">' + esc(p.sub) + '</div>';
     if (p.desc) infoHtml += '<div style="font-size:12px;color:rgba(30,41,59,0.7);line-height:1.7;margin-bottom:8px;">' + esc(p.desc) + '</div>';
@@ -4902,7 +4918,7 @@ function locateMe() {
 
 function filterNearby(cat) {
   _nearbyFilter = cat;
-  ['all','schedule','restaurant','community','photo'].forEach(function(k) {
+  ['all','schedule','restaurant','community','photo','exchange'].forEach(function(k) {
     var el = document.getElementById('lf-' + k);
     if (!el) return;
     el.style.borderColor = k===cat ? '#F4634A' : '';
@@ -4953,8 +4969,8 @@ function renderNearbyList() {
     return;
   }
 
-  var typeColor = { restaurant:'#2563EB', community:'#16a34a', photo:'#9333ea', dessert:'#e879f9', shop:'#f59e0b', schedule:'#F4634A' };
-  var typeLabel = { restaurant:'מסעדה', community:'אטרקציה', photo:'צילום', dessert:'קינוח', shop:'קניות', schedule:'בלוז' };
+  var typeColor = { restaurant:'#2563EB', community:'#16a34a', photo:'#9333ea', dessert:'#e879f9', shop:'#f59e0b', schedule:'#F4634A', exchange:'#0891B2' };
+  var typeLabel = { restaurant:'מסעדה', community:'אטרקציה', photo:'צילום', dessert:'קינוח', shop:'קניות', schedule:'בלוז', exchange:'המרת כסף' };
 
   var html = '';
   filtered.forEach(function(it) {
