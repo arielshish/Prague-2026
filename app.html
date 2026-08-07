@@ -445,7 +445,8 @@ function ensureFirebaseAuth() {
 // (לא magic link — אין תלות בלחיצה על קישור/דפדפן ששלח את הבקשה, רק הקלדת קוד)
 // GAS_URL מוגדר בהמשך הקובץ (ליד triggerReminderEmail) — נגיש כאן כי כל ה-<script> tags
 // בעמוד רצים ברצף לפני שהמשתמש יכול ללחוץ על כפתור, אז ה-var כבר מאותחל בזמן קריאה בפועל.
-var FAMILY_EMAILS_ALLOWED = ['arielshish@gmail.com','maridubi3@gmail.com','adiyasminshish@gmail.com','ariel.mariana.shish@gmail.com'];
+// כוונה: רשימת המיילים המורשים (FAMILY_EMAILS) נשמרת אך ורק בשרת (Code.gs, repo פרטי) —
+// לא ב-app.html הציבורי. בדיקת התקינות היחידה כאן היא פורמט; ההרשאה עצמה תמיד מהשרת.
 var SESSION_KEY = 'prague_auth_ok';
 var _otpEmail = '';
 
@@ -471,8 +472,8 @@ function _gasJsonp(action, args, onDone) {
 function sendLoginCode() {
   var input = document.getElementById('emailInput');
   var email = input ? input.value.trim().toLowerCase() : '';
-  if (FAMILY_EMAILS_ALLOWED.indexOf(email) === -1) {
-    showAuthError('כתובת מייל לא מוכרת — רק בני משפחה יכולים להתחבר');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showAuthError('כתובת מייל לא תקינה');
     return;
   }
   showAuthError('');
