@@ -430,13 +430,28 @@ function ensureFirebaseAuth() {
   // הוא רק יצר sessions "מוצלחים למראה" שנכשלים בשקט בכל כתיבה/קריאה בפועל.
   if (_authReadyPromise) return _authReadyPromise;
   getFirestoreDb();
-  var current = firebase.auth(_fbApp).currentUser;
-  if (current && !current.isAnonymous) {
-    _authReadyPromise = Promise.resolve(true);
-    return _authReadyPromise;
-  }
-  _authReadyPromise = Promise.resolve(false);
+  // ⚠️ חובה להמתין ל-onAuthStateChanged ולא לקרוא currentUser ישירות: Firebase משחזר
+  // session שמור באופן אסינכרוני, אז בטעינת העמוד currentUser עדיין null ברוב המקרים.
+  // קריאה סינכרונית הייתה ממַמֶשֶת (memoize) false לצמיתות וכל טעינה ראשונית מהענן
+  // הייתה מתחרה ב-auth ונכשלת ב-permission-denied (תג "⚠️ מקומי").
+  _authReadyPromise = new Promise(function(resolve) {
+    var settled = false;
+    var unsub = firebase.auth(_fbApp).onAuthStateChanged(function(user) {
+      if (settled) return;
+      settled = true;
+      try { if (typeof unsub === 'function') unsub(); } catch (e) {}
+      resolve(!!(user && !user.isAnonymous));
+    });
+    setTimeout(function() { if (!settled) { settled = true; resolve(false); } }, 8000);
+  });
   return _authReadyPromise;
+}
+
+// אחרי כניסה אמיתית — לאפס את ה-memoization (הוא נקבע כ-false בזמן מסך הכניסה)
+// ולהפעיל מחדש realtime sync, שאחרת נשאר מת עד רענון עמוד.
+function _resetAuthAndSync() {
+  _authReadyPromise = null;
+  try { if (typeof initRealtimeSync === 'function') initRealtimeSync(); } catch (e) { console.warn('re-init realtime sync failed', e); }
 }
 
 // Firebase Firestore polyfill — replaces GAS/JSONP backend
@@ -533,6 +548,7 @@ function verifyLoginCode() {
       getFirestoreDb();
       firebase.auth(_fbApp).signInWithCustomToken(result.token).then(function() {
         _setDeviceRemembered();
+        _resetAuthAndSync();
         _resyncLocalDataToCloud();
         _showApp();
       }).catch(function(err) {
@@ -5394,6 +5410,12 @@ function loadExpensesFromFirebase() {
 var _realtimeUnsubs = [];
 function initRealtimeSync() {
   if (isGas()) return;
+  // ניתן לקרוא לזה שוב אחרי כניסה (ה-listeners הראשונים נרשמו לפני שהיה auth ונדחו) —
+  // מנתקים קודם את הישנים כדי לא לצבור listeners כפולים על אותם מסמכים.
+  try {
+    _realtimeUnsubs.forEach(function(u) { try { if (typeof u === 'function') u(); } catch (e) {} });
+    _realtimeUnsubs = [];
+  } catch (e) {}
   try {
     var db = getFirestoreDb();
 
