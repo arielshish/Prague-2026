@@ -589,17 +589,29 @@ function _showApp() {
 // בעולם web: הדגל ב-localStorage (תוקף שבוע) לבד לא מספיק — זה יכול להיות שריד מלפני
 // שהיה custom token (רק anonymous ישן, שנדחה ע"י Firestore Rules), או שפג תוקפו.
 // מוודאים session אמיתי (לא anonymous) עם onAuthStateChanged לפני שמדלגים על מסך הכניסה.
+// ⚠️ קריטי: onAuthStateChanged אסינכרוני ולרוב יורה *אחרי* ש-DOMContentLoaded כבר קרה.
+// `addEventListener('DOMContentLoaded', ...)` על אירוע שכבר עבר לא יורה לעולם — לכן חייבים
+// לבדוק readyState ולקרוא ישירות. בלי זה: session תקף לגמרי אבל מסך הכניסה נשאר תקוע
+// והמשתמש חושב שהוא התנתק (דווח בפועל אחרי סגירת דפדפן).
+function _showAppWhenReady() {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _showApp);
+  } else {
+    _showApp();
+  }
+}
+
 (function() {
   var gasMode = typeof google !== 'undefined' && google.script && google.script.run;
   if (gasMode) {
-    document.addEventListener('DOMContentLoaded', _showApp);
+    _showAppWhenReady();
     return;
   }
   if (!_isDeviceRemembered()) return;
   getFirestoreDb();
   firebase.auth(_fbApp).onAuthStateChanged(function(user) {
     if (user && !user.isAnonymous) {
-      document.addEventListener('DOMContentLoaded', _showApp);
+      _showAppWhenReady();
     } else {
       localStorage.removeItem(SESSION_KEY);
       if (user) firebase.auth(_fbApp).signOut();
