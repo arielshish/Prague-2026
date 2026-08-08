@@ -425,18 +425,17 @@ function getFirestoreDb() {
   return _fbDb;
 }
 function ensureFirebaseAuth() {
-  // arielshish.github.io נוסף ל-Firebase Authorized domains (7/08) — signInAnonymously אמור לעבוד עכשיו.
-  // עדיין עם timeout+fallback: אם זה תקוע/נכשל, ממשיכים בלי auth.
+  // Firestore Rules דוחות anonymous auth לגמרי (מאומת 2026-08-07) — session אמיתי מגיע רק
+  // מ-OTP מוצלח (verifyLoginCode → signInWithCustomToken). אין יותר fallback ל-signInAnonymously —
+  // הוא רק יצר sessions "מוצלחים למראה" שנכשלים בשקט בכל כתיבה/קריאה בפועל.
   if (_authReadyPromise) return _authReadyPromise;
   getFirestoreDb();
-  if (firebase.auth(_fbApp).currentUser) {
+  var current = firebase.auth(_fbApp).currentUser;
+  if (current && !current.isAnonymous) {
     _authReadyPromise = Promise.resolve(true);
     return _authReadyPromise;
   }
-  _authReadyPromise = Promise.race([
-    firebase.auth(_fbApp).signInAnonymously().then(function() { return true; }),
-    new Promise(function(resolve) { setTimeout(function() { resolve(false); }, 5000); })
-  ]).catch(function(err) { console.warn('Firebase anonymous auth failed', err); return false; });
+  _authReadyPromise = Promise.resolve(false);
   return _authReadyPromise;
 }
 
@@ -545,12 +544,26 @@ function _showApp() {
   if (app) app.style.display = 'block';
 }
 
-// Check session on load — bypass login in GAS context
+// Check session on load — bypass login in GAS context.
+// בעולם web: sessionStorage[SESSION_KEY]='1' לבד לא מספיק — זה יכול להיות שריד מלפני
+// שהיה custom token (רק anonymous ישן, שנדחה ע"י Firestore Rules). מוודאים session
+// אמיתי (לא anonymous) עם onAuthStateChanged לפני שמדלגים על מסך הכניסה.
 (function() {
   var gasMode = typeof google !== 'undefined' && google.script && google.script.run;
-  if (gasMode || sessionStorage.getItem(SESSION_KEY) === '1') {
+  if (gasMode) {
     document.addEventListener('DOMContentLoaded', _showApp);
+    return;
   }
+  if (sessionStorage.getItem(SESSION_KEY) !== '1') return;
+  getFirestoreDb();
+  firebase.auth(_fbApp).onAuthStateChanged(function(user) {
+    if (user && !user.isAnonymous) {
+      document.addEventListener('DOMContentLoaded', _showApp);
+    } else {
+      sessionStorage.removeItem(SESSION_KEY);
+      if (user) firebase.auth(_fbApp).signOut();
+    }
+  });
 })();
 </script>
 <script>
