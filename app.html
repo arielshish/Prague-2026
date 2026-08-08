@@ -562,6 +562,19 @@ function verifyLoginCode() {
   });
 }
 
+// התנתקות ידנית: מוחקת את שתי שכבות ה"זכירה" — הדגל שלנו (localStorage) וה-session
+// של Firebase — ומרעננת. הנתונים עצמם (הוצאות/ימים/ציוד) נשארים ב-localStorage וגם
+// בענן; זה מנתק גישה בלבד, לא מוחק כלום.
+function doLogout() {
+  if (!confirm('להתנתק מהמכשיר הזה?\n\nתצטרך קוד חדש בכניסה הבאה.\nהנתונים עצמם נשמרים — לא נמחק כלום.')) return;
+  try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
+  var done = function() { try { location.reload(); } catch (e) {} };
+  try {
+    getFirestoreDb();
+    firebase.auth(_fbApp).signOut().then(done).catch(done);
+  } catch (e) { done(); }
+}
+
 function backToEmailForm() {
   var form = document.getElementById('loginForm');
   var otpForm = document.getElementById('loginOtpForm');
@@ -1016,6 +1029,7 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
       <button id="btnHomeCommunity" style="background:rgba(52,211,153,0.10);border:1px solid rgba(52,211,153,0.25);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#065F46;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;text-align:center;grid-column:1 / -1;">👥<br><span style="font-size:10px;font-weight:700;">המלצות קהילה</span></button>
       <button id="btnHomeGuides" style="background:rgba(251,146,60,0.10);border:1px solid rgba(251,146,60,0.25);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#C2410C;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;text-align:center;grid-column:1 / -1;">🎙️<br><span style="font-size:10px;font-weight:700;">מדריכים בעברית</span></button>
       <button id="btnHomeLang" style="background:rgba(168,85,247,0.10);border:1px solid rgba(168,85,247,0.22);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#6D28D9;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;text-align:center;grid-column:1 / -1;">🌐<br><span style="font-size:10px;font-weight:700;">שפה ותרגום</span></button>
+      <button onclick="doLogout()" style="background:rgba(100,116,139,0.08);border:1px solid rgba(100,116,139,0.20);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#475569;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;text-align:center;grid-column:1 / -1;">🚪<br><span style="font-size:10px;font-weight:700;">התנתק מהמכשיר</span></button>
     </div>
     <div style="background:linear-gradient(135deg,rgba(244,99,74,0.13),rgba(244,99,74,0.055));border:1px solid rgba(244,99,74,0.24);border-radius:20px;padding:16px;margin-bottom:10px;">
       <div style="font-size:14px;font-weight:800;color:#1E293B;margin-bottom:7px;">🛍️ יום 7 — יום קניות</div>
