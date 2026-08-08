@@ -159,6 +159,8 @@ var PHOTO_SPOTS = ALL_PLACES.filter(p => p.type==='photo');
 - **זכירת מכשיר ל-7 ימים** (PR #62) — `SESSION_KEY` ב-`localStorage` עם timestamp תפוגה (`_setDeviceRemembered`/`_isDeviceRemembered`), במקום `sessionStorage` שנמחק בכל סגירת טאב. הדגל לבדו אף פעם לא מספיק — תמיד מאומת מול Firebase Auth
 - **הוחלף**: הגישה הקודמת דרך Firebase Email Link (`sendSignInLinkToEmail`) הוסרה — הייתה שבירה כשהקישור נפתח בדפדפן/מכשיר אחר מזה ששלח את הבקשה
 - דורש deploy נפרד ל-GAS backend (`clasp push && clasp deploy`) — ראה `Prague-2026-backend/CLAUDE.md`
+- **כפתור "🚪 התנתק מהמכשיר"** (טאב ראשי) → `doLogout()` — מוחק את הדגל ב-localStorage + `signOut()` מ-Firebase ומרענן. לא מוחק נתונים (מקומית או בענן), רק מנתק גישה
+- **✅ אימות אבטחה (2026-08-07, נבדק אמפירית מול הפרויקט החי)**: ה-`apiKey` פומבי וספק email/password פעיל, כך שכל אחד **יכול ליצור חשבון** ב-Firebase Auth של הפרויקט. אבל **Firestore Rules חוסמות אותו**: נרשם חשבון עם מייל אקראי לא-משפחתי → קריאה מ-`appdata/main` החזירה `403 PERMISSION_DENIED`, וכתיבה ל-`appdata/` גם `403`. (חשבון הבדיקה נמחק ואומת שנמחק.) **מסקנה: גישה ל-DB רק דרך custom token של ה-GAS, שמונפק רק ל-`FAMILY_EMAILS`.** אל תשנו את ה-Rules ל-`if request.auth != null` — זה יפתח את ה-DB לכל אחד
 - **החלטה מודעת (2026-08-07)**: commit `3db2deb` בהיסטוריית `main` הציבורי עדיין מכיל את 4 מיילי המשפחה (הוסרו מה-קוד הנוכחי, לא מההיסטוריה). המשתמש נשאל אם לשכתב היסטוריה (`rebase`+`force-push`) כדי להסיר — **בחר במפורש שלא**, זה לא נתפס כמידע רגיש מספיק כדי להצדיק פעולת git הרסנית. **אל תיזום שכתוב היסטוריה על דעת עצמך** — זו החלטה שכבר התקבלה.
 
 ### כללי עבודה
