@@ -430,13 +430,28 @@ function ensureFirebaseAuth() {
   // הוא רק יצר sessions "מוצלחים למראה" שנכשלים בשקט בכל כתיבה/קריאה בפועל.
   if (_authReadyPromise) return _authReadyPromise;
   getFirestoreDb();
-  var current = firebase.auth(_fbApp).currentUser;
-  if (current && !current.isAnonymous) {
-    _authReadyPromise = Promise.resolve(true);
-    return _authReadyPromise;
-  }
-  _authReadyPromise = Promise.resolve(false);
+  // ⚠️ חובה להמתין ל-onAuthStateChanged ולא לקרוא currentUser ישירות: Firebase משחזר
+  // session שמור באופן אסינכרוני, אז בטעינת העמוד currentUser עדיין null ברוב המקרים.
+  // קריאה סינכרונית הייתה ממַמֶשֶת (memoize) false לצמיתות וכל טעינה ראשונית מהענן
+  // הייתה מתחרה ב-auth ונכשלת ב-permission-denied (תג "⚠️ מקומי").
+  _authReadyPromise = new Promise(function(resolve) {
+    var settled = false;
+    var unsub = firebase.auth(_fbApp).onAuthStateChanged(function(user) {
+      if (settled) return;
+      settled = true;
+      try { if (typeof unsub === 'function') unsub(); } catch (e) {}
+      resolve(!!(user && !user.isAnonymous));
+    });
+    setTimeout(function() { if (!settled) { settled = true; resolve(false); } }, 8000);
+  });
   return _authReadyPromise;
+}
+
+// אחרי כניסה אמיתית — לאפס את ה-memoization (הוא נקבע כ-false בזמן מסך הכניסה)
+// ולהפעיל מחדש realtime sync, שאחרת נשאר מת עד רענון עמוד.
+function _resetAuthAndSync() {
+  _authReadyPromise = null;
+  try { if (typeof initRealtimeSync === 'function') initRealtimeSync(); } catch (e) { console.warn('re-init realtime sync failed', e); }
 }
 
 // Firebase Firestore polyfill — replaces GAS/JSONP backend
@@ -533,6 +548,7 @@ function verifyLoginCode() {
       getFirestoreDb();
       firebase.auth(_fbApp).signInWithCustomToken(result.token).then(function() {
         _setDeviceRemembered();
+        _resetAuthAndSync();
         _resyncLocalDataToCloud();
         _showApp();
       }).catch(function(err) {
@@ -573,17 +589,29 @@ function _showApp() {
 // בעולם web: הדגל ב-localStorage (תוקף שבוע) לבד לא מספיק — זה יכול להיות שריד מלפני
 // שהיה custom token (רק anonymous ישן, שנדחה ע"י Firestore Rules), או שפג תוקפו.
 // מוודאים session אמיתי (לא anonymous) עם onAuthStateChanged לפני שמדלגים על מסך הכניסה.
+// ⚠️ קריטי: onAuthStateChanged אסינכרוני ולרוב יורה *אחרי* ש-DOMContentLoaded כבר קרה.
+// `addEventListener('DOMContentLoaded', ...)` על אירוע שכבר עבר לא יורה לעולם — לכן חייבים
+// לבדוק readyState ולקרוא ישירות. בלי זה: session תקף לגמרי אבל מסך הכניסה נשאר תקוע
+// והמשתמש חושב שהוא התנתק (דווח בפועל אחרי סגירת דפדפן).
+function _showAppWhenReady() {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _showApp);
+  } else {
+    _showApp();
+  }
+}
+
 (function() {
   var gasMode = typeof google !== 'undefined' && google.script && google.script.run;
   if (gasMode) {
-    document.addEventListener('DOMContentLoaded', _showApp);
+    _showAppWhenReady();
     return;
   }
   if (!_isDeviceRemembered()) return;
   getFirestoreDb();
   firebase.auth(_fbApp).onAuthStateChanged(function(user) {
     if (user && !user.isAnonymous) {
-      document.addEventListener('DOMContentLoaded', _showApp);
+      _showAppWhenReady();
     } else {
       localStorage.removeItem(SESSION_KEY);
       if (user) firebase.auth(_fbApp).signOut();
@@ -5394,6 +5422,12 @@ function loadExpensesFromFirebase() {
 var _realtimeUnsubs = [];
 function initRealtimeSync() {
   if (isGas()) return;
+  // ניתן לקרוא לזה שוב אחרי כניסה (ה-listeners הראשונים נרשמו לפני שהיה auth ונדחו) —
+  // מנתקים קודם את הישנים כדי לא לצבור listeners כפולים על אותם מסמכים.
+  try {
+    _realtimeUnsubs.forEach(function(u) { try { if (typeof u === 'function') u(); } catch (e) {} });
+    _realtimeUnsubs = [];
+  } catch (e) {}
   try {
     var db = getFirestoreDb();
 
