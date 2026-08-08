@@ -222,7 +222,7 @@ p.tips.forEach(...)  // ← גורם לקריסה שקטה, dialog לא נפתח
 | `appdata/reminders` | `data` (JSON string) |
 | `appdata/budget` | `total` (לתאימות אחורה) |
 
-- `ensureFirebaseAuth()` → **לא עושה auth בעצמו** (מ-PR #61). רק בודק אם יש כבר `currentUser` אמיתי (לא anonymous) ומחזיר Promise עם `true`/`false`. ה-auth האמיתי קורה פעם אחת ב-`verifyLoginCode()` דרך `signInWithCustomToken`. **פעם היה כאן `signInAnonymously()` — הוסר בכוונה, אל תחזירו** (ראה "session אנונימי ישן נתקע" למטה)
+- `ensureFirebaseAuth()` → **לא עושה auth בעצמו** (מ-PR #61). **ממתין ל-`onAuthStateChanged`** (לא קורא `currentUser` ישירות!) ומחזיר Promise עם `true`/`false` לפי `user && !user.isAnonymous`. ה-auth האמיתי קורה פעם אחת ב-`verifyLoginCode()` דרך `signInWithCustomToken`. **פעם היה כאן `signInAnonymously()` — הוסר בכוונה, אל תחזירו** (ראה "session אנונימי ישן נתקע" למטה)
 - `getFirestoreDb()` → Firestore instance
 - `onSnapshot` על `appdata/main` → sync real-time לימים + תקציב
 
@@ -237,6 +237,8 @@ p.tips.forEach(...)  // ← גורם לקריסה שקטה, dialog לא נפתח
 | פילטר אטרקציות מציג מסעדות/קינוחים community | `indexOf('אטרקציות')` על `cat` |
 | `renderNearbyList` — שגיאה ב-item אחד שוברת כל הרשימה | `try-catch` per item |
 | **`signInAnonymously()` כ-fallback ב-`ensureFirebaseAuth()`** — Firestore דוחה anonymous, אז זה ייצר "התחברת בהצלחה" מדומה שנכשלת בשקט בכל כתיבה (`Missing or insufficient permissions`) | הוסר לגמרי. auth אמיתי רק דרך OTP → `signInWithCustomToken`. `ensureFirebaseAuth()` רק בודק `!isAnonymous` |
+| **קריאה סינכרונית ל-`currentUser` ב-`ensureFirebaseAuth()`** — Firebase משחזר session אסינכרונית, אז בטעינת עמוד `currentUser===null` ו-`false` נִמְמָש לצמיתות; כל הטעינות ב-`DOMContentLoaded` נדחו ב-permission-denied → תג "⚠️ מקומי" | להמתין ל-`onAuthStateChanged` (עם unsubscribe + guard נגד resolve כפול + timeout 8ש׳) |
+| **`initRealtimeSync()` בלי ניתוק listeners קודמים** — `_realtimeUnsubs` היה קיים אבל מעולם לא שימש לניתוק, אז קריאה שנייה (אחרי כניסה) הכפילה listeners | לנתק את כל `_realtimeUnsubs` ולאפס את המערך בתחילת הפונקציה |
 
 ---
 
