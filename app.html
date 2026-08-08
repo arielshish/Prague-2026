@@ -494,6 +494,20 @@ function sendLoginCode() {
   });
 }
 
+// אחרי כניסה אמיתית ראשונה (custom token) — לדחוף כל מה שנשמר מקומית בזמן שה-session
+// היה anonymous (ולכן כל כתיבה ל-Firestore נכשלה בשקט) לענן, פעם אחת. משתמש בפונקציות
+// השמירה הקיימות של האפליקציה עצמן (לא לוגיקה חדשה) — כל אחת עטופה בנפרד כדי שכשל
+// באחת לא יעצור את השאר. localStorage כבר תמיד היה בטוח; זה רק סוגר את הפער לענן.
+function _resyncLocalDataToCloud() {
+  try { if (typeof saveLocal === 'function') saveLocal(); } catch (e) { console.warn('resync expenses failed', e); }
+  try { if (typeof saveDaysState === 'function') saveDaysState(); } catch (e) { console.warn('resync days failed', e); }
+  try { if (typeof PACK_STATE !== 'undefined' && typeof savePackLocal === 'function') savePackLocal(PACK_STATE); } catch (e) { console.warn('resync pack failed', e); }
+  try { if (typeof saveRemindersDoneLocal === 'function') saveRemindersDoneLocal(); } catch (e) { console.warn('resync remindersDone failed', e); }
+  try { if (typeof saveSchedules === 'function') saveSchedules(); } catch (e) { console.warn('resync remindersSchedule failed', e); }
+  try { if (typeof saveTotalBudget === 'function' && typeof loadTotalBudget === 'function') { var tb = loadTotalBudget(); if (tb) saveTotalBudget(tb); } } catch (e) { console.warn('resync total budget failed', e); }
+  try { if (typeof saveBudget === 'function' && typeof loadBudget === 'function') saveBudget(loadBudget()); } catch (e) { console.warn('resync budget categories failed', e); }
+}
+
 function verifyLoginCode() {
   var input = document.getElementById('otpInput');
   var code = input ? input.value.trim() : '';
@@ -509,6 +523,7 @@ function verifyLoginCode() {
       getFirestoreDb();
       firebase.auth(_fbApp).signInWithCustomToken(result.token).then(function() {
         sessionStorage.setItem(SESSION_KEY, '1');
+        _resyncLocalDataToCloud();
         _showApp();
       }).catch(function(err) {
         if (btn) { btn.disabled = false; btn.textContent = '✅ אמת קוד'; }
