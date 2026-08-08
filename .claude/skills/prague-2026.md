@@ -222,7 +222,7 @@ p.tips.forEach(...)  // ← גורם לקריסה שקטה, dialog לא נפתח
 | `appdata/reminders` | `data` (JSON string) |
 | `appdata/budget` | `total` (לתאימות אחורה) |
 
-- `ensureFirebaseAuth()` → anonymous auth → מחזיר Promise
+- `ensureFirebaseAuth()` → **לא עושה auth בעצמו** (מ-PR #61). רק בודק אם יש כבר `currentUser` אמיתי (לא anonymous) ומחזיר Promise עם `true`/`false`. ה-auth האמיתי קורה פעם אחת ב-`verifyLoginCode()` דרך `signInWithCustomToken`. **פעם היה כאן `signInAnonymously()` — הוסר בכוונה, אל תחזירו** (ראה "session אנונימי ישן נתקע" למטה)
 - `getFirestoreDb()` → Firestore instance
 - `onSnapshot` על `appdata/main` → sync real-time לימים + תקציב
 
@@ -236,6 +236,7 @@ p.tips.forEach(...)  // ← גורם לקריסה שקטה, dialog לא נפתח
 | `p.name`/`p.desc` עם `"` בתוך onclick attribute → שבירת HTML | `window._mapNavPlace` בmapNavDialog |
 | פילטר אטרקציות מציג מסעדות/קינוחים community | `indexOf('אטרקציות')` על `cat` |
 | `renderNearbyList` — שגיאה ב-item אחד שוברת כל הרשימה | `try-catch` per item |
+| **`signInAnonymously()` כ-fallback ב-`ensureFirebaseAuth()`** — Firestore דוחה anonymous, אז זה ייצר "התחברת בהצלחה" מדומה שנכשלת בשקט בכל כתיבה (`Missing or insufficient permissions`) | הוסר לגמרי. auth אמיתי רק דרך OTP → `signInWithCustomToken`. `ensureFirebaseAuth()` רק בודק `!isAnonymous` |
 
 ---
 
@@ -300,7 +301,7 @@ var _fb = COMMUNITY.find(c=>c.name===s.name) || RESTAURANTS.find(r=>r.name===s.n
 ### כניסה — OTP מספרי (2026-08-07, כולל תיקון Firestore custom token)
 **לא magic link.** קוד 6 ספרות שהמשתמש מקליד — אין תלות בלחיצה על קישור/בדפדפן ששלח את הבקשה.
 - `app.html`: `sendLoginCode()` → `_gasJsonp('sendOtpCode',[email],cb)` → GAS שולח מייל עם קוד ומחזיר `{ok}` → מציג `#loginOtpForm`
-- `verifyLoginCode()` → `_gasJsonp('verifyOtpCode',[email,code],cb)` → אם `ok && token` → `firebase.auth(_fbApp).signInWithCustomToken(token)` → `sessionStorage[SESSION_KEY]='1'` → `_showApp()`
+- `verifyLoginCode()` → `_gasJsonp('verifyOtpCode',[email,code],cb)` → אם `ok && token` → `firebase.auth(_fbApp).signInWithCustomToken(token)` → `_setDeviceRemembered()` → `_resyncLocalDataToCloud()` → `_showApp()`
 - `_gasJsonp()` — helper JSONP כללי (script tag + callback global + timeout 20s), משתמש ב-`GAS_URL` המוגדר ליד `triggerReminderEmail` (מאותחל לפני שהמשתמש יכול ללחוץ כפתור — סדר טעינת `<script>` tags)
 - **בדיקת המיילים המורשים היא בצד שרת בלבד** (`FAMILY_EMAILS` ב-`Code.gs`) — הקליינט לא מכיל רשימת מיילים (הוסרה ב-2026-08-07 מטעמי אבטחה, ראה "אבטחה" למטה); בצד קליינט נבדק רק פורמט מייל
 - שרת: `sendOtpCode`/`verifyOtpCode` ב-`Prague-2026-backend/gas_project/Code.gs` — קוד + תפוגה (10 דק') ב-`PropertiesService`, חד-פעמי (נמחק אחרי אימות מוצלח), נחשף דרך `dispatch_()` הקיים
@@ -320,6 +321,30 @@ var _fb = COMMUNITY.find(c=>c.name===s.name) || RESTAURANTS.find(r=>r.name===s.n
 `{ok:true, token}`. הקליינט קורא `signInWithCustomToken(token)` לפני `_showApp()` — כניסה אמיתית,
 לא anonymous. דורש Script Property `FIREBASE_SERVICE_ACCOUNT_JSON` ב-GAS (ראה
 `Prague-2026-backend/CLAUDE.md` → "Firebase custom token").
+
+#### המשך הבאג: session אנונימי ישן נתקע (PR #61, 2026-08-07)
+גם אחרי תיקון ה-custom token, מכשירים שכבר היו להם דגל session ישן **דילגו על מסך הכניסה**
+והמשיכו עם ה-session האנונימי השבור — צילום מסך מהמשתמש הראה `Auth user: kMEne5AoXeRny...`
+(UID אנונימי, לא מייל) + `Missing or insufficient permissions`. שני תיקונים:
+1. **`ensureFirebaseAuth()` כבר לא קורא ל-`signInAnonymously()` בכלל.** הוא רק בודק
+   `currentUser && !currentUser.isAnonymous`, אחרת מחזיר `false`. הנפילה ל-anonymous רק ייצרה
+   "הצלחה למראה" שנכשלת בשקט בכל כתיבה. **אל תחזירו את ה-fallback הזה.**
+2. ה-IIFE בטעינת העמוד מוודא עם `onAuthStateChanged` ש-`user && !user.isAnonymous` לפני
+   `_showApp()`. אם anonymous/אין user → מנקה את הדגל + `signOut()` → מסך כניסה מחדש.
+
+#### `_resyncLocalDataToCloud()` (PR #61)
+נקראת מ-`verifyLoginCode()` אחרי `signInWithCustomToken` מוצלח. דוחפת לענן את **כל** מה שנצבר
+ב-localStorage בזמן שה-session היה שבור (כל כתיבה נכשלה בשקט): קוראת לפונקציות השמירה הקיימות
+עצמן — `saveLocal` (הוצאות), `saveDaysState`, `savePackLocal`, `saveRemindersDoneLocal`,
+`saveSchedules`, `saveTotalBudget`, `saveBudget` — כל אחת ב-`try/catch` נפרד.
+**⚠️ מגבלה ידועה**: חלק מהכתיבות הן `set()` בלי `merge` — אם כמה מכשירים צברו נתונים מקומיים
+שונים, מי שמתחבר אחרון דורס. לא נוצר כאן, אבל שווה לדעת.
+
+#### זכירת מכשיר ל-7 ימים (PR #62)
+`SESSION_KEY` עבר מ-`sessionStorage` (נמחק בכל סגירת טאב → OTP חדש כמעט בכל פתיחה)
+ל-`localStorage` עם **timestamp של תפוגה** (`Date.now() + SESSION_TTL_MS`, שבוע):
+`_setDeviceRemembered()` / `_isDeviceRemembered()`. הדגל לבדו אף פעם לא מספיק — תמיד מאומת
+מול Firebase Auth (`onAuthStateChanged`) לפני דילוג על מסך הכניסה.
 
 ### PLACE_IMGS — 35+ תמונות
 גשר קארל, לטנה, ויישהראד, מנזר סטרהוב, מגדל פטז'ין, גן ולנשטיין, חומת לנון, גן חיות, Aquapalace, Westfield Chodov, Café Savoy, U Fleků, ועוד.

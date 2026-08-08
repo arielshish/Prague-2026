@@ -447,7 +447,17 @@ function ensureFirebaseAuth() {
 // כוונה: רשימת המיילים המורשים (FAMILY_EMAILS) נשמרת אך ורק בשרת (Code.gs, repo פרטי) —
 // לא ב-app.html הציבורי. בדיקת התקינות היחידה כאן היא פורמט; ההרשאה עצמה תמיד מהשרת.
 var SESSION_KEY = 'prague_auth_ok';
+var SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // שבוע — המכשיר "זכור" בלי לבקש OTP מחדש בכל פתיחה
 var _otpEmail = '';
+
+// localStorage (לא sessionStorage) כדי שזה ישרוד סגירת טאב/דפדפן — עם תפוגה של שבוע.
+// עדיין מאומת בפועל מול Firebase Auth (לא רק הדגל הזה) — ראה ה-IIFE למטה.
+function _setDeviceRemembered() {
+  try { localStorage.setItem(SESSION_KEY, String(Date.now() + SESSION_TTL_MS)); } catch (e) {}
+}
+function _isDeviceRemembered() {
+  try { return Number(localStorage.getItem(SESSION_KEY) || '0') > Date.now(); } catch (e) { return false; }
+}
 
 function _gasJsonp(action, args, onDone) {
   var script = document.createElement('script');
@@ -522,7 +532,7 @@ function verifyLoginCode() {
     if (result && result.ok && result.token) {
       getFirestoreDb();
       firebase.auth(_fbApp).signInWithCustomToken(result.token).then(function() {
-        sessionStorage.setItem(SESSION_KEY, '1');
+        _setDeviceRemembered();
         _resyncLocalDataToCloud();
         _showApp();
       }).catch(function(err) {
@@ -560,22 +570,22 @@ function _showApp() {
 }
 
 // Check session on load — bypass login in GAS context.
-// בעולם web: sessionStorage[SESSION_KEY]='1' לבד לא מספיק — זה יכול להיות שריד מלפני
-// שהיה custom token (רק anonymous ישן, שנדחה ע"י Firestore Rules). מוודאים session
-// אמיתי (לא anonymous) עם onAuthStateChanged לפני שמדלגים על מסך הכניסה.
+// בעולם web: הדגל ב-localStorage (תוקף שבוע) לבד לא מספיק — זה יכול להיות שריד מלפני
+// שהיה custom token (רק anonymous ישן, שנדחה ע"י Firestore Rules), או שפג תוקפו.
+// מוודאים session אמיתי (לא anonymous) עם onAuthStateChanged לפני שמדלגים על מסך הכניסה.
 (function() {
   var gasMode = typeof google !== 'undefined' && google.script && google.script.run;
   if (gasMode) {
     document.addEventListener('DOMContentLoaded', _showApp);
     return;
   }
-  if (sessionStorage.getItem(SESSION_KEY) !== '1') return;
+  if (!_isDeviceRemembered()) return;
   getFirestoreDb();
   firebase.auth(_fbApp).onAuthStateChanged(function(user) {
     if (user && !user.isAnonymous) {
       document.addEventListener('DOMContentLoaded', _showApp);
     } else {
-      sessionStorage.removeItem(SESSION_KEY);
+      localStorage.removeItem(SESSION_KEY);
       if (user) firebase.auth(_fbApp).signOut();
     }
   });
