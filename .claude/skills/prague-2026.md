@@ -222,7 +222,7 @@ p.tips.forEach(...)  // ← גורם לקריסה שקטה, dialog לא נפתח
 | `appdata/reminders` | `data` (JSON string) |
 | `appdata/budget` | `total` (לתאימות אחורה) |
 
-- `ensureFirebaseAuth()` → anonymous auth → מחזיר Promise
+- `ensureFirebaseAuth()` → **לא עושה auth בעצמו** (מ-PR #61). רק בודק אם יש כבר `currentUser` אמיתי (לא anonymous) ומחזיר Promise עם `true`/`false`. ה-auth האמיתי קורה פעם אחת ב-`verifyLoginCode()` דרך `signInWithCustomToken`. **פעם היה כאן `signInAnonymously()` — הוסר בכוונה, אל תחזירו** (ראה "session אנונימי ישן נתקע" למטה)
 - `getFirestoreDb()` → Firestore instance
 - `onSnapshot` על `appdata/main` → sync real-time לימים + תקציב
 
@@ -236,6 +236,7 @@ p.tips.forEach(...)  // ← גורם לקריסה שקטה, dialog לא נפתח
 | `p.name`/`p.desc` עם `"` בתוך onclick attribute → שבירת HTML | `window._mapNavPlace` בmapNavDialog |
 | פילטר אטרקציות מציג מסעדות/קינוחים community | `indexOf('אטרקציות')` על `cat` |
 | `renderNearbyList` — שגיאה ב-item אחד שוברת כל הרשימה | `try-catch` per item |
+| **`signInAnonymously()` כ-fallback ב-`ensureFirebaseAuth()`** — Firestore דוחה anonymous, אז זה ייצר "התחברת בהצלחה" מדומה שנכשלת בשקט בכל כתיבה (`Missing or insufficient permissions`) | הוסר לגמרי. auth אמיתי רק דרך OTP → `signInWithCustomToken`. `ensureFirebaseAuth()` רק בודק `!isAnonymous` |
 
 ---
 
