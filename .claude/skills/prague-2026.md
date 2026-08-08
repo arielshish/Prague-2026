@@ -343,6 +343,19 @@ var _fb = COMMUNITY.find(c=>c.name===s.name) || RESTAURANTS.find(r=>r.name===s.n
 **⚠️ מגבלה ידועה**: חלק מהכתיבות הן `set()` בלי `merge` — אם כמה מכשירים צברו נתונים מקומיים
 שונים, מי שמתחבר אחרון דורס. לא נוצר כאן, אבל שווה לדעת.
 
+#### אימות אבטחה — האם ה-DB פתוח לכולם? (2026-08-07, נבדק אמפירית)
+נבדק בפועל מול הפרויקט החי, לא בהנחה:
+1. הרשמה עם `accounts:signUp` (email/password, מייל אקראי לא-משפחתי) עם ה-`apiKey` הפומבי → **הצליחה**. כלומר ספק email/password פעיל וכל אחד יכול ליצור חשבון Auth.
+2. קריאה מ-`appdata/main` עם הטוקן הזה → **`403 PERMISSION_DENIED`**
+3. כתיבה ל-`appdata/sectest_probe` עם הטוקן הזה → **`403 PERMISSION_DENIED`**
+4. חשבון הבדיקה נמחק (`accounts:delete`) ואומת שנמחק.
+
+**מסקנה**: ה-Rules לא בודקות `request.auth != null` (זה היה מתיר כל חשבון) אלא משהו צר יותר שרק ה-custom token של ה-GAS עומד בו. **אל תשנו את ה-Rules ל-`if request.auth != null`** — זה יפתח את כל ה-DB לכל מי שמכיר את ה-apiKey (שהוא פומבי ב-`app.html`).
+**שיפור אפשרי (לא בוצע)**: לכבות את ספק email/password ב-Firebase Console — הוא לא בשימוש בכלל (האפליקציה משתמשת רק ב-custom tokens), וכיבויו ימנע יצירת חשבונות זבל בפרויקט.
+
+#### כפתור התנתקות (2026-08-07)
+`doLogout()` — כפתור "🚪 התנתק מהמכשיר" בטאב הראשי. מוחק `localStorage[SESSION_KEY]` + `firebase.auth().signOut()` + `location.reload()`. **לא מוחק נתונים** (לא מקומית ולא בענן) — רק מנתק גישה. עם `confirm()` נגד לחיצה בטעות.
+
 #### זכירת מכשיר ל-7 ימים (PR #62)
 `SESSION_KEY` עבר מ-`sessionStorage` (נמחק בכל סגירת טאב → OTP חדש כמעט בכל פתיחה)
 ל-`localStorage` עם **timestamp של תפוגה** (`Date.now() + SESSION_TTL_MS`, שבוע):
