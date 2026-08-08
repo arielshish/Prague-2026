@@ -239,6 +239,7 @@ p.tips.forEach(...)  // ← גורם לקריסה שקטה, dialog לא נפתח
 | **`signInAnonymously()` כ-fallback ב-`ensureFirebaseAuth()`** — Firestore דוחה anonymous, אז זה ייצר "התחברת בהצלחה" מדומה שנכשלת בשקט בכל כתיבה (`Missing or insufficient permissions`) | הוסר לגמרי. auth אמיתי רק דרך OTP → `signInWithCustomToken`. `ensureFirebaseAuth()` רק בודק `!isAnonymous` |
 | **קריאה סינכרונית ל-`currentUser` ב-`ensureFirebaseAuth()`** — Firebase משחזר session אסינכרונית, אז בטעינת עמוד `currentUser===null` ו-`false` נִמְמָש לצמיתות; כל הטעינות ב-`DOMContentLoaded` נדחו ב-permission-denied → תג "⚠️ מקומי" | להמתין ל-`onAuthStateChanged` (עם unsubscribe + guard נגד resolve כפול + timeout 8ש׳) |
 | **`initRealtimeSync()` בלי ניתוק listeners קודמים** — `_realtimeUnsubs` היה קיים אבל מעולם לא שימש לניתוק, אז קריאה שנייה (אחרי כניסה) הכפילה listeners | לנתק את כל `_realtimeUnsubs` ולאפס את המערך בתחילת הפונקציה |
+| **`addEventListener('DOMContentLoaded', _showApp)` מתוך callback אסינכרוני** — `onAuthStateChanged` יורה לרוב *אחרי* שהאירוע כבר קרה, ומאזין לאירוע שעבר לא יורה לעולם. תוצאה: session תקף לגמרי אבל מסך הכניסה נשאר תקוע והמשתמש חושב שהתנתק | `_showAppWhenReady()` — בודק `document.readyState`, קורא `_showApp()` ישירות אם ה-DOM מוכן. **כל קוד אסינכרוני שמציג UI חייב את הבדיקה הזו** |
 
 ---
 
