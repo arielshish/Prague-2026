@@ -5028,6 +5028,12 @@ function showMapNavDialog(p, coords) {
       '<span style="background:rgba(99,102,241,0.12);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:#4F46E5;">' + _cc[0] + ' ' + _cc[1] + ' ממך</span>' +
       '<span style="background:rgba(0,0,0,0.05);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:rgba(30,41,59,0.65);">🚶 ' + _dStr + ' · ' + _w + ' דק׳</span>' +
     '</div>';
+  } else if (coords) {
+    // אין עדיין מיקום — להציג כפתור במקום להעלים את הפיצ'ר בשקט.
+    // (הבאג המקורי: המשתמש פתח דיאלוג בשטח ולא הבין למה אין מרחק.)
+    infoHtml += '<div id="mapNavDistRow" style="margin-bottom:8px;">' +
+      '<button type="button" onclick="_locateForDialog(this)" style="background:rgba(99,102,241,0.10);border:1px solid rgba(99,102,241,0.28);border-radius:10px;padding:7px 12px;font-size:11px;font-weight:800;color:#4F46E5;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">📍 כמה רחוק ממני?</button>' +
+    '</div>';
   }
 
   // ── per-type rich info section ──
@@ -5195,6 +5201,21 @@ function _updateUserMarker(accuracyM) {
   }
 }
 
+// לחיצה על "📍 כמה רחוק ממני?" בתוך הדיאלוג — מבקש מיקום פעם אחת ואז
+// ממלא את השורה במקום, בלי לסגור/לפתוח מחדש את הדיאלוג.
+function _locateForDialog(btn) {
+  if (!navigator.geolocation) { toast('⚠️ אין תמיכה באיתור מיקום'); return; }
+  if (btn) { btn.disabled = true; btn.textContent = '⌛ מאתר…'; }
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    _userLat = pos.coords.latitude; _userLng = pos.coords.longitude;
+    _refreshOpenDialogDistance();
+    renderNearbyList(); // גם הרשימה ברקע תקבל מרחקים ותמוין מחדש
+  }, function(err) {
+    if (btn) { btn.disabled = false; btn.textContent = '📍 כמה רחוק ממני?'; }
+    toast(err && err.code === 1 ? '⚠️ אין הרשאת מיקום' : '⚠️ לא ניתן לאתר מיקום');
+  }, {timeout:10000, enableHighAccuracy:true, maximumAge:60000});
+}
+
 // עדכון חי של שורת המרחק/כיוון בדיאלוג הפתוח (אם יש)
 function _refreshOpenDialogDistance() {
   var el = document.getElementById('mapNavDistRow');
@@ -5203,6 +5224,8 @@ function _refreshOpenDialogDistance() {
   var d = haversine(_userLat, _userLng, c[0], c[1]);
   var dStr = d < 1 ? Math.round(d*1000) + ' מ׳' : d.toFixed(1) + ' ק״מ';
   var cc = compassFor(bearingTo(_userLat, _userLng, c[0], c[1]));
+  // גם הסגנון — השורה יכולה להיות ה-fallback עם הכפתור, שאין לו flex
+  el.style.display = 'flex'; el.style.flexWrap = 'wrap'; el.style.gap = '6px';
   el.innerHTML = '<span style="background:rgba(99,102,241,0.12);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:#4F46E5;">' + cc[0] + ' ' + cc[1] + ' ממך</span>' +
     '<span style="background:rgba(0,0,0,0.05);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:rgba(30,41,59,0.65);">🚶 ' + dStr + ' · ' + Math.ceil(d/0.08) + ' דק׳</span>';
 }
