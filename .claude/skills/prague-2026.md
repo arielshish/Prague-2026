@@ -264,6 +264,8 @@ p.tips.forEach(...)  // ← גורם לקריסה שקטה, dialog לא נפתח
 | `visitedBtnHtml(name, variant)` | `'icon'` = כפתור צר לכרטיסי קהילה · `'block'` = שורת פעולות במסעדות |
 | `refreshVisitedUI()` | מרנדר את הטאב הפעיל, **כולל `days`** — `refreshScheduleBadges` מדלגת עליו בכוונה |
 
+⚠️ **ה-listener רשום ב-capture phase** (`addEventListener('click', fn, true)`). כרטיס התחנה בטאב ימים נושא `onclick="showStopDetail(...)"` כ-attribute; ב-bubble ה-listener ב-`document` רץ **אחרי** ה-onclick של הכרטיס, ו-`stopPropagation` מאחר — הסימון עבד אבל הפופ-אפ נפתח יחד איתו. **אל תחזירו ל-bubble.**
+
 ⚠️ **event delegation ולא `onclick` inline** — listener אחד על `document` עם `.closest('.visitedBtn')` + `data-vn`. שמות מקומות מכילים גרשים ומרכאות (`מגדל פטז׳ין`, `מ"ר`, `בסופ"ש`); זו אותה מלכודת שכבר שברה `onclick` פעמיים בפרויקט הזה (ראה `_mapNavPlace`).
 
 **כיסוי בפועל — 110/110 כרטיסים + 3 משטחים נוספים**: אטרקציות 56 · מסעדות 26 · קינוחים 11 · צילום 10 · קניות 7, וכן `showStopDetail` (הפופ-אפ של תחנה), כרטיס התחנה בטאב ימים (תג ✅), ודיאלוג הנעץ במפה.
