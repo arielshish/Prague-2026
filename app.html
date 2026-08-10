@@ -574,7 +574,7 @@ function verifyLoginCode() {
 // בלי שום דרך לדעת שהם על גרסה ישנה.
 // BUILD_ID מתעדכן ידנית בכל שינוי מהותי; הוא מוצג בכפתור כדי שאפשר יהיה
 // לדעת במבט אחד איזו גרסה טעונה בטלפון.
-var BUILD_ID = '2026-08-10-d';
+var BUILD_ID = '2026-08-10-e';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
@@ -3853,7 +3853,7 @@ function renderDays() {
         '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
           (s.mapUrl ? '<a href="' + s.mapUrl + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="nav-map-btn">🗺️ נווט</a>' : '') +
           (PLACE_COORDS[s.name] ? '<button type="button" onclick="event.stopPropagation();openStopMapDialog(this.dataset.pn)" data-pn="' + esc(s.name) + '" class="nav-map-btn" style="background:rgba(99,102,241,0.10);border-color:rgba(99,102,241,0.28);color:#4F46E5;cursor:pointer;margin-right:6px;">📍 ממני</button>' : '') +
-          (isVisited(s.name) ? '<span style="display:inline-flex;align-items:center;background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.32);border-radius:12px;padding:3px 9px;font-size:10px;font-weight:800;color:#065F46;margin-right:6px;">✅ היינו</span>' : '') +
+          visitedBtnHtml(s.name, 'chip') +
           '<div style="flex:1;"></div>' +
           '<button onclick="event.stopPropagation();moveStopUpDown(' + dayIdx + ',' + si + ',-1)" style="background:rgba(0,0,0,0.04);border:none;border-radius:6px;padding:2px 5px;font-size:10px;cursor:pointer;line-height:1;color:rgba(30,41,59,0.45);">▲</button>' +
           '<button onclick="event.stopPropagation();moveStopUpDown(' + dayIdx + ',' + si + ',1)" style="background:rgba(0,0,0,0.04);border:none;border-radius:6px;padding:2px 5px;font-size:10px;cursor:pointer;line-height:1;color:rgba(30,41,59,0.45);">▼</button>' +
@@ -3933,7 +3933,14 @@ function showStopDetail(dayIdx, stopIdx) {
       '<div style="font-size:13px;color:rgba(30,41,59,0.85);">' + esc(s.booking) + '</div>' +
     '</div>' : '') +
     (tipsHtml ? '<div style="margin-bottom:14px;"><div style="font-size:11px;font-weight:800;color:#065F46;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">💡 טיפים</div>' + tipsHtml + '</div>' : '') +
-    '<div style="margin-bottom:10px;">' + visitedBtnHtml(s.name, 'block') + '</div>' +
+    // סט הפעולות המלא, זהה לזה שבכרטיס התחנה — הפופ-אפ היה חסר "ממני",
+    // "שנה שעה" ו"העבר יום", ולכן חייב סגירה וחזרה לכרטיס בשביל כל פעולה.
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">' +
+      visitedBtnHtml(s.name, 'block') +
+      (PLACE_COORDS[s.name] ? '<button type="button" onclick="document.getElementById(\'stopDetailOverlay\').remove();openStopMapDialog(this.dataset.pn)" data-pn="' + esc(s.name) + '" style="flex:0 0 auto;background:rgba(99,102,241,0.10);border:1.5px solid rgba(99,102,241,0.25);color:#4F46E5;border-radius:13px;padding:11px 14px;font-weight:800;font-size:12px;cursor:pointer;font-family:Rubik,Arial,sans-serif;">📍 ממני</button>' : '') +
+      '<button type="button" onclick="document.getElementById(\'stopDetailOverlay\').remove();openEditStopTime(' + dayIdx + ',' + stopIdx + ')" style="flex:0 0 auto;background:rgba(16,185,129,0.10);border:1.5px solid rgba(16,185,129,0.28);color:#065F46;border-radius:13px;padding:11px 14px;font-weight:800;font-size:12px;cursor:pointer;font-family:Rubik,Arial,sans-serif;">⏰ שעה</button>' +
+      '<button type="button" onclick="document.getElementById(\'stopDetailOverlay\').remove();openMoveStop(' + dayIdx + ',' + stopIdx + ')" style="flex:0 0 auto;background:rgba(59,130,246,0.10);border:1.5px solid rgba(59,130,246,0.28);color:#1E40AF;border-radius:13px;padding:11px 14px;font-weight:800;font-size:12px;cursor:pointer;font-family:Rubik,Arial,sans-serif;">↔ העבר יום</button>' +
+    '</div>' +
     (s.mapUrl ? '<a href="' + s.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:13px;font-weight:800;font-size:13px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;">🗺️ נווט למפה</a>' : '') +
     '</div>';
   document.body.appendChild(overlay);
@@ -4547,6 +4554,10 @@ function visitedBtnHtml(name, variant) {
   var label  = on ? '✅ היינו' : '⬜ היינו';
   var common = 'background:' + bg + ';border:1.5px solid ' + border + ';color:' + color +
                ';cursor:pointer;font-weight:800;font-family:Rubik,Arial,sans-serif;';
+  if (variant === 'chip') {
+    return '<button type="button" class="visitedBtn" data-vn="' + esc(name) + '" style="' + common +
+      'border-radius:12px;padding:3px 9px;font-size:10px;line-height:1.3;">' + label + '</button>';
+  }
   if (variant === 'icon') {
     return '<button type="button" class="visitedBtn" data-vn="' + esc(name) + '" style="' + common +
       'flex-shrink:0;border-radius:12px;padding:10px 12px;font-size:11px;text-align:center;line-height:1.3;">' +
@@ -4558,13 +4569,17 @@ function visitedBtnHtml(name, variant) {
 
 // listener אחד ברמת ה-document במקום onclick inline — שמות מקומות מכילים
 // מרכאות וגרשים (מ"ר, בסופ"ש), וזו בדיוק המלכודת ששברה onclick בעבר.
+// ⚠️ capture phase (הארגומנט השלישי `true`) — ולא bubble. כרטיס התחנה בטאב
+// ימים נושא `onclick="showStopDetail(...)"` כ-attribute; ב-bubble ה-listener
+// הזה רץ ב-document, כלומר **אחרי** שה-onclick של הכרטיס כבר ירה, ולכן
+// stopPropagation מאחר והפופ-אפ נפתח יחד עם הסימון. ב-capture אנחנו קודמים לו.
 document.addEventListener('click', function(e) {
   var btn = e.target && e.target.closest ? e.target.closest('.visitedBtn') : null;
   if (!btn) return;
   e.preventDefault();
   e.stopPropagation();
   toggleVisited(btn.getAttribute('data-vn'));
-});
+}, true);
 
 // ═══════════════════════════════════════════
 //  COMMUNITY
@@ -4725,6 +4740,7 @@ function renderShopping() {
       '<div style="display:flex;gap:8px;">' +
         '<a href="' + s.mapUrl + '" target="_blank" rel="noopener" style="flex:1;display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:12px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;">🗺️ ניווט</a>' +
         visitedBtnHtml(s.name, 'block') +
+        (PLACE_COORDS[s.name] ? '<button type="button" onclick="showDistanceTo(this.dataset.pn)" data-pn="' + esc(s.name) + '" style="flex:1;background:rgba(99,102,241,0.10);border:1.5px solid rgba(99,102,241,0.25);color:#4F46E5;border-radius:13px;padding:12px;font-weight:800;font-size:12px;cursor:pointer;font-family:Rubik,Arial,sans-serif;">📍 ממני</button>' : '') +
         '<button onclick="addShopToStop(' + idx + ')" style="flex:1;' + addBtnStyle + 'border-radius:13px;padding:12px;font-weight:800;font-size:12px;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">' + addBtnTxt + '</button>' +
       '</div>' +
       '</div>';
@@ -4844,6 +4860,7 @@ function renderDesserts() {
       '<div style="background:rgba(0,0,0,0.04);border-radius:10px;padding:7px 11px;font-size:11px;color:rgba(30,41,59,0.5);margin-bottom:10px;">📍 ' + esc(d.where) + '</div>' +
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">' +
         visitedBtnHtml(d.name, 'block') +
+        (PLACE_COORDS[d.name] ? '<button type="button" onclick="showDistanceTo(this.dataset.pn)" data-pn="' + esc(d.name) + '" style="background:rgba(99,102,241,0.10);border:1.5px solid rgba(99,102,241,0.25);color:#4F46E5;border-radius:12px;padding:10px;font-weight:800;font-size:12px;cursor:pointer;font-family:Rubik,Arial,sans-serif;">📍 ממני</button>' : '') +
         '<a href="' + d.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:linear-gradient(90deg,#ec4899,#f97316);color:white;text-decoration:none;border-radius:12px;padding:10px;font-weight:800;font-size:12px;font-family:\'Rubik\',Arial,sans-serif;">🗺️ ניווט</a>' +
         (_inDaysDes ? '<div style="background:rgba(16,185,129,0.13);border:1px solid rgba(16,185,129,0.38);border-radius:12px;padding:10px;font-size:11px;font-weight:800;color:#065F46;text-align:center;">✅ יום ' + _inDaysDes.dayNum + ' · ' + esc(_inDaysDes.time||'') + '</div>' : '<button onclick="openAddDessertStop(' + DESSERTS.indexOf(d) + ')" style="background:#F4634A;color:white;border:none;border-radius:12px;padding:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">➕ הוסף ללו&quot;ז</button>') +
       '</div>' +
@@ -4890,6 +4907,7 @@ function renderPhotoSpots() {
       '<div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:8px 11px;font-size:11px;color:#B45309;margin-bottom:10px;line-height:1.6;">💡 ' + esc(s.tip) + '</div>' +
       '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;">' +
         visitedBtnHtml(s.name, 'block') +
+        (PLACE_COORDS[s.name] ? '<button type="button" onclick="showDistanceTo(this.dataset.pn)" data-pn="' + esc(s.name) + '" style="background:rgba(99,102,241,0.10);border:1.5px solid rgba(99,102,241,0.25);color:#4F46E5;border-radius:12px;padding:10px 4px;font-weight:800;font-size:11px;cursor:pointer;font-family:Rubik,Arial,sans-serif;white-space:nowrap;">📍 ממני</button>' : '') +
         '<a href="' + s.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:linear-gradient(90deg,#6366f1,#8b5cf6);color:white;text-decoration:none;border-radius:12px;padding:10px 4px;font-weight:800;font-size:11px;font-family:\'Rubik\',Arial,sans-serif;white-space:nowrap;">🗺️ ניווט</a>' +
         '<button onclick="openPhotoModal(PHOTO_SPOTS[' + PHOTO_SPOTS.indexOf(s) + '].name)" style="background:linear-gradient(135deg,rgba(236,72,153,0.25),rgba(168,85,247,0.25));border:1px solid rgba(236,72,153,0.35);border-radius:12px;padding:10px 4px;font-size:11px;font-weight:800;color:#9D174D;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;white-space:nowrap;">📷 צלם</button>' +
         (_inDaysPhoto ? '<div style="background:rgba(16,185,129,0.13);border:1px solid rgba(16,185,129,0.38);border-radius:12px;padding:10px 4px;font-size:10px;font-weight:800;color:#065F46;text-align:center;white-space:nowrap;">✅ יום ' + _inDaysPhoto.dayNum + '</div>' : '<button onclick="openAddPhotoStop(' + PHOTO_SPOTS.indexOf(s) + ')" style="background:#F4634A;color:white;border:none;border-radius:12px;padding:10px 4px;font-size:11px;font-weight:800;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;white-space:nowrap;">➕ ללו&quot;ז</button>') +
