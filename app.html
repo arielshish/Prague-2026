@@ -3727,6 +3727,7 @@ function renderDays() {
         (s.desc ? '<div style="font-size:12px;color:var(--c-text-2,rgba(30,41,59,0.6));line-height:1.5;margin-bottom:7px;">' + esc(s.desc) + '</div>' : '') +
         '<div style="display:flex;align-items:center;gap:6px;">' +
           (s.mapUrl ? '<a href="' + s.mapUrl + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="nav-map-btn">🗺️ נווט</a>' : '') +
+          (PLACE_COORDS[s.name] ? '<button type="button" onclick="event.stopPropagation();openStopMapDialog(this.dataset.pn)" data-pn="' + esc(s.name) + '" class="nav-map-btn" style="background:rgba(99,102,241,0.10);border-color:rgba(99,102,241,0.28);color:#4F46E5;cursor:pointer;margin-right:6px;">📍 ממני</button>' : '') +
           '<div style="flex:1;"></div>' +
           '<button onclick="event.stopPropagation();moveStopUpDown(' + dayIdx + ',' + si + ',-1)" style="background:rgba(0,0,0,0.04);border:none;border-radius:6px;padding:2px 5px;font-size:10px;cursor:pointer;line-height:1;color:rgba(30,41,59,0.45);">▲</button>' +
           '<button onclick="event.stopPropagation();moveStopUpDown(' + dayIdx + ',' + si + ',1)" style="background:rgba(0,0,0,0.04);border:none;border-radius:6px;padding:2px 5px;font-size:10px;cursor:pointer;line-height:1;color:rgba(30,41,59,0.45);">▼</button>' +
@@ -4765,6 +4766,17 @@ var PLACE_COORDS = {
   'Nový Smíchov':                [50.0703, 14.4030],
   'Albert Supermarket — Chodov': [50.0277, 14.4892],
   'שדרת Na Příkopě':            [50.0862, 14.4290],
+  // ── כינויים לתחנות ב-DAYS ──────────────────────────────────────────────
+  // שמות התחנות ב-DAYS לא תמיד זהים לשמות ב-ALL_PLACES ("ארוחת ערב — Gran
+  // Fierro" מול "Gran Fierro"), ו-PLACE_COORDS מפתחו לפי שם מדויק. בלי
+  // הכינויים האלה התחנות האלה לא מקבלות מרחק/כיוון/כפתור מפה.
+  // כל ערך כאן = אותן קואורדינטות של הרשומה המקורית, לא ניחוש חדש.
+  'ארוחת ערב — Gran Fierro':     [50.0779, 14.4368],
+  'Gran Fierro — ארוחת ערב':     [50.0779, 14.4368],
+  'Výtopna — מסעדת הרכבות':      [50.0815, 14.4274],
+  'Hamleys Prague':              [50.0872, 14.4297],
+  'שייט ערב בוולטאווה':          [50.0900, 14.4155],
+  'Primark — כיכר וצסלב':        [50.0812, 14.4295],
   'Parizska Street — רחוב פריז': [50.0917, 14.4170],
   'Nerudova Street':             [50.0892, 14.4030],
   // ── נקודות צילום ──
@@ -5399,6 +5411,32 @@ function renderNearbyList() {
     } catch(e) { console.error('[renderNearbyList] item error', it && it.p && it.p.name, e); }
   });
   container.innerHTML = html;
+}
+
+// פתיחת הדיאלוג המלא (מרחק + כיוון + ניווט) מכרטיס תחנה בטאב ימים.
+// תחנה ב-DAYS_STATE היא לא בהכרח פריט מ-ALL_PLACES — המשתמש יכול להוסיף תחנה
+// מותאמת אישית. לכן: קודם מחפשים ברשימה המאוחדת, ואם אין — בונים אובייקט
+// מינימלי מהתחנה עצמה כדי שהדיאלוג עדיין ייפתח עם מה שיש.
+function openStopMapDialog(name) {
+  try {
+    var coords = PLACE_COORDS[name];
+    if (!coords) { toast('📍 אין קואורדינטות לתחנה הזו'); return; }
+    var p = _uniquePlacesForMap().find(function(x) { return x.name === name; });
+    if (!p) {
+      var st = null;
+      getDaysState().forEach(function(d) {
+        (d.stops || []).forEach(function(s) { if (s.name === name) st = s; });
+      });
+      p = st
+        ? { type:'community', icon: st.icon || '📍', name: st.name, desc: st.desc || '',
+            mapUrl: st.mapUrl || '', duration: st.duration || '', google: st.google || '', who: st.who || '' }
+        : { type:'community', icon:'📍', name: name };
+    }
+    showMapNavDialog(p, coords);
+  } catch (e) {
+    console.error('[days] openStopMapDialog error', name, e);
+    toast('⚠️ שגיאה בפתיחת הפרטים');
+  }
 }
 
 function _openNearbyDialog(apIdx, lat, lng) {
