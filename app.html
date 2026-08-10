@@ -4873,6 +4873,37 @@ function makePinIcon(color) {
   });
 }
 
+// ─────────────────────────────────────────
+//  de-dupe לפי שם — 15 מקומות מופיעים פעמיים ב-ALL_PLACES (פעם restaurant/shop
+//  ופעם community עם cat:'🍽️ מסעדות'/'🛍️ קניות'). שניהם עם אותו name, ולכן
+//  PLACE_COORDS[name] מחזיר קואורדינטות לשניהם → שני נעצים זהים זה על זה במפה
+//  וכרטיס כפול ברשימת הקרובים.
+//  ⚠️ אסור פשוט להסיר מ-ALL_PLACES — renderCommunity() מרנדר את רשומות ה-community
+//  לפי cat, והן היו נעלמות מטאב "קהילה". לכן ה-de-dupe הוא בשכבת התצוגה בלבד.
+//  ממזגים שדות משתי הרשומות (כדי לא לאבד מידע כמו price מ-restaurant או how
+//  מ-community), ושומרים את ה-type של הרשומה העשירה יותר — הוא קובע איך
+//  showMapNavDialog מרנדר.
+var _uniquePlacesCache = null;
+function _uniquePlacesForMap() {
+  if (_uniquePlacesCache) return _uniquePlacesCache; // ALL_PLACES סטטי — בטוח לשמור במטמון
+  var byName = {}, order = [];
+  ALL_PLACES.forEach(function(p) {
+    if (!p || !p.name) return;
+    var prev = byName[p.name];
+    if (!prev) { byName[p.name] = p; order.push(p.name); return; }
+    var score = function(o) { var n = 0; for (var k in o) { if (o[k] !== undefined && o[k] !== null && o[k] !== '') n++; } return n; };
+    var rich = score(p) > score(prev) ? p : prev;
+    var other = rich === p ? prev : p;
+    var merged = {};
+    for (var k1 in other) merged[k1] = other[k1];
+    for (var k2 in rich) { if (rich[k2] !== undefined && rich[k2] !== null && rich[k2] !== '') merged[k2] = rich[k2]; }
+    merged.type = rich.type; // ה-type של העשירה קובע את הרינדור בדיאלוג
+    byName[p.name] = merged;
+  });
+  _uniquePlacesCache = order.map(function(n) { return byName[n]; });
+  return _uniquePlacesCache;
+}
+
 function addMapMarkers() {
   if (!_leafletMap || !window.L) return;
   var catColor = { restaurant:'#2563EB', community:'#16a34a', photo:'#9333ea', dessert:'#e879f9', shop:'#f59e0b', exchange:'#0891B2' };
@@ -4880,7 +4911,7 @@ function addMapMarkers() {
   var scheduledNames = {};
   daysState.forEach(function(d) { (d.stops||[]).forEach(function(s){ scheduledNames[s.name]=true; }); });
 
-  ALL_PLACES.forEach(function(p) {
+  _uniquePlacesForMap().forEach(function(p) {
     var coords = PLACE_COORDS[p.name];
     if (!coords) return;
     var isScheduled = scheduledNames[p.name];
@@ -4974,6 +5005,14 @@ function showMapNavDialog(p, coords) {
     if (p.fee_txt) chips5 += '<span style="background:rgba(16,185,129,0.1);border-radius:8px;padding:4px 10px;font-size:11px;color:#065F46;">💳 ' + esc(p.fee_txt) + '</span>';
     if (chips5) infoHtml += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">' + chips5 + '</div>';
     if (p.tip) infoHtml += '<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:8px 11px;font-size:11px;color:#B45309;margin-bottom:8px;">💡 ' + esc(p.tip) + '</div>';
+  }
+
+  // Fallback גנרי: אחרי מיזוג הכפילויות, פריט restaurant/shop יכול לרשת how/tips
+  // מרשומת ה-community שלו. הבלוקים לפי type לא מרנדרים אותם, אז מוסיפים כאן
+  // (רק אם לא כבר הוצגו ע"י בלוק community).
+  if (p.type !== 'community') {
+    if (p.how) infoHtml += '<div style="background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.18);border-radius:10px;padding:8px 11px;font-size:11px;color:#3730a3;margin-bottom:8px;">🚇 ' + esc(p.how) + '</div>';
+    if (p.booking) infoHtml += '<div style="background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);border-radius:10px;padding:8px 11px;font-size:11px;color:#4338CA;margin-bottom:8px;">🎟️ ' + esc(p.booking) + '</div>';
   }
 
   // שמור נתוני המקום ב-global כדי להימנע מבעיות escaping ב-onclick
@@ -5080,9 +5119,9 @@ function renderNearbyList() {
   var scheduledNames = {};
   daysState.forEach(function(d,i) { (d.stops||[]).forEach(function(s){ scheduledNames[s.name]={dayNum:d.dayNum||(i+1),day:d.title,time:s.time}; }); });
 
-  // בנה רשימה עם מרחקים
+  // בנה רשימה עם מרחקים — מהרשימה המאוחדת (בלי כפילויות), ראה _uniquePlacesForMap
   var items = [];
-  ALL_PLACES.forEach(function(p) {
+  _uniquePlacesForMap().forEach(function(p) {
     if (!PLACE_COORDS[p.name]) return;
     var coords = PLACE_COORDS[p.name];
     var dist = (_userLat !== null) ? haversine(_userLat, _userLng, coords[0], coords[1]) : null;
@@ -5132,8 +5171,10 @@ function renderNearbyList() {
     var _tipStr = Array.isArray(p.tips) ? p.tips.join(' | ') : (p.tips || '');
     var desc = String(p.desc || _tipStr || '').substring(0, 90);
 
-    var apIdx = ALL_PLACES.indexOf(p);
-    if (apIdx === -1) return; // defensive: skip items not in ALL_PLACES
+    // אינדקס לתוך הרשימה המאוחדת (לא ALL_PLACES) — האובייקטים כאן ממוזגים ולכן
+    // ALL_PLACES.indexOf() היה מחזיר -1 ומשמיט כל כרטיס.
+    var apIdx = _uniquePlacesForMap().indexOf(p);
+    if (apIdx === -1) return; // defensive
     var c0 = it.coords[0], c1 = it.coords[1];
     html += '<div onclick="_openNearbyDialog(' + apIdx + ',' + c0 + ',' + c1 + ')" ' +
       'style="background:#fff;border-radius:16px;padding:13px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.05);display:flex;align-items:center;gap:12px;cursor:pointer;-webkit-tap-highlight-color:rgba(0,0,0,0.04);">' +
@@ -5162,7 +5203,7 @@ function renderNearbyList() {
 
 function _openNearbyDialog(apIdx, lat, lng) {
   try {
-    var p = ALL_PLACES[apIdx];
+    var p = _uniquePlacesForMap()[apIdx]; // אותה רשימה מאוחדת שממנה נבנו הכרטיסים
     if (!p) { console.warn('[location] _openNearbyDialog: invalid apIdx', apIdx); return; }
     showMapNavDialog(p, [lat, lng]);
   } catch(e) {
