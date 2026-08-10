@@ -112,7 +112,7 @@ var PHOTO_SPOTS = ALL_PLACES.filter(p => p.type==='photo');
 - **תמונות מסעדות**: כרטיסי מסעדה עם תמונה 150px — gradient+emoji fallback, Wikimedia Commons אם קיים ב-PLACE_IMGS
 - `restaurantImgHtml(r)` — helper שמחזיר HTML של תמונה עם onerror fallback
 - `PLACE_IMGS` — lookup לפי שם מקום → URL תמונה (Wikimedia Commons)
-- `PLACE_COORDS` — קואורדינטות [lat,lng] לכל 105 המקומות ב-ALL_PLACES (~שורה 4396)
+- `PLACE_COORDS` — קואורדינטות [lat,lng]; **126 מפתחות, כיסוי מלא: 98/98 שמות ב-`ALL_PLACES` + 29/29 שמות תחנות ב-`DAYS`** (2026-08-10). ממופתח לפי **שם מדויק**, ולכן יש בו גם כינויים לשמות תחנות שלא זהים לשם ב-`ALL_PLACES`. תחנות "פעולה" (מנוחה במלון, צ'ק-אאוט) ממופות לעוגן ההגיוני שלהן (המלון). כל קואורדינטה **אומתה משני מקורות בלתי-תלויים לפחות** — אין ניחושים (ראה הסקיל לטבלת המקורות)
 - `PLACE_IMGS` — 35+ תמונות Wikimedia Commons לפי שם מקום (~שורה 4494)
 - **טאב מיקום** (`location`) — מפת Leaflet+OpenStreetMap, כפתור "📍 אתרו אותי" (Geolocation API)
 - **מעקב מיקום חי** (2026-08-10) — הכפתור הוא toggle על `watchPosition`: המרחק/כיוון/מיון מתעדכנים תוך כדי הליכה, נעץ יחיד שזז + עיגול דיוק. throttle לרשימה (3 שנ׳ / 15 מ׳) ועצירה אוטומטית ביציאה מהטאב וב-`visibilitychange` — סוללה

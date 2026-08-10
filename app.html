@@ -2644,12 +2644,12 @@ var DAYS = [
    peak:'להגיע למלון ולסגור היום בארוחה רגועה בלי לחץ.',
    stops:[
      {emoji:'🏨',name:'Comfort Hotel Prague City East',time:'60–90 דק׳',desc:"צ'ק אין, מקלחות, טעינת טלפונים",
-      details:"המלון ממוקם ברובע Žižkov, כ-10 דקות ממרכז פראג במטרו. מלון 4 כוכבים עם בריכה פנימית, מסעדה, בר וחדרים גדולים ונוחים. צ'ק אין מ-14:00, צ'ק אאוט עד 12:00.",
-      tips:['לבקש חדר גבוה לנוף עירוני','ניתן להשאיר מזוודות לפני צ׳ק אין','Wi-Fi חינם בכל החדרים','הבריכה פתוחה 07:00–22:00'],
+      details:"הכתובת: Bečvářova 2081/14, רובע Strašnice (פראג 10) — לא Žižkov. תחנת החשמלית Solidarita ממש ליד המלון (קווים 7 ו-11), ותחנת המטרו Strašnická (קו A) במרחק הליכה קצר. מלון 4 כוכבים עם מסעדה, בר וחדרים גדולים ונוחים. צ'ק אין מ-14:00, צ'ק אאוט עד 12:00.",
+      tips:['לבקש חדר גבוה לנוף עירוני','ניתן להשאיר מזוודות לפני צ׳ק אין','Wi-Fi חינם בכל החדרים','חדר כושר 24/7, חדר משחקים ומועדון ילדים — אין בריכה במלון'],
       booking:'לא נדרשת הזמנה מראש לכניסה — מספיק אישור ההזמנה הקיים.',
       mapUrl:'https://www.google.com/maps/search/Comfort+Hotel+Prague+City+East'},
      {emoji:'🚶',name:'סיבוב קצר באזור המלון',time:'30–45 דק׳',desc:'קניית מים, נשנושים, בדיקת תחנת מטרו',
-      details:'רחוב Seifertova ליד המלון — יש Albert Supermarket שקרוב, קיוסקים וקפה. שווה לאתר תחנת מטרו Žižkov ולהבין את הכיוונים לעיר.',
+      details:'האזור סביב Bečvářova ב-Strašnice — שכונת מגורים שקטה עם סופרים, קיוסקים ובתי קפה. שווה לאתר את תחנת החשמלית Solidarita (ממש ליד המלון) ואת תחנת המטרו Strašnická בקו A — משם ~15 דקות למרכז.',
       tips:['לקנות כרטיסי מטרו 24/48/72 שעות בתחנה — חוסך זמן','להוריד מפה אופליין (Google Maps) לפני יציאה','מים בסופר — 20–30 CZK, יקרים יותר בתיירות'],
       booking:'ללא צורך.',
       mapUrl:'https://www.google.com/maps/search/convenience+store+near+Comfort+Hotel+Prague'},
@@ -3727,6 +3727,7 @@ function renderDays() {
         (s.desc ? '<div style="font-size:12px;color:var(--c-text-2,rgba(30,41,59,0.6));line-height:1.5;margin-bottom:7px;">' + esc(s.desc) + '</div>' : '') +
         '<div style="display:flex;align-items:center;gap:6px;">' +
           (s.mapUrl ? '<a href="' + s.mapUrl + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="nav-map-btn">🗺️ נווט</a>' : '') +
+          (PLACE_COORDS[s.name] ? '<button type="button" onclick="event.stopPropagation();openStopMapDialog(this.dataset.pn)" data-pn="' + esc(s.name) + '" class="nav-map-btn" style="background:rgba(99,102,241,0.10);border-color:rgba(99,102,241,0.28);color:#4F46E5;cursor:pointer;margin-right:6px;">📍 ממני</button>' : '') +
           '<div style="flex:1;"></div>' +
           '<button onclick="event.stopPropagation();moveStopUpDown(' + dayIdx + ',' + si + ',-1)" style="background:rgba(0,0,0,0.04);border:none;border-radius:6px;padding:2px 5px;font-size:10px;cursor:pointer;line-height:1;color:rgba(30,41,59,0.45);">▲</button>' +
           '<button onclick="event.stopPropagation();moveStopUpDown(' + dayIdx + ',' + si + ',1)" style="background:rgba(0,0,0,0.04);border:none;border-radius:6px;padding:2px 5px;font-size:10px;cursor:pointer;line-height:1;color:rgba(30,41,59,0.45);">▼</button>' +
@@ -4765,6 +4766,17 @@ var PLACE_COORDS = {
   'Nový Smíchov':                [50.0703, 14.4030],
   'Albert Supermarket — Chodov': [50.0277, 14.4892],
   'שדרת Na Příkopě':            [50.0862, 14.4290],
+  // ── כינויים לתחנות ב-DAYS ──────────────────────────────────────────────
+  // שמות התחנות ב-DAYS לא תמיד זהים לשמות ב-ALL_PLACES ("ארוחת ערב — Gran
+  // Fierro" מול "Gran Fierro"), ו-PLACE_COORDS מפתחו לפי שם מדויק. בלי
+  // הכינויים האלה התחנות האלה לא מקבלות מרחק/כיוון/כפתור מפה.
+  // כל ערך כאן = אותן קואורדינטות של הרשומה המקורית, לא ניחוש חדש.
+  'ארוחת ערב — Gran Fierro':     [50.0779, 14.4368],
+  'Gran Fierro — ארוחת ערב':     [50.0779, 14.4368],
+  'Výtopna — מסעדת הרכבות':      [50.0815, 14.4274],
+  'Hamleys Prague':              [50.0872, 14.4297],
+  'שייט ערב בוולטאווה':          [50.0900, 14.4155],
+  'Primark — כיכר וצסלב':        [50.0812, 14.4295],
   'Parizska Street — רחוב פריז': [50.0917, 14.4170],
   'Nerudova Street':             [50.0892, 14.4030],
   // ── נקודות צילום ──
@@ -4783,6 +4795,37 @@ var PLACE_COORDS = {
   'מנזר סטרהוב — ספרייה':       [50.0835, 14.3948],
   'מגדל פטז׳ין':                 [50.0826, 14.3997],
   'שעון אסטרונומי — מגדל':      [50.0867, 14.4211],
+  // ── השלמת תחנות DAYS שלא היו להן קואורדינטות (2026-08-10) ──────────────
+  // כל תחנה בטאב "ימים" צריכה מיקום כדי לקבל "📍 ממני" + דיאלוג מפה.
+  // מקורות אימות (לא ניחוש — ראה CLAUDE.md → "לקח מ-2026-08-07"):
+  //   • המלון — 50°4'34.829"N 14°29'37.250"E מדף "צור קשר" הרשמי של המלון,
+  //     מאומת שנית מול Wikidata Q98398369 (50°4'34.61"N 14°29'36.92"E) →
+  //     פער של ~7 מ׳. Bečvářova 2081/14, Strašnice, Praha 10.
+  //   • כיכר העיר העתיקה/אורלוי — 50°05′13.23″N 14°25′15.30″E (ויקיפדיה)
+  //   • טירת פראג — 50°05′27″N 14°24′02″E (ויקיפדיה) = אותו ערך של 'מצודת פראג'
+  //   • אי קמפה — 50°05′06″N 14°24′30″E (ויקיפדיה/Prague City Tourism)
+  //   • Čertovka (גלגל המים) — 50.0863, 14.4081, ~130 מ׳ צפונית למרכז קמפה
+  //   • Království železnic — 50°4'16.765"N 14°24'9.124"E (Stroupežnického 23)
+  // תחנות "פעילות" בלי כתובת משלהן ממופות לעוגן ההגיוני שלהן:
+  //   מלון (סיבוב/מנוחה/בוקר/צ'ק-אאוט) → קואורדינטות המלון;
+  //   "סמטאות העיר העתיקה" → כיכר העיר העתיקה;
+  //   "קפה אחרון וארוחת סיום" → Gran Fierro (לפי ה-mapUrl של התחנה עצמה).
+  'Comfort Hotel Prague City East': [50.0763, 14.4937],
+  'סיבוב קצר באזור המלון': [50.0763, 14.4937],
+  'חזרה למלון ומנוחה': [50.0763, 14.4937],
+  'חזרה ומנוחה במלון': [50.0763, 14.4937],
+  'ארוחת בוקר אחרונה במלון': [50.0763, 14.4937],
+  "צ'ק-אאוט ויציאה לשדה": [50.0763, 14.4937],
+  'כיכר העיר העתיקה והשעון האסטרונומי': [50.0870, 14.4209],
+  'סמטאות העיר העתיקה': [50.0870, 14.4209],
+  'ממלכת הרכבות — Království železnic': [50.0713, 14.4025],
+  'טירת פראג וקתדרלת ויטוס': [50.0908, 14.4003],
+  'Mala Strana — שכונת הברוק': [50.0890, 14.4035],
+  'אי קמפה': [50.0850, 14.4083],
+  'Čertovka — ונציה של פראג': [50.0863, 14.4081],
+  'יציאה ל-Aquapalace בבוקר': [50.0218, 14.5536],
+  'הליכה דרך Na Příkopě': [50.0862, 14.4290],
+  'קפה אחרון וארוחת סיום': [50.0779, 14.4368],
 };
 
 // תמונות לפי שם (Wikimedia Commons — עם fallback לגרדיאנט)
@@ -5399,6 +5442,32 @@ function renderNearbyList() {
     } catch(e) { console.error('[renderNearbyList] item error', it && it.p && it.p.name, e); }
   });
   container.innerHTML = html;
+}
+
+// פתיחת הדיאלוג המלא (מרחק + כיוון + ניווט) מכרטיס תחנה בטאב ימים.
+// תחנה ב-DAYS_STATE היא לא בהכרח פריט מ-ALL_PLACES — המשתמש יכול להוסיף תחנה
+// מותאמת אישית. לכן: קודם מחפשים ברשימה המאוחדת, ואם אין — בונים אובייקט
+// מינימלי מהתחנה עצמה כדי שהדיאלוג עדיין ייפתח עם מה שיש.
+function openStopMapDialog(name) {
+  try {
+    var coords = PLACE_COORDS[name];
+    if (!coords) { toast('📍 אין קואורדינטות לתחנה הזו'); return; }
+    var p = _uniquePlacesForMap().find(function(x) { return x.name === name; });
+    if (!p) {
+      var st = null;
+      getDaysState().forEach(function(d) {
+        (d.stops || []).forEach(function(s) { if (s.name === name) st = s; });
+      });
+      p = st
+        ? { type:'community', icon: st.icon || '📍', name: st.name, desc: st.desc || '',
+            mapUrl: st.mapUrl || '', duration: st.duration || '', google: st.google || '', who: st.who || '' }
+        : { type:'community', icon:'📍', name: name };
+    }
+    showMapNavDialog(p, coords);
+  } catch (e) {
+    console.error('[days] openStopMapDialog error', name, e);
+    toast('⚠️ שגיאה בפתיחת הפרטים');
+  }
 }
 
 function _openNearbyDialog(apIdx, lat, lng) {
