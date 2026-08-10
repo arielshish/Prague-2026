@@ -3463,6 +3463,10 @@ function openTab(id) {
   if (id === 'shopping') renderShopping();
   if (id === 'reminders') initReminders();
   if (id === 'location') renderLocationTab();
+  // יציאה מטאב מיקום — לעצור מעקב GPS חי (סוללה).
+  // `!= null` בכוונה (לא `!==`): var hoisting עושה את _geoWatchId `undefined`
+  // אם openTab רץ לפני שורת ההשמה, ו-`undefined !== null` היה נכנס לכאן לשווא.
+  else if (typeof stopLocationWatch === 'function' && _geoWatchId != null) stopLocationWatch();
 }
 
 // ═══════════════════════════════════════════
@@ -4957,7 +4961,8 @@ function showMapNavDialog(p, coords) {
     var _dStr = _d < 1 ? Math.round(_d*1000) + ' מ׳' : _d.toFixed(1) + ' ק״מ';
     var _w = Math.ceil(_d / 0.08);
     var _cc = compassFor(bearingTo(_userLat, _userLng, coords[0], coords[1]));
-    infoHtml += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">' +
+    // id — כדי ש-_refreshOpenDialogDistance() תעדכן את השורה חי בזמן מעקב
+    infoHtml += '<div id="mapNavDistRow" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">' +
       '<span style="background:rgba(99,102,241,0.12);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:#4F46E5;">' + _cc[0] + ' ' + _cc[1] + ' ממך</span>' +
       '<span style="background:rgba(0,0,0,0.05);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:rgba(30,41,59,0.65);">🚶 ' + _dStr + ' · ' + _w + ' דק׳</span>' +
     '</div>';
@@ -5045,6 +5050,7 @@ function showMapNavDialog(p, coords) {
 
   // שמור נתוני המקום ב-global כדי להימנע מבעיות escaping ב-onclick
   window._mapNavPlace = p;
+  window._mapNavCoords = coords; // ל-_refreshOpenDialogDistance() בזמן מעקב חי
 
   var overlay = document.createElement('div');
   overlay.id = 'mapNavDialog';
@@ -5096,38 +5102,112 @@ function showMapNavDialog(p, coords) {
   } catch(e) { console.error('[showMapNavDialog] error for', p && p.name, e); }
 }
 
+// ── מעקב מיקום חי ─────────────────────────────────────────────────────────
+// watchPosition (לא getCurrentPosition) — המרחק והכיוון מתעדכנים תוך כדי הליכה.
+// הכפתור הוא toggle: הפעלה/עצירה. עצירה חשובה — watchPosition מרוקן סוללה.
+var _geoWatchId = null;
+var _userMarker = null, _userCircle = null;
+var _lastNearbyRender = 0, _lastRenderLat = null, _lastRenderLng = null;
+
+function _updateUserMarker(accuracyM) {
+  if (!_leafletMap || !window.L) return;
+  // נעץ יחיד שממוקם מחדש — לא נעץ חדש בכל עדכון (הבאג הישן: נעצים נערמו)
+  if (!_userMarker) {
+    var youIcon = L.divIcon({
+      html:'<div style="width:18px;height:18px;background:#9333ea;border:3px solid #fff;border-radius:50%;box-shadow:0 0 0 4px rgba(147,51,234,0.25);"></div>',
+      iconSize:[18,18],iconAnchor:[9,9],className:''
+    });
+    _userMarker = L.marker([_userLat,_userLng],{icon:youIcon,zIndexOffset:1000})
+      .bindPopup('<div style="font-weight:800;color:#9333ea;">📍 אתם כאן</div>')
+      .addTo(_leafletMap);
+  } else {
+    _userMarker.setLatLng([_userLat,_userLng]);
+  }
+  // עיגול דיוק — מראה עד כמה ה-GPS בטוח (חשוב בין בניינים גבוהים)
+  if (accuracyM && accuracyM > 0) {
+    if (!_userCircle) {
+      _userCircle = L.circle([_userLat,_userLng], {radius:accuracyM, color:'#9333ea', weight:1, opacity:0.4, fillColor:'#9333ea', fillOpacity:0.10}).addTo(_leafletMap);
+    } else {
+      _userCircle.setLatLng([_userLat,_userLng]); _userCircle.setRadius(accuracyM);
+    }
+  }
+}
+
+// עדכון חי של שורת המרחק/כיוון בדיאלוג הפתוח (אם יש)
+function _refreshOpenDialogDistance() {
+  var el = document.getElementById('mapNavDistRow');
+  if (!el || !window._mapNavCoords || _userLat === null) return;
+  var c = window._mapNavCoords;
+  var d = haversine(_userLat, _userLng, c[0], c[1]);
+  var dStr = d < 1 ? Math.round(d*1000) + ' מ׳' : d.toFixed(1) + ' ק״מ';
+  var cc = compassFor(bearingTo(_userLat, _userLng, c[0], c[1]));
+  el.innerHTML = '<span style="background:rgba(99,102,241,0.12);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:#4F46E5;">' + cc[0] + ' ' + cc[1] + ' ממך</span>' +
+    '<span style="background:rgba(0,0,0,0.05);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:rgba(30,41,59,0.65);">🚶 ' + dStr + ' · ' + Math.ceil(d/0.08) + ' דק׳</span>';
+}
+
+function _onGeoPosition(pos, opts) {
+  _userLat = pos.coords.latitude;
+  _userLng = pos.coords.longitude;
+  var acc = pos.coords.accuracy || 0;
+  var statusEl = document.getElementById('locationStatusText');
+  if (statusEl) {
+    statusEl.textContent = (_geoWatchId !== null ? '🛰️ מעקב חי · ' : '✅ מיקום עודכן · ') +
+      _userLat.toFixed(4) + ', ' + _userLng.toFixed(4) + (acc ? ' (±' + Math.round(acc) + 'מ׳)' : '');
+  }
+  _updateUserMarker(acc);
+  if (opts && opts.recenter && _leafletMap) _leafletMap.setView([_userLat,_userLng], 15, {animate:true});
+  _refreshOpenDialogDistance();
+  // throttle: הרשימה נבנית מחדש כולה (innerHTML), אז לא בכל טיק GPS —
+  // רק אם עברו 3 שניות או שזזנו יותר מ-15 מטר.
+  var now = Date.now();
+  var moved = (_lastRenderLat === null) ? 9999 :
+    haversine(_lastRenderLat, _lastRenderLng, _userLat, _userLng) * 1000;
+  if (now - _lastNearbyRender > 3000 || moved > 15) {
+    _lastNearbyRender = now; _lastRenderLat = _userLat; _lastRenderLng = _userLng;
+    renderNearbyList();
+  }
+}
+
+function _setLocateBtn(tracking) {
+  var btn = document.getElementById('btnLocate');
+  if (!btn) return;
+  btn.disabled = false;
+  btn.textContent = tracking ? '🛑 עצור מעקב' : '📍 אתרו אותי';
+  btn.style.background = tracking ? '#0891B2' : '#F4634A';
+}
+
+function stopLocationWatch() {
+  if (_geoWatchId !== null) { try { navigator.geolocation.clearWatch(_geoWatchId); } catch(e) {} _geoWatchId = null; }
+  _setLocateBtn(false);
+  var statusEl = document.getElementById('locationStatusText');
+  if (statusEl && _userLat !== null) statusEl.textContent = '⏸️ המעקב נעצר — המיקום האחרון נשמר';
+}
+
 function locateMe() {
   var statusEl = document.getElementById('locationStatusText');
   var btn = document.getElementById('btnLocate');
   if (!navigator.geolocation) {
-    statusEl.textContent = '⚠️ דפדפן זה לא תומך באיתור מיקום';
+    if (statusEl) statusEl.textContent = '⚠️ דפדפן זה לא תומך באיתור מיקום';
     return;
   }
-  statusEl.textContent = '⌛ מאתר מיקום…';
-  btn.disabled = true;
-  navigator.geolocation.getCurrentPosition(function(pos) {
-    _userLat = pos.coords.latitude;
-    _userLng = pos.coords.longitude;
-    btn.disabled = false;
-    statusEl.textContent = '✅ מיקום עודכן — ' + _userLat.toFixed(4) + ', ' + _userLng.toFixed(4);
-    // הוסף פין לאתם כאן
-    if (_leafletMap && window.L) {
-      var youIcon = L.divIcon({
-        html:'<div style="width:18px;height:18px;background:#9333ea;border:3px solid #fff;border-radius:50%;box-shadow:0 0 0 4px rgba(147,51,234,0.25);"></div>',
-        iconSize:[18,18],iconAnchor:[9,9],className:''
-      });
-      L.marker([_userLat,_userLng],{icon:youIcon,zIndexOffset:1000})
-        .bindPopup('<div style="font-weight:800;color:#9333ea;">📍 אתם כאן</div>')
-        .addTo(_leafletMap)
-        .openPopup();
-      _leafletMap.setView([_userLat,_userLng], 15, {animate:true});
-    }
-    renderNearbyList();
+  if (_geoWatchId !== null) { stopLocationWatch(); return; } // toggle
+  if (statusEl) statusEl.textContent = '⌛ מאתר מיקום…';
+  if (btn) btn.disabled = true;
+  var first = true;
+  _geoWatchId = navigator.geolocation.watchPosition(function(pos) {
+    _setLocateBtn(true);
+    _onGeoPosition(pos, {recenter: first});
+    first = false;
   }, function(err) {
-    btn.disabled = false;
-    statusEl.textContent = '⚠️ לא ניתן לאתר: ' + (err.code===1 ? 'אין הרשאה' : 'שגיאת GPS');
-  }, {timeout:10000, enableHighAccuracy:true});
+    stopLocationWatch();
+    if (statusEl) statusEl.textContent = '⚠️ לא ניתן לאתר: ' + (err.code===1 ? 'אין הרשאה' : err.code===3 ? 'תם הזמן' : 'שגיאת GPS');
+  }, {timeout:15000, enableHighAccuracy:true, maximumAge:2000});
 }
+
+// עצירת המעקב כשעוזבים את טאב מיקום או מסתירים את הדף — חוסך סוללה
+document.addEventListener('visibilitychange', function() {
+  if (document.hidden && _geoWatchId !== null) stopLocationWatch();
+});
 
 function filterNearby(cat) {
   _nearbyFilter = cat;
