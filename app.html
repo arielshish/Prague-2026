@@ -1073,7 +1073,10 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
   <!-- מודל הוספת תחנה ליום -->
   <div id="addStopModal" style="display:none;position:fixed;inset:0;z-index:80;align-items:flex-end;justify-content:center;">
     <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);" id="addStopOverlay"></div>
-    <div style="position:relative;background:#ffffff;border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:min(680px,100%);z-index:1;">
+    <!-- max-height + overflow-y חובה: תוכן הגיליון הוא ~730px, כלומר גבוה מגובה
+         המסך ברוב הטלפונים (667–715px). בלי זה החלק העליון (כותרת + טאבי הבנק)
+         נחתך מעל גבול המסך ואי אפשר לגלול אליו בכלל — הקונטיינר fixed. -->
+    <div style="position:relative;background:#ffffff;border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:min(680px,100%);z-index:1;box-sizing:border-box;max-height:88vh;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;">
       <h2 id="addStopTitle" style="margin:0 0 12px;font-size:17px;font-weight:900;color:#1E293B;">➕ הוסף תחנה</h2>
       <div style="display:flex;gap:6px;margin-bottom:10px;">
         <button id="bankTabAttr" onclick="switchBankTab('attr')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(244,99,74,0.25);color:#F4634A;font-weight:700;font-size:10px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🎟️ אטרקציות</button>
@@ -1081,7 +1084,9 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
         <button id="bankTabShop" onclick="switchBankTab('shop')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(0,0,0,0.04);color:rgba(30,41,59,0.5);font-weight:700;font-size:10px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">🛍️ קניות</button>
         <button id="bankTabRem" onclick="switchBankTab('rem')" style="flex:1;padding:7px 0;border-radius:10px;border:none;background:rgba(0,0,0,0.04);color:rgba(30,41,59,0.5);font-weight:700;font-size:10px;cursor:pointer;font-family:'Rubik',Arial,sans-serif;">⏰ תזכורות</button>
       </div>
-      <div id="attrBankRow" style="display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
+      <!-- הסגנון כאן חייב להישאר זהה ל-BANK_ROW_STYLE ב-JS — buildBankCards/
+           buildBankRemCards דורסות את ה-style הזה בכל החלפת טאב. -->
+      <div id="attrBankRow" style="display:flex;flex-direction:column;gap:8px;max-height:min(42vh,300px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-bottom:4px;margin-bottom:14px;"></div>
       <div style="font-size:11px;font-weight:700;color:rgba(30,41,59,0.45);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;">✏️ או הקלד ידנית</div>
       <input id="addStopEmoji" type="text" maxlength="4" placeholder="😀" style="width:56px;background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:13px;padding:11px 10px;font-size:22px;color:#1E293B;font-family:\'Rubik\',Arial,sans-serif;text-align:center;box-sizing:border-box;margin-bottom:10px;">
       <input id="addStopName" type="text" placeholder="שם המקום" style="width:100%;background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:13px;padding:12px 14px;font-size:14px;color:#1E293B;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:10px;">
@@ -3725,7 +3730,7 @@ function renderDays() {
           (hasDetails ? '<span style="font-size:10px;color:var(--c-text-3);font-style:italic;">פרטים ›</span>' : '') +
         '</div>' +
         (s.desc ? '<div style="font-size:12px;color:var(--c-text-2,rgba(30,41,59,0.6));line-height:1.5;margin-bottom:7px;">' + esc(s.desc) + '</div>' : '') +
-        '<div style="display:flex;align-items:center;gap:6px;">' +
+        '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
           (s.mapUrl ? '<a href="' + s.mapUrl + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="nav-map-btn">🗺️ נווט</a>' : '') +
           (PLACE_COORDS[s.name] ? '<button type="button" onclick="event.stopPropagation();openStopMapDialog(this.dataset.pn)" data-pn="' + esc(s.name) + '" class="nav-map-btn" style="background:rgba(99,102,241,0.10);border-color:rgba(99,102,241,0.28);color:#4F46E5;cursor:pointer;margin-right:6px;">📍 ממני</button>' : '') +
           '<div style="flex:1;"></div>' +
@@ -3949,12 +3954,19 @@ function showAttrDetail(attr, iconKey, nameKey, descKey, howKey, existing) {
   document.body.appendChild(overlay);
 }
 
+// סגנון אחיד לרשימת הבנק במודל "הוסף תחנה".
+// ⚠️ buildBankCards ו-buildBankRemCards דורסות את ה-cssText של הקונטיינר בכל
+// החלפת טאב, כך שכל מה שלא מופיע כאן **נמחק** מה-style שנכתב ב-HTML (ככה אבדו
+// קודם `-webkit-overflow-scrolling` ו-`margin-bottom`). לכן: מחרוזת אחת ששתיהן
+// משתמשות בה, וחייבת להישאר זהה ל-style של #attrBankRow ב-HTML.
+var BANK_ROW_STYLE = 'display:flex;flex-direction:column;gap:8px;max-height:min(42vh,300px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-bottom:4px;margin-bottom:14px;';
+
 function buildBankCards(items, iconKey, nameKey, descKey, howKey) {
   var bank = qs('attrBankRow');
   if (!bank) return;
   bank.innerHTML = '';
-  // switch to vertical list layout
-  bank.style.cssText = 'display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto;padding-bottom:4px;scrollbar-width:none;';
+  bank.scrollTop = 0;
+  bank.style.cssText = BANK_ROW_STYLE;
   items.forEach(function(a) {
     var name = a[nameKey] || '';
     var existing = findItemInDays(name);
@@ -4026,11 +4038,16 @@ function buildBankRemCards() {
   var bank = qs('attrBankRow');
   if (!bank) return;
   bank.innerHTML = '';
+  bank.scrollTop = 0;
+  // קודם הפונקציה הזו לא נגעה בסגנון הקונטיינר בכלל — כלומר ירשה בשקט את מה
+  // ש-buildBankCards השאירה, וכרטיסי התזכורות (שנבנו לשורה אופקית ברוחב 138px)
+  // נדחסו לתוך עמודה. עכשיו שתי הפונקציות מיישרות לאותו סגנון.
+  bank.style.cssText = BANK_ROW_STYLE;
   var rems = typeof REMINDERS !== 'undefined' ? REMINDERS : [];
   rems.forEach(function(r) {
     var card = document.createElement('button');
     card.type = 'button';
-    card.style.cssText = 'flex-shrink:0;width:138px;background:rgba(251,191,36,0.08);border:1.5px solid rgba(251,191,36,0.25);border-radius:14px;padding:10px 11px;cursor:pointer;position:relative;text-align:right;font-family:Rubik,Arial,sans-serif;-webkit-tap-highlight-color:transparent;';
+    card.style.cssText = 'flex-shrink:0;width:100%;background:rgba(251,191,36,0.08);border:1.5px solid rgba(251,191,36,0.25);border-radius:14px;padding:10px 11px;cursor:pointer;position:relative;text-align:right;font-family:Rubik,Arial,sans-serif;-webkit-tap-highlight-color:transparent;';
     var _inDaysBankRem = findItemInDays(r.title);
     card.innerHTML =
       '<div style="font-size:22px;margin-bottom:4px;">' + (r.emoji||'📌') + '</div>' +

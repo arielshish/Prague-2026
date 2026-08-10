@@ -108,6 +108,12 @@ var PHOTO_SPOTS = ALL_PLACES.filter(p => p.type==='photo');
 - `_openNearbyDialog(apIdx, lat, lng)` (~שורה 4901) — wrapper עם try-catch; `apIdx = ALL_PLACES.indexOf(p)` — אינדקס מספרי, ללא בעיות escaping
 - כפתורי ניווט נעוצים בתחתית: Google Maps | Waze | 📍 מפה מקומית | סגור
 
+#### תיקון גלילה במודל "הוסף תחנה" (2026-08-10)
+- `#addStopModal` היה ה-bottom sheet **היחיד** בקובץ בלי `max-height`+`overflow-y`. תוכן הגיליון ~730px — גבוה ממסך של רוב הטלפונים — ועם `align-items:flex-end` הכותרת וטאבי הבנק נחתכו **מעל** גבול המסך בלי אפשרות לגלול אליהם (קונטיינר `position:fixed`). נמדד ב-Chromium: 62px חתוכים ב-375×667, 65px ב-390×664, 14px ב-414×715
+- תוקן: `max-height:88vh;overflow-y:auto;overscroll-behavior:contain;box-sizing:border-box` על הפאנל
+- רשימת הבנק (`#attrBankRow`) הוגדלה מ-220px ל-`min(42vh,300px)`, והסגנון שלה רוכז ב-`BANK_ROW_STYLE` — `buildBankCards` הייתה דורסת את ה-`cssText` בכל החלפת טאב ומוחקת בשקט מאפיינים שהיו ב-HTML, ו-`buildBankRemCards` בכלל לא הציבה סגנון (ירשה את של הטאב הקודם)
+- שורת הכפתורים בכרטיס תחנה קיבלה `flex-wrap:wrap` — היא גדלה בכפתור "📍 ממני" ובמסך צר גלשה
+
 #### תמונות + טאב מיקום (2026-07-18)
 - **תמונות מסעדות**: כרטיסי מסעדה עם תמונה 150px — gradient+emoji fallback, Wikimedia Commons אם קיים ב-PLACE_IMGS
 - `restaurantImgHtml(r)` — helper שמחזיר HTML של תמונה עם onerror fallback
