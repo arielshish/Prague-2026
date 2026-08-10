@@ -228,6 +228,23 @@ p.tips.forEach(...)  // ← גורם לקריסה שקטה, dialog לא נפתח
 
 ---
 
+## כפתור "היינו" — מצב ביקורים (2026-08-10)
+
+`VISITED_STATE` = `{שם מקום: timestamp}`. **ממופתח לפי שם, לא לפי אינדקס** — אינדקס ב-`ALL_PLACES` זז בכל הוספת מקום והסימון היה עובר למקום אחר.
+
+| פונקציה | תפקיד |
+|----------|-------|
+| `getVisitedState()` | טעינה עצלה מ-`localStorage['prague_visited_v1']` |
+| `isVisited(name)` / `visitedCount()` | קריאה |
+| `toggleVisited(name)` | סימון/ביטול + שמירה + רענון UI |
+| `saveVisitedState()` | localStorage → `appdata/main.visited` (דפוס `saveDaysState`) |
+| `visitedBtnHtml(name, variant)` | `'icon'` = כפתור צר לכרטיסי קהילה · `'block'` = שורת פעולות במסעדות |
+| `refreshVisitedUI()` | מרנדר את הטאב הפעיל, **כולל `days`** — `refreshScheduleBadges` מדלגת עליו בכוונה |
+
+⚠️ **event delegation ולא `onclick` inline** — listener אחד על `document` עם `.closest('.visitedBtn')` + `data-vn`. שמות מקומות מכילים גרשים ומרכאות (`מגדל פטז׳ין`, `מ"ר`, `בסופ"ש`); זו אותה מלכודת שכבר שברה `onclick` פעמיים בפרויקט הזה (ראה `_mapNavPlace`).
+
+**להרחבה לטאבים נוספים** (קניות/קינוחים/צילום): להוסיף `visitedBtnHtml(x.name, 'icon')` לשורת הפעולות של הכרטיס — המנגנון כבר גנרי, לא צריך לגעת בשמירה או בסנכרון.
+
 ## באגים ידועים שתוקנו (אל תחזיר אותם!)
 
 | באג | תיקון |

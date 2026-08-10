@@ -527,6 +527,7 @@ function _resyncLocalDataToCloud() {
   try { if (typeof saveLocal === 'function') saveLocal(); } catch (e) { console.warn('resync expenses failed', e); }
   try { if (typeof saveDaysState === 'function') saveDaysState(); } catch (e) { console.warn('resync days failed', e); }
   try { if (typeof PACK_STATE !== 'undefined' && typeof savePackLocal === 'function') savePackLocal(PACK_STATE); } catch (e) { console.warn('resync pack failed', e); }
+  try { if (typeof saveVisitedState === 'function') saveVisitedState(); } catch (e) { console.warn('resync visited failed', e); }
   try { if (typeof saveRemindersDoneLocal === 'function') saveRemindersDoneLocal(); } catch (e) { console.warn('resync remindersDone failed', e); }
   try { if (typeof saveSchedules === 'function') saveSchedules(); } catch (e) { console.warn('resync remindersSchedule failed', e); }
   try { if (typeof saveTotalBudget === 'function' && typeof loadTotalBudget === 'function') { var tb = loadTotalBudget(); if (tb) saveTotalBudget(tb); } } catch (e) { console.warn('resync total budget failed', e); }
@@ -4435,6 +4436,88 @@ function renderHistory() {
 }
 
 // ═══════════════════════════════════════════
+//  "היינו" — סימון מקומות שכבר ביקרנו בהם
+// ═══════════════════════════════════════════
+// ממופתח לפי **שם המקום** ולא לפי אינדקס — אינדקסים ב-ALL_PLACES זזים בכל
+// הוספה של מקום, וסימון "היינו" היה עובר למקום אחר. הערך הוא timestamp כדי
+// שנוכל להציג "מתי היינו" בעתיד בלי מיגרציה.
+var VISITED_STATE = null;
+var VISITED_KEY = 'prague_visited_v1';
+
+function getVisitedState() {
+  if (VISITED_STATE) return VISITED_STATE;
+  try { VISITED_STATE = JSON.parse(localStorage.getItem(VISITED_KEY) || '{}') || {}; }
+  catch (e) { VISITED_STATE = {}; }
+  return VISITED_STATE;
+}
+function isVisited(name) { return !!getVisitedState()[name]; }
+function visitedCount() { return Object.keys(getVisitedState()).length; }
+
+function saveVisitedState() {
+  var json = JSON.stringify(getVisitedState());
+  localStorage.setItem(VISITED_KEY, json);
+  // אותו דפוס כמו saveDaysState — מקומי קודם, ואז ענן. אם ה-auth לא תקין
+  // הכתיבה נכשלת בשקט אבל הסימון כבר שמור מקומית ולא הולך לאיבוד.
+  if (!isGas()) {
+    try {
+      ensureFirebaseAuth().then(function() {
+        getFirestoreDb().collection('appdata').doc('main').set({ visited: json }, { merge: true })
+          .catch(function(err) { console.warn('saveVisitedState Firebase error', err); });
+      });
+    } catch (e) {}
+  }
+}
+
+// toggle מכל כרטיס. מרנדר מחדש רק את הטאב הפעיל — אותה גישה של
+// refreshScheduleBadges, כדי שהסימון יופיע מיד בכל מקום שבו המקום מוצג.
+function toggleVisited(name) {
+  if (!name) return;
+  var st = getVisitedState();
+  if (st[name]) { delete st[name]; toast('↩️ הוסר מ"היינו"'); }
+  else { st[name] = Date.now(); toast('✅ סומן — היינו ב' + name); }
+  saveVisitedState();
+  refreshVisitedUI();
+}
+
+function refreshVisitedUI() {
+  try { if (typeof refreshScheduleBadges === 'function') refreshScheduleBadges(); } catch (e) {}
+  try {
+    var daysSec = qs('days');
+    if (daysSec && daysSec.className && daysSec.className.indexOf('active') !== -1) renderDays();
+  } catch (e) {}
+}
+
+// כפתור אחיד לכל סוגי הכרטיסים. `variant`:
+//   'block' — כפתור רחב בשורת הפעולות (מסעדות)
+//   'icon'  — כפתור צר ליד "נווט"/"ממני" (אטרקציות)
+function visitedBtnHtml(name, variant) {
+  var on = isVisited(name);
+  var bg     = on ? 'rgba(16,185,129,0.15)' : 'rgba(0,0,0,0.03)';
+  var border = on ? 'rgba(16,185,129,0.45)' : 'rgba(0,0,0,0.12)';
+  var color  = on ? '#065F46' : 'rgba(30,41,59,0.55)';
+  var label  = on ? '✅ היינו' : '⬜ היינו';
+  var common = 'background:' + bg + ';border:1.5px solid ' + border + ';color:' + color +
+               ';cursor:pointer;font-weight:800;font-family:Rubik,Arial,sans-serif;';
+  if (variant === 'icon') {
+    return '<button type="button" class="visitedBtn" data-vn="' + esc(name) + '" style="' + common +
+      'flex-shrink:0;border-radius:12px;padding:10px 12px;font-size:11px;text-align:center;line-height:1.3;">' +
+      (on ? '✅<br>היינו' : '⬜<br>היינו') + '</button>';
+  }
+  return '<button type="button" class="visitedBtn" data-vn="' + esc(name) + '" style="' + common +
+    'flex:0 0 auto;border-radius:13px;padding:11px 14px;font-size:12px;">' + label + '</button>';
+}
+
+// listener אחד ברמת ה-document במקום onclick inline — שמות מקומות מכילים
+// מרכאות וגרשים (מ"ר, בסופ"ש), וזו בדיוק המלכודת ששברה onclick בעבר.
+document.addEventListener('click', function(e) {
+  var btn = e.target && e.target.closest ? e.target.closest('.visitedBtn') : null;
+  if (!btn) return;
+  e.preventDefault();
+  e.stopPropagation();
+  toggleVisited(btn.getAttribute('data-vn'));
+});
+
+// ═══════════════════════════════════════════
 //  COMMUNITY
 // ═══════════════════════════════════════════
 var _commCat = 'הכל';
@@ -4480,6 +4563,7 @@ function renderCommunity() {
         '</div>' +
         (p.mapUrl ? '<a href="'+p.mapUrl+'" target="_blank" rel="noopener" style="flex-shrink:0;background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.25);border-radius:12px;padding:10px 12px;font-size:11px;font-weight:700;color:#065F46;text-decoration:none;text-align:center;line-height:1.3;">🗺️<br>נווט</a>' : '') +
         (PLACE_COORDS[p.name] ? '<button type="button" onclick="showDistanceTo(this.dataset.pn)" data-pn="'+esc(p.name)+'" style="flex-shrink:0;background:rgba(99,102,241,0.10);border:1px solid rgba(99,102,241,0.25);border-radius:12px;padding:10px 12px;font-size:11px;font-weight:700;color:#4F46E5;cursor:pointer;text-align:center;line-height:1.3;font-family:\'Rubik\',Arial,sans-serif;">📍<br>ממני</button>' : '') +
+        visitedBtnHtml(p.name, 'icon') +
       '</div>' +
       '<div style="margin-top:12px;padding-top:12px;border-top:1px dashed rgba(30,41,59,0.1);display:flex;align-items:center;justify-content:space-between;gap:8px;">' +
         schedBadgeHtml +
@@ -4643,6 +4727,7 @@ function renderRestaurants() {
       '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
         '<a href="' + r.mapUrl + '" target="_blank" rel="noopener" style="flex:1;display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:11px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;">🗺️ ניווט</a>' +
         (PLACE_COORDS[r.name] ? '<button type="button" onclick="showDistanceTo(this.dataset.pn)" data-pn="' + esc(r.name) + '" style="flex:0 0 auto;background:rgba(99,102,241,0.10);border:1.5px solid rgba(99,102,241,0.25);color:#4F46E5;border-radius:13px;padding:11px 14px;font-weight:800;font-size:12px;cursor:pointer;font-family:Rubik,Arial,sans-serif;">📍 ממני</button>' : '') +
+        visitedBtnHtml(r.name, 'block') +
         '<button data-rest-icon="' + (r.icon||'🍽️') + '" data-rest-name="' + esc(r.name) + '" data-rest-desc="' + esc((r.desc||'').substring(0,120).replace(/\n/g,' ')) + '" class="restAddStopBtn" style="flex:1;background:' + (_inDaysR ? 'rgba(244,99,74,0.13)' : 'rgba(244,99,74,0.12)') + ';border:1.5px solid rgba(244,99,74,0.3);color:#C2410C;border-radius:13px;padding:11px;font-weight:800;font-size:12px;cursor:pointer;font-family:Rubik,Arial,sans-serif;">' + (_inDaysR ? '✏️ עדכן' : '📅 הוסף תחנה') + '</button>' +
       '</div>' +
     '</div></div>';
@@ -5950,6 +6035,19 @@ function initRealtimeSync() {
             renderDays();
             refreshScheduleBadges();
             showSyncBadge('📅');
+          }
+        } catch(e) {}
+      }
+
+      // "היינו"
+      if (d.visited) {
+        try {
+          var localVisited = localStorage.getItem(VISITED_KEY);
+          if (d.visited !== localVisited) {
+            VISITED_STATE = JSON.parse(d.visited);
+            localStorage.setItem(VISITED_KEY, d.visited);
+            refreshVisitedUI();
+            showSyncBadge('✅');
           }
         } catch(e) {}
       }

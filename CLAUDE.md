@@ -108,6 +108,15 @@ var PHOTO_SPOTS = ALL_PLACES.filter(p => p.type==='photo');
 - `_openNearbyDialog(apIdx, lat, lng)` (~שורה 4901) — wrapper עם try-catch; `apIdx = ALL_PLACES.indexOf(p)` — אינדקס מספרי, ללא בעיות escaping
 - כפתורי ניווט נעוצים בתחתית: Google Maps | Waze | 📍 מפה מקומית | סגור
 
+#### כפתור "היינו" (2026-08-10)
+- `VISITED_STATE` — אובייקט `{שם מקום: timestamp}`, מקור יחיד לסימון מקומות שכבר ביקרנו בהם
+- **ממופתח לפי שם ולא לפי אינדקס** — אינדקסים ב-`ALL_PLACES` זזים בכל הוספת מקום, והסימון היה עובר למקום אחר. ה-timestamp נשמר כדי שאפשר יהיה להציג "מתי היינו" בעתיד בלי מיגרציה
+- `isVisited(name)` · `toggleVisited(name)` · `visitedCount()` · `visitedBtnHtml(name, variant)` — `variant:'icon'` לכרטיסי קהילה (כפתור צר ליד נווט/ממני), `'block'` לכרטיסי מסעדות (שורת הפעולות)
+- **event delegation** — listener אחד על `document` עם `.closest('.visitedBtn')` ו-`data-vn`, **לא** `onclick` inline: שמות מקומות מכילים גרשים ומרכאות (`מגדל פטז׳ין`, `מ"ר`) וזו בדיוק המלכודת ששברה `onclick` בעבר
+- **סנכרון**: `localStorage['prague_visited_v1']` קודם, ואז `appdata/main.visited` — אותו דפוס של `saveDaysState`. יש listener ב-`initRealtimeSync`, והשדה נדחף גם ב-`_resyncLocalDataToCloud` אחרי כניסה
+- `refreshVisitedUI()` מרנדר מחדש את הטאב הפעיל (כולל `days`, ש-`refreshScheduleBadges` מדלגת עליו בכוונה)
+- כיסוי: 56/56 כרטיסי קהילה + 26/26 כרטיסי מסעדות
+
 #### פרטי אטרקציה שנעלמו בפופ-אפ (2026-08-10)
 - `showDayTimePicker(emoji, name, desc)` קיבל `desc` כפרמטר ו**מעולם לא הציג אותו** — הפופ-אפ הראה רק emoji+שם (מקוצר ל-26 תווים). בלי תיאור, דירוג, משך או הזמנה, אי אפשר היה להחליט לאיזה יום לשבץ בלי לצאת ולחזור
 - חמור יותר: בשמירה הוא דחף תחנה **רזה** — `{emoji, name, time, desc, mapUrl:''}` בלבד — ואיבד `details`/`tips`/`booking`/`google`/`duration`/`who`/`mapUrl`. `saveAddCommunityStop` לעומתו שמר את הרשומה המלאה. תוצאה: כל מקום שנוסף מבנק האטרקציות נפתח אח"כ ב"ימים" ככותרת ריקה
