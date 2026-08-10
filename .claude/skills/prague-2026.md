@@ -350,6 +350,14 @@ var _fb = COMMUNITY.find(c=>c.name===s.name) || RESTAURANTS.find(r=>r.name===s.n
 
 **עוד ברובע (נוספו 2026-08-07)**: `בית העירייה היהודי — השעון שהולך אחורה` (שעון עברי נגד כיוון השעון, 1764 — **חינם**, צפייה מבחוץ), `פסל פרנץ קפקא — Vězeňská` (רונה 2003 — **חינם**; אבנים שחורות במדרכה = צורת חרק, רמז ל"גלגול"), ושתי מסעדות כשרות שחסרו: `King Solomon — כשר` (הוותיקה בצ׳כיה, מרתף, ליל שבת) ו-`Dinitz — כשר ישראלי` (קליל וזול יותר).
 
+### מעקב מיקום חי (2026-08-10)
+`locateMe()` הוא **toggle** על `watchPosition` (לא `getCurrentPosition` חד-פעמי). `stopLocationWatch()` עוצר.
+- **נעץ יחיד** `_userMarker` שממוקם מחדש + `_userCircle` (רדיוס דיוק). **הבאג הישן**: כל לחיצה הוסיפה נעץ חדש בלי להסיר → נעצים נערמו.
+- **throttle לרשימה**: `renderNearbyList()` בונה `innerHTML` מלא, אז רצה רק אם עברו 3 שניות **או** תזוזה >15 מ׳. הדיאלוג זול (שורה אחת) אז מתעדכן בכל טיק דרך `_refreshOpenDialogDistance()` → דורש `id="mapNavDistRow"` + `window._mapNavCoords`.
+- **עצירה אוטומטית** (סוללה): ביציאה מטאב מיקום (`openTab`) וב-`visibilitychange`.
+- **⚠️ ב-`openTab` הבדיקה היא `_geoWatchId != null` ולא `!==`** — var hoisting עושה אותו `undefined` אם `openTab` ירוץ לפני שורת ההשמה, ו-`undefined !== null` היה נכנס לשווא.
+- נבדק בסימולציה: 20 טיקים בהליכת ~100 מ׳ → 7 רינדורים (לא 20); 30 טיקים בעמידה → 0.
+
 ### כיוון יחסי למיקום (2026-08-10)
 `bearingTo(lat1,lng1,lat2,lng2)` — forward azimuth על ספירה, מחזיר 0–360° (0=צפון, 90=מזרח).
 `compassFor(deg)` → `_COMPASS[Math.round(deg/45)%8]` → `[חץ, שם בעברית]`.
