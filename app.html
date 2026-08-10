@@ -3625,6 +3625,8 @@ function timeOfDay(timeStr) {
 function saveDaysState() {
   var json = JSON.stringify(DAYS_STATE);
   localStorage.setItem('prague_days_v1', json);
+  // הלוז השתנה → רשימת המקומות למפה (שכוללת תחנות לוז) כבר לא תקפה
+  try { _invalidateMappable(); } catch (e) {}
   // refresh badges on whichever tab is currently visible
   refreshScheduleBadges();
   if (isGas()) {
@@ -4480,6 +4482,15 @@ function toggleVisited(name) {
 }
 
 function refreshVisitedUI() {
+  // קודם כל — לעדכן כל כפתור "היינו" שכרגע ב-DOM במקום, כולל כאלה שיושבים
+  // בדיאלוג פתוח (מפה) ולא ייבנו מחדש ע"י רינדור הטאב.
+  try {
+    document.querySelectorAll('.visitedBtn').forEach(function(btn) {
+      var n = btn.getAttribute('data-vn');
+      var isIcon = btn.innerHTML.indexOf('<br>') !== -1;
+      btn.outerHTML = visitedBtnHtml(n, isIcon ? 'icon' : 'block');
+    });
+  } catch (e) {}
   try { if (typeof refreshScheduleBadges === 'function') refreshScheduleBadges(); } catch (e) {}
   try {
     var daysSec = qs('days');
@@ -5086,6 +5097,9 @@ var TYPE_GRAD = {
   dessert:    ['#880e4f','#6a1b4d'],
   shop:       ['#1b5e20','#2e7d32'],
   exchange:   ['#0e7490','#155e75'],
+  // תחנה שקיימת בלוז אבל לא ב-ALL_PLACES (מלון, "סמטאות העיר העתיקה") —
+  // ראה _mappablePlaces. חייב ערך כאן, אחרת נופלת ל-fallback אפור.
+  stop:       ['#7c2d12','#9a3412'],
 };
 
 // Haversine — מרחק בק"מ בין שתי נקודות
@@ -5184,6 +5198,16 @@ function makePinIcon(color) {
   });
 }
 
+// נעץ "היינו" — ירוק עם ✓. מובחן מכל שאר הצבעים ב-catColor כדי שלא יתבלבל
+// עם קטגוריה. ראה addMapMarkers.
+function makeVisitedPinIcon() {
+  if (!window.L) return null;
+  return L.divIcon({
+    html: '<div style="width:16px;height:16px;background:#16a34a;border:2.5px solid #fff;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:900;line-height:1;">\u2713</div>',
+    iconSize:[16,16], iconAnchor:[8,8], className:''
+  });
+}
+
 // ─────────────────────────────────────────
 //  de-dupe לפי שם — 15 מקומות מופיעים פעמיים ב-ALL_PLACES (פעם restaurant/shop
 //  ופעם community עם cat:'🍽️ מסעדות'/'🛍️ קניות'). שניהם עם אותו name, ולכן
@@ -5215,19 +5239,110 @@ function _uniquePlacesForMap() {
   return _uniquePlacesCache;
 }
 
+// ─────────────────────────────────────────
+//  קורלציה תחנות ↔ מקומות ↔ מיקום
+//  ─────────────────────────────────────────
+//  המפה ורשימת "קרוב אליי" רצו על ALL_PLACES בלבד, ולכן **תחנה שקיימת בלוז
+//  אבל לא ב-ALL_PLACES פשוט לא צוירה** — גם כשהיו לה קואורדינטות. בפועל:
+//  29 תחנות עם מיקום, 7 בלבד על המפה. המלון, טירת פראג, כיכר העיר העתיקה,
+//  אי קמפה — כולן נעלמו מהמפה ומהרשימה.
+//
+//  הפונקציה מחזירה את **האיחוד**: כל ALL_PLACES + כל תחנה בלוז שיש לה
+//  קואורדינטות ואינה כבר ברשימה. התחנות המסונתזות מקבלות type:'stop'
+//  ומועשרות ב-_withPlaceDetails כדי שהדיאלוג יציג עליהן מידע אמיתי.
+//
+//  ⚠️ **חייב להיות ממומש במטמון (memoized)**: הכרטיסים ברשימת הקרובים מעבירים
+//  לדיאלוג **אינדקס מספרי** לתוך הרשימה הזו. אם כל קריאה הייתה בונה מערך חדש,
+//  ה-indexOf של אובייקט מסונתז היה מחזיר -1 והדיאלוג לא היה נפתח — בדיוק הבאג
+//  שכבר קרה עם אובייקטים ממוזגים ב-ALL_PLACES.indexOf. המטמון מבוטל בכל שינוי
+//  לוז דרך _invalidateMappable().
+var _mappableCache = null;
+function _invalidateMappable() { _mappableCache = null; }
+
+function _mappablePlaces() {
+  if (_mappableCache) return _mappableCache;
+  var base = _uniquePlacesForMap();
+  var seen = {}, coordSeen = {};
+  base.forEach(function(p) {
+    seen[p.name] = true;
+    var c = PLACE_COORDS[p.name];
+    if (c) coordSeen[c[0] + ',' + c[1]] = true;
+  });
+  var extra = [];
+  try {
+    getDaysState().forEach(function(d) {
+      (d.stops || []).forEach(function(s) {
+        if (!s || !s.name || seen[s.name]) return;
+        var c = PLACE_COORDS[s.name];
+        if (!c) return;
+        // ⚠️ de-dupe לפי **קואורדינטה** ולא רק לפי שם: "ארוחת ערב — Gran Fierro"
+        // ו-"Gran Fierro" הם שמות שונים באותה נקודה בדיוק, וכך גם 6 תחנות
+        // "מלון" שכולן ממופות לעוגן אחד. בלי זה נמדדו 120 נעצים על 98 נקודות —
+        // נעצים מוערמים זה על זה, בדיוק הבאג ש-_uniquePlacesForMap נועד לפתור.
+        var ck = c[0] + ',' + c[1];
+        if (coordSeen[ck]) return;
+        seen[s.name] = true;
+        coordSeen[ck] = true;
+        var full = _withPlaceDetails(s);
+        extra.push({
+          type: 'stop',
+          name: s.name,
+          icon: full.emoji || s.emoji || '📍',
+          desc: full.desc || s.desc || '',
+          details: full.details || '',
+          tips: full.tips || [],
+          booking: full.booking || '',
+          google: full.google || '',
+          duration: full.duration || '',
+          who: full.who || '',
+          mapUrl: full.mapUrl || s.mapUrl || ''
+        });
+      });
+    });
+  } catch (e) {}
+  _mappableCache = base.concat(extra);
+  return _mappableCache;
+}
+
+// שמות המקומות שנחשבים "בלוז". כולל מקום ב-ALL_PLACES שתחנה בלוז היא כינוי
+// שלו — אותן קואורדינטות, שם אחר ("Gran Fierro" מול "ארוחת ערב — Gran Fierro").
+// בלי זה הנעץ ששרד את ה-de-dupe לא היה מסומן כמתוזמן ולא היה מקבל תג יום.
+function _scheduledPlaceNames() {
+  var out = {}, byCoord = {};
+  try {
+    getDaysState().forEach(function(d, i) {
+      (d.stops || []).forEach(function(s) {
+        if (!s || !s.name) return;
+        var info = { dayNum: d.dayNum || (i + 1), day: d.title, time: s.time || '' };
+        if (!out[s.name]) out[s.name] = info;
+        var c = PLACE_COORDS[s.name];
+        if (c && !byCoord[c[0] + ',' + c[1]]) byCoord[c[0] + ',' + c[1]] = info;
+      });
+    });
+    _mappablePlaces().forEach(function(p) {
+      if (out[p.name]) return;
+      var c = PLACE_COORDS[p.name];
+      if (!c) return;
+      var info = byCoord[c[0] + ',' + c[1]];
+      if (info) out[p.name] = info;
+    });
+  } catch (e) {}
+  return out;
+}
+
 function addMapMarkers() {
   if (!_leafletMap || !window.L) return;
-  var catColor = { restaurant:'#2563EB', community:'#16a34a', photo:'#9333ea', dessert:'#e879f9', shop:'#f59e0b', exchange:'#0891B2' };
-  var daysState = getDaysState();
-  var scheduledNames = {};
-  daysState.forEach(function(d) { (d.stops||[]).forEach(function(s){ scheduledNames[s.name]=true; }); });
+  var catColor = { restaurant:'#2563EB', community:'#16a34a', photo:'#9333ea', dessert:'#e879f9', shop:'#f59e0b', exchange:'#0891B2', stop:'#F4634A' };
+  var scheduledNames = _scheduledPlaceNames();
 
-  _uniquePlacesForMap().forEach(function(p) {
+  _mappablePlaces().forEach(function(p) {
     var coords = PLACE_COORDS[p.name];
     if (!coords) return;
     var isScheduled = scheduledNames[p.name];
     var color = isScheduled ? '#F4634A' : (catColor[p.type] || '#64748B');
-    var icon = makePinIcon(color);
+    // מקום שכבר היינו בו מקבל נעץ ירוק עם ✓ — כך שמבט אחד על המפה עונה על
+    // "מה עוד לא עשינו?" בלי לפתוח כרטיסים.
+    var icon = isVisited(p.name) ? makeVisitedPinIcon() : makePinIcon(color);
     if (!icon) return;
     var marker = L.marker(coords, {icon:icon}).addTo(_leafletMap);
     marker.on('click', (function(place, coord) {
@@ -5247,6 +5362,9 @@ function showMapNavDialog(p, coords) {
 
   // ── מרחק + כיוון מהמיקום הנוכחי (רק אם GPS פעיל) ──
   var infoHtml = '';
+  // "היינו" — אותו כפתור בדיוק של כרטיסי המסעדות/אטרקציות, כדי שאפשר יהיה
+  // לסמן ישירות מהמפה בשטח בלי לחזור לטאב אחר. ה-listener הגלובלי כבר מטפל בו.
+  infoHtml += '<div style="margin-bottom:8px;">' + visitedBtnHtml(p.name, 'block') + '</div>';
   if (_userLat !== null && _userLng !== null && coords) {
     var _d = haversine(_userLat, _userLng, coords[0], coords[1]);
     var _dStr = _d < 1 ? Math.round(_d*1000) + ' מ׳' : _d.toFixed(1) + ' ק״מ';
@@ -5537,13 +5655,11 @@ function filterNearby(cat) {
 function renderNearbyList() {
   var container = document.getElementById('nearbyPlacesList');
   if (!container) return;
-  var daysState = getDaysState();
-  var scheduledNames = {};
-  daysState.forEach(function(d,i) { (d.stops||[]).forEach(function(s){ scheduledNames[s.name]={dayNum:d.dayNum||(i+1),day:d.title,time:s.time}; }); });
+  var scheduledNames = _scheduledPlaceNames();
 
   // בנה רשימה עם מרחקים — מהרשימה המאוחדת (בלי כפילויות), ראה _uniquePlacesForMap
   var items = [];
-  _uniquePlacesForMap().forEach(function(p) {
+  _mappablePlaces().forEach(function(p) {
     if (!PLACE_COORDS[p.name]) return;
     var coords = PLACE_COORDS[p.name];
     var dist = (_userLat !== null) ? haversine(_userLat, _userLng, coords[0], coords[1]) : null;
@@ -5576,8 +5692,8 @@ function renderNearbyList() {
     return;
   }
 
-  var typeColor = { restaurant:'#2563EB', community:'#16a34a', photo:'#9333ea', dessert:'#e879f9', shop:'#f59e0b', schedule:'#F4634A', exchange:'#0891B2' };
-  var typeLabel = { restaurant:'מסעדה', community:'אטרקציה', photo:'צילום', dessert:'קינוח', shop:'קניות', schedule:'בלוז', exchange:'המרת כסף' };
+  var typeColor = { restaurant:'#2563EB', community:'#16a34a', photo:'#9333ea', dessert:'#e879f9', shop:'#f59e0b', schedule:'#F4634A', exchange:'#0891B2', stop:'#F4634A' };
+  var typeLabel = { restaurant:'מסעדה', community:'אטרקציה', photo:'צילום', dessert:'קינוח', shop:'קניות', schedule:'בלוז', exchange:'המרת כסף', stop:'בלוז' };
 
   var html = '';
   filtered.forEach(function(it) {
@@ -5601,7 +5717,7 @@ function renderNearbyList() {
 
     // אינדקס לתוך הרשימה המאוחדת (לא ALL_PLACES) — האובייקטים כאן ממוזגים ולכן
     // ALL_PLACES.indexOf() היה מחזיר -1 ומשמיט כל כרטיס.
-    var apIdx = _uniquePlacesForMap().indexOf(p);
+    var apIdx = _mappablePlaces().indexOf(p);
     if (apIdx === -1) return; // defensive
     var c0 = it.coords[0], c1 = it.coords[1];
     html += '<div onclick="_openNearbyDialog(' + apIdx + ',' + c0 + ',' + c1 + ')" ' +
@@ -5619,6 +5735,7 @@ function renderNearbyList() {
           '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:' + catClr + '18;color:' + catClr + ';">' + catLbl + '</span>' +
           (distStr ? '<span style="font-size:10px;font-weight:700;color:rgba(30,41,59,0.5);">🚶 '+distStr+(walkMin?(' · '+walkMin+'ד\''):'')+'</span>' : '') +
           dirHtml +
+          (isVisited(p.name) ? '<span style="font-size:10px;font-weight:800;color:#065F46;background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.3);padding:2px 8px;border-radius:20px;">✅ היינו</span>' : '') +
           (it.inDays ? '<span style="font-size:10px;font-weight:700;color:#16a34a;background:rgba(22,163,74,0.10);padding:2px 8px;border-radius:20px;margin-right:auto;">✅ יום '+it.inDays.dayNum+(it.inDays.time?' · '+it.inDays.time:'')+'</span>' : '') +
         '</div>' +
       '</div>' +
@@ -5638,7 +5755,7 @@ function openStopMapDialog(name) {
   try {
     var coords = PLACE_COORDS[name];
     if (!coords) { toast('📍 אין קואורדינטות לתחנה הזו'); return; }
-    var p = _uniquePlacesForMap().find(function(x) { return x.name === name; });
+    var p = _mappablePlaces().find(function(x) { return x.name === name; });
     if (!p) {
       var st = null;
       getDaysState().forEach(function(d) {
@@ -5658,7 +5775,7 @@ function openStopMapDialog(name) {
 
 function _openNearbyDialog(apIdx, lat, lng) {
   try {
-    var p = _uniquePlacesForMap()[apIdx]; // אותה רשימה מאוחדת שממנה נבנו הכרטיסים
+    var p = _mappablePlaces()[apIdx]; // אותה רשימה מאוחדת שממנה נבנו הכרטיסים
     if (!p) { console.warn('[location] _openNearbyDialog: invalid apIdx', apIdx); return; }
     showMapNavDialog(p, [lat, lng]);
   } catch(e) {
@@ -6032,6 +6149,7 @@ function initRealtimeSync() {
           if (JSON.stringify(remoteDays) !== localDays) {
             DAYS_STATE = remoteDays;
             localStorage.setItem('prague_days_v1', d.days_custom);
+            try { _invalidateMappable(); } catch (e) {}
             renderDays();
             refreshScheduleBadges();
             showSyncBadge('📅');
