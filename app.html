@@ -566,6 +566,33 @@ function verifyLoginCode() {
 // התנתקות ידנית: מוחקת את שתי שכבות ה"זכירה" — הדגל שלנו (localStorage) וה-session
 // של Firebase — ומרעננת. הנתונים עצמם (הוצאות/ימים/ציוד) נשארים ב-localStorage וגם
 // בענן; זה מנתק גישה בלבד, לא מוחק כלום.
+// ── גרסה + משיכת עדכון בכוח ────────────────────────────────────────────────
+// הבעיה: האפליקציה מוגשת כקובץ HTML יחיד מ-GitHub Pages, ויש לה
+// apple-mobile-web-app-capable. כשמוסיפים אותה למסך הבית ב-iOS היא רצה
+// standalone — **בלי סרגל כתובות ובלי כפתור רענון** — ו-Safari מגיש את
+// הגרסה השמורה. התוצאה: תיקון נפרס בהצלחה והמשפחה ממשיכה לראות ישן,
+// בלי שום דרך לדעת שהם על גרסה ישנה.
+// BUILD_ID מתעדכן ידנית בכל שינוי מהותי; הוא מוצג בכפתור כדי שאפשר יהיה
+// לדעת במבט אחד איזו גרסה טעונה בטלפון.
+var BUILD_ID = '2026-08-10-c';
+
+function forceUpdate() {
+  // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
+  // reload(true) הוסר מהתקן ומתעלמים ממנו ברוב הדפדפנים, ולכן לא מספיק.
+  try {
+    var u = new URL(window.location.href);
+    u.searchParams.set('v', String(Date.now()));
+    window.location.replace(u.toString());
+  } catch (e) {
+    window.location.href = window.location.pathname + '?v=' + Date.now();
+  }
+}
+
+function _renderBuildStamp() {
+  var el = document.getElementById('buildStamp');
+  if (el) el.textContent = 'גרסה ' + BUILD_ID;
+}
+
 function doLogout() {
   if (!confirm('להתנתק מהמכשיר הזה?\n\nתצטרך קוד חדש בכניסה הבאה.\nהנתונים עצמם נשמרים — לא נמחק כלום.')) return;
   try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
@@ -597,6 +624,7 @@ function _showApp() {
   var app = document.getElementById('app');
   if (ls) ls.style.display = 'none';
   if (app) app.style.display = 'block';
+  try { _renderBuildStamp(); } catch (e) {}
 }
 
 // Check session on load — bypass login in GAS context.
@@ -1030,6 +1058,7 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
       <button id="btnHomeCommunity" style="background:rgba(52,211,153,0.10);border:1px solid rgba(52,211,153,0.25);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#065F46;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;text-align:center;grid-column:1 / -1;">👥<br><span style="font-size:10px;font-weight:700;">המלצות קהילה</span></button>
       <button id="btnHomeGuides" style="background:rgba(251,146,60,0.10);border:1px solid rgba(251,146,60,0.25);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#C2410C;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;text-align:center;grid-column:1 / -1;">🎙️<br><span style="font-size:10px;font-weight:700;">מדריכים בעברית</span></button>
       <button id="btnHomeLang" style="background:rgba(168,85,247,0.10);border:1px solid rgba(168,85,247,0.22);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#6D28D9;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;text-align:center;grid-column:1 / -1;">🌐<br><span style="font-size:10px;font-weight:700;">שפה ותרגום</span></button>
+      <button onclick="forceUpdate()" style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.22);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#4F46E5;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;text-align:center;grid-column:1 / -1;">🔄<br><span style="font-size:10px;font-weight:700;">משוך גרסה עדכנית</span><br><span id="buildStamp" style="font-size:9px;font-weight:600;opacity:0.6;"></span></button>
       <button onclick="doLogout()" style="background:rgba(100,116,139,0.08);border:1px solid rgba(100,116,139,0.20);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#475569;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;text-align:center;grid-column:1 / -1;">🚪<br><span style="font-size:10px;font-weight:700;">התנתק מהמכשיר</span></button>
     </div>
     <div style="background:linear-gradient(135deg,rgba(244,99,74,0.13),rgba(244,99,74,0.055));border:1px solid rgba(244,99,74,0.24);border-radius:20px;padding:16px;margin-bottom:10px;">
