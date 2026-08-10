@@ -108,6 +108,14 @@ var PHOTO_SPOTS = ALL_PLACES.filter(p => p.type==='photo');
 - `_openNearbyDialog(apIdx, lat, lng)` (~שורה 4901) — wrapper עם try-catch; `apIdx = ALL_PLACES.indexOf(p)` — אינדקס מספרי, ללא בעיות escaping
 - כפתורי ניווט נעוצים בתחתית: Google Maps | Waze | 📍 מפה מקומית | סגור
 
+#### פרטי אטרקציה שנעלמו בפופ-אפ (2026-08-10)
+- `showDayTimePicker(emoji, name, desc)` קיבל `desc` כפרמטר ו**מעולם לא הציג אותו** — הפופ-אפ הראה רק emoji+שם (מקוצר ל-26 תווים). בלי תיאור, דירוג, משך או הזמנה, אי אפשר היה להחליט לאיזה יום לשבץ בלי לצאת ולחזור
+- חמור יותר: בשמירה הוא דחף תחנה **רזה** — `{emoji, name, time, desc, mapUrl:''}` בלבד — ואיבד `details`/`tips`/`booking`/`google`/`duration`/`who`/`mapUrl`. `saveAddCommunityStop` לעומתו שמר את הרשומה המלאה. תוצאה: כל מקום שנוסף מבנק האטרקציות נפתח אח"כ ב"ימים" ככותרת ריקה
+- `showStopDetail` ו-`renderDays` עשו fallback רק ל-`google`/`duration`/`who`, ורק מול `COMMUNITY`/`RESTAURANTS` — לא מול `ALL_PLACES` המלא, ולא ל-`details`/`tips`/`booking`/`mapUrl`
+- **התיקון**: `_placeToStopFields(rec)` מנרמל את סכימות ה-type השונות (community: `how`/`booking`/`tips`־string · shop: `hours`/`metro`/`brands` · dessert: `where`/`rating` · photo: `best`/`crowds`/`fee_txt`) לשדות של תחנה. `_stopFallback(name)` מאתר ב-`_uniquePlacesForMap()`, ו-`_withPlaceDetails(stop)` ממלא **רק שדות ריקים** כדי לא לדרוס עריכות של המשתמש
+- מוחל בשלושה מקומות: `showStopDetail`, `renderDays`, ובשמירה של `showDayTimePicker`. **ההשלמה בזמן תצוגה מתקנת גם תחנות שכבר נשמרו רזות בענן** — בלי מיגרציה של הנתונים
+- הפופ-אפ של בחירת היום מציג עכשיו תיאור מלא + צ׳יפים של ⭐ דירוג / משך / מתאים ל / הזמנה
+
 #### תיקון גלילה במודל "הוסף תחנה" (2026-08-10)
 - `#addStopModal` היה ה-bottom sheet **היחיד** בקובץ בלי `max-height`+`overflow-y`. תוכן הגיליון ~730px — גבוה ממסך של רוב הטלפונים — ועם `align-items:flex-end` הכותרת וטאבי הבנק נחתכו **מעל** גבול המסך בלי אפשרות לגלול אליהם (קונטיינר `position:fixed`). נמדד ב-Chromium: 62px חתוכים ב-375×667, 65px ב-390×664, 14px ב-414×715
 - תוקן: `max-height:88vh;overflow-y:auto;overscroll-behavior:contain;box-sizing:border-box` על הפאנל

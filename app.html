@@ -2150,6 +2150,68 @@ var remindersDone = {};
 var remindersSchedule = {}; // { [id]: { day, time } }
 var _pendingAttrStop = null; // { emoji, name, desc } set before opening addStop overlay
 
+// ── השלמת פרטים לתחנה מתוך ALL_PLACES ──────────────────────────────────────
+// תחנה ב-DAYS_STATE נשמרת לפעמים "רזה": showDayTimePicker שמר רק
+// emoji/name/time/desc, בלי details/tips/booking/google/mapUrl. התוצאה הייתה
+// שפתיחת התחנה ב"ימים" הראתה כותרת ריקה — כל הפרטים על האטרקציה "נעלמו".
+// הפונקציות כאן משלימות את החסר בזמן תצוגה, כך שגם תחנות שכבר נשמרו רזות
+// בענן מקבלות את הפרטים בחזרה — בלי מיגרציה של הנתונים.
+//
+// ⚠️ לכל type ב-ALL_PLACES סכימה משלו (community: how/booking/tips־string,
+// shop: hours/metro/brands, dessert: where/rating, photo: best/crowds/fee_txt),
+// ולכן הממפה מנרמל אותם לשדות שהתחנה יודעת להציג.
+function _placeToStopFields(rec) {
+  if (!rec) return {};
+  var tips = [];
+  if (rec.tips) tips = tips.concat(Array.isArray(rec.tips) ? rec.tips : [rec.tips]);
+  if (rec.tip) tips.push(rec.tip);
+  if (rec.who) tips.push('👥 מתאים ל: ' + rec.who);
+  if (rec.hours) tips.push('🕐 ' + rec.hours);
+  if (rec.metro) tips.push('🚇 ' + rec.metro);
+  if (rec.brands) tips.push('🏷️ ' + rec.brands);
+  if (rec.where) tips.push('📍 ' + rec.where);
+  if (rec.best) tips.push('📸 הזמן הכי טוב: ' + rec.best);
+  if (rec.crowds) tips.push('👥 עומס: ' + rec.crowds);
+  if (rec.price) tips.push('💰 ' + rec.price);
+  if (rec.fee_txt) tips.push('🎟️ ' + rec.fee_txt);
+  var details = rec.details || rec.desc || rec.sub || '';
+  if (rec.how) details = (details ? details + ' ' : '') + '🚇 ' + rec.how;
+  return {
+    emoji:    rec.icon || '📍',
+    desc:     rec.desc || rec.sub || rec.tip || '',
+    details:  details,
+    tips:     tips,
+    booking:  rec.booking || '',
+    google:   rec.google || rec.rating || rec.stars || '',
+    duration: rec.duration || '',
+    who:      rec.who || '',
+    mapUrl:   rec.mapUrl || ''
+  };
+}
+
+// לפי שם תחנה — מהרשימה המאוחדת (ממזגת כפילויות, ולכן מחזירה את הרשומה
+// העשירה מבין השתיים). {} אם אין התאמה — תחנה מותאמת אישית, לגיטימי.
+function _stopFallback(name) {
+  try {
+    var list = (typeof _uniquePlacesForMap === 'function') ? _uniquePlacesForMap()
+             : (typeof ALL_PLACES !== 'undefined' ? ALL_PLACES : []);
+    return _placeToStopFields(list.find(function(p) { return p.name === name; }));
+  } catch (e) { return {}; }
+}
+
+// ממלאת רק שדות ריקים — מה שהמשתמש ערך בעצמו לא נדרס.
+function _withPlaceDetails(stop) {
+  var fb = _stopFallback(stop && stop.name);
+  var out = Object.assign({}, stop);
+  Object.keys(fb).forEach(function(k) {
+    var cur = out[k], val = fb[k];
+    var curEmpty = (cur === undefined || cur === null || cur === '' || (Array.isArray(cur) && !cur.length));
+    var valEmpty = (val === undefined || val === null || val === '' || (Array.isArray(val) && !val.length));
+    if (curEmpty && !valEmpty) out[k] = val;
+  });
+  return out;
+}
+
 function showDayTimePicker(emoji, name, desc) {
   try {
   var ex = document.getElementById('dayTimePickerOverlay');
@@ -2166,9 +2228,24 @@ function showDayTimePicker(emoji, name, desc) {
   panel.style.cssText = 'background:#ffffff;border-radius:24px 24px 0 0;padding:22px 18px 36px;width:100%;max-width:480px;direction:rtl;font-family:Rubik,Arial,sans-serif;max-height:85vh;overflow-y:auto;box-shadow:0 -4px 30px rgba(0,0,0,0.4);';
 
   var header = document.createElement('div');
-  header.style.cssText = 'font-size:15px;font-weight:900;color:#1E293B;margin-bottom:16px;text-align:center;';
-  var shortName = (name||'').length > 26 ? (name||'').substring(0,26)+'…' : (name||'');
-  header.textContent = (emoji||'📍') + ' ' + shortName;
+  header.style.cssText = 'font-size:15px;font-weight:900;color:#1E293B;margin-bottom:10px;text-align:center;line-height:1.35;';
+  header.textContent = (emoji||'📍') + ' ' + (name||'');
+
+  // פרטי המקום — קודם ה-desc התקבל כפרמטר ומעולם לא הוצג, אז הפופ-אפ הראה
+  // רק שם וקצר אותו ל-26 תווים. עכשיו: תיאור מלא + צ׳יפים של דירוג/משך/הזמנה,
+  // מ-ALL_PLACES, כדי שאפשר יהיה להחליט על היום בלי לצאת ולחזור.
+  var _rec = _stopFallback(name);
+  var info = document.createElement('div');
+  info.style.cssText = 'margin-bottom:16px;';
+  var chips = '';
+  if (_rec.google)   chips += '<span style="background:rgba(254,240,138,0.6);border:1px solid rgba(202,138,4,0.3);border-radius:9px;padding:3px 9px;font-size:11px;font-weight:700;color:#92400E;">⭐ ' + esc(_rec.google) + '</span>';
+  if (_rec.duration) chips += '<span style="background:rgba(0,0,0,0.05);border-radius:9px;padding:3px 9px;font-size:11px;font-weight:700;color:rgba(30,41,59,0.65);">' + esc(_rec.duration.replace('⏱️ ','⏳ ')) + '</span>';
+  if (_rec.who)      chips += '<span style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:9px;padding:3px 9px;font-size:11px;color:#065F46;">👨‍👩‍👧 ' + esc(_rec.who) + '</span>';
+  if (_rec.booking)  chips += '<span style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:9px;padding:3px 9px;font-size:11px;color:#4338CA;">🎟️ ' + esc(_rec.booking) + '</span>';
+  var _text = _rec.details || desc || '';
+  info.innerHTML =
+    (_text ? '<div style="background:rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.07);border-radius:13px;padding:11px 13px;font-size:12px;color:rgba(30,41,59,0.78);line-height:1.6;margin-bottom:' + (chips ? '8px' : '0') + ';">' + esc(_text) + '</div>' : '') +
+    (chips ? '<div style="display:flex;flex-wrap:wrap;gap:5px;justify-content:center;">' + chips + '</div>' : '');
 
   var dayLabel = document.createElement('div');
   dayLabel.style.cssText = 'font-size:11px;font-weight:700;color:rgba(30,41,59,0.45);letter-spacing:0.5px;margin-bottom:8px;';
@@ -2245,7 +2322,17 @@ function showDayTimePicker(emoji, name, desc) {
     var st = getDaysState();
     if (!st[selectedDay]) { toast('⚠️ יום לא קיים'); return; }
     var finalTime = (timeInput.value || selectedTime || '').trim();
-    st[selectedDay].stops.push({ emoji: emoji||'📍', name: name||'', time: finalTime, desc: (desc||'').substring(0,120).replace(/\n/g,' '), mapUrl: '' });
+    // שומרים את הרשומה המלאה מ-ALL_PLACES ולא רק emoji/name/time/desc —
+    // כך התחנה נשמרת בענן עם details/tips/booking/google/mapUrl, בדיוק כמו
+    // תחנה שנוספה דרך saveAddCommunityStop. הגרסה הרזה הקודמת היא הסיבה
+    // שפרטי האטרקציה "נעלמו" בפופ-אפ אחרי ההוספה.
+    var _base = _stopFallback(name);
+    st[selectedDay].stops.push(Object.assign({}, _base, {
+      emoji: emoji || _base.emoji || '📍',
+      name: name || '',
+      time: finalTime,
+      desc: (_base.desc || desc || '').substring(0,120).replace(/\n/g,' ')
+    }));
     sortDayStops(selectedDay);
     saveDaysState();
     renderDays();
@@ -2262,6 +2349,7 @@ function showDayTimePicker(emoji, name, desc) {
   btnRow.appendChild(cancelBtn);
   btnRow.appendChild(addBtn);
   panel.appendChild(header);
+  panel.appendChild(info);
   panel.appendChild(dayLabel);
   panel.appendChild(dayGrid);
   panel.appendChild(timeLabel);
@@ -3679,13 +3767,13 @@ function renderDays() {
   var d = state[i - 1];
   var card = qs('dayCard');
   if (!card) return;
-  var _commAll = typeof COMMUNITY !== 'undefined' ? COMMUNITY : [];
-  var _restAll = typeof RESTAURANTS !== 'undefined' ? RESTAURANTS : [];
   var stopsHtml = (d.stops || []).map(function(s, si) {
-    var _fallback = _commAll.find(function(c){return c.name===s.name;}) || _restAll.find(function(r){return r.name===s.name;}) || {};
-    var _google = s.google || _fallback.google || '';
-    var _duration = s.duration || _fallback.duration || '';
-    var hasDetails = !!(s.details || s.tips);
+    // אותה השלמה כמו ב-showStopDetail — אחרת הכרטיס והפופ-אפ מראים מידע שונה
+    // (למשל "פרטים ›" שלא מופיע, או כפתור 🗺️ נווט חסר) לאותה תחנה בדיוק.
+    s = _withPlaceDetails(s);
+    var _google = s.google || '';
+    var _duration = s.duration || '';
+    var hasDetails = !!(s.details || (s.tips && s.tips.length));
     var dayIdx = i - 1;
     var stopNumLabel = '<span style="position:absolute;right:-26px;top:50%;transform:translateY(-50%);width:20px;height:20px;border-radius:50%;background:#F4634A;color:white;font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(244,99,74,0.45);">' + (si+1) + '</span>';
     // תמונת תחנה
@@ -3777,13 +3865,9 @@ function renderDays() {
 function showStopDetail(dayIdx, stopIdx) {
   var s = (getDaysState()[dayIdx] || {stops:[]}).stops[stopIdx];
   if (!s) return;
-  var _commAll2 = typeof COMMUNITY !== 'undefined' ? COMMUNITY : [];
-  var _restAll2 = typeof RESTAURANTS !== 'undefined' ? RESTAURANTS : [];
-  var _fb2 = _commAll2.find(function(c){return c.name===s.name;}) || _restAll2.find(function(r){return r.name===s.name;}) || {};
-  s = Object.assign({}, s);
-  if (!s.google && _fb2.google) s.google = _fb2.google;
-  if (!s.duration && _fb2.duration) s.duration = _fb2.duration;
-  if (!s.who && _fb2.who) s.who = _fb2.who;
+  // משלים details/tips/booking/mapUrl/google/duration/who מ-ALL_PLACES — גם
+  // לתחנות שנשמרו רזות בעבר. בלי זה הפופ-אפ מציג רק כותרת.
+  s = _withPlaceDetails(s);
   var existing = document.getElementById('stopDetailOverlay');
   if (existing) existing.remove();
   var tipsHtml = (s.tips || []).map(function(t) {
