@@ -4377,6 +4377,7 @@ function renderCommunity() {
           '</div>' +
         '</div>' +
         (p.mapUrl ? '<a href="'+p.mapUrl+'" target="_blank" rel="noopener" style="flex-shrink:0;background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.25);border-radius:12px;padding:10px 12px;font-size:11px;font-weight:700;color:#065F46;text-decoration:none;text-align:center;line-height:1.3;">🗺️<br>נווט</a>' : '') +
+        (PLACE_COORDS[p.name] ? '<button type="button" onclick="showDistanceTo(this.dataset.pn)" data-pn="'+esc(p.name)+'" style="flex-shrink:0;background:rgba(99,102,241,0.10);border:1px solid rgba(99,102,241,0.25);border-radius:12px;padding:10px 12px;font-size:11px;font-weight:700;color:#4F46E5;cursor:pointer;text-align:center;line-height:1.3;font-family:\'Rubik\',Arial,sans-serif;">📍<br>ממני</button>' : '') +
       '</div>' +
       '<div style="margin-top:12px;padding-top:12px;border-top:1px dashed rgba(30,41,59,0.1);display:flex;align-items:center;justify-content:space-between;gap:8px;">' +
         schedBadgeHtml +
@@ -4539,6 +4540,7 @@ function renderRestaurants() {
       '</div>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
         '<a href="' + r.mapUrl + '" target="_blank" rel="noopener" style="flex:1;display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:11px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;">🗺️ ניווט</a>' +
+        (PLACE_COORDS[r.name] ? '<button type="button" onclick="showDistanceTo(this.dataset.pn)" data-pn="' + esc(r.name) + '" style="flex:0 0 auto;background:rgba(99,102,241,0.10);border:1.5px solid rgba(99,102,241,0.25);color:#4F46E5;border-radius:13px;padding:11px 14px;font-weight:800;font-size:12px;cursor:pointer;font-family:Rubik,Arial,sans-serif;">📍 ממני</button>' : '') +
         '<button data-rest-icon="' + (r.icon||'🍽️') + '" data-rest-name="' + esc(r.name) + '" data-rest-desc="' + esc((r.desc||'').substring(0,120).replace(/\n/g,' ')) + '" class="restAddStopBtn" style="flex:1;background:' + (_inDaysR ? 'rgba(244,99,74,0.13)' : 'rgba(244,99,74,0.12)') + ';border:1.5px solid rgba(244,99,74,0.3);color:#C2410C;border-radius:13px;padding:11px;font-weight:800;font-size:12px;cursor:pointer;font-family:Rubik,Arial,sans-serif;">' + (_inDaysR ? '✏️ עדכן' : '📅 הוסף תחנה') + '</button>' +
       '</div>' +
     '</div></div>';
@@ -4879,6 +4881,29 @@ var _COMPASS = [
   ['⬇️','דרומה'], ['↙️','דרום-מערבה'], ['⬅️','מערבה'], ['↖️','צפון-מערבה']
 ];
 function compassFor(deg) { return _COMPASS[Math.round(deg/45)%8]; }
+
+// "כמה רחוק ממני?" — כפתור בכרטיס של כל מקום, בכל טאב (לא רק בטאב מיקום).
+// אם אין עדיין מיקום — מבקש אותו פעם אחת (getCurrentPosition, לא watch — לא רוצים
+// להתחיל מעקב מלא רק בשביל בדיקה נקודתית). המיקום נשמר, אז לחיצות הבאות מיידיות.
+function showDistanceTo(placeName) {
+  var coords = PLACE_COORDS[placeName];
+  if (!coords) { toast('📍 אין קואורדינטות למקום הזה'); return; }
+  var show = function() {
+    var d = haversine(_userLat, _userLng, coords[0], coords[1]);
+    var dStr = d < 1 ? Math.round(d*1000) + ' מ׳' : d.toFixed(1) + ' ק״מ';
+    var c = compassFor(bearingTo(_userLat, _userLng, coords[0], coords[1]));
+    toast(c[0] + ' ' + c[1] + ' · ' + dStr + ' · ~' + Math.ceil(d/0.08) + ' דק׳ הליכה');
+  };
+  if (_userLat !== null && _userLng !== null) { show(); return; }
+  if (!navigator.geolocation) { toast('⚠️ אין תמיכה באיתור מיקום'); return; }
+  toast('⌛ מאתר מיקום…');
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    _userLat = pos.coords.latitude; _userLng = pos.coords.longitude;
+    show();
+  }, function(err) {
+    toast(err && err.code === 1 ? '⚠️ אין הרשאת מיקום' : '⚠️ לא ניתן לאתר מיקום');
+  }, {timeout:10000, enableHighAccuracy:true, maximumAge:60000});
+}
 
 var _leafletMap = null;
 var _userLat = null, _userLng = null;
