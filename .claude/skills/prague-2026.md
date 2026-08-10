@@ -369,6 +369,12 @@ var _fb = COMMUNITY.find(c=>c.name===s.name) || RESTAURANTS.find(r=>r.name===s.n
 - **⚠️ ב-`openTab` הבדיקה היא `_geoWatchId != null` ולא `!==`** — var hoisting עושה אותו `undefined` אם `openTab` ירוץ לפני שורת ההשמה, ו-`undefined !== null` היה נכנס לשווא.
 - נבדק בסימולציה: 20 טיקים בהליכת ~100 מ׳ → 7 רינדורים (לא 20); 30 טיקים בעמידה → 0.
 
+### כפתור "📍 ממני" בכרטיסים (2026-08-10)
+`showDistanceTo(placeName)` — toast עם כיוון+מרחק+זמן הליכה, זמין מ**כל טאב** (לא רק מיקום).
+- מוצג בכרטיסי `renderCommunity` וגם `renderRestaurants`, **רק אם `PLACE_COORDS[name]` קיים** (בפועל כיסוי מלא: 56/56 קהילה, 26/26 מסעדות).
+- משתמש ב-`getCurrentPosition` (לא `watchPosition`) — בדיקה נקודתית, לא מעקב. התוצאה נשמרת ב-`_userLat/_userLng` אז לחיצות הבאות מיידיות; `maximumAge:60000` מאפשר קריאה אחרונה במקום fix חדש.
+- **שם המקום עובר ב-`data-pn` ולא inline string** — לפי הדפוס הקיים נגד שבירת `onclick` על מרכאות בשם (אותה מלכודת של `_mapNavPlace`).
+
 ### כיוון יחסי למיקום (2026-08-10)
 `bearingTo(lat1,lng1,lat2,lng2)` — forward azimuth על ספירה, מחזיר 0–360° (0=צפון, 90=מזרח).
 `compassFor(deg)` → `_COMPASS[Math.round(deg/45)%8]` → `[חץ, שם בעברית]`.
