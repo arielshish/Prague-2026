@@ -944,7 +944,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-11-i';
+var BUILD_ID = '2026-08-11-j';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
@@ -1467,7 +1467,10 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
         <button class="back-btn" id="btnBackDays">← ראשי</button>
       </div>
     </div>
-    <div id="dayButtons" style="display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
+    <!-- ⚠️ היה כאן <div id="dayButtons"> סטטי וריק שאיש לא כתב אליו. הוא יצר
+         **id כפול** עם זה ש-renderDays מייצר בתוך #dayCard, ו-getElementById
+         החזיר תמיד את הריק. תוצאה: המגן ב-initDaySwipe ("אל תחליף יום כשגוררים
+         את שורת הכדורים") בדק אלמנט ריק ולכן מעולם לא פעל. הוסר 11/08. -->
     <div id="dayCard" class="card"></div>
   </section>
 
@@ -2439,6 +2442,28 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
 var RATE = Number(localStorage.getItem('prague_rate_v10') || 6.4);
 var EXPENSES = [];
 var EDIT_ID = null;
+// ── היום הנוכחי בטיול ──────────────────────────────────────────────────────
+// הטיול 8–15/8/2026. במקום לפתוח תמיד ביום 1, נפתח ביום שבאמת היום —
+// זה הדבר היחיד שרוצים לראות כשפותחים את האפליקציה בשטח.
+// ⚠️ להשוות **תאריך מקומי** ולא UTC: new Date('2026-08-08') הוא חצות UTC,
+// ובישראל/פראג זה כבר 08/08 03:00 — חיסור ישיר של timestamps מחזיר יום שגוי
+// בשעות מסוימות. לכן בונים את שני התאריכים כחצות מקומית.
+var TRIP_START = new Date(2026, 7, 8); // חודש 7 = אוגוסט
+function tripDayNumber(when) {
+  var d = when || new Date();
+  var today = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  return Math.round((today - TRIP_START) / 86400000) + 1;
+}
+// מספר היום מוגבל לטווח הימים הקיים; לפני הטיול → 1, אחריו → האחרון.
+function currentTripDay() {
+  var n = tripDayNumber();
+  var total = 8;
+  try { total = getDaysState().length || 8; } catch (e) {}
+  return Math.min(Math.max(n, 1), total);
+}
+function isPastDay(i) { return i < tripDayNumber(); }
+function isToday(i) { return i === tripDayNumber(); }
+
 var currentDay = 1;
 
 // ═══════════════════════════════════════════
@@ -3631,6 +3656,14 @@ var ALL_PLACES = [
   // אתרי Josefov. הגדול בפראג, ולדעת רבים היפה ביותר.
   // קואורדינטה אומתה משני מקורות: ויקיפדיה 50°05′05″N 14°25′55″E
   // ו-unesco-czech.cz 50°5'4.96"N 14°25'55.13"E — זהים.
+  // Café Louvre — היה רק קואורדינטה בלי רשומה, כלומר לא נמצא בחיפוש, לא במפה
+  // ולא ניתן לסימון "היינו". נוסף 11/08 אחרי שהתברר שהוא האופציה המעשית
+  // ביותר בקו של הרובע היהודי + בית הכנסת ירושלים.
+  {type:'restaurant',level:1,icon:'☕',name:'Café Louvre',sub:'בית הקפה של קפקא ואיינשטיין — מ-1902',
+   desc:'בית קפה וינאי היסטורי הפועל 120 שנה ברציפות. פרנץ קפקא ואלברט איינשטיין היו קבועים כאן (איינשטיין ב-1911–12, בזמן שלימד בפראג). בזמנו החזיק את אולם הביליארד הראשון בעיר — והוא עדיין שם. אולם גבוה בוורוד-לבן, עוגות בית, ומטבח צ׳כי מלא: גולאש בקר עם קנדליקי, כתף חזיר, עוף עם שפצלה, וגם שניצל. אפשרויות צמחוניות, טבעוניות וללא גלוטן. Národní 22.',
+   price:'100–500 CZK',badge:'☕ קלאסי',badgeClr:'rgba(146,64,14,0.28)',badgeTxt:'#92400E',
+   google:'4.4',mapUrl:'https://www.google.com/maps/search/Cafe+Louvre+Prague+Narodni+22'},
+
   {type:'community',cat:'🎟️ אטרקציות', icon:'🕍', name:'בית הכנסת ירושלים — Jeruzalémská', fb:'⭐⭐⭐⭐⭐', google:'4.7',
    desc:'בית הכנסת הגדול בפראג (1906, האדריכל Wilhelm Stiassny) — סגנון מאורי מעורב עם ארט נובו. חזית פסים אדום-לבן, קשת פרסה, כיפות בצל וחלון ורדה עם מגן דוד. הפנים צבעוני ומרהיב, מקום ל-850 מתפללים. נבנה לכבוד יובל הכסף של פרנץ יוזף — מכאן "בית הכנסת היובל". נמצא בעיר החדשה, לא ברובע היהודי — ולכן פחות תיירים.',
    booking:'🎟️ כרטיס נפרד בכניסה — 150 CZK מבוגר / 100 ילד. **לא כלול** בכרטיס המשולב של הרובע היהודי. אין צורך בהזמנה מראש ואין בידוק ביטחוני.',
@@ -4135,7 +4168,15 @@ function loadDaysFromSheets(silent) {
   }
 }
 
-function selectDay(i) { currentDay = i; renderDays(); }
+function selectDay(i) { currentDay = i; _daySelectedManually = true; renderDays(); }
+
+// ⚠️ פעם אחת בלבד: אחרי שהמשתמש בחר יום ידנית, רינדור מחדש (סנכרון מהענן,
+// סימון "היינו", חזרה לטאב) לא יקפיץ אותו בחזרה להיום.
+var _daySelectedManually = false;
+function _autoSelectToday() {
+  if (_daySelectedManually) return;
+  try { currentDay = currentTripDay(); } catch (e) {}
+}
 
 (function initDaySwipe() {
   // touch-action:pan-y tells Android Chrome "vertical scroll is yours, horizontal is mine"
@@ -4175,6 +4216,7 @@ function selectDay(i) { currentDay = i; renderDays(); }
 
 function renderDays() {
   var state = getDaysState();
+  _autoSelectToday();
   var i = currentDay || 1;
   var total = state.length;
   // בנה pills HTML כ-string (מוזרק לתוך הכרטיס)
@@ -4189,12 +4231,16 @@ function renderDays() {
         dateShort = m[0] + '/' + (mn ? months[mn] : (m[1]||''));
       }
     }
+    // ימים שעברו מתעמעמים ומקבלים ✓; היום הנוכחי מסומן בטבעת גם כשלא נבחר,
+    // כדי שתמיד יהיה ברור איפה "עכשיו" גם אחרי שגוללים ליום אחר.
+    var past = isPastDay(idx + 1), tod = isToday(idx + 1);
+    var ring = (tod && !a) ? 'box-shadow:0 0 0 2px #F4634A;' : '';
     return '<button data-day="' + (idx+1) + '" style="min-width:42px;border:' +
       (a ? '0' : '1px solid rgba(0,0,0,0.10)') + ';border-radius:12px;padding:6px 8px;background:' +
-      (a ? '#F4634A' : '#ffffff') + ';color:' + (a ? 'white' : 'rgba(30,41,59,0.65)') +
-      ';font-weight:800;font-size:13px;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;flex-shrink:0;box-shadow:' +
-      (a ? '0 4px 12px rgba(244,99,74,0.32)' : '0 1px 3px rgba(0,0,0,0.06)') + ';line-height:1.2;display:flex;flex-direction:column;align-items:center;gap:1px;">' +
-      '<span>' + (idx+1) + '</span>' +
+      (a ? '#F4634A' : (past ? 'rgba(0,0,0,0.04)' : '#ffffff')) + ';color:' + (a ? 'white' : (past ? 'rgba(30,41,59,0.42)' : 'rgba(30,41,59,0.65)')) +
+      ';font-weight:800;font-size:13px;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;flex-shrink:0;' + ring + 'box-shadow:' +
+      (a ? '0 4px 12px rgba(244,99,74,0.32)' : (ring ? '' : '0 1px 3px rgba(0,0,0,0.06)')) + ';line-height:1.2;display:flex;flex-direction:column;align-items:center;gap:1px;opacity:' + (past && !a ? '0.75' : '1') + ';">' +
+      '<span>' + (past ? '✓' : (idx+1)) + '</span>' +
       (dateShort ? '<span style="font-size:9px;font-weight:600;opacity:' + (a ? '0.9' : '0.5') + ';">' + dateShort + '</span>' : '') +
       '</button>';
   }).join('');
@@ -4271,7 +4317,11 @@ function renderDays() {
         '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">' +
         '<span style="font-size:28px;">' + (d.emoji||'📅') + '</span>' +
         '<div><div style="font-size:15px;font-weight:900;color:#1E293B;">' + esc(d.title||'') + '</div>' +
-        '<div style="font-size:12px;color:rgba(30,41,59,0.5);">📅 ' + esc(d.date||'') + '</div></div></div>' +
+        '<div style="font-size:12px;color:rgba(30,41,59,0.5);display:flex;align-items:center;gap:6px;flex-wrap:wrap;">📅 ' + esc(d.date||'') +
+          (isToday(i) ? '<span style="background:#F4634A;color:#fff;border-radius:999px;padding:2px 9px;font-size:10px;font-weight:800;">● היום</span>' : '') +
+          (isPastDay(i) ? '<span style="background:rgba(0,0,0,0.06);color:rgba(30,41,59,0.55);border-radius:999px;padding:2px 9px;font-size:10px;font-weight:800;">✓ עבר</span>' : '') +
+          (i > tripDayNumber() ? '<span style="background:rgba(59,130,246,0.10);color:#1E40AF;border-radius:999px;padding:2px 9px;font-size:10px;font-weight:800;">בעוד ' + (i - tripDayNumber()) + ' ימים</span>' : '') +
+        '</div></div></div>' +
         '<p style="font-size:12px;color:rgba(30,41,59,0.6);line-height:1.6;margin-bottom:4px;">' + esc(d.story||'') + '</p>' +
         (d.peak ? '<div style="background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.25);border-radius:12px;padding:8px 12px;margin:10px 0;font-size:12px;color:#92400E;font-weight:600;">⭐ ' + esc(d.peak) + '</div>' : '') +
         (d.meals ? '<div style="background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);border-radius:14px;padding:12px;margin-top:4px;">' +
