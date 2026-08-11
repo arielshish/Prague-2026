@@ -566,6 +566,254 @@ function verifyLoginCode() {
 // התנתקות ידנית: מוחקת את שתי שכבות ה"זכירה" — הדגל שלנו (localStorage) וה-session
 // של Firebase — ומרעננת. הנתונים עצמם (הוצאות/ימים/ציוד) נשארים ב-localStorage וגם
 // בענן; זה מנתק גישה בלבד, לא מוחק כלום.
+
+// ═══════════════════════════════════════════════════════════════
+//  לוח סיכום הטיול — SVG לייצוא
+// ═══════════════════════════════════════════════════════════════
+// נבנה כ-SVG **טהור** (text/rect/circle בלבד) ולא כ-HTML, משתי סיבות:
+//   1. אפשר לרסטר אותו ל-PNG דרך Image+canvas בלי שום ספרייה חיצונית.
+//      (foreignObject עם HTML בפנים נחסם/מזהם canvas ב-Safari — לא לנסות.)
+//   2. SVG מטפל נכון ב-RTL עם direction="rtl" + text-anchor="end".
+// ⚠️ SVG שנטען כ-image מבודד — גופני web (Rubik) לא נטענים שם. לכן
+//    font-family חייב להישען על גופני מערכת, אחרת הייצוא ייראה אחרת מהתצוגה.
+
+function _sxesc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(m) {
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[m];
+  });
+}
+
+// קיצור לפי אורך משוער בפיקסלים (עברית ~0.52em, לטינית ~0.5em)
+function _sclip(s, maxChars) {
+  s = String(s || '').replace(/\s+/g, ' ').trim();
+  return s.length > maxChars ? s.slice(0, maxChars - 1) + '…' : s;
+}
+
+// אוסף את המקומות המסומנים ומעשיר אותם מאותה רשומה שכל שאר האפליקציה משתמשת בה
+function _tripSummaryData() {
+  var st = getVisitedState();
+  var names = Object.keys(st);
+  var items = names.map(function(n) {
+    var rec = _stopFallback(n);
+    var mapRec = null;
+    try { mapRec = _mappablePlaces().find(function(x) { return x.name === n; }); } catch (e) {}
+    var day = null;
+    try { day = findItemInDays(n); } catch (e) {}
+    return {
+      name: n,
+      icon: (mapRec && mapRec.icon) || rec.emoji || '📍',
+      desc: _sclip(rec.desc || rec.details || '', 62),
+      type: (mapRec && mapRec.type) || 'community',
+      coords: PLACE_COORDS[n] || null,
+      day: day ? day.dayNum : null,
+      ts: st[n]
+    };
+  });
+  // מיון לפי יום בלוז, ואז לפי מתי סומן — כך הלוח נקרא כרונולוגית
+  items.sort(function(a, b) {
+    if (a.day && b.day && a.day !== b.day) return a.day - b.day;
+    if (a.day && !b.day) return -1;
+    if (!a.day && b.day) return 1;
+    return (a.ts || 0) - (b.ts || 0);
+  });
+  return items;
+}
+
+var _SUM_TYPE = {
+  restaurant: ['מסעדות', '#2563EB'], community: ['אטרקציות', '#16a34a'],
+  dessert: ['קינוחים', '#e879f9'], shop: ['קניות', '#f59e0b'],
+  photo: ['נקודות צילום', '#9333ea'], exchange: ['המרת כסף', '#0891B2'],
+  stop: ['תחנות', '#F4634A']
+};
+
+function buildTripSummarySVG() {
+  var items = _tripSummaryData();
+  var W = 1080;
+  var PAD = 56;
+  var headerH = 250;
+  var mapH = items.some(function(i) { return i.coords; }) ? 430 : 0;
+  var rowH = 76;
+  // מיקום פאנל המפה מחושב פעם אחת ומשמש גם את תחילת הרשימה — קודם הם חושבו
+  // בנפרד וכותרת "הרשימה המלאה" נפלה בתוך הפאנל.
+  var mapTop = headerH + 168;
+  var mapBottom = mapH ? (mapTop + mapH - 40) : (headerH + 138);
+  var listTop = mapBottom + 100;
+  var H = listTop + items.length * rowH + 130;
+
+  var s = '';
+  s += '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" font-family="-apple-system,BlinkMacSystemFont,\'Segoe UI\',Arial,sans-serif" direction="rtl">';
+  s += '<defs>' +
+       '<linearGradient id="hg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0F172A"/><stop offset="1" stop-color="#1E293B"/></linearGradient>' +
+       '<linearGradient id="ac" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#F4634A"/><stop offset="1" stop-color="#D6A54A"/></linearGradient>' +
+       '</defs>';
+  s += '<rect width="' + W + '" height="' + H + '" fill="#FAF7F4"/>';
+
+  // ── header ──
+  s += '<rect width="' + W + '" height="' + headerH + '" fill="url(#hg)"/>';
+  s += '<rect y="' + (headerH - 6) + '" width="' + W + '" height="6" fill="url(#ac)"/>';
+  s += '<text x="' + (W - PAD) + '" y="86" text-anchor="start" font-size="26" font-weight="600" fill="#D6A54A" letter-spacing="7">PRAGUE 2026</text>';
+  s += '<text x="' + (W - PAD) + '" y="150" text-anchor="start" font-size="52" font-weight="800" fill="#FFFFFF">משפחת שיש · סיכום הטיול</text>';
+  s += '<text x="' + (W - PAD) + '" y="196" text-anchor="start" font-size="25" fill="rgba(255,255,255,0.62)">8–15 באוגוסט 2026 · פראג, צ׳כיה</text>';
+
+  // ── stat chips ──
+  var byType = {};
+  items.forEach(function(i) { byType[i.type] = (byType[i.type] || 0) + 1; });
+  var daysCovered = {};
+  items.forEach(function(i) { if (i.day) daysCovered[i.day] = 1; });
+  var stats = [
+    [String(items.length), 'מקומות שהיינו בהם'],
+    [String(Object.keys(daysCovered).length || '—'), 'ימים עם ביקורים'],
+    [String(Object.keys(byType).length), 'קטגוריות']
+  ];
+  var chipW = (W - PAD * 2 - 24 * 2) / 3;
+  stats.forEach(function(st2, i) {
+    var x = W - PAD - chipW - i * (chipW + 24);
+    var y = headerH + 34;
+    s += '<rect x="' + x + '" y="' + y + '" width="' + chipW + '" height="104" rx="20" fill="#FFFFFF" stroke="rgba(0,0,0,0.07)"/>';
+    s += '<text x="' + (x + chipW / 2) + '" y="' + (y + 50) + '" text-anchor="middle" font-size="40" font-weight="800" fill="#F4634A">' + _sxesc(st2[0]) + '</text>';
+    s += '<text x="' + (x + chipW / 2) + '" y="' + (y + 82) + '" text-anchor="middle" font-size="20" fill="rgba(30,41,59,0.55)">' + _sxesc(st2[1]) + '</text>';
+  });
+
+  // ── map panel: real coordinates, equirectangular, scaled to fit ──
+  if (mapH) {
+    var mx = PAD, my = mapTop, mw = W - PAD * 2, mh = mapH - 40;
+    s += '<rect x="' + mx + '" y="' + my + '" width="' + mw + '" height="' + mh + '" rx="24" fill="#FFFFFF" stroke="rgba(0,0,0,0.07)"/>';
+    s += '<text x="' + (W - PAD - 24) + '" y="' + (my + 42) + '" text-anchor="start" font-size="22" font-weight="800" fill="rgba(30,41,59,0.45)">איפה היינו</text>';
+
+    var pts = items.filter(function(i) { return i.coords; });
+    var lats = pts.map(function(p) { return p.coords[0]; });
+    var lngs = pts.map(function(p) { return p.coords[1]; });
+    var minLat = Math.min.apply(null, lats), maxLat = Math.max.apply(null, lats);
+    var minLng = Math.min.apply(null, lngs), maxLng = Math.max.apply(null, lngs);
+    // ריפוד כדי שנקודות קיצון לא יידבקו לשוליים, ומרווח מינימלי כשכל הנקודות צפופות
+    var padLat = Math.max((maxLat - minLat) * 0.18, 0.004);
+    var padLng = Math.max((maxLng - minLng) * 0.18, 0.006);
+    minLat -= padLat; maxLat += padLat; minLng -= padLng; maxLng += padLng;
+    var innerX = mx + 34, innerY = my + 64, innerW = mw - 68, innerH = mh - 100;
+    // תיקון יחס — קו אורך מתכווץ ב-cos(lat) בקו הרוחב של פראג
+    var project = function(c) {
+      var fx = (maxLng - c[1]) / (maxLng - minLng);      // RTL: מזרח משמאל
+      var fy = (maxLat - c[0]) / (maxLat - minLat);
+      return [innerX + fx * innerW, innerY + fy * innerH];
+    };
+    // רקע: כל שאר המקומות באפור חיוור, כדי לתת הקשר למה שכן ביקרנו
+    try {
+      _mappablePlaces().forEach(function(p) {
+        var c = PLACE_COORDS[p.name];
+        if (!c || getVisitedState()[p.name]) return;
+        if (c[0] < minLat || c[0] > maxLat || c[1] < minLng || c[1] > maxLng) return;
+        var q = project(c);
+        s += '<circle cx="' + q[0].toFixed(1) + '" cy="' + q[1].toFixed(1) + '" r="4" fill="rgba(30,41,59,0.13)"/>';
+      });
+    } catch (e) {}
+    pts.forEach(function(p, i) {
+      var q = project(p.coords);
+      var clr = (_SUM_TYPE[p.type] || ['', '#F4634A'])[1];
+      s += '<circle cx="' + q[0].toFixed(1) + '" cy="' + q[1].toFixed(1) + '" r="13" fill="' + clr + '" stroke="#fff" stroke-width="3"/>';
+      s += '<text x="' + q[0].toFixed(1) + '" y="' + (q[1] + 5).toFixed(1) + '" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">' + (i + 1) + '</text>';
+    });
+    s += '<text x="' + (mx + 24) + '" y="' + (my + mh - 20) + '" text-anchor="end" font-size="17" fill="rgba(30,41,59,0.35)">' + pts.length + ' נקודות · מיקום אמיתי לפי קואורדינטות</text>';
+  }
+
+  // ── list ──
+  s += '<text x="' + (W - PAD) + '" y="' + (listTop - 34) + '" text-anchor="start" font-size="30" font-weight="800" fill="#1E293B">הרשימה המלאה</text>';
+  items.forEach(function(it, i) {
+    var y = listTop + i * rowH;
+    var clr = (_SUM_TYPE[it.type] || ['', '#64748B'])[1];
+    if (i % 2 === 0) s += '<rect x="' + PAD + '" y="' + (y - 12) + '" width="' + (W - PAD * 2) + '" height="' + (rowH - 8) + '" rx="16" fill="#FFFFFF"/>';
+    s += '<circle cx="' + (W - PAD - 30) + '" cy="' + (y + 22) + '" r="19" fill="' + clr + '"/>';
+    s += '<text x="' + (W - PAD - 30) + '" y="' + (y + 29) + '" text-anchor="middle" font-size="18" font-weight="800" fill="#fff">' + (i + 1) + '</text>';
+    s += '<text x="' + (W - PAD - 68) + '" y="' + (y + 17) + '" text-anchor="start" font-size="27" font-weight="700" fill="#1E293B">' + _sxesc(it.icon + ' ' + _sclip(it.name, 34)) + '</text>';
+    if (it.desc) s += '<text x="' + (W - PAD - 68) + '" y="' + (y + 46) + '" text-anchor="start" font-size="20" fill="rgba(30,41,59,0.52)">' + _sxesc(it.desc) + '</text>';
+    if (it.day) {
+      s += '<rect x="' + PAD + '" y="' + (y + 2) + '" width="86" height="34" rx="12" fill="rgba(244,99,74,0.10)"/>';
+      s += '<text x="' + (PAD + 43) + '" y="' + (y + 26) + '" text-anchor="middle" font-size="19" font-weight="800" fill="#C2410C">יום ' + it.day + '</text>';
+    }
+  });
+
+  // ── footer ──
+  var d = new Date();
+  var stamp = d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear();
+  s += '<text x="' + (W - PAD) + '" y="' + (H - 44) + '" text-anchor="start" font-size="19" fill="rgba(30,41,59,0.35)">נוצר ' + stamp + ' · אפליקציית פראג 2026</text>';
+  s += '<text x="' + PAD + '" y="' + (H - 44) + '" text-anchor="end" font-size="19" fill="rgba(30,41,59,0.28)">♥</text>';
+  s += '</svg>';
+  return s;
+}
+
+function openTripSummary() {
+  try {
+    if (visitedCount() === 0) {
+      toast('סמנו קודם מקומות ב"היינו" — הלוח נבנה מהם');
+      return;
+    }
+    var ex = document.getElementById('tripSummaryOverlay');
+    if (ex) ex.remove();
+    var svg = buildTripSummarySVG();
+    var ov = document.createElement('div');
+    ov.id = 'tripSummaryOverlay';
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.92);z-index:10050;display:flex;flex-direction:column;';
+    ov.innerHTML =
+      '<div style="flex-shrink:0;display:flex;gap:8px;padding:14px 14px 10px;">' +
+        '<button type="button" onclick="document.getElementById(\'tripSummaryOverlay\').remove()" style="flex:0 0 auto;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:13px;padding:11px 15px;font-size:14px;font-weight:800;cursor:pointer;font-family:Rubik,Arial,sans-serif;">✕</button>' +
+        '<button type="button" onclick="exportTripSummary()" style="flex:1;background:#F4634A;border:none;color:#fff;border-radius:13px;padding:11px;font-size:14px;font-weight:800;cursor:pointer;font-family:Rubik,Arial,sans-serif;">📤 שמור / שתף כתמונה</button>' +
+      '</div>' +
+      '<div style="flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:0 12px 20px;">' +
+        '<div id="tripSummaryCanvasHost" style="border-radius:16px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,0.45);">' + svg + '</div>' +
+      '</div>';
+    // ה-SVG מוזרק inline ולכן נמתח לרוחב הקונטיינר
+    document.body.appendChild(ov);
+    var el = ov.querySelector('svg');
+    if (el) { el.removeAttribute('width'); el.removeAttribute('height'); el.style.width = '100%'; el.style.height = 'auto'; el.style.display = 'block'; }
+  } catch (e) {
+    toast('⚠️ שגיאה בבניית הלוח: ' + (e && e.message));
+  }
+}
+
+// SVG → PNG בלי ספריות: data-URI → Image → canvas → blob.
+// ⚠️ ה-data-URI חייב להיות encodeURIComponent ולא btoa — btoa נופל על עברית
+// (תווים מחוץ ל-Latin1) עם InvalidCharacterError.
+function exportTripSummary() {
+  try {
+    var svg = buildTripSummarySVG();
+    var m = svg.match(/width="(\d+)" height="(\d+)"/);
+    var w = m ? parseInt(m[1]) : 1080, h = m ? parseInt(m[2]) : 1920;
+    var scale = 2; // רזולוציה כפולה — נראה חד גם במסך Retina וגם בהדפסה
+    var img = new Image();
+    img.onload = function() {
+      try {
+        var cv = document.createElement('canvas');
+        cv.width = w * scale; cv.height = h * scale;
+        var ctx = cv.getContext('2d');
+        ctx.fillStyle = '#FAF7F4'; ctx.fillRect(0, 0, cv.width, cv.height);
+        ctx.drawImage(img, 0, 0, cv.width, cv.height);
+        cv.toBlob(function(blob) {
+          if (!blob) { toast('⚠️ הייצוא נכשל'); return; }
+          var file = null;
+          try { file = new File([blob], 'prague-2026-summary.png', {type:'image/png'}); } catch (e) {}
+          // iOS: share sheet אמיתי (וואטסאפ/תמונות). אחרת — הורדה רגילה.
+          if (file && navigator.canShare && navigator.canShare({files:[file]}) && navigator.share) {
+            navigator.share({files:[file], title:'פראג 2026 — סיכום הטיול'})
+              .catch(function() { _downloadBlob(blob); });
+          } else {
+            _downloadBlob(blob);
+          }
+        }, 'image/png');
+      } catch (e) { toast('⚠️ שגיאה בייצוא: ' + (e && e.message)); }
+    };
+    img.onerror = function() { toast('⚠️ לא ניתן לרנדר את הלוח'); };
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  } catch (e) { toast('⚠️ שגיאה בייצוא: ' + (e && e.message)); }
+}
+
+function _downloadBlob(blob) {
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = 'prague-2026-summary.png';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function() { URL.revokeObjectURL(url); }, 4000);
+  toast('✅ הלוח נשמר');
+}
+
 // ── גרסה + משיכת עדכון בכוח ────────────────────────────────────────────────
 // הבעיה: האפליקציה מוגשת כקובץ HTML יחיד מ-GitHub Pages, ויש לה
 // apple-mobile-web-app-capable. כשמוסיפים אותה למסך הבית ב-iOS היא רצה
@@ -1058,6 +1306,7 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
       <button id="btnHomeCommunity" style="background:rgba(52,211,153,0.10);border:1px solid rgba(52,211,153,0.25);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#065F46;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;text-align:center;grid-column:1 / -1;">👥<br><span style="font-size:10px;font-weight:700;">המלצות קהילה</span></button>
       <button id="btnHomeGuides" style="background:rgba(251,146,60,0.10);border:1px solid rgba(251,146,60,0.25);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#C2410C;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;text-align:center;grid-column:1 / -1;">🎙️<br><span style="font-size:10px;font-weight:700;">מדריכים בעברית</span></button>
       <button id="btnHomeLang" style="background:rgba(168,85,247,0.10);border:1px solid rgba(168,85,247,0.22);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#6D28D9;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;text-align:center;grid-column:1 / -1;">🌐<br><span style="font-size:10px;font-weight:700;">שפה ותרגום</span></button>
+      <button onclick="openTripSummary()" style="background:linear-gradient(135deg,rgba(244,99,74,0.12),rgba(214,165,74,0.12));border:1px solid rgba(244,99,74,0.28);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#C2410C;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;text-align:center;grid-column:1 / -1;">🏆<br><span style="font-size:10px;font-weight:700;">לוח סיכום הטיול</span></button>
       <button onclick="forceUpdate()" style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.22);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#4F46E5;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;text-align:center;grid-column:1 / -1;">🔄<br><span style="font-size:10px;font-weight:700;">משוך גרסה עדכנית</span><br><span id="buildStamp" style="font-size:9px;font-weight:600;opacity:0.6;"></span></button>
       <button onclick="doLogout()" style="background:rgba(100,116,139,0.08);border:1px solid rgba(100,116,139,0.20);border-radius:16px;padding:11px 6px;font-size:20px;font-weight:800;color:#475569;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;text-align:center;grid-column:1 / -1;">🚪<br><span style="font-size:10px;font-weight:700;">התנתק מהמכשיר</span></button>
     </div>
@@ -1979,6 +2228,9 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
       <button onclick="filterNearby('restaurant')" id="lf-restaurant" class="cat-chip" style="white-space:nowrap;">🍽 מסעדות</button>
       <button onclick="filterNearby('community')" id="lf-community" class="cat-chip" style="white-space:nowrap;">🎟 אטרקציות</button>
       <button onclick="filterNearby('photo')" id="lf-photo" class="cat-chip" style="white-space:nowrap;">📷 צילום</button>
+      <button onclick="filterNearby('dessert')" id="lf-dessert" class="cat-chip" style="white-space:nowrap;">🍦 קינוחים</button>
+      <button onclick="filterNearby('shop')" id="lf-shop" class="cat-chip" style="white-space:nowrap;">🛍 קניות</button>
+      <button onclick="filterNearby('visited')" id="lf-visited" class="cat-chip" style="white-space:nowrap;">✅ היינו</button>
       <button onclick="filterNearby('exchange')" id="lf-exchange" class="cat-chip" style="white-space:nowrap;">💱 המרת כסף</button>
     </div>
     <!-- Nearby list -->
@@ -3169,7 +3421,7 @@ var ALL_PLACES = [
   // ── 🍽️ מסעדות ──
   {type:'community',cat:'🍽️ מסעדות', icon:'✡️', name:'המזללה', fb:'⭐⭐⭐⭐⭐', google:'4.5', desc:'מסעדה כשרה שמשפחות ישראליות חוזרות אליה. אוכל מעולה, אווירה ישראלית.',
    how:'מטרו A → Staroměstská + 5 דק׳ הליכה לרובע היהודי', mapUrl:'https://www.google.com/maps/search/HaMazlela+kosher+Prague'},
-  {type:'community',cat:'🍽️ מסעדות', icon:'🥐', name:'קריוטוש כשר — רובע יהודי', fb:'⭐⭐⭐⭐⭐', google:'4.6', desc:'הכי טעים לפי כולם! קריוטוש כשר חם עם מילויים. עדיף על Little Chimney לדעת הקהילה.',
+  {type:'community',cat:'🍽️ מסעדות', icon:'🥐', name:'קריוטוש כשר', fb:'⭐⭐⭐⭐⭐', google:'4.6', desc:'הכי טעים לפי כולם! קריוטוש כשר חם עם מילויים. עדיף על Little Chimney לדעת הקהילה.',
    how:'מטרו A → Staroměstská + 5 דק׳ לרובע היהודי', mapUrl:'https://www.google.com/maps/search/kosher+Trdelnik+Jewish+Quarter+Prague'},
   {type:'community',cat:'🍽️ מסעדות', icon:'🥐', name:'Little Chimney — קריוטוש דובאי', fb:'⭐⭐⭐⭐', google:'4.4', desc:'קריוטוש דובאי עם גלידת פיסטוק — מאוד טעים! ממש ליד גשר קארל, נוף מהמם.',
    how:'הליכה מגשר קארל — צד מאלה סטרנה, 2 דק׳', mapUrl:'https://www.google.com/maps/search/Little+Chimney+Prague+Charles+Bridge'},
@@ -4980,7 +5232,10 @@ var PLACE_COORDS = {
   'פסל קפקא המסתובב':            [50.0892, 14.4228],
   'גלרית Lumia — מוזיאון האורות': [50.0888, 14.4254],
   'מוזיאון האשליות':             [50.0880, 14.4210],
-  'מוזיאון החושים':              [50.0875, 14.4213],
+  // Jindřišská 939/20, Nové Město. היה ממופה בטעות לעיר העתיקה, על אותה
+  // נקודה של Trdelník. אומת: Google Maps place = 50.0839944,14.4290621,
+  // ותואם לרחוב Jindřišská (~130 מ׳ מ-Praha Exchange שכבר במאגר).
+  'מוזיאון החושים':              [50.0840, 14.4291],
   'גן החיות של פראג':            [50.1173, 14.4075],
   'בית הכנסת הגדול — Staronová synagoga': [50.0903, 14.4184],
   'בית העלמין היהודי העתיק — Josefov':      [50.0891, 14.4166],
@@ -5016,11 +5271,17 @@ var PLACE_COORDS = {
   'Palladium':                   [50.0882, 14.4334],
   'Primark Wenceslas Square':    [50.0812, 14.4295],
   'Primark — וצסלב':            [50.0812, 14.4295],
-  'Westfield Chodov':            [50.0277, 14.4892],
+  // Roztylská 2321/19. אומת משלושה מקורות: ויקיפדיה 50°01′50″N 14°29′26″E,
+  // Apple Maps 50.031557,14.490308, ומקור שלישי 50.03137,14.49234 — כולם
+  // מתכנסים ל-~50.031,14.490. הערך הקודם היה ~350 מ׳ דרום-מערבה.
+  'Westfield Chodov':            [50.0311, 14.4905],
   'Fashion Arena Outlet':        [50.0528, 14.5121],
   'Hamleys + LEGO Store':        [50.0872, 14.4297],
   'Nový Smíchov':                [50.0703, 14.4030],
-  'Albert Supermarket — Chodov': [50.0277, 14.4892],
+  // ⚠️ אותה נקודה כמו Westfield Chodov **במכוון**: ההיפרמרקט יושב בתוך
+  // הקניון (Roztylská 2321/19, אומת מול albert.cz ומול westfield.com).
+  // זו לא כפילות לתיקון — שני POI אמיתיים בבניין אחד.
+  'Albert Supermarket — Chodov': [50.0311, 14.4905],
   'שדרת Na Příkopě':            [50.0862, 14.4290],
   // ── כינויים לתחנות ב-DAYS ──────────────────────────────────────────────
   // שמות התחנות ב-DAYS לא תמיד זהים לשמות ב-ALL_PLACES ("ארוחת ערב — Gran
@@ -5293,7 +5554,13 @@ function _uniquePlacesForMap() {
     var merged = {};
     for (var k1 in other) merged[k1] = other[k1];
     for (var k2 in rich) { if (rich[k2] !== undefined && rich[k2] !== null && rich[k2] !== '') merged[k2] = rich[k2]; }
-    merged.type = rich.type; // ה-type של העשירה קובע את הרינדור בדיאלוג
+    // ⚠️ ה-type נקבע לפי ה**ספציפי** ולא לפי ה"עשיר". `community` הוא הקטלוג
+    // הגנרי; restaurant/shop/dessert/photo הם הסיווג האמיתי, והם אלה שקובעים
+    // תחת איזה פילטר בטאב מיקום המקום יופיע. כשה-community במקרה היה עשיר
+    // יותר, מקום כמו "Manifesto Market — Anděl" נרשם כ-community ונעלם
+    // מפילטר "מסעדות" — 25 מתוך 26. השדות עדיין ממוזגים משניהם.
+    merged.type = (rich.type === 'community' && other.type && other.type !== 'community')
+      ? other.type : rich.type;
     byName[p.name] = merged;
   });
   _uniquePlacesCache = order.map(function(n) { return byName[n]; });
@@ -5704,7 +5971,7 @@ document.addEventListener('visibilitychange', function() {
 
 function filterNearby(cat) {
   _nearbyFilter = cat;
-  ['all','schedule','restaurant','community','photo','exchange'].forEach(function(k) {
+  ['all','schedule','restaurant','community','dessert','shop','visited','photo','exchange'].forEach(function(k) {
     var el = document.getElementById('lf-' + k);
     if (!el) return;
     el.style.borderColor = k===cat ? '#F4634A' : '';
@@ -5733,6 +6000,7 @@ function renderNearbyList() {
   var filtered = items.filter(function(it) {
     if (_nearbyFilter === 'all') return true;
     if (_nearbyFilter === 'schedule') return !!it.inDays;
+    if (_nearbyFilter === 'visited') return isVisited(it.p.name);
     // 'community' filter = only actual attractions (cat contains 'אטרקציות')
     if (_nearbyFilter === 'community') {
       return it.p.type === 'community' && (it.p.cat || '').indexOf('אטרקציות') !== -1;
