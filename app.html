@@ -944,7 +944,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-11-o';
+var BUILD_ID = '2026-08-11-p';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
@@ -3237,8 +3237,14 @@ var DAYS = [
       details:'Museum of Illusions Prague — חדרים עם אשליות אופטיות, חדר הולוגרמות, חדר האינסוף, מנהרת מסתובבת ועוד. אינטראקטיבי לחלוטין, מצוין לצילומים מטורפים.',
       tips:['כ-60–75 דקות — מספיק','מתאים לכל הגילאים','להביא הרבה טעינה לטלפון — תצלמו הרבה','כרטיסים מראש — זול יותר ב-10–15%'],
       booking:'כרטיסים: muzeumiluziprag.cz | ~350 CZK מבוגר',
-      mapUrl:'https://www.google.com/maps/place/Museum+of+Illusions+Prague'}
-   ],meals:{lunch:'Výtopna — חוויה יותר ממסעדת גורמה',dinner:'Antricote או Gran Fierro — בקר בלבד'},
+      mapUrl:'https://www.google.com/maps/place/Museum+of+Illusions+Prague'},
+     {emoji:'🍕',name:'Pizza & Pasta Factory',time:'ערב',desc:'👨‍👩‍👧 מה שאכלנו בפועל — "היה מדהים"',
+      google:'4.9',duration:'⏱️ 60–75 דקות',who:'👨‍👩‍👧‍👦 כל המשפחה',
+      details:'איטלקית קטנה ומצוינת ב-28. října, בין כיכר ואצלב ל-Národní. פיצה ופסטה ברמה גבוהה, שירות מהיר ואדיב, ומחיר הוגן — 4.9 מתוך 5 על פני אלפי ביקורות. 👨‍👩‍👧 משפחת שיש, 10/08/2026: "היה מדהים". מחיר לאדם 300–550 CZK.',
+      tips:['✅ היינו כאן בערב של 10/8 — נרשם כדי שהלוז ישקף מה שקרה בפועל','פתוח 11:00–23:00 כל יום','מטרו A מ-Strašnická → Můstek, ואז 2 דק׳ הליכה'],
+      booking:'ללא צורך בהזמנה — בשעות שיא כדאי להגיע מוקדם.',
+      mapUrl:'https://www.google.com/maps/search/Pizza+Pasta+Factory+28+rijna+Prague'}
+   ],meals:{lunch:'Výtopna — חוויה יותר ממסעדת גורמה',dinner:'Pizza & Pasta Factory — 👨‍👩‍👧 מה שאכלנו בפועל'},
    tips:['להתחיל בממלכת הרכבות בבוקר','Výtopna — להזמין מראש!','אם עייפות — לוותר על מוזיאון האשליות'],
    mapUrl:'https://www.google.com/maps/dir/Comfort+Hotel+Prague+City+East/Kingdom+of+Railways+Prague'},
   {id:4,emoji:'✡️',date:'11 באוגוסט',title:'הרובע היהודי ובית הכנסת הגדול בפראג',sub:'Josefov, בית הכנסת ירושלים, Café Savoy',
@@ -3286,13 +3292,13 @@ var DAYS = [
       tips:['להזמין Bolt מהחניון של הפארק','ערב זה — לנוח ולא לתכנן אטרקציות'],
       booking:'ללא צורך.',
       mapUrl:'https://www.google.com/maps/search/Comfort+Hotel+Prague+City+East'},
-     {emoji:'🍕',name:'Pizza & Pasta Factory',time:'ערב',desc:'⭐ המלצת המשפחה — פיצה ופסטה מצוינות במרכז',
-      google:'4.9',duration:'⏱️ 60–75 דקות',who:'👨‍👩‍👧‍👦 כל המשפחה | 🍕 קל ומהיר אחרי יום מים',
-      details:'איטלקית קטנה ומצוינת ב-28. října, בין כיכר ואצלב ל-Národní. פיצה ופסטה ברמה גבוהה, שירות מהיר ואדיב, ומחיר הוגן — 4.9 מתוך 5 על פני אלפי ביקורות. משפחת שיש אכלה כאן ב-10/08/2026: "היה מדהים". מחיר לאדם 300–550 CZK.',
-      tips:['המשפחה כבר אכלה כאן — שווה מאוד','פתוח 11:00–23:00 כל יום','מטרו A מ-Strašnická → Můstek, ואז 2 דק׳ הליכה','קל ומהיר אחרי יום מים — וילדים אוהבים'],
-      booking:'ללא צורך בהזמנה — בשעות שיא כדאי להגיע מוקדם.',
-      mapUrl:'https://www.google.com/maps/search/Pizza+Pasta+Factory+28+rijna+Prague'}
-   ],meals:{lunch:'אוכל בפארק (יקר — לשקול מחוץ)',dinner:'Pizza & Pasta Factory — ⭐ המלצת המשפחה'},
+     {emoji:'🍔',name:'Manifesto Market — Anděl',time:'ערב',desc:'שוק ערב — פוד קורט בקונטיינרים עם אורות ומוזיקה',
+      google:'4.5',duration:'⏱️ 60–90 דקות',who:'👨‍👩‍👧‍👦 כל הגילאים | 🌙 אידיאלי לארוחת ערב כיפית',
+      details:'פוד-מרקט בקונטיינרים צבעוניים בשכונת Anděl — 15 דוכני אוכל מהעולם (בורגרים, אסייתי, פיצה), בר בירה גדול, בר קוקטיילים, במת מוזיקה וקירות ירוקים. מושב בחוץ עם אורות חגיגיים. זה השוק היחיד בפראג שפועל בערב — כל שווקי האיכרים סוגרים ב-17:00–18:00.',
+      tips:['🌆 כיף יותר דווקא בערב עם האורות','פתוח 11:00–22:00 בימי חול, עד 23:00 בסופ״ש','ללא הזמנה — מגיעים ובוחרים מהדוכנים','מטרו A מ-Strašnická → Můstek → החלפה לקו B → Anděl, ואז 3 דק׳ הליכה (~30–35 דק׳)','⚠️ 6.7 ק״מ מהמלון ובכיוון ההפוך — לשקול אם היום בפארק המים הוציא את כל האנרגיה','אפשר לשלב עם קניון Nový Smíchov שממש לידו'],
+      booking:'ללא הזמנה. פתוח 11:00–22:00 בימי חול.',
+      mapUrl:'https://www.google.com/maps/search/Manifesto+Market+Andel+Prague'}
+   ],meals:{lunch:'אוכל בפארק (יקר — לשקול מחוץ)',dinner:'Manifesto Market — Anděl (שוק ערב)'},
    tips:['לקנות כרטיסים אונליין מראש','Bolt עדיף עם מגבות ותיקים','קרם הגנה + בגד ים יבש חלופי'],
    mapUrl:'https://www.google.com/maps/dir/Comfort+Hotel+Prague+City+East/Aquapalace+Prague'},
   {id:6,emoji:'🦁',date:'13 באוגוסט',title:'גן החיות של פראג + שייט ערב',sub:'Prague Zoo + שייט ערב בוולטאווה',
