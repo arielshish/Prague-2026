@@ -944,7 +944,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-11-l';
+var BUILD_ID = '2026-08-11-m';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
@@ -3285,8 +3285,14 @@ var DAYS = [
       details:'לאחר יום שלם בפארק — Bolt חזרה למלון. ארוחת ערב קלה — ניתן להזמין פיצה, שווארמה, או לאכול במסעדת המלון.',
       tips:['להזמין Bolt מהחניון של הפארק','ערב זה — לנוח ולא לתכנן אטרקציות'],
       booking:'ללא צורך.',
-      mapUrl:'https://www.google.com/maps/search/Comfort+Hotel+Prague+City+East'}
-   ],meals:{lunch:'אוכל בפארק (יקר — לשקול מחוץ)',dinner:'ארוחה קלה ליד המלון'},
+      mapUrl:'https://www.google.com/maps/search/Comfort+Hotel+Prague+City+East'},
+     {emoji:'🍕',name:'Pizza & Pasta Factory',time:'ערב',desc:'⭐ המלצת המשפחה — פיצה ופסטה מצוינות במרכז',
+      google:'4.9',duration:'⏱️ 60–75 דקות',who:'👨‍👩‍👧‍👦 כל המשפחה | 🍕 קל ומהיר אחרי יום מים',
+      details:'איטלקית קטנה ומצוינת ב-28. října, בין כיכר ואצלב ל-Národní. פיצה ופסטה ברמה גבוהה, שירות מהיר ואדיב, ומחיר הוגן — 4.9 מתוך 5 על פני אלפי ביקורות. משפחת שיש אכלה כאן ב-10/08/2026: "היה מדהים". מחיר לאדם 300–550 CZK.',
+      tips:['המשפחה כבר אכלה כאן — שווה מאוד','פתוח 11:00–23:00 כל יום','מטרו A מ-Strašnická → Můstek, ואז 2 דק׳ הליכה','קל ומהיר אחרי יום מים — וילדים אוהבים'],
+      booking:'ללא צורך בהזמנה — בשעות שיא כדאי להגיע מוקדם.',
+      mapUrl:'https://www.google.com/maps/search/Pizza+Pasta+Factory+28+rijna+Prague'}
+   ],meals:{lunch:'אוכל בפארק (יקר — לשקול מחוץ)',dinner:'Pizza & Pasta Factory — ⭐ המלצת המשפחה'},
    tips:['לקנות כרטיסים אונליין מראש','Bolt עדיף עם מגבות ותיקים','קרם הגנה + בגד ים יבש חלופי'],
    mapUrl:'https://www.google.com/maps/dir/Comfort+Hotel+Prague+City+East/Aquapalace+Prague'},
   {id:6,emoji:'🦁',date:'13 באוגוסט',title:'גן החיות של פראג + שייט ערב',sub:'Prague Zoo + שייט ערב בוולטאווה',
