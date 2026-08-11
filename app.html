@@ -944,7 +944,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-11-l';
+var BUILD_ID = '2026-08-11-n';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
@@ -3285,8 +3285,14 @@ var DAYS = [
       details:'לאחר יום שלם בפארק — Bolt חזרה למלון. ארוחת ערב קלה — ניתן להזמין פיצה, שווארמה, או לאכול במסעדת המלון.',
       tips:['להזמין Bolt מהחניון של הפארק','ערב זה — לנוח ולא לתכנן אטרקציות'],
       booking:'ללא צורך.',
-      mapUrl:'https://www.google.com/maps/search/Comfort+Hotel+Prague+City+East'}
-   ],meals:{lunch:'אוכל בפארק (יקר — לשקול מחוץ)',dinner:'ארוחה קלה ליד המלון'},
+      mapUrl:'https://www.google.com/maps/search/Comfort+Hotel+Prague+City+East'},
+     {emoji:'🍕',name:'Pizza & Pasta Factory',time:'ערב',desc:'⭐ המלצת המשפחה — פיצה ופסטה מצוינות במרכז',
+      google:'4.9',duration:'⏱️ 60–75 דקות',who:'👨‍👩‍👧‍👦 כל המשפחה | 🍕 קל ומהיר אחרי יום מים',
+      details:'איטלקית קטנה ומצוינת ב-28. října, בין כיכר ואצלב ל-Národní. פיצה ופסטה ברמה גבוהה, שירות מהיר ואדיב, ומחיר הוגן — 4.9 מתוך 5 על פני אלפי ביקורות. משפחת שיש אכלה כאן ב-10/08/2026: "היה מדהים". מחיר לאדם 300–550 CZK.',
+      tips:['המשפחה כבר אכלה כאן — שווה מאוד','פתוח 11:00–23:00 כל יום','מטרו A מ-Strašnická → Můstek, ואז 2 דק׳ הליכה','קל ומהיר אחרי יום מים — וילדים אוהבים'],
+      booking:'ללא צורך בהזמנה — בשעות שיא כדאי להגיע מוקדם.',
+      mapUrl:'https://www.google.com/maps/search/Pizza+Pasta+Factory+28+rijna+Prague'}
+   ],meals:{lunch:'אוכל בפארק (יקר — לשקול מחוץ)',dinner:'Pizza & Pasta Factory — ⭐ המלצת המשפחה'},
    tips:['לקנות כרטיסים אונליין מראש','Bolt עדיף עם מגבות ותיקים','קרם הגנה + בגד ים יבש חלופי'],
    mapUrl:'https://www.google.com/maps/dir/Comfort+Hotel+Prague+City+East/Aquapalace+Prague'},
   {id:6,emoji:'🦁',date:'13 באוגוסט',title:'גן החיות של פראג + שייט ערב',sub:'Prague Zoo + שייט ערב בוולטאווה',
@@ -3413,6 +3419,7 @@ var ALL_PLACES = [
   {type:'shop',icon:'🧸',name:'Hamleys + LEGO Store',stars:'★★★★★',hours:'10:00–20:00',metro:'מרכז — קרוב ל-Můstek',duration:'הליכה מ-Primark',brands:'צעצועים, LEGO, הצגות חינמיות',tip:'לשלב אחרי Primark.',mapUrl:'https://www.google.com/maps/search/Hamleys+Prague+LEGO+Store'},
   {type:'shop',icon:'🛒',name:'Nový Smíchov',stars:'★★★★☆',hours:'09:00–21:00',metro:'מטרו B — Anděl',duration:'~30 דק׳',brands:'אופנה, Tesco, אוכל',tip:'מצוין וקרוב למרכז העיר — מומלץ מישראלים שחזרו.',mapUrl:'https://www.google.com/maps/search/Novy+Smichov+Prague'},
   {type:'shop',icon:'🍫',name:'Albert Supermarket — Chodov',stars:'★★★★☆',hours:'07:00–22:00',metro:'מטרו C — Chodov',duration:'~40 דק׳',brands:'סופר ענק בקומה מינוס 1 בחודוב',tip:'מקום מעולה לקנות שוקולדים לארץ במחיר שפוי!',mapUrl:'https://www.google.com/maps/search/Albert+supermarket+Chodov+Prague'},
+  {type:'shop',icon:'🏪',name:'OC Skalka — Action · Pepco · Tesco',stars:'★★★★☆',hours:'טסקו 06:00–22:00 · חנויות הגלריה 08:00/09:00–20:00',metro:'מטרו A — Skalka (תחנה אחת מהמלון)',duration:'~60–90 דק׳',brands:'Action (סטוק), Pepco, Tesco Extra (היפרמרקט 8,000 מ״ר), JYSK, dm drogerie, Stoklasa',tip:'👨‍👩‍👧 משפחת שיש, 11/08/2026: היינו — Action הוא חנות סטוק זולה מאוד, ולצידה Pepco וטסקו גדול. הקניון הכי קרוב למלון: תחנת מטרו אחת מ-Strašnická, או ~1.4 ק״מ הליכה. חניה חינם ל-560 מקומות. ⚠️ שעות טסקו סותרות בין מקורות (22:00 מול חצות) — שווה לוודא לפני נסיעה מאוחרת.',mapUrl:'https://www.google.com/maps/search/OC+Skalka+P%C5%99etluck%C3%A1+3295%2F50+Praha'},
 
 // ── RESTAURANTS (type:'restaurant') — level: 1=💰 עד 1,000 CZK | 2=💰💰 1,000–2,000 | 3=💰💰💰 2,000–3,500 | 4=💰💰💰💰 3,500+ ──
   // ── ✡️ כשר / מומלץ מקומיים ──────────────────────────
@@ -5613,6 +5620,10 @@ var PLACE_COORDS = {
   //   "סמטאות העיר העתיקה" → כיכר העיר העתיקה;
   //   "קפה אחרון וארוחת סיום" → Gran Fierro (לפי ה-mapUrl של התחנה עצמה).
   'Comfort Hotel Prague City East': [50.0763, 14.4937],
+  // Přetlucká 3295/50, Praha 10 — Strašnice. אומת משני מקורות בלתי-תלויים:
+  // tesca.cz ו-2GIS מחזירים שניהם 50.0702854,14.5103746; מקור שלישי נותן
+  // 50.0703,14.5099 (הפרש ~35 מ׳). נלקח הערך ששני מקורות מסכימים עליו.
+  'OC Skalka — Action · Pepco · Tesco': [50.0703, 14.5104],
   'סיבוב קצר באזור המלון': [50.0763, 14.4937],
   'חזרה למלון ומנוחה': [50.0763, 14.4937],
   'חזרה ומנוחה במלון': [50.0763, 14.4937],

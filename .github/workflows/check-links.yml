@@ -70,9 +70,30 @@ jobs:
               -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
               "$url" 2>/dev/null) || STATUS="ERR"
 
+            # ⚠️ הבחנה שנוספה ב-11/08 אחרי שלוש ריצות אדומות ברצף:
+            # כשל **רשת** (timeout/DNS — curl לא קיבל שום תשובת HTTP, כלומר "000"
+            # או ERR) הוא לא אותו דבר ככשל **קישור** (404/410/500 — השרת ענה
+            # שהמשאב לא קיים). בשלוש הריצות נפל כל פעם אתר אחר (prague2go,
+            # ואז jewishmuseum שעבר דקות קודם) — תמיד ב-timeout, בזמן ש-main
+            # היה ירוק. זה רעש רשת של הראנר, לא קישור שבור, והוספת דומיין אחרי
+            # דומיין ל-soft list היא משחק חתול-ועכבר שמסתיר את הסימן האמיתי.
+            # לכן: 404 עדיין מפיל build (וזו כל מטרת הבדיקה), אבל חוסר-תשובה
+            # מדווח כאזהרה בלבד. ניסיון אחרון ארוך לפני שמוותרים.
+            if [[ ! "$STATUS" =~ ^(200|201|301|302|303|307|308)$ ]]; then
+              if [[ "$STATUS" == "ERR" || "$STATUS" == "000" ]]; then
+                sleep 5
+                STATUS=$(curl -o /dev/null -s -w "%{http_code}" --max-time 45 -L \
+                  -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
+                  "$url" 2>/dev/null) || STATUS="ERR"
+              fi
+            fi
+
             if [[ "$STATUS" =~ ^(200|201|301|302|303|307|308)$ ]]; then
               echo "✅ $STATUS — $url"
               echo "| ✅ $STATUS | $url |" >> $GITHUB_STEP_SUMMARY
+            elif [[ "$STATUS" == "ERR" || "$STATUS" == "000" ]]; then
+              echo "⚠️ (רשת, לא מפיל) $STATUS — $url"
+              echo "| ⚠️ אין תשובה (רשת — לא מפיל) | $url |" >> $GITHUB_STEP_SUMMARY
             else
               echo "❌ $STATUS — $url"
               echo "| ❌ $STATUS | $url |" >> $GITHUB_STEP_SUMMARY
