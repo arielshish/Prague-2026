@@ -59,10 +59,16 @@ jobs:
             [ -z "$url" ] && continue
             # --retry עם --retry-all-errors: אתר יעד יחיד (prague-venice.cz) כבר נראה timeout חד-פעמי
             # בריצה קודמת בלי שום שינוי בקוד — לא רוצים שרעש רשת חד-פעמי יפיל את כל ה-build.
-            STATUS=$(curl -o /dev/null -s -w "%{http_code}" --max-time 10 -L \
+            # ⚠️ שתי מלכודות שנתפסו ב-11/08:
+            # 1. `$(curl ... || echo ERR)` **משרשר**: curl כבר הדפיס "302" לפני
+            #    שנכשל, אז התוצאה הייתה "302ERR" — סטטוס שלא תואם שום דפוס
+            #    ונראה כמו קישור שבור אמיתי. ההשמה נפרדת מהפולבאק.
+            # 2. `--max-time 10` קצר מדי לאתרים שמפנים ואז נטענים לאט
+            #    (jewishmuseum.cz נכשל ב-3 נסיונות = 36 שנ׳ בלי שום שינוי בקוד).
+            STATUS=$(curl -o /dev/null -s -w "%{http_code}" --max-time 25 -L \
               --retry 2 --retry-delay 3 --retry-all-errors \
               -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
-              "$url" 2>/dev/null || echo "ERR")
+              "$url" 2>/dev/null) || STATUS="ERR"
 
             if [[ "$STATUS" =~ ^(200|201|301|302|303|307|308)$ ]]; then
               echo "✅ $STATUS — $url"
