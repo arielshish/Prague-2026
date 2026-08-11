@@ -2228,6 +2228,9 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
       <button onclick="filterNearby('restaurant')" id="lf-restaurant" class="cat-chip" style="white-space:nowrap;">🍽 מסעדות</button>
       <button onclick="filterNearby('community')" id="lf-community" class="cat-chip" style="white-space:nowrap;">🎟 אטרקציות</button>
       <button onclick="filterNearby('photo')" id="lf-photo" class="cat-chip" style="white-space:nowrap;">📷 צילום</button>
+      <button onclick="filterNearby('dessert')" id="lf-dessert" class="cat-chip" style="white-space:nowrap;">🍦 קינוחים</button>
+      <button onclick="filterNearby('shop')" id="lf-shop" class="cat-chip" style="white-space:nowrap;">🛍 קניות</button>
+      <button onclick="filterNearby('visited')" id="lf-visited" class="cat-chip" style="white-space:nowrap;">✅ היינו</button>
       <button onclick="filterNearby('exchange')" id="lf-exchange" class="cat-chip" style="white-space:nowrap;">💱 המרת כסף</button>
     </div>
     <!-- Nearby list -->
@@ -5229,7 +5232,10 @@ var PLACE_COORDS = {
   'פסל קפקא המסתובב':            [50.0892, 14.4228],
   'גלרית Lumia — מוזיאון האורות': [50.0888, 14.4254],
   'מוזיאון האשליות':             [50.0880, 14.4210],
-  'מוזיאון החושים':              [50.0875, 14.4213],
+  // Jindřišská 939/20, Nové Město. היה ממופה בטעות לעיר העתיקה, על אותה
+  // נקודה של Trdelník. אומת: Google Maps place = 50.0839944,14.4290621,
+  // ותואם לרחוב Jindřišská (~130 מ׳ מ-Praha Exchange שכבר במאגר).
+  'מוזיאון החושים':              [50.0840, 14.4291],
   'גן החיות של פראג':            [50.1173, 14.4075],
   'בית הכנסת הגדול — Staronová synagoga': [50.0903, 14.4184],
   'בית העלמין היהודי העתיק — Josefov':      [50.0891, 14.4166],
@@ -5265,11 +5271,17 @@ var PLACE_COORDS = {
   'Palladium':                   [50.0882, 14.4334],
   'Primark Wenceslas Square':    [50.0812, 14.4295],
   'Primark — וצסלב':            [50.0812, 14.4295],
-  'Westfield Chodov':            [50.0277, 14.4892],
+  // Roztylská 2321/19. אומת משלושה מקורות: ויקיפדיה 50°01′50″N 14°29′26″E,
+  // Apple Maps 50.031557,14.490308, ומקור שלישי 50.03137,14.49234 — כולם
+  // מתכנסים ל-~50.031,14.490. הערך הקודם היה ~350 מ׳ דרום-מערבה.
+  'Westfield Chodov':            [50.0311, 14.4905],
   'Fashion Arena Outlet':        [50.0528, 14.5121],
   'Hamleys + LEGO Store':        [50.0872, 14.4297],
   'Nový Smíchov':                [50.0703, 14.4030],
-  'Albert Supermarket — Chodov': [50.0277, 14.4892],
+  // ⚠️ אותה נקודה כמו Westfield Chodov **במכוון**: ההיפרמרקט יושב בתוך
+  // הקניון (Roztylská 2321/19, אומת מול albert.cz ומול westfield.com).
+  // זו לא כפילות לתיקון — שני POI אמיתיים בבניין אחד.
+  'Albert Supermarket — Chodov': [50.0311, 14.4905],
   'שדרת Na Příkopě':            [50.0862, 14.4290],
   // ── כינויים לתחנות ב-DAYS ──────────────────────────────────────────────
   // שמות התחנות ב-DAYS לא תמיד זהים לשמות ב-ALL_PLACES ("ארוחת ערב — Gran
@@ -5542,7 +5554,13 @@ function _uniquePlacesForMap() {
     var merged = {};
     for (var k1 in other) merged[k1] = other[k1];
     for (var k2 in rich) { if (rich[k2] !== undefined && rich[k2] !== null && rich[k2] !== '') merged[k2] = rich[k2]; }
-    merged.type = rich.type; // ה-type של העשירה קובע את הרינדור בדיאלוג
+    // ⚠️ ה-type נקבע לפי ה**ספציפי** ולא לפי ה"עשיר". `community` הוא הקטלוג
+    // הגנרי; restaurant/shop/dessert/photo הם הסיווג האמיתי, והם אלה שקובעים
+    // תחת איזה פילטר בטאב מיקום המקום יופיע. כשה-community במקרה היה עשיר
+    // יותר, מקום כמו "Manifesto Market — Anděl" נרשם כ-community ונעלם
+    // מפילטר "מסעדות" — 25 מתוך 26. השדות עדיין ממוזגים משניהם.
+    merged.type = (rich.type === 'community' && other.type && other.type !== 'community')
+      ? other.type : rich.type;
     byName[p.name] = merged;
   });
   _uniquePlacesCache = order.map(function(n) { return byName[n]; });
@@ -5953,7 +5971,7 @@ document.addEventListener('visibilitychange', function() {
 
 function filterNearby(cat) {
   _nearbyFilter = cat;
-  ['all','schedule','restaurant','community','photo','exchange'].forEach(function(k) {
+  ['all','schedule','restaurant','community','dessert','shop','visited','photo','exchange'].forEach(function(k) {
     var el = document.getElementById('lf-' + k);
     if (!el) return;
     el.style.borderColor = k===cat ? '#F4634A' : '';
@@ -5982,6 +6000,7 @@ function renderNearbyList() {
   var filtered = items.filter(function(it) {
     if (_nearbyFilter === 'all') return true;
     if (_nearbyFilter === 'schedule') return !!it.inDays;
+    if (_nearbyFilter === 'visited') return isVisited(it.p.name);
     // 'community' filter = only actual attractions (cat contains 'אטרקציות')
     if (_nearbyFilter === 'community') {
       return it.p.type === 'community' && (it.p.cat || '').indexOf('אטרקציות') !== -1;
