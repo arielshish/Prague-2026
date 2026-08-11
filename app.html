@@ -642,8 +642,10 @@ function _lat2tileF(lat, z) {
 }
 
 // בוחר zoom שבו כל הנקודות נכנסות לפאנל, וממרכז אותן בתוכו
-function _tripMapGeo(pts, w, h) {
+function _tripMapGeo(pts, w, h, density) {
   if (!pts.length) return null;
+  density = density || 1;
+  var vw = w * density, vh = h * density;
   var lats = pts.map(function(p) { return p.coords[0]; });
   var lngs = pts.map(function(p) { return p.coords[1]; });
   var minLat = Math.min.apply(null, lats), maxLat = Math.max.apply(null, lats);
@@ -651,22 +653,32 @@ function _tripMapGeo(pts, w, h) {
   var padLat = Math.max((maxLat - minLat) * 0.16, 0.0035);
   var padLng = Math.max((maxLng - minLng) * 0.16, 0.005);
   minLat -= padLat; maxLat += padLat; minLng -= padLng; maxLng += padLng;
-  var z = 16, pw, ph;
+  var z = 18, pw, ph;
   for (; z > 9; z--) {
     pw = (_lon2tileF(maxLng, z) - _lon2tileF(minLng, z)) * 256;
     ph = (_lat2tileF(minLat, z) - _lat2tileF(maxLat, z)) * 256;
-    if (pw <= w && ph <= h) break;
+    if (pw <= vw && ph <= vh) break;
   }
   pw = (_lon2tileF(maxLng, z) - _lon2tileF(minLng, z)) * 256;
   ph = (_lat2tileF(minLat, z) - _lat2tileF(maxLat, z)) * 256;
-  var ox = _lon2tileF(minLng, z) * 256 - (w - pw) / 2;
-  var oy = _lat2tileF(maxLat, z) * 256 - (h - ph) / 2;
+  var ox = _lon2tileF(minLng, z) * 256 - (vw - pw) / 2;
+  var oy = _lat2tileF(maxLat, z) * 256 - (vh - ph) / 2;
+  var k = 1 / density; // יחידות-קנבס לכל פיקסל-אריח
   return {
-    z: z, ox: ox, oy: oy, w: w, h: h,
+    z: z, ox: ox, oy: oy, w: vw, h: vh, k: k,
     project: function(c) {
-      return [_lon2tileF(c[1], z) * 256 - ox, _lat2tileF(c[0], z) * 256 - oy];
+      return [(_lon2tileF(c[1], z) * 256 - ox) * k, (_lat2tileF(c[0], z) * 256 - oy) * k];
     }
   };
+}
+
+// כמה אריחים ידרשו לפריסה נתונה — לפני שמתחילים למשוך אותם
+function _tripTileCount(L) {
+  var g = L.geo;
+  if (!g) return 0;
+  var nx = Math.floor((g.ox + g.w) / 256) - Math.floor(g.ox / 256) + 1;
+  var ny = Math.floor((g.oy + g.h) / 256) - Math.floor(g.oy / 256) + 1;
+  return nx * ny;
 }
 
 function _roundRectPath(ctx, x, y, w, h, r) {
@@ -688,7 +700,7 @@ function _drawTripMapTiles(ctx, L) {
     var y0 = Math.floor(g.oy / 256), y1 = Math.floor((g.oy + g.h) / 256);
     var jobs = [];
     for (var tx = x0; tx <= x1; tx++) for (var ty = y0; ty <= y1; ty++) jobs.push([tx, ty]);
-    if (jobs.length > 24) return resolve(false); // הגנה: לא למשוך עשרות אריחים
+    if (jobs.length > 48) return resolve(false); // רשת ביטחון — הבחירה כבר נעשתה ב-renderTripSummaryCanvas
     ctx.save();
     _roundRectPath(ctx, m.x, m.y, m.w, m.h, 24);
     ctx.clip();
@@ -703,7 +715,9 @@ function _drawTripMapTiles(ctx, L) {
       };
       img.onload = function() {
         try {
-          ctx.drawImage(img, m.x + t[0] * 256 - g.ox, m.y + t[1] * 256 - g.oy, 256, 256);
+          // גודל היעד = 256 * k. אחרי ctx.scale(scale) זה יוצא בדיוק 256
+          // פיקסלי-מכשיר — האריח בגודלו הטבעי, בלי מתיחה ובלי טשטוש.
+          ctx.drawImage(img, m.x + (t[0] * 256 - g.ox) * g.k, m.y + (t[1] * 256 - g.oy) * g.k, 256 * g.k, 256 * g.k);
           finish(true);
         } catch (e) { finish(false); }
       };
@@ -716,7 +730,7 @@ function _drawTripMapTiles(ctx, L) {
 
 // פריסה מחושבת פעם אחת ומשותפת ל-SVG ולציור האריחים — קודם שני האזורים
 // חושבו בנפרד וכותרת הרשימה נפלה בתוך פאנל המפה.
-function _tripSummaryLayout(items) {
+function _tripSummaryLayout(items, density) {
   var W = 1080, PAD = 56, headerH = 250;
   // ⚠️ שומרים את האינדקס **ברשימה המלאה**: מספרי הנעצים חייבים להתאים
   // למספרי השורות. פילטר בלי שמירת האינדקס היה מסיט את כל המספרים ברגע
@@ -732,7 +746,7 @@ function _tripSummaryLayout(items) {
     W: W, PAD: PAD, headerH: headerH, rowH: rowH, listTop: listTop,
     H: listTop + items.length * rowH + 130,
     map: map, pts: pts,
-    geo: map ? _tripMapGeo(pts.map(function(e) { return e.it; }), map.w, map.h) : null
+    geo: map ? _tripMapGeo(pts.map(function(e) { return e.it; }), map.w, map.h, density || 1) : null
   };
 }
 
@@ -825,9 +839,19 @@ function buildTripSummarySVG(items, L) {
 
 // מרכיב את הלוח: רקע → אריחים → SVG מעל. מחזיר canvas.
 function renderTripSummaryCanvas(scale) {
-  scale = scale || 2;
   var items = _tripSummaryData();
-  var L = _tripSummaryLayout(items);
+  if (!scale) {
+    // ⚠️ iOS מגביל את **שטח** ה-canvas (לא רק את הצלע). לוח ארוך ב-3x חוצה
+    // את התקרה ומחזיר canvas ריק **בלי לזרוק**. לכן בוחרים 3x רק כשהשטח
+    // המתקבל מתחת ל-~20MP, אחרת 2x.
+    var probe = _tripSummaryLayout(items, 1);
+    scale = (probe.W * 3 * probe.H * 3 <= 20e6) ? 3 : 2;
+  }
+  // ⚠️ צפיפות האריחים אינה תמיד שווה ל-scale: כל הכפלה בצפיפות מרבעת כמעט
+  // את מספר האריחים (בצפיפות 3 נמדדו 74 — מעל התקרה, וה-map לא נטענה בכלל).
+  // בוחרים את הצפיפות הגבוהה ביותר שעדיין דורשת מספר אריחים סביר.
+  var density = scale, L = _tripSummaryLayout(items, density);
+  while (density > 1 && _tripTileCount(L) > 44) { density--; L = _tripSummaryLayout(items, density); }
   var svg = buildTripSummarySVG(items, L);
   var cv = document.createElement('canvas');
   cv.width = L.W * scale; cv.height = L.H * scale;
@@ -863,7 +887,7 @@ function openTripSummary() {
       '</div>';
     document.body.appendChild(ov);
     // התצוגה היא ה-canvas עצמו — מה שרואים הוא בדיוק מה שמיוצא
-    renderTripSummaryCanvas(2).then(function(cv) {
+    renderTripSummaryCanvas().then(function(cv) {
       var host = document.getElementById('tripSummaryHost');
       if (!host) return;
       host.style.padding = '0';
@@ -883,7 +907,7 @@ function exportTripSummary() {
   var btn = document.getElementById('tripShareBtn');
   if (btn) { btn.disabled = true; btn.textContent = '⌛ מכין…'; }
   var reset = function() { if (btn) { btn.disabled = false; btn.textContent = '📤 שמור / שתף כתמונה'; } };
-  var p = window._tripCanvas ? Promise.resolve(window._tripCanvas) : renderTripSummaryCanvas(2);
+  var p = window._tripCanvas ? Promise.resolve(window._tripCanvas) : renderTripSummaryCanvas();
   p.then(function(cv) {
     cv.toBlob(function(blob) {
       reset();
@@ -920,7 +944,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-11-f';
+var BUILD_ID = '2026-08-11-g';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
