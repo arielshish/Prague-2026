@@ -827,7 +827,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-11-d';
+var BUILD_ID = '2026-08-11-e';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
@@ -4738,16 +4738,69 @@ function renderHistory() {
 // ממופתח לפי **שם המקום** ולא לפי אינדקס — אינדקסים ב-ALL_PLACES זזים בכל
 // הוספה של מקום, וסימון "היינו" היה עובר למקום אחר. הערך הוא timestamp כדי
 // שנוכל להציג "מתי היינו" בעתיד בלי מיגרציה.
+// ── שם קנוני לכל נקודה ─────────────────────────────────────────────────────
+// ב-PLACE_COORDS יש 126 מפתחות אבל רק ~98 נקודות: 17 קבוצות שבהן אותה נקודה
+// פיזית מופיעה תחת כמה שמות ("Výtopna" מול "Výtopna — מסעדת הרכבות",
+// "מצודת פראג" מול "טירת פראג וקתדרלת ויטוס"). הכינויים נוצרו כדי שתחנות
+// DAYS יקבלו מיקום, אבל הם גרמו לכך ש**אותו מקום נספר פעמיים בלוח הסיכום**
+// וש"היינו" שסומן מכרטיס אחד לא השתקף בשני.
+// מכאן והלאה: כל מה שממופתח לפי שם עובר דרך _canonicalName.
+var _canonCache = null;
+function _canonMap() {
+  if (_canonCache) return _canonCache;
+  var byCoord = {}, apNames = {};
+  try { ALL_PLACES.forEach(function(x) { if (x && x.name) apNames[x.name] = true; }); } catch (e) {}
+  Object.keys(PLACE_COORDS).forEach(function(n) {
+    var c = PLACE_COORDS[n];
+    if (!c) return;
+    var k = c[0] + ',' + c[1];
+    (byCoord[k] = byCoord[k] || []).push(n);
+  });
+  var m = {};
+  Object.keys(byCoord).forEach(function(k) {
+    var names = byCoord[k];
+    var inAp = names.filter(function(n) { return apNames[n]; });
+    // 1. שם שקיים ב-ALL_PLACES (הרשומה האמיתית) — הקצר מביניהם.
+    // 2. אחרת הארוך ביותר: בקבוצת המלון כל השמות הם תחנות פעולה
+    //    ("חזרה למלון ומנוחה"), והארוך הוא "Comfort Hotel Prague City East" —
+    //    השם היחיד שמתאר מקום. הקצר היה נותן כותרת מגוחכת בלוח הסיכום.
+    var canon = inAp.length
+      ? inAp.slice().sort(function(a, b) { return a.length - b.length; })[0]
+      : names.slice().sort(function(a, b) { return b.length - a.length; })[0];
+    names.forEach(function(n) { m[n] = canon; });
+  });
+  _canonCache = m;
+  return m;
+}
+function _canonicalName(n) { return _canonMap()[n] || n; }
+
 var VISITED_STATE = null;
 var VISITED_KEY = 'prague_visited_v1';
 
+// מנרמל אובייקט "היינו" לשמות קנוניים. חייב לרוץ על **כל** מקור — גם
+// localStorage וגם מה שמגיע מהענן: מכשיר אחר (או גרסה ישנה) עשוי לשמור
+// תחת כינוי, ובלי נרמול הסימון פשוט לא ייראה. מחזיר {state, changed}.
+function _normalizeVisited(raw) {
+  var out = {}, changed = false;
+  Object.keys(raw || {}).forEach(function(n) {
+    var c = _canonicalName(n);
+    if (c !== n) changed = true;
+    if (!out[c] || raw[n] < out[c]) out[c] = raw[n];
+  });
+  return { state: out, changed: changed };
+}
+
 function getVisitedState() {
   if (VISITED_STATE) return VISITED_STATE;
-  try { VISITED_STATE = JSON.parse(localStorage.getItem(VISITED_KEY) || '{}') || {}; }
-  catch (e) { VISITED_STATE = {}; }
+  var raw = {};
+  try { raw = JSON.parse(localStorage.getItem(VISITED_KEY) || '{}') || {}; }
+  catch (e) { raw = {}; }
+  var n = _normalizeVisited(raw);
+  VISITED_STATE = n.state;
+  if (n.changed) { try { localStorage.setItem(VISITED_KEY, JSON.stringify(VISITED_STATE)); } catch (e) {} }
   return VISITED_STATE;
 }
-function isVisited(name) { return !!getVisitedState()[name]; }
+function isVisited(name) { return !!getVisitedState()[_canonicalName(name)]; }
 function visitedCount() { return Object.keys(getVisitedState()).length; }
 
 function saveVisitedState() {
@@ -4770,8 +4823,10 @@ function saveVisitedState() {
 function toggleVisited(name) {
   if (!name) return;
   var st = getVisitedState();
+  var label = name;
+  name = _canonicalName(name); // סימון מכל כינוי מתייחס לאותה נקודה
   if (st[name]) { delete st[name]; toast('↩️ הוסר מ"היינו"'); }
-  else { st[name] = Date.now(); toast('✅ סומן — היינו ב' + name); }
+  else { st[name] = Date.now(); toast('✅ סומן — היינו ב' + label); }
   saveVisitedState();
   refreshVisitedUI();
 }
@@ -6496,8 +6551,10 @@ function initRealtimeSync() {
         try {
           var localVisited = localStorage.getItem(VISITED_KEY);
           if (d.visited !== localVisited) {
-            VISITED_STATE = JSON.parse(d.visited);
-            localStorage.setItem(VISITED_KEY, d.visited);
+            // ⚠️ דרך _normalizeVisited ולא השמה ישירה — מכשיר אחר עשוי לשלוח
+            // מפתחות תחת כינוי, ובלי נרמול הסימון לא ייראה כאן בכלל.
+            VISITED_STATE = _normalizeVisited(JSON.parse(d.visited)).state;
+            localStorage.setItem(VISITED_KEY, JSON.stringify(VISITED_STATE));
             refreshVisitedUI();
             showSyncBadge('✅');
           }
