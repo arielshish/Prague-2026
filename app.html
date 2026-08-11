@@ -944,7 +944,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-11-p';
+var BUILD_ID = '2026-08-11-q';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
@@ -7589,14 +7589,94 @@ function renderWeather(data) {
   if (upd) upd.textContent = 'עודכן: ' + new Date().toLocaleString('he-IL', {hour:'2-digit',minute:'2-digit',day:'numeric',month:'numeric'});
 }
 
+// ── ייצוא CSV ────────────────────────────────────────────────────────────────
+// ⚠️ EXPENSES נבנה ב-unshift, כלומר סדר המערך הוא "מי נוסף אחרון" ולא סדר
+// כרונולוגי מובטח — ובמיוחד כשמתמזגות רשומות מ-Sheets ומ-Firebase. הייצוא
+// חייב למיין בעצמו ולא להסתמך על סדר המערך.
+// `e.date` הוא מחרוזת he-IL ("11.8.2026, 22:03:53") ולא Date — Date.parse
+// נכשל עליה. לכן פרסור מפורש, עם נפילה ל-`id` (שהוא Date.now() ביצירה).
+function _expTs(e) {
+  var m = /^\s*(\d{1,2})\.(\d{1,2})\.(\d{4})(?:,\s*(\d{1,2}):(\d{2})(?::(\d{2}))?)?/.exec(String(e.date || ''));
+  if (m) return new Date(+m[3], +m[2] - 1, +m[1], +(m[4] || 0), +(m[5] || 0), +(m[6] || 0)).getTime();
+  var id = Number(e.id);
+  return (isFinite(id) && id > 1e12) ? id : 0;
+}
+function _expDateParts(e) {
+  var ts = _expTs(e);
+  if (!ts) return { iso: '', time: '', day: '' };
+  var d = new Date(ts), p = function(n) { return (n < 10 ? '0' : '') + n; };
+  var dayNum = tripDayNumber(d);
+  return {
+    iso: d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()),
+    time: p(d.getHours()) + ':' + p(d.getMinutes()),
+    day: (dayNum >= 1 && dayNum <= DAYS.length) ? String(dayNum) : ''
+  };
+}
+// הקטגוריה נגזרת מהאימוג׳י שהמשתמש עצמו בחר בשם ההוצאה — לא ניחוש שלנו.
+// רשומה בלי אימוג׳י מוכר נופלת ל"אחר" במפורש ולא משויכת בכוח.
+function _expCat(name) {
+  var n = String(name || '');
+  if (/[\u{1F37D}\u{1F354}\u{1F355}\u{2615}\u{1F366}\u{1F96A}\u{1F37A}]/u.test(n)) return '\u{1F37D}️ אוכל';
+  if (/[\u{1F6CD}\u{1F3EC}\u{1F3EA}\u{1F6D2}]/u.test(n))                          return '\u{1F6CD}️ קניות';
+  if (/[\u{1F39F}\u{1F3F0}\u{1F54D}\u{1F682}\u{1F300}\u{1F981}\u{1F30A}\u{1F4A1}\u{1F3AD}\u{1F5BC}]/u.test(n)) return '\u{1F39F}️ אטרקציות';
+  if (/[\u{1F696}\u{1F687}\u{1F68B}\u{2708}]/u.test(n))                           return '\u{1F696} תחבורה';
+  return '❓ אחר';
+}
 function exportCsv() {
-  var rows = ['תאריך,שם,CZK,ILS,הערה'].concat(EXPENSES.map(function(e) {
-    return [e.date||'', e.name, e.czk||0, e.ils||0, e.note||''].map(function(v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(',');
-  }));
-  var blob = new Blob(['\ufeff' + rows.join('\n')], {type:'text/csv;charset=utf-8'});
+  var COLS = 8;
+  var q = function(v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; };
+  var line = function(arr) {
+    var a = arr.slice();
+    while (a.length < COLS) a.push('');
+    return a.slice(0, COLS).map(q).join(',');
+  };
+  var blank = line([]);
+
+  // מיון כרונולוגי עולה — יום 1 → יום אחרון, כמו שקוראים יומן טיול.
+  var items = EXPENSES.slice().sort(function(a, b) { return _expTs(a) - _expTs(b); });
+
+  var rows = [line(['תאריך', 'שעה', 'יום בטיול', 'קטגוריה', 'שם', 'CZK', 'ILS', 'הערה'])];
+  var totC = 0, totI = 0;
+  var byDay = {}, dayOrder = [], byCat = {}, catOrder = [];
+
+  items.forEach(function(e) {
+    var c = Number(e.czk) || 0, i = Number(e.ils) || 0, dp = _expDateParts(e), cat = _expCat(e.name);
+    totC += c; totI += i;
+    var dk = dp.iso || 'ללא תאריך';
+    if (!byDay[dk]) { byDay[dk] = { czk: 0, ils: 0, n: 0, day: dp.day }; dayOrder.push(dk); }
+    byDay[dk].czk += c; byDay[dk].ils += i; byDay[dk].n++;
+    if (!byCat[cat]) { byCat[cat] = { czk: 0, ils: 0, n: 0 }; catOrder.push(cat); }
+    byCat[cat].czk += c; byCat[cat].ils += i; byCat[cat].n++;
+    rows.push(line([dp.iso, dp.time, dp.day, cat, e.name, c, i, e.note || '']));
+  });
+
+  // בלוק הסיכום בתחתית ולא כשורות ביניים — כך אזור הפירוט נשאר טבלה נקייה
+  // שאפשר למיין ולסנן, והסיכומים עדיין שם.
+  rows.push(blank);
+  rows.push(line(['סה״כ הטיול', '', '', '', items.length + ' הוצאות', totC, totI, '']));
+  rows.push(blank);
+
+  rows.push(line(['סיכום לפי יום']));
+  rows.push(line(['תאריך', '', 'יום בטיול', '', 'מספר הוצאות', 'CZK', 'ILS', '']));
+  dayOrder.forEach(function(k) {
+    var d = byDay[k];
+    rows.push(line([k, '', d.day, '', d.n, d.czk, d.ils, '']));
+  });
+
+  rows.push(blank);
+  rows.push(line(['סיכום לפי קטגוריה']));
+  rows.push(line(['קטגוריה', '', '', '', 'מספר הוצאות', 'CZK', 'ILS', 'אחוז']));
+  catOrder.sort(function(a, b) { return byCat[b].czk - byCat[a].czk; }).forEach(function(k) {
+    var c = byCat[k];
+    var pct = totC ? Math.round(c.czk / totC * 1000) / 10 : 0;
+    rows.push(line([k, '', '', '', c.n, c.czk, c.ils, pct + '%']));
+  });
+
+  var stamp = new Date(), p2 = function(n) { return (n < 10 ? '0' : '') + n; };
+  var blob = new Blob(['\ufeff' + rows.join('\r\n')], {type:'text/csv;charset=utf-8'});
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'Prague_Expenses.csv';
+  a.download = 'Prague_Expenses_' + stamp.getFullYear() + '-' + p2(stamp.getMonth()+1) + '-' + p2(stamp.getDate()) + '.csv';
   a.click();
 }
 
