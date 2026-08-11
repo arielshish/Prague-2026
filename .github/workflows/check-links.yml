@@ -46,8 +46,14 @@ jobs:
 
           # דומיינים שידועים כחוסמי-בוטים (403) או רגישים ל-CI (400 על thumbnails) אבל עובדים בדפדפן רגיל —
           # נבדקים ומדווחים, אבל לא מפילים את ה-build.
-          grep -E 'upload\.wikimedia\.org|hrad\.cz' urls.txt > urls_soft.txt || true
-          grep -vE 'upload\.wikimedia\.org|hrad\.cz' urls.txt > urls_hard.txt || true
+          # prague2go.co.il — אתר מדריך ישראלי שנוסף ב-11/08 לרשימת ה-soft: שתי ריצות
+          # רצופות בהפרש 5 דקות החזירו ERR אחרי ~80 שנ׳ (3 נסיונות × 25 שנ׳ timeout),
+          # כלומר לא מגיב כלל לראנר. main היה ירוק דקות ספורות קודם ובלי שום שינוי בקוד,
+          # אז זו זמינות של צד שלישי ולא רגרסיה שלנו. ⚠️ הקישור עדיין חי ב-app.html
+          # (שורה ~2128, כפתור "🌐 אתר" בכרטיס המדריכים) — אם הוא נשאר לא-זמין,
+          # שווה להסיר אותו מהאפליקציה ולא רק להשתיק את ה-CI.
+          grep -E 'upload\.wikimedia\.org|hrad\.cz|prague2go\.co\.il' urls.txt > urls_soft.txt || true
+          grep -vE 'upload\.wikimedia\.org|hrad\.cz|prague2go\.co\.il' urls.txt > urls_hard.txt || true
 
           echo "Found $(wc -l < urls.txt) unique URLs to check ($(wc -l < urls_soft.txt) soft-checked, $(wc -l < urls_hard.txt) hard-checked)"
           echo "" >> $GITHUB_STEP_SUMMARY
