@@ -626,31 +626,138 @@ var _SUM_TYPE = {
   stop: ['תחנות', '#F4634A']
 };
 
-function buildTripSummarySVG() {
-  var items = _tripSummaryData();
-  var W = 1080;
-  var PAD = 56;
-  var headerH = 250;
-  var mapH = items.some(function(i) { return i.coords; }) ? 430 : 0;
-  var rowH = 76;
-  // מיקום פאנל המפה מחושב פעם אחת ומשמש גם את תחילת הרשימה — קודם הם חושבו
-  // בנפרד וכותרת "הרשימה המלאה" נפלה בתוך הפאנל.
-  var mapTop = headerH + 168;
-  var mapBottom = mapH ? (mapTop + mapH - 40) : (headerH + 138);
-  var listTop = mapBottom + 100;
-  var H = listTop + items.length * rowH + 130;
+// ── מפה אמיתית בלוח הסיכום ──────────────────────────────────────────────────
+// הגרסה הראשונה ציירה את הנקודות על רקע ריק — זה נראה כמו scatter plot ולא
+// כמו פראג. עכשיו הרקע הוא **אריחי OpenStreetMap אמיתיים**, והנעצים מעליהם.
+//
+// ⚠️ הפרויקציה חייבת להיות Web Mercator ולא שטוחה — אחרת הנעצים לא יישבו
+//    על המפה. זו בדיוק המתמטיקה של Leaflet/OSM.
+// ⚠️ `crossOrigin='anonymous'` חובה: בלעדיו ה-canvas נהיה tainted ו-toBlob
+//    זורק SecurityError. tile.openstreetmap.org מחזיר Access-Control-Allow-Origin.
+// ⚠️ שימוש באריחי OSM מחייב ייחוס — מוצג בתחתית פאנל המפה.
+function _lon2tileF(lon, z) { return (lon + 180) / 360 * Math.pow(2, z); }
+function _lat2tileF(lat, z) {
+  var r = lat * Math.PI / 180;
+  return (1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2 * Math.pow(2, z);
+}
 
+// בוחר zoom שבו כל הנקודות נכנסות לפאנל, וממרכז אותן בתוכו
+function _tripMapGeo(pts, w, h) {
+  if (!pts.length) return null;
+  var lats = pts.map(function(p) { return p.coords[0]; });
+  var lngs = pts.map(function(p) { return p.coords[1]; });
+  var minLat = Math.min.apply(null, lats), maxLat = Math.max.apply(null, lats);
+  var minLng = Math.min.apply(null, lngs), maxLng = Math.max.apply(null, lngs);
+  var padLat = Math.max((maxLat - minLat) * 0.16, 0.0035);
+  var padLng = Math.max((maxLng - minLng) * 0.16, 0.005);
+  minLat -= padLat; maxLat += padLat; minLng -= padLng; maxLng += padLng;
+  var z = 16, pw, ph;
+  for (; z > 9; z--) {
+    pw = (_lon2tileF(maxLng, z) - _lon2tileF(minLng, z)) * 256;
+    ph = (_lat2tileF(minLat, z) - _lat2tileF(maxLat, z)) * 256;
+    if (pw <= w && ph <= h) break;
+  }
+  pw = (_lon2tileF(maxLng, z) - _lon2tileF(minLng, z)) * 256;
+  ph = (_lat2tileF(minLat, z) - _lat2tileF(maxLat, z)) * 256;
+  var ox = _lon2tileF(minLng, z) * 256 - (w - pw) / 2;
+  var oy = _lat2tileF(maxLat, z) * 256 - (h - ph) / 2;
+  return {
+    z: z, ox: ox, oy: oy, w: w, h: h,
+    project: function(c) {
+      return [_lon2tileF(c[1], z) * 256 - ox, _lat2tileF(c[0], z) * 256 - oy];
+    }
+  };
+}
+
+function _roundRectPath(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+// מצייר את אריחי המפה לתוך אזור הפאנל. נכשל בשקט (בלי רשת → לוח בלי רקע).
+function _drawTripMapTiles(ctx, L) {
+  return new Promise(function(resolve) {
+    var g = L.geo, m = L.map;
+    if (!g) return resolve(false);
+    var x0 = Math.floor(g.ox / 256), x1 = Math.floor((g.ox + g.w) / 256);
+    var y0 = Math.floor(g.oy / 256), y1 = Math.floor((g.oy + g.h) / 256);
+    var jobs = [];
+    for (var tx = x0; tx <= x1; tx++) for (var ty = y0; ty <= y1; ty++) jobs.push([tx, ty]);
+    if (jobs.length > 24) return resolve(false); // הגנה: לא למשוך עשרות אריחים
+    ctx.save();
+    _roundRectPath(ctx, m.x, m.y, m.w, m.h, 24);
+    ctx.clip();
+    var left = jobs.length, ok = 0;
+    if (!left) { ctx.restore(); return resolve(false); }
+    jobs.forEach(function(t) {
+      var img = new Image();
+      img.crossOrigin = 'anonymous';
+      var finish = function(drew) {
+        if (drew) ok++;
+        if (--left === 0) { ctx.restore(); resolve(ok > 0); }
+      };
+      img.onload = function() {
+        try {
+          ctx.drawImage(img, m.x + t[0] * 256 - g.ox, m.y + t[1] * 256 - g.oy, 256, 256);
+          finish(true);
+        } catch (e) { finish(false); }
+      };
+      img.onerror = function() { finish(false); };
+      img.src = 'https://tile.openstreetmap.org/' + g.z + '/' + t[0] + '/' + t[1] + '.png';
+    });
+    setTimeout(function() { if (left > 0) { left = 0; try { ctx.restore(); } catch (e) {} resolve(ok > 0); } }, 9000);
+  });
+}
+
+// פריסה מחושבת פעם אחת ומשותפת ל-SVG ולציור האריחים — קודם שני האזורים
+// חושבו בנפרד וכותרת הרשימה נפלה בתוך פאנל המפה.
+function _tripSummaryLayout(items) {
+  var W = 1080, PAD = 56, headerH = 250;
+  // ⚠️ שומרים את האינדקס **ברשימה המלאה**: מספרי הנעצים חייבים להתאים
+  // למספרי השורות. פילטר בלי שמירת האינדקס היה מסיט את כל המספרים ברגע
+  // שלמקום אחד אין קואורדינטות.
+  var pts = [];
+  items.forEach(function(it, idx) { if (it.coords) pts.push({ it: it, n: idx + 1 }); });
+  var mapH = pts.length ? 470 : 0;
+  var map = mapH ? { x: PAD, y: headerH + 168, w: W - PAD * 2, h: mapH - 40 } : null;
+  var mapBottom = map ? (map.y + map.h) : (headerH + 138);
+  var rowH = 76;
+  var listTop = mapBottom + 100;
+  return {
+    W: W, PAD: PAD, headerH: headerH, rowH: rowH, listTop: listTop,
+    H: listTop + items.length * rowH + 130,
+    map: map, pts: pts,
+    geo: map ? _tripMapGeo(pts.map(function(e) { return e.it; }), map.w, map.h) : null
+  };
+}
+
+function buildTripSummarySVG(items, L) {
+  var W = L.W, PAD = L.PAD, H = L.H;
   var s = '';
   s += '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" font-family="-apple-system,BlinkMacSystemFont,\'Segoe UI\',Arial,sans-serif" direction="rtl">';
   s += '<defs>' +
        '<linearGradient id="hg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0F172A"/><stop offset="1" stop-color="#1E293B"/></linearGradient>' +
        '<linearGradient id="ac" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#F4634A"/><stop offset="1" stop-color="#D6A54A"/></linearGradient>' +
        '</defs>';
-  s += '<rect width="' + W + '" height="' + H + '" fill="#FAF7F4"/>';
+  // ⚠️ הרקע מצויר רק **מחוץ** לפאנל המפה — האריחים כבר על ה-canvas מתחת,
+  //    מלבן אטום על כל הרוחב היה מוחק אותם.
+  if (L.map) {
+    s += '<rect width="' + W + '" height="' + L.map.y + '" fill="#FAF7F4"/>';
+    s += '<rect y="' + (L.map.y + L.map.h) + '" width="' + W + '" height="' + (H - L.map.y - L.map.h) + '" fill="#FAF7F4"/>';
+    s += '<rect y="' + L.map.y + '" width="' + PAD + '" height="' + L.map.h + '" fill="#FAF7F4"/>';
+    s += '<rect x="' + (W - PAD) + '" y="' + L.map.y + '" width="' + PAD + '" height="' + L.map.h + '" fill="#FAF7F4"/>';
+  } else {
+    s += '<rect width="' + W + '" height="' + H + '" fill="#FAF7F4"/>';
+  }
 
   // ── header ──
-  s += '<rect width="' + W + '" height="' + headerH + '" fill="url(#hg)"/>';
-  s += '<rect y="' + (headerH - 6) + '" width="' + W + '" height="6" fill="url(#ac)"/>';
+  s += '<rect width="' + W + '" height="' + L.headerH + '" fill="url(#hg)"/>';
+  s += '<rect y="' + (L.headerH - 6) + '" width="' + W + '" height="6" fill="url(#ac)"/>';
   s += '<text x="' + (W - PAD) + '" y="86" text-anchor="start" font-size="26" font-weight="600" fill="#D6A54A" letter-spacing="7">PRAGUE 2026</text>';
   s += '<text x="' + (W - PAD) + '" y="150" text-anchor="start" font-size="52" font-weight="800" fill="#FFFFFF">משפחת שיש · סיכום הטיול</text>';
   s += '<text x="' + (W - PAD) + '" y="196" text-anchor="start" font-size="25" fill="rgba(255,255,255,0.62)">8–15 באוגוסט 2026 · פראג, צ׳כיה</text>';
@@ -665,62 +772,41 @@ function buildTripSummarySVG() {
     [String(Object.keys(daysCovered).length || '—'), 'ימים עם ביקורים'],
     [String(Object.keys(byType).length), 'קטגוריות']
   ];
-  var chipW = (W - PAD * 2 - 24 * 2) / 3;
-  stats.forEach(function(st2, i) {
-    var x = W - PAD - chipW - i * (chipW + 24);
-    var y = headerH + 34;
+  var chipW = (W - PAD * 2 - 48) / 3;
+  stats.forEach(function(st, i) {
+    var x = W - PAD - chipW - i * (chipW + 24), y = L.headerH + 34;
     s += '<rect x="' + x + '" y="' + y + '" width="' + chipW + '" height="104" rx="20" fill="#FFFFFF" stroke="rgba(0,0,0,0.07)"/>';
-    s += '<text x="' + (x + chipW / 2) + '" y="' + (y + 50) + '" text-anchor="middle" font-size="40" font-weight="800" fill="#F4634A">' + _sxesc(st2[0]) + '</text>';
-    s += '<text x="' + (x + chipW / 2) + '" y="' + (y + 82) + '" text-anchor="middle" font-size="20" fill="rgba(30,41,59,0.55)">' + _sxesc(st2[1]) + '</text>';
+    s += '<text x="' + (x + chipW / 2) + '" y="' + (y + 50) + '" text-anchor="middle" font-size="40" font-weight="800" fill="#F4634A">' + _sxesc(st[0]) + '</text>';
+    s += '<text x="' + (x + chipW / 2) + '" y="' + (y + 82) + '" text-anchor="middle" font-size="20" fill="rgba(30,41,59,0.55)">' + _sxesc(st[1]) + '</text>';
   });
 
-  // ── map panel: real coordinates, equirectangular, scaled to fit ──
-  if (mapH) {
-    var mx = PAD, my = mapTop, mw = W - PAD * 2, mh = mapH - 40;
-    s += '<rect x="' + mx + '" y="' + my + '" width="' + mw + '" height="' + mh + '" rx="24" fill="#FFFFFF" stroke="rgba(0,0,0,0.07)"/>';
-    s += '<text x="' + (W - PAD - 24) + '" y="' + (my + 42) + '" text-anchor="start" font-size="22" font-weight="800" fill="rgba(30,41,59,0.45)">איפה היינו</text>';
-
-    var pts = items.filter(function(i) { return i.coords; });
-    var lats = pts.map(function(p) { return p.coords[0]; });
-    var lngs = pts.map(function(p) { return p.coords[1]; });
-    var minLat = Math.min.apply(null, lats), maxLat = Math.max.apply(null, lats);
-    var minLng = Math.min.apply(null, lngs), maxLng = Math.max.apply(null, lngs);
-    // ריפוד כדי שנקודות קיצון לא יידבקו לשוליים, ומרווח מינימלי כשכל הנקודות צפופות
-    var padLat = Math.max((maxLat - minLat) * 0.18, 0.004);
-    var padLng = Math.max((maxLng - minLng) * 0.18, 0.006);
-    minLat -= padLat; maxLat += padLat; minLng -= padLng; maxLng += padLng;
-    var innerX = mx + 34, innerY = my + 64, innerW = mw - 68, innerH = mh - 100;
-    // תיקון יחס — קו אורך מתכווץ ב-cos(lat) בקו הרוחב של פראג
-    var project = function(c) {
-      var fx = (maxLng - c[1]) / (maxLng - minLng);      // RTL: מזרח משמאל
-      var fy = (maxLat - c[0]) / (maxLat - minLat);
-      return [innerX + fx * innerW, innerY + fy * innerH];
-    };
-    // רקע: כל שאר המקומות באפור חיוור, כדי לתת הקשר למה שכן ביקרנו
-    try {
-      _mappablePlaces().forEach(function(p) {
-        var c = PLACE_COORDS[p.name];
-        if (!c || getVisitedState()[p.name]) return;
-        if (c[0] < minLat || c[0] > maxLat || c[1] < minLng || c[1] > maxLng) return;
-        var q = project(c);
-        s += '<circle cx="' + q[0].toFixed(1) + '" cy="' + q[1].toFixed(1) + '" r="4" fill="rgba(30,41,59,0.13)"/>';
-      });
-    } catch (e) {}
-    pts.forEach(function(p, i) {
-      var q = project(p.coords);
-      var clr = (_SUM_TYPE[p.type] || ['', '#F4634A'])[1];
-      s += '<circle cx="' + q[0].toFixed(1) + '" cy="' + q[1].toFixed(1) + '" r="13" fill="' + clr + '" stroke="#fff" stroke-width="3"/>';
-      s += '<text x="' + q[0].toFixed(1) + '" y="' + (q[1] + 5).toFixed(1) + '" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">' + (i + 1) + '</text>';
+  // ── map overlay (האריחים כבר מתחת) ──
+  if (L.map && L.geo) {
+    var m = L.map, g = L.geo;
+    // מסגרת + הבהרה עדינה כדי שהנעצים יבלטו מעל האריחים
+    s += '<rect x="' + m.x + '" y="' + m.y + '" width="' + m.w + '" height="' + m.h + '" rx="24" fill="rgba(255,255,255,0.05)" stroke="rgba(0,0,0,0.12)"/>';
+    var lbl = 'איפה היינו';
+    s += '<rect x="' + (m.x + m.w - 24 - 130) + '" y="' + (m.y + 18) + '" width="130" height="34" rx="10" fill="rgba(255,255,255,0.88)"/>';
+    s += '<text x="' + (m.x + m.w - 34) + '" y="' + (m.y + 42) + '" text-anchor="start" font-size="20" font-weight="800" fill="rgba(30,41,59,0.7)">' + lbl + '</text>';
+    L.pts.forEach(function(e) {
+      var q = g.project(e.it.coords);
+      var x = m.x + q[0], y = m.y + q[1];
+      if (x < m.x || x > m.x + m.w || y < m.y || y > m.y + m.h) return;
+      var clr = (_SUM_TYPE[e.it.type] || ['', '#F4634A'])[1];
+      s += '<circle cx="' + x.toFixed(1) + '" cy="' + (y + 2).toFixed(1) + '" r="15" fill="rgba(0,0,0,0.18)"/>';
+      s += '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="15" fill="' + clr + '" stroke="#fff" stroke-width="3.5"/>';
+      s += '<text x="' + x.toFixed(1) + '" y="' + (y + 6).toFixed(1) + '" text-anchor="middle" font-size="16" font-weight="800" fill="#fff">' + e.n + '</text>';
     });
-    s += '<text x="' + (mx + 24) + '" y="' + (my + mh - 20) + '" text-anchor="end" font-size="17" fill="rgba(30,41,59,0.35)">' + pts.length + ' נקודות · מיקום אמיתי לפי קואורדינטות</text>';
+    s += '<rect x="' + (m.x + 14) + '" y="' + (m.y + m.h - 44) + '" width="290" height="30" rx="8" fill="rgba(255,255,255,0.85)"/>';
+    s += '<text x="' + (m.x + 24) + '" y="' + (m.y + m.h - 23) + '" text-anchor="end" font-size="17" fill="rgba(30,41,59,0.6)">© OpenStreetMap · ' + L.pts.length + ' נקודות</text>';
   }
 
   // ── list ──
-  s += '<text x="' + (W - PAD) + '" y="' + (listTop - 34) + '" text-anchor="start" font-size="30" font-weight="800" fill="#1E293B">הרשימה המלאה</text>';
+  s += '<text x="' + (W - PAD) + '" y="' + (L.listTop - 34) + '" text-anchor="start" font-size="30" font-weight="800" fill="#1E293B">הרשימה המלאה</text>';
   items.forEach(function(it, i) {
-    var y = listTop + i * rowH;
+    var y = L.listTop + i * L.rowH;
     var clr = (_SUM_TYPE[it.type] || ['', '#64748B'])[1];
-    if (i % 2 === 0) s += '<rect x="' + PAD + '" y="' + (y - 12) + '" width="' + (W - PAD * 2) + '" height="' + (rowH - 8) + '" rx="16" fill="#FFFFFF"/>';
+    if (i % 2 === 0) s += '<rect x="' + PAD + '" y="' + (y - 12) + '" width="' + (W - PAD * 2) + '" height="' + (L.rowH - 8) + '" rx="16" fill="#FFFFFF"/>';
     s += '<circle cx="' + (W - PAD - 30) + '" cy="' + (y + 22) + '" r="19" fill="' + clr + '"/>';
     s += '<text x="' + (W - PAD - 30) + '" y="' + (y + 29) + '" text-anchor="middle" font-size="18" font-weight="800" fill="#fff">' + (i + 1) + '</text>';
     s += '<text x="' + (W - PAD - 68) + '" y="' + (y + 17) + '" text-anchor="start" font-size="27" font-weight="700" fill="#1E293B">' + _sxesc(it.icon + ' ' + _sclip(it.name, 34)) + '</text>';
@@ -731,78 +817,85 @@ function buildTripSummarySVG() {
     }
   });
 
-  // ── footer ──
   var d = new Date();
-  var stamp = d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear();
-  s += '<text x="' + (W - PAD) + '" y="' + (H - 44) + '" text-anchor="start" font-size="19" fill="rgba(30,41,59,0.35)">נוצר ' + stamp + ' · אפליקציית פראג 2026</text>';
-  s += '<text x="' + PAD + '" y="' + (H - 44) + '" text-anchor="end" font-size="19" fill="rgba(30,41,59,0.28)">♥</text>';
+  s += '<text x="' + (W - PAD) + '" y="' + (H - 44) + '" text-anchor="start" font-size="19" fill="rgba(30,41,59,0.35)">נוצר ' + d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear() + ' · אפליקציית פראג 2026</text>';
   s += '</svg>';
   return s;
 }
 
+// מרכיב את הלוח: רקע → אריחים → SVG מעל. מחזיר canvas.
+function renderTripSummaryCanvas(scale) {
+  scale = scale || 2;
+  var items = _tripSummaryData();
+  var L = _tripSummaryLayout(items);
+  var svg = buildTripSummarySVG(items, L);
+  var cv = document.createElement('canvas');
+  cv.width = L.W * scale; cv.height = L.H * scale;
+  var ctx = cv.getContext('2d');
+  ctx.scale(scale, scale);
+  ctx.fillStyle = '#FAF7F4'; ctx.fillRect(0, 0, L.W, L.H);
+  var drawSvg = function() {
+    return new Promise(function(res, rej) {
+      var img = new Image();
+      img.onload = function() { ctx.drawImage(img, 0, 0, L.W, L.H); res(cv); };
+      img.onerror = function() { rej(new Error('svg render failed')); };
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    });
+  };
+  return _drawTripMapTiles(ctx, L).then(drawSvg, drawSvg);
+}
+
 function openTripSummary() {
   try {
-    if (visitedCount() === 0) {
-      toast('סמנו קודם מקומות ב"היינו" — הלוח נבנה מהם');
-      return;
-    }
+    if (visitedCount() === 0) { toast('סמנו קודם מקומות ב"היינו" — הלוח נבנה מהם'); return; }
     var ex = document.getElementById('tripSummaryOverlay');
     if (ex) ex.remove();
-    var svg = buildTripSummarySVG();
     var ov = document.createElement('div');
     ov.id = 'tripSummaryOverlay';
     ov.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.92);z-index:10050;display:flex;flex-direction:column;';
     ov.innerHTML =
       '<div style="flex-shrink:0;display:flex;gap:8px;padding:14px 14px 10px;">' +
         '<button type="button" onclick="document.getElementById(\'tripSummaryOverlay\').remove()" style="flex:0 0 auto;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:13px;padding:11px 15px;font-size:14px;font-weight:800;cursor:pointer;font-family:Rubik,Arial,sans-serif;">✕</button>' +
-        '<button type="button" onclick="exportTripSummary()" style="flex:1;background:#F4634A;border:none;color:#fff;border-radius:13px;padding:11px;font-size:14px;font-weight:800;cursor:pointer;font-family:Rubik,Arial,sans-serif;">📤 שמור / שתף כתמונה</button>' +
+        '<button type="button" id="tripShareBtn" onclick="exportTripSummary()" style="flex:1;background:#F4634A;border:none;color:#fff;border-radius:13px;padding:11px;font-size:14px;font-weight:800;cursor:pointer;font-family:Rubik,Arial,sans-serif;">📤 שמור / שתף כתמונה</button>' +
       '</div>' +
       '<div style="flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:0 12px 20px;">' +
-        '<div id="tripSummaryCanvasHost" style="border-radius:16px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,0.45);">' + svg + '</div>' +
+        '<div id="tripSummaryHost" style="border-radius:16px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,0.45);color:#fff;font-family:Rubik,Arial,sans-serif;padding:18px;text-align:center;">⌛ בונה את הלוח ומוריד את המפה…</div>' +
       '</div>';
-    // ה-SVG מוזרק inline ולכן נמתח לרוחב הקונטיינר
     document.body.appendChild(ov);
-    var el = ov.querySelector('svg');
-    if (el) { el.removeAttribute('width'); el.removeAttribute('height'); el.style.width = '100%'; el.style.height = 'auto'; el.style.display = 'block'; }
-  } catch (e) {
-    toast('⚠️ שגיאה בבניית הלוח: ' + (e && e.message));
-  }
+    // התצוגה היא ה-canvas עצמו — מה שרואים הוא בדיוק מה שמיוצא
+    renderTripSummaryCanvas(2).then(function(cv) {
+      var host = document.getElementById('tripSummaryHost');
+      if (!host) return;
+      host.style.padding = '0';
+      host.innerHTML = '';
+      cv.style.width = '100%'; cv.style.height = 'auto'; cv.style.display = 'block';
+      host.appendChild(cv);
+      window._tripCanvas = cv;
+    }).catch(function(e) {
+      var host = document.getElementById('tripSummaryHost');
+      if (host) host.textContent = '⚠️ שגיאה בבניית הלוח: ' + (e && e.message);
+    });
+  } catch (e) { toast('⚠️ שגיאה: ' + (e && e.message)); }
 }
 
-// SVG → PNG בלי ספריות: data-URI → Image → canvas → blob.
-// ⚠️ ה-data-URI חייב להיות encodeURIComponent ולא btoa — btoa נופל על עברית
-// (תווים מחוץ ל-Latin1) עם InvalidCharacterError.
+// ייצוא: משתמש ב-canvas שכבר מוצג, ואם אין — בונה מחדש.
 function exportTripSummary() {
-  try {
-    var svg = buildTripSummarySVG();
-    var m = svg.match(/width="(\d+)" height="(\d+)"/);
-    var w = m ? parseInt(m[1]) : 1080, h = m ? parseInt(m[2]) : 1920;
-    var scale = 2; // רזולוציה כפולה — נראה חד גם במסך Retina וגם בהדפסה
-    var img = new Image();
-    img.onload = function() {
-      try {
-        var cv = document.createElement('canvas');
-        cv.width = w * scale; cv.height = h * scale;
-        var ctx = cv.getContext('2d');
-        ctx.fillStyle = '#FAF7F4'; ctx.fillRect(0, 0, cv.width, cv.height);
-        ctx.drawImage(img, 0, 0, cv.width, cv.height);
-        cv.toBlob(function(blob) {
-          if (!blob) { toast('⚠️ הייצוא נכשל'); return; }
-          var file = null;
-          try { file = new File([blob], 'prague-2026-summary.png', {type:'image/png'}); } catch (e) {}
-          // iOS: share sheet אמיתי (וואטסאפ/תמונות). אחרת — הורדה רגילה.
-          if (file && navigator.canShare && navigator.canShare({files:[file]}) && navigator.share) {
-            navigator.share({files:[file], title:'פראג 2026 — סיכום הטיול'})
-              .catch(function() { _downloadBlob(blob); });
-          } else {
-            _downloadBlob(blob);
-          }
-        }, 'image/png');
-      } catch (e) { toast('⚠️ שגיאה בייצוא: ' + (e && e.message)); }
-    };
-    img.onerror = function() { toast('⚠️ לא ניתן לרנדר את הלוח'); };
-    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
-  } catch (e) { toast('⚠️ שגיאה בייצוא: ' + (e && e.message)); }
+  var btn = document.getElementById('tripShareBtn');
+  if (btn) { btn.disabled = true; btn.textContent = '⌛ מכין…'; }
+  var reset = function() { if (btn) { btn.disabled = false; btn.textContent = '📤 שמור / שתף כתמונה'; } };
+  var p = window._tripCanvas ? Promise.resolve(window._tripCanvas) : renderTripSummaryCanvas(2);
+  p.then(function(cv) {
+    cv.toBlob(function(blob) {
+      reset();
+      if (!blob) { toast('⚠️ הייצוא נכשל'); return; }
+      var file = null;
+      try { file = new File([blob], 'prague-2026-summary.png', {type:'image/png'}); } catch (e) {}
+      if (file && navigator.canShare && navigator.canShare({files:[file]}) && navigator.share) {
+        navigator.share({files:[file], title:'פראג 2026 — סיכום הטיול'})
+          .catch(function() { _downloadBlob(blob); });
+      } else { _downloadBlob(blob); }
+    }, 'image/png');
+  }).catch(function(e) { reset(); toast('⚠️ שגיאה בייצוא: ' + (e && e.message)); });
 }
 
 function _downloadBlob(blob) {
@@ -827,7 +920,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-11-e';
+var BUILD_ID = '2026-08-11-f';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
