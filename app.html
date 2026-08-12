@@ -523,12 +523,30 @@ function sendLoginCode() {
 // היה anonymous (ולכן כל כתיבה ל-Firestore נכשלה בשקט) לענן, פעם אחת. משתמש בפונקציות
 // השמירה הקיימות של האפליקציה עצמן (לא לוגיקה חדשה) — כל אחת עטופה בנפרד כדי שכשל
 // באחת לא יעצור את השאר. localStorage כבר תמיד היה בטוח; זה רק סוגר את הפער לענן.
+// ⚠️ מכשיר בלי נתונים מקומיים אין לו מה לתרום לענן — ודחיפה ממנו **מוחקת**
+// את מה שיש שם. זה מה שקרה ב-12/08: מכשיר שנכנס בפעם הראשונה (localStorage
+// ריק) דחף {} ל-appdata/main.visited, וה-listener בשאר המכשירים ראה מחרוזת
+// "{}" — truthy, ולכן עבר את המגן `if (d.visited)` — ודרס את הסימונים
+// המקומיים. אותו כשל בדיוק חל על הלוז: getDaysState() נופל ל-DAYS הבסיסי,
+// כלומר מכשיר חדש היה דוחף את המסלול המקורי מעל העריכות של המשפחה.
+// **resync מעלה למעלה בלבד.** אם אין כלום מקומית — אין מה להעלות.
+function _hasLocalData(key) {
+  try {
+    var v = localStorage.getItem(key);
+    if (!v) return false;
+    var p = JSON.parse(v);
+    if (!p) return false;
+    if (Array.isArray(p)) return p.length > 0;
+    if (typeof p === 'object') return Object.keys(p).length > 0;
+    return true;
+  } catch (e) { return false; }
+}
 function _resyncLocalDataToCloud() {
-  try { if (typeof saveLocal === 'function') saveLocal(); } catch (e) { console.warn('resync expenses failed', e); }
-  try { if (typeof saveDaysState === 'function') saveDaysState(); } catch (e) { console.warn('resync days failed', e); }
-  try { if (typeof PACK_STATE !== 'undefined' && typeof savePackLocal === 'function') savePackLocal(PACK_STATE); } catch (e) { console.warn('resync pack failed', e); }
-  try { if (typeof saveVisitedState === 'function') saveVisitedState(); } catch (e) { console.warn('resync visited failed', e); }
-  try { if (typeof saveRemindersDoneLocal === 'function') saveRemindersDoneLocal(); } catch (e) { console.warn('resync remindersDone failed', e); }
+  try { if (_hasLocalData('prague_exp_v10') && typeof saveLocal === 'function') saveLocal(); } catch (e) { console.warn('resync expenses failed', e); }
+  try { if (_hasLocalData('prague_days_v1') && typeof saveDaysState === 'function') saveDaysState(); } catch (e) { console.warn('resync days failed', e); }
+  try { if (_hasLocalData('prague_pack_v2') && typeof PACK_STATE !== 'undefined' && typeof savePackLocal === 'function') savePackLocal(PACK_STATE); } catch (e) { console.warn('resync pack failed', e); }
+  try { if (_hasLocalData(VISITED_KEY) && typeof saveVisitedState === 'function') saveVisitedState(); } catch (e) { console.warn('resync visited failed', e); }
+  try { if (_hasLocalData('prague_remindersDone') && typeof saveRemindersDoneLocal === 'function') saveRemindersDoneLocal(); } catch (e) { console.warn('resync remindersDone failed', e); }
   try { if (typeof saveSchedules === 'function') saveSchedules(); } catch (e) { console.warn('resync remindersSchedule failed', e); }
   try { if (typeof saveTotalBudget === 'function' && typeof loadTotalBudget === 'function') { var tb = loadTotalBudget(); if (tb) saveTotalBudget(tb); } } catch (e) { console.warn('resync total budget failed', e); }
   try { if (typeof saveBudget === 'function' && typeof loadBudget === 'function') saveBudget(loadBudget()); } catch (e) { console.warn('resync budget categories failed', e); }
@@ -944,7 +962,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-12-c';
+var BUILD_ID = '2026-08-12-d';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
@@ -6863,10 +6881,21 @@ function initRealtimeSync() {
           if (d.visited !== localVisited) {
             // ⚠️ דרך _normalizeVisited ולא השמה ישירה — מכשיר אחר עשוי לשלוח
             // מפתחות תחת כינוי, ובלי נרמול הסימון לא ייראה כאן בכלל.
-            VISITED_STATE = _normalizeVisited(JSON.parse(d.visited)).state;
-            localStorage.setItem(VISITED_KEY, JSON.stringify(VISITED_STATE));
-            refreshVisitedUI();
-            showSyncBadge('✅');
+            var incoming = _normalizeVisited(JSON.parse(d.visited)).state;
+            // ⚠️ מגן שני מול אותו באג: ענן ריק לא דורס סימונים מקומיים קיימים.
+            // מכשיר שנכנס לראשונה דוחף "{}", וזה עבר כאן כי המחרוזת truthy.
+            // ביטול סימון אמיתי תמיד משאיר לפחות מפתח אחד או מגיע מהמכשיר
+            // הזה עצמו, אז החסימה הזו לא מונעת unmark לגיטימי.
+            var haveLocal = Object.keys(getVisitedState()).length > 0;
+            if (!Object.keys(incoming).length && haveLocal) {
+              console.warn('[visited] התעלמות מענן ריק — יש סימונים מקומיים');
+              saveVisitedState();
+            } else {
+              VISITED_STATE = incoming;
+              localStorage.setItem(VISITED_KEY, JSON.stringify(VISITED_STATE));
+              refreshVisitedUI();
+              showSyncBadge('✅');
+            }
           }
         } catch(e) {}
       }
