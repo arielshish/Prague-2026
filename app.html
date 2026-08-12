@@ -944,7 +944,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-11-r';
+var BUILD_ID = '2026-08-12-b';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
@@ -7675,51 +7675,81 @@ function exportCsv() {
   var COLS = 8;
   var q = function(v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; };
   var line = function(arr) {
-    var a = arr.slice();
+    var a = (arr || []).slice();
     while (a.length < COLS) a.push('');
     return a.slice(0, COLS).map(q).join(',');
   };
   var blank = line([]);
+  var pct = function(n, tot) { return tot ? (Math.round(n / tot * 1000) / 10) + '%' : '0%'; };
+  var cnt = function(n) { return n === 1 ? 'הוצאה אחת' : n + ' הוצאות'; };
 
-  // מיון כרונולוגי עולה — יום 1 → יום אחרון, כמו שקוראים יומן טיול.
+  // מיון כרונולוגי עולה בתוך כל קבוצה — הקובץ נקרא כמו יומן טיול.
   var items = EXPENSES.slice().sort(function(a, b) { return _expTs(a) - _expTs(b); });
 
-  var rows = [line(['תאריך', 'שעה', 'יום בטיול', 'קטגוריה', 'שם', 'CZK', 'ILS', 'הערה'])];
   var totC = 0, totI = 0;
-  var byDay = {}, dayOrder = [], byCat = {}, catOrder = [];
-
+  var byCat = {}, catOrder = [], byDay = {}, dayOrder = [];
   items.forEach(function(e) {
-    var c = Number(e.czk) || 0, i = Number(e.ils) || 0, dp = _expDateParts(e), cat = _expCat(e.name);
+    var c = Number(e.czk) || 0, i = Number(e.ils) || 0;
+    var cat = _expCat(e.name), dp = _expDateParts(e), dk = dp.iso || 'ללא תאריך';
     totC += c; totI += i;
-    var dk = dp.iso || 'ללא תאריך';
+    if (!byCat[cat]) { byCat[cat] = { czk: 0, ils: 0, rows: [] }; catOrder.push(cat); }
+    byCat[cat].czk += c; byCat[cat].ils += i; byCat[cat].rows.push({ e: e, c: c, i: i, dp: dp });
     if (!byDay[dk]) { byDay[dk] = { czk: 0, ils: 0, n: 0, day: dp.day }; dayOrder.push(dk); }
     byDay[dk].czk += c; byDay[dk].ils += i; byDay[dk].n++;
-    if (!byCat[cat]) { byCat[cat] = { czk: 0, ils: 0, n: 0 }; catOrder.push(cat); }
-    byCat[cat].czk += c; byCat[cat].ils += i; byCat[cat].n++;
-    rows.push(line([dp.iso, dp.time, dp.day, cat, e.name, c, i, e.note || '']));
   });
+  catOrder.sort(function(a, b) { return byCat[b].czk - byCat[a].czk; });
 
-  // בלוק הסיכום בתחתית ולא כשורות ביניים — כך אזור הפירוט נשאר טבלה נקייה
-  // שאפשר למיין ולסנן, והסיכומים עדיין שם.
-  rows.push(blank);
-  rows.push(line(['סה״כ הטיול', '', '', '', items.length + ' הוצאות', totC, totI, '']));
+  var first = items.length ? _expDateParts(items[0]).iso : '';
+  var last  = items.length ? _expDateParts(items[items.length - 1]).iso : '';
+  var rate  = Math.round((RATE || 6.4) * 100) / 100;
+  var rows  = [];
+
+  // ── כותרת הדוח ──
+  rows.push(line(['דוח הוצאות — פראג 2026']));
+  rows.push(line(['תקופה', first + (last && last !== first ? ' — ' + last : '')]));
+  rows.push(line(['מספר הוצאות', items.length]));
+  rows.push(line(['שער חליפין', '1 ILS = ' + rate + ' CZK']));
   rows.push(blank);
 
-  rows.push(line(['סיכום לפי יום']));
-  rows.push(line(['תאריך', '', 'יום בטיול', '', 'מספר הוצאות', 'CZK', 'ILS', '']));
-  dayOrder.forEach(function(k) {
-    var d = byDay[k];
-    rows.push(line([k, '', d.day, '', d.n, d.czk, d.ils, '']));
-  });
-
+  // ── סה״כ כללי, מיד בראש ובשתי המטבעות ──
+  rows.push(line(['', '', '', '', 'סה״כ כללי', totC, totI, '']));
+  rows.push(line(['', '', '', '', '', 'CZK', 'ILS', '']));
   rows.push(blank);
+
+  // ── סיכום לפי קטגוריה ──
   rows.push(line(['סיכום לפי קטגוריה']));
   rows.push(line(['קטגוריה', '', '', '', 'מספר הוצאות', 'CZK', 'ILS', 'אחוז']));
-  catOrder.sort(function(a, b) { return byCat[b].czk - byCat[a].czk; }).forEach(function(k) {
+  catOrder.forEach(function(k) {
     var c = byCat[k];
-    var pct = totC ? Math.round(c.czk / totC * 1000) / 10 : 0;
-    rows.push(line([k, '', '', '', c.n, c.czk, c.ils, pct + '%']));
+    rows.push(line([k, '', '', '', c.rows.length, c.czk, c.ils, pct(c.czk, totC)]));
   });
+  rows.push(line(['סה״כ', '', '', '', items.length, totC, totI, '100%']));
+  rows.push(blank);
+
+  // ── סיכום לפי יום ──
+  rows.push(line(['סיכום לפי יום']));
+  rows.push(line(['תאריך', '', 'יום בטיול', '', 'מספר הוצאות', 'CZK', 'ILS', 'אחוז']));
+  dayOrder.forEach(function(k) {
+    var d = byDay[k];
+    rows.push(line([k, '', d.day, '', d.n, d.czk, d.ils, pct(d.czk, totC)]));
+  });
+  rows.push(line(['סה״כ', '', '', '', items.length, totC, totI, '100%']));
+  rows.push(blank);
+
+  // ── פירוט מלא, מחולק לקטגוריות, עם סה״כ לכל קטגוריה ──
+  rows.push(line(['פירוט לפי קטגוריה']));
+  catOrder.forEach(function(k) {
+    var c = byCat[k];
+    rows.push(blank);
+    rows.push(line([k, '', '', '', '', c.czk, c.ils, pct(c.czk, totC)]));
+    rows.push(line(['', 'תאריך', 'שעה', 'יום בטיול', 'שם', 'CZK', 'ILS', 'הערה']));
+    c.rows.forEach(function(r) {
+      rows.push(line(['', r.dp.iso, r.dp.time, r.dp.day, r.e.name, r.c, r.i, r.e.note || '']));
+    });
+    rows.push(line(['', '', '', '', 'סה״כ ' + k + ' (' + cnt(c.rows.length) + ')', c.czk, c.ils, pct(c.czk, totC)]));
+  });
+  rows.push(blank);
+  rows.push(line(['', '', '', '', 'סה״כ כללי (' + cnt(items.length) + ')', totC, totI, '100%']));
 
   var stamp = new Date(), p2 = function(n) { return (n < 10 ? '0' : '') + n; };
   var blob = new Blob(['\ufeff' + rows.join('\r\n')], {type:'text/csv;charset=utf-8'});
