@@ -944,7 +944,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-12-a';
+var BUILD_ID = '2026-08-12-b';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
@@ -2439,6 +2439,50 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
 // ═══════════════════════════════════════════
 //  DATA
 // ═══════════════════════════════════════════
+// ── שווי בשקלים ליד כל מחיר CZK ──────────────────────────────────────────────
+// מומר **בזמן תצוגה** ולא בנתונים: המחירים נשארים ב-CZK במקור, ולכן שינוי
+// שער (ידני או מה-fetch החי) משתקף מיד בכל המסכים בלי מיגרציה.
+// ⚠️ שדות price ב-ALL_PLACES כבר מכילים "CZK" ("400–800 CZK למנה"), והתבניות
+// הוסיפו עוד אחד בסוף -> "400–800 CZK למנה CZK". באג קיים שנחשף כשהומרו מחירים.
+function _priceTxt(v) {
+  var t = String(v == null ? '' : v).trim();
+  if (!t) return '';
+  return /CZK|K\u010d/.test(t) ? t : t + ' CZK';
+}
+function _ilsOf(czk) { return Math.round(czk / (RATE || 6.4)); }
+function _withIls(s) {
+  if (!s) return s;
+  // ה-lookahead מונע הכפלה אם הטקסט כבר הומר (רינדור חוזר על אותו צומת)
+  return String(s).replace(
+    /(\d{1,3}(?:,\d{3})+|\d+)(\s*[\u2013\u2014-]\s*(\d{1,3}(?:,\d{3})+|\d+))?\s*(?:CZK|K\u010d)(?!\s*\(\u20aa)/g,
+    function(m, a, _r, b) {
+      var na = Number(String(a).replace(/,/g, ''));
+      if (!isFinite(na) || na <= 0) return m;
+      if (b) {
+        var nb = Number(String(b).replace(/,/g, ''));
+        if (!isFinite(nb) || nb <= 0) return m;
+        return m + ' (\u20aa' + _ilsOf(na) + '\u2013' + _ilsOf(nb) + ')';
+      }
+      return m + ' (\u20aa' + _ilsOf(na) + ')';
+    }
+  );
+}
+// עובר על צמתי טקסט בלבד — לא נוגע ב-HTML או ב-attributes, ולכן לא יכול
+// לשבור onclick או מרכאות בתוך שמות מקומות.
+function _annotateIls(root) {
+  if (!root || typeof document.createTreeWalker !== 'function') return;
+  try {
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null), n, list = [];
+    while ((n = w.nextNode())) list.push(n);
+    list.forEach(function(t) {
+      var v = t.nodeValue;
+      if (!v || (v.indexOf('CZK') < 0 && v.indexOf('K\u010d') < 0)) return;
+      var out = _withIls(v);
+      if (out !== v) t.nodeValue = out;
+    });
+  } catch (e) { console.error('[_annotateIls]', e); }
+}
+
 var RATE = Number(localStorage.getItem('prague_rate_v10') || 6.4);
 var EXPENSES = [];
 var EDIT_ID = null;
@@ -2788,6 +2832,7 @@ function showDayTimePicker(emoji, name, desc) {
   overlay.appendChild(panel);
   overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
   document.body.appendChild(overlay);
+  _annotateIls(overlay);
   } catch(e) { toast('⚠️ שגיאה בפתיחת בחירת יום: ' + e.message); }
 }
 
@@ -4098,6 +4143,7 @@ function openTab(id) {
   if (id === 'shopping') renderShopping();
   if (id === 'reminders') initReminders();
   if (id === 'location') renderLocationTab();
+  if (id !== 'expenses') _annotateIls(qs(id));
   // יציאה מטאב מיקום — לעצור מעקב GPS חי (סוללה).
   // `!= null` בכוונה (לא `!==`): var hoisting עושה את _geoWatchId `undefined`
   // אם openTab רץ לפני שורת ההשמה, ו-`undefined !== null` היה נכנס לכאן לשווא.
@@ -4389,6 +4435,7 @@ function renderDays() {
   if (card) card.querySelectorAll('button[data-day]').forEach(function(btn) {
     btn.addEventListener('click', function() { selectDay(Number(this.getAttribute('data-day'))); });
   });
+  _annotateIls(card);
 }
 
 function showStopDetail(dayIdx, stopIdx) {
@@ -4440,6 +4487,7 @@ function showStopDetail(dayIdx, stopIdx) {
     (s.mapUrl ? '<a href="' + s.mapUrl + '" target="_blank" rel="noopener" style="display:block;text-align:center;background:#F4634A;color:white;text-decoration:none;border-radius:13px;padding:13px;font-weight:800;font-size:13px;box-shadow:0 4px 14px rgba(244,99,74,0.28);font-family:\'Rubik\',Arial,sans-serif;">🗺️ נווט למפה</a>' : '') +
     '</div>';
   document.body.appendChild(overlay);
+  _annotateIls(overlay);
 }
 
 function deleteStop(dayIdx, stopIdx) {
@@ -5337,7 +5385,7 @@ function renderRestaurants() {
       '<div style="font-size:12px;color:rgba(30,41,59,0.65);line-height:1.7;margin-bottom:10px;">' + esc(r.desc) + '</div>' +
       '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">' +
         '<div style="background:' + LEVEL_COLORS[lv] + ';border:1px solid ' + LEVEL_BORDER[lv] + ';border-radius:10px;padding:6px 12px;font-size:12px;font-weight:700;color:' + LEVEL_TXT[lv] + ';">' + LEVEL_LABELS[lv] + '</div>' +
-        '<div style="background:rgba(0,0,0,0.05);border-radius:10px;padding:6px 12px;font-size:12px;font-weight:600;color:rgba(30,41,59,0.6);">🧾 ' + esc(r.price) + ' CZK</div>' +
+        '<div style="background:rgba(0,0,0,0.05);border-radius:10px;padding:6px 12px;font-size:12px;font-weight:600;color:rgba(30,41,59,0.6);">🧾 ' + esc(_priceTxt(r.price)) + '</div>' +
         (r.google ? '<div style="background:rgba(254,240,138,0.5);border:1px solid rgba(202,138,4,0.35);border-radius:10px;padding:6px 12px;font-size:12px;font-weight:700;color:#92400E;">⭐ ' + r.google + ' Google</div>' : '') +
         (schedBadge ? '<div style="font-size:11px;color:#065F46;background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.25);border-radius:9px;padding:4px 9px;">' + schedBadge + '</div>' : '') +
       '</div>' +
@@ -6057,7 +6105,7 @@ function showMapNavDialog(p, coords) {
     if (p.desc) infoHtml += '<div style="font-size:12px;color:rgba(30,41,59,0.7);line-height:1.7;margin-bottom:8px;">' + esc(p.desc) + '</div>';
     var chips2 = '';
     if (p.level) chips2 += '<span style="background:' + LEVEL_COLORS[lv] + ';border:1px solid ' + LEVEL_BORDER[lv] + ';border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:' + LEVEL_TXT[lv] + ';">' + LEVEL_LABELS[lv] + '</span> ';
-    if (p.price) chips2 += '<span style="background:rgba(0,0,0,0.05);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:600;color:rgba(30,41,59,0.6);">🧾 ' + esc(p.price) + ' CZK</span> ';
+    if (p.price) chips2 += '<span style="background:rgba(0,0,0,0.05);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:600;color:rgba(30,41,59,0.6);">🧾 ' + esc(_priceTxt(p.price)) + '</span> ';
     if (p.google) chips2 += '<span style="background:rgba(254,240,138,0.5);border:1px solid rgba(202,138,4,0.3);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:#92400E;">⭐ ' + esc(p.google) + ' Google</span>';
     if (chips2) infoHtml += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">' + chips2 + '</div>';
   } else if (p.type === 'dessert') {
@@ -6158,6 +6206,7 @@ function showMapNavDialog(p, coords) {
     '</div>';
 
   document.body.appendChild(overlay);
+  _annotateIls(overlay);
   } catch(e) { console.error('[showMapNavDialog] error for', p && p.name, e); }
 }
 
