@@ -549,7 +549,10 @@ function _resyncLocalDataToCloud() {
   try { if (_hasLocalData('prague_remindersDone') && typeof saveRemindersDoneLocal === 'function') saveRemindersDoneLocal(); } catch (e) { console.warn('resync remindersDone failed', e); }
   try { if (typeof saveSchedules === 'function') saveSchedules(); } catch (e) { console.warn('resync remindersSchedule failed', e); }
   try { if (typeof saveTotalBudget === 'function' && typeof loadTotalBudget === 'function') { var tb = loadTotalBudget(); if (tb) saveTotalBudget(tb); } } catch (e) { console.warn('resync total budget failed', e); }
-  try { if (typeof saveBudget === 'function' && typeof loadBudget === 'function') saveBudget(loadBudget()); } catch (e) { console.warn('resync budget categories failed', e); }
+  // ⚠️ loadBudget() נופל ל-DEFAULT_BUDGET כשאין נתונים מקומיים, ולכן דחיפה
+  // ללא תנאי דרסה את הקטגוריות שהמשתמש ערך בערכי ברירת המחדל (אוכל 3,000).
+  // אותה משפחת באגים של מחיקת "היינו" — resync מעלה למעלה בלבד.
+  try { if (_hasLocalData('prague_budget_v1') && typeof saveBudget === 'function' && typeof loadBudget === 'function') saveBudget(loadBudget()); } catch (e) { console.warn('resync budget categories failed', e); }
 }
 
 function verifyLoginCode() {
@@ -962,7 +965,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-12-e';
+var BUILD_ID = '2026-08-12-f';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
