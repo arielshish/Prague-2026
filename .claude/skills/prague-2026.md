@@ -323,6 +323,22 @@ p.tips.forEach(...)  // ← גורם לקריסה שקטה, dialog לא נפתח
 
 ⚠️ **הכשל שלי**: הוספתי `_hasLocalData` לחמישה מפתחות ו**דילגתי על שתי שורות התקציב באותה פונקציה**. כשמתקנים מחלקת באג — **למנות את כל החברים אחד-אחד ולסמן ✅/❌**, לא "לעבור על הפונקציה" בעין.
 
+## תקציב: הסה״כ נגזר מהקטגוריות (13/08)
+
+היו **שני מספרים בלתי-תלויים** — `manualTotal || catTotal`, והידני גבר. העלאת קטגוריה לא הזיזה את הסה״כ, והסה״כ לא התחלק לקטגוריות.
+
+**עכשיו**: `budgetCatTotal()` הוא מקור האמת. `prague_total_budget` **לא נמחק** — `_syncDerivedTotal()` מעדכן אותו כמראה, בשביל גיליון ה-GAS וקוראים ותיקים.
+
+| פונקציה | תפקיד |
+|----------|-------|
+| `budgetCatTotal(budget)` | סכום הקטגוריות — המספר שמוצג |
+| `_syncDerivedTotal(budget)` | מראה ל-`prague_total_budget` + ענן. **נקרא מתוך `saveBudget()`** — נקודת הכתיבה היחידה לקטגוריות |
+| `_modalCatTotal()` / `_refreshModalTotal()` | סה״כ חי במודל תוך כדי הקלדה (`oninput`) |
+
+⚠️ **`_syncDerivedTotal` פותח ב-`_hasLocalData('prague_budget_v1')`** — בלעדיו זו אותה תקלה בפעם השלישית: מכשיר ריק היה דוחף את סכום `DEFAULT_BUDGET` (11,500) מעל התקציב האמיתי.
+
+⚠️ **מתכנס, לא מהדהד** — דוחפים רק כש-`t !== loadTotalBudget()`; שני מכשירים מחשבים אותו סכום ולכן זה נעצר אחרי דחיפה אחת.
+
 **הרשימה המלאה של הקריאות המוגנות ב-`_resyncLocalDataToCloud`:** `prague_exp_v10` · `prague_days_v1` · `prague_pack_v2` · `prague_visited_v1` · `prague_remindersDone` · `prague_budget_v1` · `saveTotalBudget` (מוגן ב-`if (tb)`) · `saveSchedules` (לא נדרש — כותב `remindersSchedule` בלבד).
 
 ⚠️ **`getDaysState()` נופל ל-`DAYS` הבסיסי** כשאין שמירה מקומית — כלומר בלי המגן, מכשיר חדש דוחף את המסלול המקורי מעל עריכות המשפחה. אותה פצצה, רק שקטה יותר.
