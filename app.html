@@ -981,7 +981,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-13-l';
+var BUILD_ID = '2026-08-13-m';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
@@ -1594,6 +1594,7 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
     <div style="background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.09);border-radius:20px;padding:16px;margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
         <div style="font-size:13px;font-weight:800;color:#1E293B;">📊 תקציב מול בפועל</div>
+        <button id="btnBalanceBudget" onclick="openBalanceDialog()" style="background:#ffffff;border:1px solid rgba(0,0,0,0.10);border-radius:10px;padding:4px 10px;font-size:11px;font-weight:700;color:rgba(30,41,59,0.75);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;margin-left:6px;">⚖️ אזן</button>
         <button id="btnEditBudget" onclick="openBudgetModal()" style="background:#ffffff;border:1px solid rgba(0,0,0,0.10);border-radius:10px;padding:4px 10px;font-size:11px;font-weight:700;color:rgba(30,41,59,0.75);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">✏️ ערוך</button>
       </div>
       <!-- כרטיס סיכום גדול -->
@@ -1634,6 +1635,22 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
     </div>
     <div id="expenseList" style="display:grid;gap:10px;"><p style="color:rgba(30,41,59,0.35);text-align:center;padding:28px 0;font-size:13px;">טוען...</p></div>
   </section>
+
+  <!-- מודל איזון תקציב -->
+  <div id="balanceModal" style="display:none;position:fixed;inset:0;z-index:85;align-items:flex-end;justify-content:center;">
+    <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);" onclick="closeBalanceDialog()"></div>
+    <div style="position:relative;background:#ffffff;border-radius:28px 28px 0 0;padding:22px 20px 32px;width:100%;max-width:min(680px,100%);z-index:1;max-height:85vh;overflow-y:auto;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <h2 style="margin:0;font-size:17px;font-weight:900;color:#1E293B;">⚖️ איזון תקציב</h2>
+        <button onclick="closeBalanceDialog()" style="background:#ffffff;border:1px solid rgba(0,0,0,0.10);border-radius:10px;padding:6px 13px;font-size:13px;font-weight:700;color:rgba(30,41,59,0.65);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">ביטול</button>
+      </div>
+      <div id="balanceBody" style="margin-bottom:16px;"></div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="closeBalanceDialog()" style="flex:1;background:#ffffff;border:1px solid rgba(0,0,0,0.10);border-radius:13px;padding:14px;font-size:14px;font-weight:700;color:rgba(30,41,59,0.65);cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">ביטול</button>
+        <button onclick="applyBalance()" style="flex:2;background:#F4634A;color:white;border:0;border-radius:13px;padding:14px;font-size:15px;font-weight:900;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">⚖️ אשר איזון</button>
+      </div>
+    </div>
+  </div>
 
   <!-- מודל עריכת תקציב -->
   <div id="budgetModal" style="display:none;position:fixed;inset:0;z-index:80;align-items:flex-end;justify-content:center;">
@@ -7284,7 +7301,9 @@ function renderBudget() {
     return '<div>' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
         '<div style="font-size:12px;font-weight:700;color:rgba(30,41,59,0.85);">' + b.cat + '</div>' +
-        '<div style="font-size:11px;color:rgba(30,41,59,0.5);">₪' + pct.toLocaleString('he-IL') + ' / ₪' + (Number(b.ils)||0).toLocaleString('he-IL') + '</div>' +
+        // ⚠️ `<bdi>` חובה — `₪2,198 / ₪3,000` בתוך שורה עברית נקרא הפוך, ואי
+        // אפשר לדעת מה בפועל ומה תקציב. תווית מפורשת כי גם סדר נכון לא מסביר.
+        '<div style="font-size:11px;color:rgba(30,41,59,0.5);white-space:nowrap;">בפועל <bdi style="unicode-bidi:isolate;direction:ltr;font-weight:700;color:rgba(30,41,59,0.8);">₪' + pct.toLocaleString('he-IL') + '</bdi> · מתוך <bdi style="unicode-bidi:isolate;direction:ltr;">₪' + (Number(b.ils)||0).toLocaleString('he-IL') + '</bdi></div>' +
       '</div>' +
       '<div style="background:#ffffff;border-radius:6px;height:6px;overflow:hidden;">' +
         '<div style="width:' + Math.round(ratio*100) + '%;height:100%;background:' + color + ';border-radius:6px;transition:width 0.4s;"></div>' +
@@ -7322,6 +7341,71 @@ function _modalCatTotal() {
 function _refreshModalTotal() {
   var ti = qs('budgetTotalInput');
   if (ti) ti.value = _modalCatTotal();
+}
+
+// ── כפתור "אזן" (13/08) ──
+// המשתמש ביקש איזון בין הקטגוריות. ⚠️ **ההכרעה: לא אוטומטי.** איזון אוטומטי
+// משכתב בשקט מספרים שהמשתמש קבע בכוונה — וזה בדיוק סוג הכתיבה שמחקה השבוע
+// סימוני "היינו" ותקציב. כאן הוא רואה בדיוק מה יזוז, ולוחץ בעצמו.
+// **הסה״כ לא משתנה** — זו העברה בין קטגוריות, לא הגדלה.
+function computeBalance(budget, actualMap) {
+  var over = [], slack = [], needTot = 0, slackTot = 0;
+  budget.forEach(function(b, i) {
+    var act = actualMap[b.cat] || 0, plan = Number(b.ils) || 0;
+    if (act > plan) { over.push({ i: i, cat: b.cat, need: act - plan }); needTot += act - plan; }
+    else if (plan > act) { slack.push({ i: i, cat: b.cat, free: plan - act }); slackTot += plan - act; }
+  });
+  if (!over.length) return { ok: false, reason: 'אין חריגה — כל הקטגוריות בתוך התקציב' };
+  if (!slackTot) return { ok: false, reason: 'אין עודף באף קטגוריה שאפשר להעביר ממנה' };
+  // לוקחים מכל קטגוריה עם עודף **ביחס לגודל העודף שלה**, ולא בחלוקה שווה —
+  // כך קטגוריה שכמעט מוצתה לא נשאבת עד הסוף.
+  var take = Math.min(needTot, slackTot);
+  var moves = [], taken = 0;
+  slack.forEach(function(sl, k) {
+    var amt = (k === slack.length - 1) ? (take - taken) : Math.round(take * (sl.free / slackTot));
+    amt = Math.min(amt, sl.free);
+    if (amt > 0) { moves.push({ i: sl.i, cat: sl.cat, delta: -amt }); taken += amt; }
+  });
+  var given = 0;
+  over.forEach(function(ov, k) {
+    var amt = (k === over.length - 1) ? (taken - given) : Math.round(taken * (ov.need / needTot));
+    if (amt > 0) { moves.push({ i: ov.i, cat: ov.cat, delta: amt }); given += amt; }
+  });
+  return { ok: true, moves: moves, covered: taken, need: needTot };
+}
+
+function openBalanceDialog() {
+  var budget = loadBudget();
+  var r = computeBalance(budget, catActualMap(budget));
+  if (!r.ok) { toast('⚖️ ' + r.reason); return; }
+  var rows = r.moves.map(function(m) {
+    var up = m.delta > 0;
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(0,0,0,0.06);font-size:13px;">' +
+      '<div style="font-weight:600;color:#1E293B;">' + esc(m.cat) + '</div>' +
+      '<bdi style="unicode-bidi:isolate;direction:ltr;font-weight:800;color:' + (up ? '#166534' : '#991B1B') + ';">' +
+        (up ? '+' : '−') + '₪' + Math.abs(m.delta).toLocaleString('he-IL') + '</bdi></div>';
+  }).join('');
+  var short = r.need - r.covered;
+  var el = qs('balanceBody');
+  if (el) el.innerHTML =
+    '<div style="font-size:13px;color:rgba(30,41,59,0.7);margin-bottom:10px;line-height:1.5;">' +
+      'מעביר <b><bdi style="unicode-bidi:isolate;direction:ltr;">₪' + r.covered.toLocaleString('he-IL') + '</bdi></b> ' +
+      'מקטגוריות עם עודף אל אלה שחרגו. <b>הסה״כ לא משתנה.</b>' +
+      (short > 0 ? '<br><span style="color:#991B1B;">⚠️ חסרים עוד <bdi style="unicode-bidi:isolate;direction:ltr;">₪' + short.toLocaleString('he-IL') + '</bdi> שאין מהיכן לקחת.</span>' : '') +
+    '</div>' + rows;
+  window._balanceMoves = r.moves;
+  var m = qs('balanceModal'); if (m) m.style.display = 'flex';
+}
+function closeBalanceDialog() { var m = qs('balanceModal'); if (m) m.style.display = 'none'; }
+function applyBalance() {
+  var moves = window._balanceMoves || [];
+  if (!moves.length) { closeBalanceDialog(); return; }
+  var budget = loadBudget();
+  moves.forEach(function(m) { if (budget[m.i]) budget[m.i].ils = (Number(budget[m.i].ils) || 0) + m.delta; });
+  saveBudget(budget);          // כותב מקומית **וגם** דוחף לענן ומסנכרן את הסה״כ
+  closeBalanceDialog();
+  renderExpenses();
+  toast('⚖️ התקציב אוזן');
 }
 
 function populateBudgetModal(budget, totalVal) {
