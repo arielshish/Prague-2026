@@ -981,7 +981,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-13-d';
+var BUILD_ID = '2026-08-13-e';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
@@ -7792,7 +7792,7 @@ function exportCsv() {
   var items = EXPENSES.slice().sort(function(a, b) { return _expTs(a) - _expTs(b); });
 
   var totC = 0, totI = 0;
-  var byCat = {}, catOrder = [], byDay = {}, dayOrder = [];
+  var byCat = {}, catOrder = [], byDay = {}, dayOrder = [], byCatDay = {};
   items.forEach(function(e) {
     var c = Number(e.czk) || 0, i = Number(e.ils) || 0;
     var cat = _expCat(e.name), dp = _expDateParts(e), dk = dp.iso || 'ללא תאריך';
@@ -7801,8 +7801,15 @@ function exportCsv() {
     byCat[cat].czk += c; byCat[cat].ils += i; byCat[cat].rows.push({ e: e, c: c, i: i, dp: dp });
     if (!byDay[dk]) { byDay[dk] = { czk: 0, ils: 0, n: 0, day: dp.day }; dayOrder.push(dk); }
     byDay[dk].czk += c; byDay[dk].ils += i; byDay[dk].n++;
+    // הצלבה קטגוריה × יום — התא שממנו נבנית המטריצה
+    if (!byCatDay[cat]) byCatDay[cat] = {};
+    if (!byCatDay[cat][dk]) byCatDay[cat][dk] = { czk: 0, ils: 0 };
+    byCatDay[cat][dk].czk += c; byCatDay[cat][dk].ils += i;
   });
   catOrder.sort(function(a, b) { return byCat[b].czk - byCat[a].czk; });
+  // ⚠️ רוחב הקובץ נקבע רק כאן — אחרי שידוע כמה ימים יש בפועל. `line` קורא את
+  // COLS בזמן הקריאה, וכל השורות נבנות אחרי השורה הזו, ולכן ההרחבה תקפה לכולן.
+  COLS = Math.max(8, dayOrder.length + 2);
 
   var first = items.length ? _expDateParts(items[0]).iso : '';
   var last  = items.length ? _expDateParts(items[items.length - 1]).iso : '';
@@ -7840,6 +7847,31 @@ function exportCsv() {
   });
   rows.push(line(['סה״כ', '', '', '', items.length, totC, totI, '100%']));
   rows.push(blank);
+
+  // ── מטריצת קטגוריה × יום ──
+  // שורה לכל קטגוריה, עמודה לכל יום, סה״כ בשני הכיוונים. זו הטבלה שעונה על
+  // "כמה הוצאנו על אוכל ביום 3" בלי לסרוק את הפירוט, ואפשר להדביק אותה
+  // ישירות לגרף באקסל. שתי מטריצות — CZK ואז ILS — כדי שכל תא יישאר מספר
+  // גולמי אחד וניתן לסיכום, ולא מחרוזת עם שתי מטבעות.
+  var matrix = function(cur) {
+    rows.push(line(['מטריצה: קטגוריה × יום (' + cur.toUpperCase() + ')']));
+    rows.push(line(['קטגוריה'].concat(dayOrder.map(function(k) {
+      return 'יום ' + (byDay[k].day != null ? byDay[k].day : '?') + ' · ' + k.slice(5);
+    })).concat(['סה״כ'])));
+    catOrder.forEach(function(c) {
+      rows.push(line([c].concat(dayOrder.map(function(k) {
+        var cell = (byCatDay[c] || {})[k];
+        // תא ריק ולא 0 — "לא הוצאנו כאן" שונה מ"הוצאנו אפס", וגרף באקסל
+        // מדלג על ריק במקום לצייר קו לרצפה.
+        return cell ? cell[cur] : '';
+      })).concat([byCat[c][cur]])));
+    });
+    rows.push(line(['סה״כ יומי'].concat(dayOrder.map(function(k) { return byDay[k][cur]; }))
+                                 .concat([cur === 'czk' ? totC : totI])));
+    rows.push(blank);
+  };
+  matrix('czk');
+  matrix('ils');
 
   // ── פירוט מלא, מחולק לקטגוריות, עם סה״כ לכל קטגוריה ──
   rows.push(line(['פירוט לפי קטגוריה']));
