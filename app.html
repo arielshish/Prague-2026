@@ -965,7 +965,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-12-f';
+var BUILD_ID = '2026-08-13-a';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
@@ -1628,7 +1628,8 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
       </div>
       <div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);border-radius:14px;padding:14px;margin-bottom:16px;">
         <div style="font-size:11px;font-weight:700;color:#B45309;margin-bottom:8px;letter-spacing:0.5px;">💰 תקציב כולל לטיול (₪)</div>
-        <input id="budgetTotalInput" type="number" placeholder="לדוג׳ 15000" style="width:100%;background:#ffffff;border:1px solid rgba(245,158,11,0.35);border-radius:10px;padding:11px 13px;font-size:18px;font-weight:800;color:#B45309;font-family:\'Rubik\',Arial,sans-serif;box-sizing:border-box;text-align:center;">
+        <input id="budgetTotalInput" type="number" readonly tabindex="-1" style="width:100%;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.35);border-radius:10px;padding:11px 13px;font-size:18px;font-weight:800;color:#B45309;font-family:\'Rubik\',Arial,sans-serif;box-sizing:border-box;text-align:center;cursor:default;">
+        <div style="font-size:10px;color:#B45309;opacity:0.75;margin-top:7px;text-align:center;">🔒 מחושב אוטומטית מסכום הקטגוריות למטה</div>
       </div>
       <div style="font-size:11px;font-weight:700;color:rgba(30,41,59,0.55);margin-bottom:10px;letter-spacing:0.5px;">📊 פירוט לפי קטגוריה (₪)</div>
       <div id="budgetInputs" style="display:grid;gap:10px;margin-bottom:16px;"></div>
@@ -6930,6 +6931,9 @@ function initRealtimeSync() {
           var localBudget = localStorage.getItem('prague_budget_v1');
           if (d.budget_categories !== localBudget) {
             localStorage.setItem('prague_budget_v1', d.budget_categories);
+            // קטגוריות השתנו במכשיר אחר → הסה״כ הנגזר משתנה איתן.
+            // מתכנס: שני המכשירים מחשבים את אותו סכום, ולכן אין הד אינסופי.
+            try { _syncDerivedTotal(); } catch(e) {}
             renderExpenses();
             showSyncBadge('💰');
           }
@@ -7015,6 +7019,22 @@ function loadBudget() {
 function loadTotalBudget() {
   try { return Number(localStorage.getItem('prague_total_budget') || '0') || 0; } catch(e) { return window._memTotalBudget || 0; }
 }
+// סכום הקטגוריות — מקור האמת היחיד לסה״כ התקציב (13/08).
+// קודם היה `manualTotal || catTotal`, כלומר מספר ידני נפרד שגבר על הקטגוריות:
+// העלאת קטגוריה לא הזיזה את הסה״כ, והסה״כ לא התחלק לקטגוריות. שני מספרים שיכלו לסתור.
+function budgetCatTotal(budget) {
+  return (budget || loadBudget()).reduce(function(s, b) { return s + (Number(b.ils) || 0); }, 0);
+}
+// `prague_total_budget` / `appdata/main.total_budget` **לא נמחקים** — הם ממשיכים
+// להתעדכן כמראה של הסכום הנגזר, כדי שגיליון ה-GAS וכל קורא ותיק יראו את אותו מספר.
+function _syncDerivedTotal(budget) {
+  // ⚠️ אותה מלכודת של resync (ראה CLAUDE.md): מכשיר בלי תקציב שמור מקבל מ-loadBudget
+  // את DEFAULT_BUDGET, ודחיפת הסכום שלו הייתה דורסת את התקציב האמיתי בענן.
+  if (!_hasLocalData('prague_budget_v1')) return 0;
+  var t = budgetCatTotal(budget);
+  if (t !== loadTotalBudget()) saveTotalBudget(t);
+  return t;
+}
 function saveTotalBudget(val) {
   localStorage.setItem('prague_total_budget', String(val));
   if (isGas()) {
@@ -7055,6 +7075,9 @@ function syncBudgetFromFirebase(cb) {
 }
 function saveBudget(b) {
   localStorage.setItem('prague_budget_v1', JSON.stringify(b));
+  // כל שינוי בקטגוריות (הוספה, מחיקה, עריכה) גורר מיד את הסה״כ הנגזר —
+  // זו נקודת הכתיבה היחידה לקטגוריות, ולכן אין מסלול שמדלג על העדכון.
+  try { _syncDerivedTotal(b); } catch(e) {}
   if (isGas()) {
     google.script.run
       .withFailureHandler(function() {})
@@ -7131,9 +7154,8 @@ function renderBudget() {
   var budget = loadBudget();
   var totalActual = 0;
   EXPENSES.forEach(function(e) { totalActual += Number(e.ils) || 0; });
-  var catTotal = budget.reduce(function(s,b) { return s + (Number(b.ils)||0); }, 0);
-  var manualTotal = loadTotalBudget();
-  var totalBudget = manualTotal || catTotal;
+  // הסה״כ נגזר מהקטגוריות ומתעדכן מאליו בכל עריכה — אין יותר מספר ידני שגובר.
+  var totalBudget = budgetCatTotal(budget);
   var actualMap = catActualMap(budget);
 
   var rows = qs('budgetRows');
@@ -7171,19 +7193,34 @@ function renderBudget() {
   if (pctEl) { pctEl.textContent = pct + '% נוצל'; pctEl.style.color = pct >= 90 ? '#EF4444' : pct >= 70 ? '#D97706' : 'rgba(30,41,59,0.6)'; }
 }
 
+// מסכם את מה שמוקלד **כרגע** בשדות המודל, כדי שהסה״כ יזוז תוך כדי הקלדה
+// ולא רק אחרי שמירה. אותה נוסחה שתישמר בפועל — מה שרואים הוא מה שנשמר.
+function _modalCatTotal() {
+  var t = 0;
+  document.querySelectorAll('#budgetInputs input[data-field="ils"]').forEach(function(inp) {
+    t += Number(inp.value) || 0;
+  });
+  return t;
+}
+function _refreshModalTotal() {
+  var ti = qs('budgetTotalInput');
+  if (ti) ti.value = _modalCatTotal();
+}
+
 function populateBudgetModal(budget, totalVal) {
   budget = budget || loadBudget();
-  totalVal = (totalVal != null) ? totalVal : loadTotalBudget();
-  var ti = qs('budgetTotalInput'); if (ti) ti.value = totalVal || '';
   var inp = qs('budgetInputs');
-  if (!inp) return;
+  if (!inp) { _refreshModalTotal(); return; }
   inp.innerHTML = budget.map(function(b, i) {
     return '<div style="display:flex;gap:8px;align-items:center;">' +
       '<input data-bi="' + i + '" data-field="cat" value="' + b.cat + '" style="flex:1.5;background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:10px;padding:10px 12px;font-size:13px;color:#1E293B;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;">' +
-      '<input data-bi="' + i + '" data-field="ils" type="number" value="' + (b.ils||0) + '" placeholder="₪" style="flex:0.8;background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:10px;padding:10px 12px;font-size:13px;color:#1E293B;font-family:\'Rubik\',Arial,sans-serif;">' +
+      '<input data-bi="' + i + '" data-field="ils" type="number" value="' + (b.ils||0) + '" placeholder="₪" oninput="_refreshModalTotal()" style="flex:0.8;background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:10px;padding:10px 12px;font-size:13px;color:#1E293B;font-family:\'Rubik\',Arial,sans-serif;">' +
       '<button onclick="removeBudgetRow(' + i + ')" style="background:rgba(239,68,68,0.15);border:none;border-radius:8px;padding:8px 10px;color:#991B1B;font-size:14px;cursor:pointer;">🗑</button>' +
     '</div>';
   }).join('');
+  // הפרמטר totalVal נשמר בחתימה לתאימות (openBudgetModal ב-GAS מעביר אותו),
+  // אבל השדה כבר לא ניתן להקלדה — הוא תמיד סכום הקטגוריות שמוצגות.
+  _refreshModalTotal();
 }
 
 var _budgetModalOpenTime = 0;
@@ -7228,7 +7265,6 @@ function removeBudgetRow(i) {
 function closeBudgetModal() { var m = qs('budgetModal'); if (m) m.style.display = 'none'; }
 
 function saveBudgetFromModal() {
-  var totalVal = Number((qs('budgetTotalInput') || {}).value || 0) || 0;
   var inputs = document.querySelectorAll('#budgetInputs input');
   var map = {};
   inputs.forEach(function(inp) {
@@ -7240,6 +7276,9 @@ function saveBudgetFromModal() {
   var budget = Object.keys(map).sort(function(a,b){return a-b;}).map(function(i) {
     return {cat: map[i].cat || '', ils: Number(map[i].ils) || 0};
   });
+  // הסה״כ נגזר מהקטגוריות שנשמרות ממש עכשיו — לא נקרא משדה שהמשתמש יכול היה
+  // לערוך בנפרד, ולכן אין דרך שהשניים ייפרדו.
+  var totalVal = budgetCatTotal(budget);
 
   // סגור קודם — לפני כל קוד שעלול לזרוק שגיאה
   closeBudgetModal();
