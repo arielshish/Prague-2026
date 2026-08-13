@@ -981,7 +981,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-13-m';
+var BUILD_ID = '2026-08-13-n';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
@@ -8194,15 +8194,10 @@ function exportHtmlReport() {
   var pct = function(n, t) { return t ? Math.round(n / t * 100) : 0; };
 
   // ── מפת חום: גוון אחד, בהיר→כהה. הבהיר ביותר נסוג אל הרקע = "קרוב לאפס".
-  var RAMP = ['#cde2fb','#b7d3f6','#9ec5f4','#86b6ef','#6da7ec','#5598e7','#3987e5','#2a78d6','#256abf','#1c5cab','#184f95','#104281'];
   var cellBg = function(v) {
     if (!v) return 'transparent';
-    var idx = Math.min(RAMP.length - 1, Math.max(0, Math.round(v / (maxCell || 1) * (RAMP.length - 1))));
-    return RAMP[idx];
-  };
-  var cellInk = function(v) {
-    if (!v) return 'var(--muted)';
-    return (v / (maxCell || 1)) > 0.55 ? '#ffffff' : '#0b0b0b';
+    var a = Math.min(0.34, 0.05 + (v / (maxCell || 1)) * 0.29);
+    return 'rgba(42,120,214,' + (Math.round(a * 100) / 100) + ')';
   };
 
   var h = [];
@@ -8210,8 +8205,8 @@ function exportHtmlReport() {
   h.push('<meta name="viewport" content="width=device-width,initial-scale=1">');
   h.push('<title>דוח הוצאות — פראג 2026</title><style>');
   h.push(':root{--bg:#F7F3EE;--card:#fff;--ink:#141C19;--muted:#5C6B64;--rule:#E3DDD5;--accent:#2a78d6;' +
-         '--good:#0ca30c;--warn:#fab219;--crit:#d03b3b;}');
-  h.push('@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12100E;--card:#1C1A17;--ink:#EFEAE3;--muted:#9C948A;--rule:#2C2823;--accent:#3987e5;}}');
+         '--good:#0ca30c;--warn:#fab219;--crit:#d03b3b;--zebra:rgba(20,28,25,.028);}');
+  h.push('@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12100E;--card:#1C1A17;--ink:#EFEAE3;--muted:#9C948A;--rule:#2C2823;--accent:#3987e5;--zebra:rgba(255,255,255,.04);}}');
   h.push('*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:"Heebo","Rubik","Arial Hebrew",system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.5;-webkit-text-size-adjust:100%}');
   h.push('.wrap{max-width:46rem;margin:0 auto;padding:1.5rem 1rem 3rem}');
   h.push('h1{font-size:1.6rem;margin:0 0 .2rem;font-weight:800;letter-spacing:-.01em}');
@@ -8247,10 +8242,20 @@ function exportHtmlReport() {
   h.push('th{color:var(--muted);font-weight:600;font-size:.72rem}');
   h.push('td.n,th.n{font-variant-numeric:tabular-nums;text-align:left;white-space:nowrap}');
   h.push('.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}');
-  h.push('.hm td{text-align:center;font-variant-numeric:tabular-nums;font-size:.78rem;padding:.42rem .3rem;border:2px solid var(--card);border-radius:.25rem}');
-  h.push('.hm th{white-space:nowrap;font-size:.68rem}');
-  h.push('.hm td:first-child,.hm th:first-child{text-align:right;font-weight:600;font-size:.8rem;color:var(--ink)}');
-  h.push('.hm .tot{text-align:left;font-variant-numeric:tabular-nums;border-inline-start:1px solid var(--rule);padding-inline-start:.55rem}');
+  // ⚠️ **מילוי מלא בכל תא הפך את הטבלה לקיר מלבנים.** עכשיו הרקע הוא רמז
+  // עדין בלבד (שקיפות נמוכה), הטקסט תמיד כהה וקריא, והיום היקר בכל שורה
+  // מודגש. העין קופצת למה שחשוב במקום להיאבק בכל התאים.
+  h.push('.hm{border-collapse:separate;border-spacing:0}');
+  h.push('.hm td{text-align:center;font-variant-numeric:tabular-nums;font-size:.82rem;padding:.62rem .45rem;color:var(--ink)}');
+  h.push('.hm tbody tr:nth-child(odd) td{background-image:linear-gradient(var(--zebra),var(--zebra))}');
+  h.push('.hm th{white-space:nowrap;font-size:.72rem;padding:.5rem .45rem;line-height:1.25;border-bottom:1px solid var(--rule)}');
+  h.push('.hm th b{display:block;font-size:.82rem;color:var(--ink)}');
+  h.push('.hm td:first-child,.hm th:first-child{text-align:right;font-weight:700;font-size:.84rem;padding-inline-end:.7rem}');
+  h.push('.hm .tot{text-align:left;font-weight:800;border-inline-start:2px solid var(--rule);border-inline-end:2px solid var(--rule);padding-inline:.6rem}');
+  h.push('.hm .peak{font-weight:800}');
+  h.push('.hm .zero{color:var(--muted);opacity:.5}');
+  h.push('.hm tfoot td{border-top:2px solid var(--rule);font-weight:800;padding-top:.6rem;background:none!important}');
+  h.push('.hm tfoot td:first-child{font-size:.84rem}');
   h.push('details{background:var(--card);border:1px solid var(--rule);border-radius:.8rem;padding:.7rem 1rem;margin-bottom:.55rem}');
   h.push('summary{cursor:pointer;font-weight:700;font-size:.92rem;display:flex;justify-content:space-between;gap:.6rem;align-items:baseline}');
   h.push('summary::-webkit-details-marker{display:none}');
@@ -8260,8 +8265,7 @@ function exportHtmlReport() {
   h.push('details{padding:.85rem 1rem}');
   h.push('details[open] summary{margin-bottom:.6rem;padding-bottom:.55rem;border-bottom:1px solid var(--rule)}');
   h.push('footer{margin-top:2.4rem;padding-top:1rem;border-top:1px solid var(--rule);color:var(--muted);font-size:.76rem}');
-  h.push('.legend{display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:var(--muted);margin-top:.5rem}');
-  h.push('.legend i{display:block;width:1.1rem;height:.6rem;border-radius:.15rem}');
+  h.push('.legend{font-size:.74rem;color:var(--muted);margin-top:.7rem;line-height:1.5}');
   h.push('@media print{body{background:#fff}.card,.hero,details{break-inside:avoid;border-color:#ccc}details{open:open}h2{page-break-after:avoid}}');
   h.push('</style></head><body><div class="wrap">');
 
@@ -8309,24 +8313,27 @@ function exportHtmlReport() {
 
   // ── מפת חום: קטגוריה × יום ──
   h.push('<h2>לפי קטגוריה ויום (CZK)</h2><div class="card"><div class="scroll"><table class="hm">');
-  h.push('<tr><th>קטגוריה</th><th class="tot">סה״כ</th>' + dayOrder.map(function(k) {
-    return '<th>' + _h(dayLabel(k)) + '<br><span style="font-weight:400;opacity:.7">' + _h(k.slice(5)) + '</span></th>';
-  }).join('') + '</tr>');
+  h.push('<thead><tr><th>קטגוריה</th><th class="tot">סה״כ</th>' + dayOrder.map(function(k) {
+    return '<th><b>' + _h(dayLabel(k)) + '</b><span style="color:var(--muted)">' + _h(k.slice(5)) + '</span></th>';
+  }).join('') + '</tr></thead><tbody>');
   catOrder.forEach(function(c) {
-    h.push('<tr><td>' + _h(c) + '</td><td class="tot"><b>' + _nf((byCat[c] || {}).czk || 0) + '</b></td>' +
+    // היום היקר בשורה — מודגש, כדי שיהיה אפשר לסרוק בלי לקרוא כל תא
+    var peak = 0;
+    dayOrder.forEach(function(k) { peak = Math.max(peak, (byCatDay[c] || {})[k] || 0); });
+    h.push('<tr><td>' + _h(c) + '</td><td class="tot"><bdi>' + _nf((byCat[c] || {}).czk || 0) + '</bdi></td>' +
       dayOrder.map(function(k) {
         var v = (byCatDay[c] || {})[k] || 0;
-        return '<td style="background:' + cellBg(v) + ';color:' + cellInk(v) + '" title="' + _h(c + ' · ' + dayLabel(k)) +
-               '">' + (v ? _nf(v) : '—') + '</td>';
+        if (!v) return '<td class="zero">—</td>';
+        return '<td class="' + (v === peak ? 'peak' : '') + '" style="background-color:' + cellBg(v) + '" title="' +
+               _h(c + ' · ' + dayLabel(k)) + '"><bdi>' + _nf(v) + '</bdi></td>';
       }).join('') + '</tr>');
   });
-  h.push('<tr><td><b>סה״כ יומי</b></td><td class="tot"><b>' + _nf(totC) + '</b></td>' + dayOrder.map(function(k) {
-    return '<td><b>' + _nf(byDay[k].czk) + '</b></td>';
-  }).join('') + '</tr>');
+  h.push('</tbody><tfoot><tr><td>סה״כ יומי</td><td class="tot"><bdi>' + _nf(totC) + '</bdi></td>' +
+    dayOrder.map(function(k) { return '<td><bdi>' + _nf(byDay[k].czk) + '</bdi></td>'; }).join('') + '</tr></tfoot>');
   h.push('</table></div>');
-  h.push('<div class="legend"><span>נמוך</span><i style="background:' + RAMP[1] + '"></i><i style="background:' +
-         RAMP[5] + '"></i><i style="background:' + RAMP[9] + '"></i><i style="background:' + RAMP[11] +
-         '"></i><span>גבוה · המספרים בכל תא</span></div></div>');
+  h.push('<div class="legend">' +
+    (dayOrder.length > 3 ? '<b>↔ הטבלה נגללת לצדדים</b> — יש בה ' + dayOrder.length + ' ימים.<br>' : '') +
+    'ככל שהתא כחול יותר — הוצאנו שם יותר. <b>המספר המודגש בכל שורה</b> הוא היום היקר ביותר באותה קטגוריה.</div></div>');
 
   // ── הוצאה יומית ──
   h.push('<h2>הוצאה יומית</h2><div class="card">');
