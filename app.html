@@ -981,7 +981,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-13-k';
+var BUILD_ID = '2026-08-13-l';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
@@ -8142,6 +8142,19 @@ function exportHtmlReport() {
   h.push('.bar>i{display:block;height:100%;border-radius:.25rem}');
   h.push('.crow{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;font-size:.88rem}');
   h.push('.crow .n{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.82rem;white-space:nowrap}');
+  // ⚠️ **בידוד כיווניות.** `₪2,198 / ₪3,000` בתוך שורה עברית נקרא הפוך —
+  // המספרים הם LTR בתוך RTL, והדפדפן מסדר אותם מחדש. `bdi` + `dir=ltr`
+  // מקבע כל סכום כיחידה אחת, ומונע את ההיפוך שהפך את הדוח לבלתי-קריא.
+  h.push('bdi{unicode-bidi:isolate;direction:ltr;font-variant-numeric:tabular-nums}');
+  // בלוק קטגוריה: שם+סטטוס בשורה, מספרים בשורה נפרדת עם תוויות, ואז הפס.
+  h.push('.cat{padding:.85rem 0;border-bottom:1px solid var(--rule)}');
+  h.push('.cat:first-child{padding-top:.15rem}.cat:last-child{border-bottom:0;padding-bottom:.15rem}');
+  h.push('.cat .hd{display:flex;justify-content:space-between;align-items:center;gap:.6rem;margin-bottom:.5rem}');
+  h.push('.cat .nm{font-weight:700;font-size:.95rem;line-height:1.3}');
+  h.push('.cat .fig{display:flex;gap:1.4rem;align-items:baseline;margin-bottom:.45rem;flex-wrap:wrap}');
+  h.push('.cat .fig div{font-size:.78rem;color:var(--muted)}');
+  h.push('.cat .fig b{display:block;font-size:1rem;color:var(--ink);font-weight:800;margin-top:.1rem}');
+  h.push('.cat .bar{height:.55rem}');
   h.push('.tag{display:inline-block;font-size:.68rem;font-weight:700;padding:.08rem .38rem;border-radius:.28rem;border:1px solid currentColor;margin-inline-start:.3rem;white-space:nowrap}');
   h.push('table{width:100%;border-collapse:collapse;font-size:.84rem}');
   h.push('th,td{padding:.4rem .35rem;text-align:right;border-bottom:1px solid var(--rule)}');
@@ -8157,7 +8170,11 @@ function exportHtmlReport() {
   h.push('details{background:var(--card);border:1px solid var(--rule);border-radius:.8rem;padding:.7rem 1rem;margin-bottom:.55rem}');
   h.push('summary{cursor:pointer;font-weight:700;font-size:.92rem;display:flex;justify-content:space-between;gap:.6rem;align-items:baseline}');
   h.push('summary::-webkit-details-marker{display:none}');
-  h.push('summary .n{font-variant-numeric:tabular-nums;color:var(--muted);font-weight:600;font-size:.82rem}');
+  h.push('summary .n{font-variant-numeric:tabular-nums;color:var(--muted);font-weight:600;font-size:.82rem;white-space:nowrap}');
+  h.push('.sname{font-weight:700;font-size:.95rem;line-height:1.3}');
+  h.push('.sumline{font-size:.82rem;color:var(--muted);margin-top:.22rem;font-weight:600}');
+  h.push('details{padding:.85rem 1rem}');
+  h.push('details[open] summary{margin-bottom:.6rem;padding-bottom:.55rem;border-bottom:1px solid var(--rule)}');
   h.push('footer{margin-top:2.4rem;padding-top:1rem;border-top:1px solid var(--rule);color:var(--muted);font-size:.76rem}');
   h.push('.legend{display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:var(--muted);margin-top:.5rem}');
   h.push('.legend i{display:block;width:1.1rem;height:.6rem;border-radius:.15rem}');
@@ -8171,28 +8188,37 @@ function exportHtmlReport() {
 
   // ── מספרי כותרת ──
   h.push('<div class="heroRow">');
-  h.push('<div class="hero"><div class="k">סה״כ בפועל</div><div class="v">₪' + _nf(totI) + '</div>' +
-         '<div class="k" style="margin-top:.2rem;font-weight:400">' + _nf(totC) + ' CZK</div></div>');
+  h.push('<div class="hero"><div class="k">סה״כ בפועל</div><div class="v"><bdi>₪' + _nf(totI) + '</bdi></div>' +
+         '<div class="k" style="margin-top:.2rem;font-weight:400"><bdi>' + _nf(totC) + ' CZK</bdi></div></div>');
   var remain = budTotal - totI, over = remain < 0;
   h.push('<div class="hero"><div class="k">' + (over ? 'חריגה' : 'נותר מהתקציב') + '</div><div class="v" style="color:' +
-         (over ? 'var(--crit)' : 'var(--good)') + '">₪' + _nf(Math.abs(remain)) + '</div>' +
-         '<div class="k" style="margin-top:.2rem;font-weight:400">מתוך ₪' + _nf(budTotal) + '</div></div>');
+         (over ? 'var(--crit)' : 'var(--good)') + '"><bdi>₪' + _nf(Math.abs(remain)) + '</bdi></div>' +
+         '<div class="k" style="margin-top:.2rem;font-weight:400">מתוך <bdi>₪' + _nf(budTotal) + '</bdi></div></div>');
   h.push('</div>');
 
   // ── תקציב מול בפועל, לפי הקטגוריות של המשתמש ──
   // ⚠️ צבע הסטטוס אף פעם לא לבד — לצידו תווית מילולית, כי שני מהגוונים
   // יושבים מתחת ל-3:1 על רקע בהיר.
   h.push('<h2>תקציב מול בפועל</h2><div class="card">');
-  budget.forEach(function(b, bi) {
+  budget.forEach(function(b) {
     var act = (byCat[b.cat] || {}).ils || 0, plan = Number(b.ils) || 0;
+    var actC = (byCat[b.cat] || {}).czk || 0;
     var r = plan > 0 ? act / plan : (act ? 1 : 0);
     var col = r >= 1 ? 'var(--crit)' : r >= 0.85 ? 'var(--warn)' : 'var(--good)';
     var lbl = r >= 1 ? '⚠️ חריגה' : r >= 0.85 ? '● קרוב לתקרה' : '✓ בתקציב';
-    h.push('<div style="margin-bottom:' + (bi === budget.length - 1 ? '0' : '.75rem') + '">' +
-      '<div class="crow"><div>' + _h(b.cat) +
+    var left = plan - act;
+    h.push('<div class="cat">' +
+      '<div class="hd"><div class="nm">' + _h(b.cat) + '</div>' +
         '<span class="tag" style="color:' + col + '">' + lbl + '</span></div>' +
-      '<div class="n">₪' + _nf(act) + ' / ₪' + _nf(plan) + '</div></div>' +
+      '<div class="fig">' +
+        '<div>בפועל<b><bdi>₪' + _nf(act) + '</bdi></b></div>' +
+        '<div>מתוך<b><bdi>₪' + _nf(plan) + '</bdi></b></div>' +
+        '<div>' + (left < 0 ? 'חריגה' : 'נותר') + '<b style="color:' + (left < 0 ? 'var(--crit)' : 'var(--ink)') +
+          '"><bdi>₪' + _nf(Math.abs(left)) + '</bdi></b></div>' +
+        '<div>נוצל<b><bdi>' + Math.round(r * 100) + '%</bdi></b></div>' +
+      '</div>' +
       '<div class="bar"><i style="width:' + Math.min(Math.round(r * 100), 100) + '%;background:' + col + '"></i></div>' +
+      (actC ? '<div style="font-size:.72rem;color:var(--muted);margin-top:.35rem"><bdi>' + _nf(actC) + ' CZK</bdi></div>' : '') +
     '</div>');
   });
   h.push('</div>');
@@ -8224,7 +8250,7 @@ function exportHtmlReport() {
     var v = byDay[k].czk;
     h.push('<div style="margin-bottom:' + (i === dayOrder.length - 1 ? '0' : '.6rem') + '">' +
       '<div class="crow"><div>' + _h(dayLabel(k)) + ' <span style="color:var(--muted);font-size:.78rem">' + _h(k.slice(5)) + '</span></div>' +
-      '<div class="n">' + _nf(v) + ' CZK · ₪' + _nf(byDay[k].ils) + '</div></div>' +
+      '<div class="n"><bdi>' + _nf(v) + ' CZK</bdi> · <bdi>₪' + _nf(byDay[k].ils) + '</bdi></div></div>' +
       '<div class="bar"><i style="width:' + pct(v, maxDay) + '%;background:var(--accent)"></i></div>' +
     '</div>');
   });
@@ -8235,8 +8261,13 @@ function exportHtmlReport() {
   catOrder.forEach(function(c) {
     var g = byCat[c];
     if (!g) return;
-    h.push('<details><summary><span>' + _h(c) + '</span><span class="n">' + _nf(g.czk) + ' CZK · ₪' + _nf(g.ils) +
-           ' · ' + (g.rows.length === 1 ? 'הוצאה אחת' : g.rows.length + ' הוצאות') + '</span></summary>');
+    h.push('<details><summary>' +
+           '<div style="flex:1;min-width:0">' +
+             '<div class="sname">' + _h(c) + '</div>' +
+             '<div class="sumline"><bdi>' + _nf(g.czk) + ' CZK</bdi> · <bdi>₪' + _nf(g.ils) + '</bdi></div>' +
+           '</div>' +
+           '<span class="n">' + (g.rows.length === 1 ? 'הוצאה אחת' : g.rows.length + ' הוצאות') + '</span>' +
+           '</summary>');
     h.push('<div class="scroll"><table><tr><th>תאריך</th><th>שעה</th><th>יום</th><th>שם</th><th>מיקום</th><th class="n">CZK</th><th class="n">₪</th></tr>');
     g.rows.forEach(function(r) {
       h.push('<tr><td>' + _h(r.dp.iso) + '</td><td>' + _h(r.dp.time) + '</td><td>' + _h(r.dp.day) + '</td><td>' +
