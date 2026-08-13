@@ -981,7 +981,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-13-b';
+var BUILD_ID = '2026-08-13-d';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
@@ -7303,7 +7303,13 @@ function saveBudgetFromModal() {
   window._memTotalBudget = totalVal;
   window._memBudget = budget;
   try { localStorage.setItem('prague_total_budget', String(totalVal)); } catch(e) {}
-  try { localStorage.setItem('prague_budget_v1', JSON.stringify(budget)); } catch(e) {}
+  // ⚠️ `saveBudget` ולא `setItem` גולמי. זו הייתה **הסיבה האמיתית** שעריכת
+  // קטגוריה לא נשמרה: המודל כתב ל-localStorage בלבד ולא דחף `budget_categories`
+  // לענן (הענף הלא-GAS דחף רק `total_budget`). הענן נשאר עם הערך הישן, ה-snapshot
+  // הבא — שנוצר מהדחיפה של `total_budget` עצמה — החזיר אותו, והעריכה נמחקה
+  // תוך שברירי שנייה. נמדד: אוכל 3000→4000 חזר ל-3000 עוד לפני שהמסך התרענן.
+  try { saveBudget(budget); }
+  catch(e) { try { localStorage.setItem('prague_budget_v1', JSON.stringify(budget)); } catch(e2) {} }
 
   renderBudget();
   toast('✅ תקציב עודכן!');
