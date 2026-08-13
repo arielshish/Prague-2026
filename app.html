@@ -981,7 +981,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-13-h';
+var BUILD_ID = '2026-08-13-i';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
@@ -3737,6 +3737,20 @@ var ALL_PLACES = [
    who:'👨‍👩‍👧‍👦 כל הגילאים | ⚡ מהיר — נהדר בדרך לאטרקציה אחרת',
    how:'מטרו A/C → Václavské náměstí + 3 דק׳ הליכה', mapUrl:'https://www.google.com/maps/search/Kafka+rotating+head+Prague'},
 
+  {type:'community',cat:'🎟️ אטרקציות', icon:'🚂', name:'ממלכת הרכבות — Království železnic', fb:'⭐⭐⭐⭐⭐', google:'4.6',
+   desc:'המוזיאון הגדול ביותר של רכבות מיניאטוריות במרכז אירופה. מעל 2,000 מ"ר של פסי רכבת, ערים מיניאטוריות, נמל תעופה, הרים, מנהרות וגשרים — הכל בקנה מידה 1:87. אורות יום/לילה משתנים. מרתק גם למבוגרים!',
+   booking:'🎟️ כרטיסים: kralovstvi-zeleznic.cz | ~350 CZK מבוגר, 250 CZK ילד',
+   duration:'⏱️ שעתיים ומעלה',
+   tips:'להגיע בפתיחה (10:00) — פחות עמוס. כרטיס מראש חוסך תור. יש פינת תצפית גבוהה — לא לפספס.',
+   who:'👧🧒 ילדים | 🚂 חובבי רכבות | 👨‍👩‍👧‍👦 כל המשפחה',
+   how:'מטרו B → Anděl', mapUrl:'https://www.google.com/maps/place/Království+železnic,+Prague'},
+  {type:'community',cat:'🎟️ אטרקציות', icon:'⏰', name:'כיכר העיר העתיקה והשעון האסטרונומי', fb:'⭐⭐⭐⭐⭐', google:'4.7',
+   desc:'כיכר העיר העתיקה (Staroměstské náměstí) היא לב פראג. השעון האסטרונומי (Orloj) — בנוי ב-1410, אחד מהיפים בעולם. בכל שעה עגולה פותחות הדלתות ו-12 השליחים מצעדים. יש גם כנסיית טין המרשימה ועמוד מריה.',
+   booking:'🎟️ הכיכר עצמה חינם. עליה למגדל השעון — כרטיס בקופה, ~200 CZK, ללא הזמנה מראש.',
+   duration:'⏱️ 60–90 דקות',
+   tips:'השעון מציג הצגה בכל שעה עגולה — לתכנן בהתאם. כייסים רבים: תיק קדימה, ארנק בכיס קדמי. לאכול בכיכר עצמה יקר — עדיף לצאת לסמטאות.',
+   who:'👨‍👩‍👧‍👦 כל המשפחה | 📸 צילום',
+   how:'מטרו A → Staroměstská', mapUrl:'https://www.google.com/maps/place/Old+Town+Square,+Prague'},
   {type:'community',cat:'🎟️ אטרקציות', icon:'🎨', name:'גלרית Lumia — מוזיאון האורות', fb:'⭐⭐⭐⭐⭐', google:'4.5',
    desc:'מוזיאון אמנות דיגיטלי אימרסיבי עם 10+ חדרים שלמים של הקרנות אורות ענקיות, מוזיקה ותנועה. לא סתם תמונות — אתה בתוך היצירה. ילדים יכולים לרוץ ולרקוד בתוך האמנות. ליד הכניסה יש מוזיאון פלדה (Steel Museum) שנותנים עליו 20% הנחה אחרי כניסה ל-Lumia.',
    booking:'🎟️ מומלץ לקנות Online מראש — galerie-lumia.com | ~350–450 CZK לאדם | הנחה לילדים',
@@ -7462,11 +7476,14 @@ function buildExpNameList() {
   var cats = [
     { label:'🍽️ מסעדות', items: RESTAURANTS.map(function(r){ return r.icon+' '+r.name; }) },
     { label:'🍦 קינוחים', items: DESSERTS.map(function(r){ return r.icon+' '+r.name; }) },
-    { label:'🏛️ אטרקציות', items: (function(){
-        var seen={}, out=[];
-        (DAYS||[]).forEach(function(d){ (d.stops||[]).forEach(function(s){ if(!seen[s.name]){ seen[s.name]=1; out.push((s.emoji||'🎟️')+' '+s.name); } }); });
-        return out;
-      })() },
+    // ⚠️ **תחנות הלוז הוסרו מכאן (13/08).** רשימת ההוצאות היא "על מה משלמים",
+    // ותחנת לוז היא "איפה היינו" — שני דברים שונים. הרשימה הציעה `😴 חזרה
+    // ומנוחה במלון`, `🚶 הליכה דרך Na Příkopě`, `🌉 גשר קארל` ו-`🏝️ אי קמפה`,
+    // שאף אחד מהם אינו הוצאה. המקומות שכן משלמים עליהם כבר במאגר: טירת פראג
+    // (`מצודת פראג`), השייט, ו-Hamleys. שניים שהיו קיימים **רק** כתחנה —
+    // ממלכת הרכבות והשעון האסטרונומי — נוספו ל-COMMUNITY עם התוכן שלהן.
+    // מיקום ו"היינו" ממשיכים להציג את **כל** התחנות; רק כאן הן לא רלוונטיות.
+    { label:'🎟️ אטרקציות', items: COMMUNITY.filter(function(c){ return c.cat==='🎟️ אטרקציות'; }).map(function(c){ return c.icon+' '+c.name; }) },
     // ⚠️ `r.e`/`r.n` היו הסכימה הישנה של החנויות. באיחוד ל-ALL_PLACES (18/07)
     // הן הפכו ל-`icon`/`name`, והשורה הזו פוספסה — 9 החנויות הוצגו כאן
     // כ-"undefined undefined" במשך חודש. הרשימה לא זרקה שגיאה, ולכן שום
@@ -7475,7 +7492,6 @@ function buildExpNameList() {
         COMMUNITY.filter(function(c){ return c.cat==='🛍️ קניות'; }).map(function(c){ return c.icon+' '+c.name; })
       ) },
     { label:'👥 קהילה — מסעדות', items: COMMUNITY.filter(function(c){ return c.cat==='🍽️ מסעדות'; }).map(function(c){ return c.icon+' '+c.name; }) },
-    { label:'👥 קהילה — אטרקציות', items: COMMUNITY.filter(function(c){ return c.cat==='🎟️ אטרקציות'; }).map(function(c){ return c.icon+' '+c.name; }) },
     { label:'👥 קהילה — קינוחים', items: COMMUNITY.filter(function(c){ return c.cat==='🍦 קינוחים'; }).map(function(c){ return c.icon+' '+c.name; }) },
     { label:'🚖 תחבורה', items:['🚖 Bolt / Uber','🚇 מטרו','🚌 אוטובוס','🚋 טראם'] },
     { label:'☕ אוכל ושתייה', items:['☕ קפה','🥐 ארוחת בוקר','🍕 ארוחת צהריים','🍺 בר'] },
