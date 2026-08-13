@@ -981,7 +981,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-13-f';
+var BUILD_ID = '2026-08-13-g';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
@@ -7417,7 +7417,11 @@ function buildExpNameList() {
         (DAYS||[]).forEach(function(d){ (d.stops||[]).forEach(function(s){ if(!seen[s.name]){ seen[s.name]=1; out.push((s.emoji||'🎟️')+' '+s.name); } }); });
         return out;
       })() },
-    { label:'🛍️ קניות', items: SHOPS.map(function(r){ return r.e+' '+r.n; }).concat(
+    // ⚠️ `r.e`/`r.n` היו הסכימה הישנה של החנויות. באיחוד ל-ALL_PLACES (18/07)
+    // הן הפכו ל-`icon`/`name`, והשורה הזו פוספסה — 9 החנויות הוצגו כאן
+    // כ-"undefined undefined" במשך חודש. הרשימה לא זרקה שגיאה, ולכן שום
+    // בדיקת "0 שגיאות JS" לא תפסה את זה. שדה חסר הוא באג שקט.
+    { label:'🛍️ קניות', items: SHOPS.map(function(r){ return r.icon+' '+r.name; }).concat(
         COMMUNITY.filter(function(c){ return c.cat==='🛍️ קניות'; }).map(function(c){ return c.icon+' '+c.name; })
       ) },
     { label:'👥 קהילה — מסעדות', items: COMMUNITY.filter(function(c){ return c.cat==='🍽️ מסעדות'; }).map(function(c){ return c.icon+' '+c.name; }) },
