@@ -541,13 +541,29 @@ function _hasLocalData(key) {
     return true;
   } catch (e) { return false; }
 }
+// המגן המשלים, בצד הקליטה: **ריק מהענן לא דורס נתונים מקומיים קיימים.**
+// `_hasLocalData` חוסם דחיפת ריק למעלה; זה חוסם קליטת ריק למטה. שניהם נחוצים —
+// מספיק מכשיר אחד עם גרסה ישנה, או כתיבה ישירה, כדי שריק יגיע לענן.
+// ⚠️ הבדיקה היא על **תוכן**: `"[]"`, `"{}"` ו-`"0"` כולן מחרוזות truthy, ולכן
+// `if (d.days_custom)` לבדו אף פעם לא היה מגן. נמדד ב-13/08: הזרקת snapshot ריק
+// מחקה בפועל את הלוז, הציוד, התקציב והתזכורות — ורק visited שרד, כי רק הוא תוקן.
+// אם אין לנו כלום מקומית — מקבלים כרגיל, אין מה להגן עליו.
+function _acceptRemote(json, localKey) {
+  var has = false;
+  try {
+    var p = JSON.parse(json);
+    has = Array.isArray(p) ? p.length > 0
+        : (p && typeof p === 'object') ? Object.keys(p).length > 0 : !!p;
+  } catch (e) { return false; }
+  return has || !_hasLocalData(localKey);
+}
 function _resyncLocalDataToCloud() {
   try { if (_hasLocalData('prague_exp_v10') && typeof saveLocal === 'function') saveLocal(); } catch (e) { console.warn('resync expenses failed', e); }
   try { if (_hasLocalData('prague_days_v1') && typeof saveDaysState === 'function') saveDaysState(); } catch (e) { console.warn('resync days failed', e); }
   try { if (_hasLocalData('prague_pack_v2') && typeof PACK_STATE !== 'undefined' && typeof savePackLocal === 'function') savePackLocal(PACK_STATE); } catch (e) { console.warn('resync pack failed', e); }
   try { if (_hasLocalData(VISITED_KEY) && typeof saveVisitedState === 'function') saveVisitedState(); } catch (e) { console.warn('resync visited failed', e); }
   try { if (_hasLocalData('prague_remindersDone') && typeof saveRemindersDoneLocal === 'function') saveRemindersDoneLocal(); } catch (e) { console.warn('resync remindersDone failed', e); }
-  try { if (typeof saveSchedules === 'function') saveSchedules(); } catch (e) { console.warn('resync remindersSchedule failed', e); }
+  try { if (_hasLocalData('prague_remindersSchedule') && typeof saveSchedules === 'function') saveSchedules(); } catch (e) { console.warn('resync remindersSchedule failed', e); }
   try { if (typeof saveTotalBudget === 'function' && typeof loadTotalBudget === 'function') { var tb = loadTotalBudget(); if (tb) saveTotalBudget(tb); } } catch (e) { console.warn('resync total budget failed', e); }
   // ⚠️ loadBudget() נופל ל-DEFAULT_BUDGET כשאין נתונים מקומיים, ולכן דחיפה
   // ללא תנאי דרסה את הקטגוריות שהמשתמש ערך בערכי ברירת המחדל (אוכל 3,000).
@@ -965,7 +981,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-13-a';
+var BUILD_ID = '2026-08-13-b';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
@@ -2881,7 +2897,7 @@ function initReminders() {
   if (isGas()) {
     google.script.run
       .withSuccessHandler(function(data) {
-        if (data && data.ok && data.remindersDone) {
+        if (data && data.ok && data.remindersDone && _acceptRemote(data.remindersDone, 'prague_remindersDone')) {
           try { remindersDone = JSON.parse(data.remindersDone); } catch(e) {}
         }
         renderReminders();
@@ -2894,10 +2910,10 @@ function initReminders() {
       ensureFirebaseAuth().then(function() {
         return getFirestoreDb().collection('appdata').doc('main').get();
       }).then(function(doc) {
-        if (doc.exists && doc.data().remindersDone) {
+        if (doc.exists && doc.data().remindersDone && _acceptRemote(doc.data().remindersDone, 'prague_remindersDone')) {
           try { remindersDone = JSON.parse(doc.data().remindersDone); } catch(e) {}
         }
-        if (doc.exists && doc.data().remindersSchedule) {
+        if (doc.exists && doc.data().remindersSchedule && _acceptRemote(doc.data().remindersSchedule, 'prague_remindersSchedule')) {
           try { remindersSchedule = JSON.parse(doc.data().remindersSchedule); } catch(e) {}
         }
 
@@ -4269,7 +4285,7 @@ function loadDaysFromSheets(silent) {
       }),
       daysTimeout
     ]).then(function(doc) {
-      if (doc.exists && doc.data().days_custom) {
+      if (doc.exists && doc.data().days_custom && _acceptRemote(doc.data().days_custom, 'prague_days_v1')) {
         try {
           DAYS_STATE = JSON.parse(doc.data().days_custom);
           localStorage.setItem('prague_days_v1', JSON.stringify(DAYS_STATE));
@@ -6774,7 +6790,7 @@ function loadExpenses() {
       }),
       fbTimeout
     ]).then(function(doc) {
-      if (doc.exists && doc.data().expenses) {
+      if (doc.exists && doc.data().expenses && _acceptRemote(doc.data().expenses, 'prague_exp_v10')) {
         try {
           EXPENSES = JSON.parse(doc.data().expenses) || [];
           saveLocal();
@@ -6870,7 +6886,7 @@ function initRealtimeSync() {
       var d = doc.data();
 
       // ימים
-      if (d.days_custom) {
+      if (d.days_custom && _acceptRemote(d.days_custom, 'prague_days_v1')) {
         try {
           var remoteDays = JSON.parse(d.days_custom);
           var localDays = localStorage.getItem('prague_days_v1');
@@ -6912,7 +6928,7 @@ function initRealtimeSync() {
       }
 
       // ציוד
-      if (d.packing_list) {
+      if (d.packing_list && _acceptRemote(d.packing_list, 'prague_pack_v2')) {
         try {
           var remotePack = JSON.parse(d.packing_list);
           var localPack = localStorage.getItem('prague_pack_v2');
@@ -6926,7 +6942,7 @@ function initRealtimeSync() {
       }
 
       // תקציב
-      if (d.budget_categories) {
+      if (d.budget_categories && _acceptRemote(d.budget_categories, 'prague_budget_v1')) {
         try {
           var localBudget = localStorage.getItem('prague_budget_v1');
           if (d.budget_categories !== localBudget) {
@@ -6950,7 +6966,7 @@ function initRealtimeSync() {
       }
 
       // תזכורות שבוצעו
-      if (d.remindersDone) {
+      if (d.remindersDone && _acceptRemote(d.remindersDone, 'prague_remindersDone')) {
         try {
           var localRem = localStorage.getItem('prague_remindersDone');
           if (d.remindersDone !== localRem) {
@@ -7093,7 +7109,7 @@ function syncBudgetFromSheets(cb) {
     google.script.run
       .withSuccessHandler(function(r) {
         if (r && r.ok && r.data) {
-          if (r.data.budget_categories) {
+          if (r.data.budget_categories && _acceptRemote(JSON.stringify(r.data.budget_categories), 'prague_budget_v1')) {
             localStorage.setItem('prague_budget_v1', JSON.stringify(r.data.budget_categories));
           }
           if (r.data.total_budget != null) {
@@ -7112,7 +7128,7 @@ function syncBudgetFromSheets(cb) {
     }).then(function(doc) {
       if (doc.exists) {
         var d = doc.data();
-        if (d.budget_categories) {
+        if (d.budget_categories && _acceptRemote(d.budget_categories, 'prague_budget_v1')) {
           localStorage.setItem('prague_budget_v1', d.budget_categories);
         }
         if (d.total_budget != null) {
