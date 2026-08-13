@@ -981,7 +981,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-13-e';
+var BUILD_ID = '2026-08-13-f';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
@@ -1630,6 +1630,7 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
       <button id="btnAddExpense" class="btn-primary" style="flex:1;">➕ הוסף הוצאה</button>
       <button id="btnRefreshExp" class="btn-ghost" title="רענן">🔄</button>
       <button id="btnExportCsv" class="btn-ghost" title="ייצוא CSV">📤</button>
+      <button id="btnExportHtml" class="btn-ghost" title="דוח HTML">📄</button>
     </div>
     <div id="expenseList" style="display:grid;gap:10px;"><p style="color:rgba(30,41,59,0.35);text-align:center;padding:28px 0;font-size:13px;">טוען...</p></div>
   </section>
@@ -7145,23 +7146,52 @@ function syncBudgetFromSheets(cb) {
   }
 }
 
+// ── טבלת סיווג אחת לכל האפליקציה (13/08) ──
+// קודם היו **שתיים**: `guessExpCat` לפסי התקציב ו-`_expCat` לייצוא, עם טבלאות
+// אימוג׳י שונות ועם fallback שונה. נמדד: 22 אימוג׳י סווגו אחרת בין המסכים —
+// `🚌` תחבורה בתקציב ו-"אחר" בדוח, `💡` "כללי" בתקציב ו-"אטרקציות" בדוח.
+// ⚠️ **מפתח אחד לא יופיע בשתי רשימות** — האיחוד הוא איחוד ולא העתקה.
+var EXP_CAT_EMOJI = {
+  'אוכל':     ['🍽️','🍦','☕','🥐','🍕','🍺','✡️','🌸','🍔','🥩','🥪','🍜','🍰','🧁','🥗','🍩','🍟','🥤','🍇'],
+  'אטרקציות': ['🎟️','🏰','🏛️','🌊','🚤','🏊','🎠','🎡','🎢','🏟️','⏰','🏘️','🏝️','🛶','🚶','🌀','🚂','🧸','🕍','🦁','🎭','🖼','🎨','🎪','🏛','⛲'],
+  'קניות':    ['🛍️','🏬','🏢','🏷️','🛒','🍫','👕','👟','💄','🧴','🎁'],
+  'תחבורה':   ['🚖','🚇','🚌','🚋','✈️','🚕','🚙','🚗','🛴','🚊','⛴️','🚆']
+};
+// מחזיר את מילת המפתח של הקטגוריה, או null אם אין אימוג׳י מוכר.
+// ⚠️ **התאמה בכל מקום בשם ולא רק בתחילתו** — `"🎟️ 💡 🕍 בית הכנסת"` וגם
+// `"ארוחה 🍽️"` צריכים להיתפס. הגרסה הישנה של פסי התקציב עגנה ל-`^` בלבד.
 function guessExpCat(name) {
-  if (!name) return null;
-  if (/^(🍽️|🍦|☕|🥐|🍕|🍺|✡️|🌸|🍔|🥩)/.test(name)) return 'אוכל';
-  if (/^(🎟️|🏰|🏛️|🌊|🚤|🏊|🎠|🎡|🎢|🏟️|⏰|🏘️|🏝️|🛶|🚶|🌀|🚂|🧸)/.test(name)) return 'אטרקציות';
-  if (/^(🛍️|🏬|🏢|🏷️|🛒|🍫)/.test(name)) return 'קניות';
-  if (/^(🚖|🚇|🚌|🚋|✈️|🚕|🚙)/.test(name)) return 'תחבורה';
+  var n = String(name || '');
+  if (!n) return null;
+  for (var k in EXP_CAT_EMOJI) {
+    for (var i = 0; i < EXP_CAT_EMOJI[k].length; i++) {
+      if (n.indexOf(EXP_CAT_EMOJI[k][i]) !== -1) return k;
+    }
+  }
   return null;
 }
+// ממפה הוצאה ל**קטגוריית התקציב של המשתמש** — מקור אמת אחד לפסים ולדוח כאחד.
+// הוצאה בלי אימוג׳י מוכר נופלת לקטגוריה האחרונה בתקציב (התנהגות הפסים מאז ומתמיד,
+// אצל המשתמש `כללי ושונות 💡`). היא מסומנת בדוח כ"ללא סיווג" ולא נבלעת בשקט.
+function expBudgetCat(name, budget) {
+  budget = budget || loadBudget();
+  var k = guessExpCat(name);
+  if (k) {
+    for (var i = 0; i < budget.length; i++) {
+      if (String(budget[i].cat).indexOf(k) !== -1) return budget[i].cat;
+    }
+  }
+  return budget.length ? budget[budget.length - 1].cat : '❓ אחר';
+}
+function expIsUnclassified(name) { return guessExpCat(name) === null; }
 
 function catActualMap(budget) {
-  var map = {}, last = budget[budget.length-1];
+  // עובר דרך expBudgetCat — אותה פונקציה בדיוק שהדוח משתמש בה, כדי ששני
+  // המסכים לא יוכלו להראות מספרים שונים לאותה הוצאה.
+  var map = {};
   EXPENSES.forEach(function(e) {
-    var ils = Number(e.ils)||0;
-    var guess = guessExpCat(e.name||'');
-    var matched = false;
-    if (guess) budget.forEach(function(b) { if (!matched && b.cat.indexOf(guess)!==-1){ map[b.cat]=(map[b.cat]||0)+ils; matched=true; } });
-    if (!matched && last) map[last.cat]=(map[last.cat]||0)+ils;
+    var c = expBudgetCat(e.name || '', budget);
+    map[c] = (map[c] || 0) + (Number(e.ils) || 0);
   });
   return map;
 }
@@ -7768,14 +7798,9 @@ function _expDateParts(e) {
 }
 // הקטגוריה נגזרת מהאימוג׳י שהמשתמש עצמו בחר בשם ההוצאה — לא ניחוש שלנו.
 // רשומה בלי אימוג׳י מוכר נופלת ל"אחר" במפורש ולא משויכת בכוח.
-function _expCat(name) {
-  var n = String(name || '');
-  if (/[\u{1F37D}\u{1F354}\u{1F355}\u{2615}\u{1F366}\u{1F96A}\u{1F37A}]/u.test(n)) return '\u{1F37D}️ אוכל';
-  if (/[\u{1F6CD}\u{1F3EC}\u{1F3EA}\u{1F6D2}]/u.test(n))                          return '\u{1F6CD}️ קניות';
-  if (/[\u{1F39F}\u{1F3F0}\u{1F54D}\u{1F682}\u{1F300}\u{1F981}\u{1F30A}\u{1F4A1}\u{1F3AD}\u{1F5BC}]/u.test(n)) return '\u{1F39F}️ אטרקציות';
-  if (/[\u{1F696}\u{1F687}\u{1F68B}\u{2708}]/u.test(n))                           return '\u{1F696} תחבורה';
-  return '❓ אחר';
-}
+// הדוח משתמש עכשיו ב**קטגוריות התקציב של המשתמש** ולא בחמש שהמציא לעצמו,
+// כך ש"תקציב מול בפועל" בדוח הוא השוואה אמיתית ולא בין שתי טקסונומיות.
+function _expCat(name) { return expBudgetCat(name); }
 function exportCsv() {
   var COLS = 8;
   var q = function(v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; };
@@ -7897,6 +7922,207 @@ function exportCsv() {
 }
 
 // ═══════════════════════════════════════════
+// דוח HTML — קובץ אחד עצמאי, לקריאה בטלפון ולהדפסה ל-PDF
+// ═══════════════════════════════════════════
+// ⚠️ כל טקסט שמגיע מהמשתמש (שם הוצאה, הערה, שם קטגוריה) עובר `_h()`.
+// שמות ההוצאות מכילים גרשיים ומרכאות (`שטויות של עדי`, `מ"ר`) — בדיוק המלכודת
+// ששברה `onclick` פעמיים בעבר. כאן זה קובץ סטטי, אבל תו אחד לא-מוברח שובר את
+// כל המסמך מהנקודה ההיא והלאה.
+function _h(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function _nf(n) { return (Number(n) || 0).toLocaleString('he-IL'); }
+
+function exportHtmlReport() {
+  var items = EXPENSES.slice().sort(function(a, b) { return _expTs(a) - _expTs(b); });
+  if (!items.length) { toast('אין הוצאות לייצוא'); return; }
+
+  var budget = loadBudget();
+  var totC = 0, totI = 0;
+  var byCat = {}, byDay = {}, dayOrder = [], byCatDay = {}, unclassified = 0;
+  items.forEach(function(e) {
+    var c = Number(e.czk) || 0, i = Number(e.ils) || 0;
+    var cat = expBudgetCat(e.name, budget), dp = _expDateParts(e), dk = dp.iso || 'ללא תאריך';
+    totC += c; totI += i;
+    if (expIsUnclassified(e.name)) unclassified++;
+    if (!byCat[cat]) byCat[cat] = { czk: 0, ils: 0, rows: [] };
+    byCat[cat].czk += c; byCat[cat].ils += i; byCat[cat].rows.push({ e: e, c: c, i: i, dp: dp });
+    if (!byDay[dk]) { byDay[dk] = { czk: 0, ils: 0, n: 0, day: dp.day }; dayOrder.push(dk); }
+    byDay[dk].czk += c; byDay[dk].ils += i; byDay[dk].n++;
+    if (!byCatDay[cat]) byCatDay[cat] = {};
+    byCatDay[cat][dk] = (byCatDay[cat][dk] || 0) + c;
+  });
+  // סדר הקטגוריות = סדר התקציב, כדי שהדוח והמסך ייקראו אותו דבר.
+  // קטגוריה בלי הוצאות נשארת ברשימה — "לא הוצאנו" הוא מידע.
+  var catOrder = budget.map(function(b) { return b.cat; });
+  Object.keys(byCat).forEach(function(c) { if (catOrder.indexOf(c) === -1) catOrder.push(c); });
+
+  var budTotal = budgetCatTotal(budget);
+  var rate = Math.round((RATE || 6.4) * 100) / 100;
+  var maxDay = dayOrder.reduce(function(m, k) { return Math.max(m, byDay[k].czk); }, 0);
+  var maxCell = 0;
+  Object.keys(byCatDay).forEach(function(c) {
+    Object.keys(byCatDay[c]).forEach(function(k) { maxCell = Math.max(maxCell, byCatDay[c][k]); });
+  });
+
+  var dayLabel = function(k) { return byDay[k].day != null ? 'יום ' + byDay[k].day : k; };
+  var pct = function(n, t) { return t ? Math.round(n / t * 100) : 0; };
+
+  // ── מפת חום: גוון אחד, בהיר→כהה. הבהיר ביותר נסוג אל הרקע = "קרוב לאפס".
+  var RAMP = ['#cde2fb','#b7d3f6','#9ec5f4','#86b6ef','#6da7ec','#5598e7','#3987e5','#2a78d6','#256abf','#1c5cab','#184f95','#104281'];
+  var cellBg = function(v) {
+    if (!v) return 'transparent';
+    var idx = Math.min(RAMP.length - 1, Math.max(0, Math.round(v / (maxCell || 1) * (RAMP.length - 1))));
+    return RAMP[idx];
+  };
+  var cellInk = function(v) {
+    if (!v) return 'var(--muted)';
+    return (v / (maxCell || 1)) > 0.55 ? '#ffffff' : '#0b0b0b';
+  };
+
+  var h = [];
+  h.push('<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8">');
+  h.push('<meta name="viewport" content="width=device-width,initial-scale=1">');
+  h.push('<title>דוח הוצאות — פראג 2026</title><style>');
+  h.push(':root{--bg:#F7F3EE;--card:#fff;--ink:#141C19;--muted:#5C6B64;--rule:#E3DDD5;--accent:#2a78d6;' +
+         '--good:#0ca30c;--warn:#fab219;--crit:#d03b3b;}');
+  h.push('@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12100E;--card:#1C1A17;--ink:#EFEAE3;--muted:#9C948A;--rule:#2C2823;--accent:#3987e5;}}');
+  h.push('*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:"Heebo","Rubik","Arial Hebrew",system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.5;-webkit-text-size-adjust:100%}');
+  h.push('.wrap{max-width:46rem;margin:0 auto;padding:1.5rem 1rem 3rem}');
+  h.push('h1{font-size:1.6rem;margin:0 0 .2rem;font-weight:800;letter-spacing:-.01em}');
+  h.push('.sub{color:var(--muted);font-size:.85rem;margin:0 0 1.4rem}');
+  h.push('h2{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:2.2rem 0 .7rem}');
+  h.push('.card{background:var(--card);border:1px solid var(--rule);border-radius:.8rem;padding:1rem;margin:0 0 .8rem}');
+  h.push('.heroRow{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:.7rem}');
+  h.push('.hero{background:var(--card);border:1px solid var(--rule);border-radius:.8rem;padding:.9rem 1rem}');
+  h.push('.hero .k{font-size:.7rem;color:var(--muted);font-weight:700;letter-spacing:.06em}');
+  h.push('.hero .v{font-size:1.55rem;font-weight:800;font-variant-numeric:tabular-nums;margin-top:.15rem}');
+  h.push('.bar{height:.5rem;background:var(--bg);border-radius:.25rem;overflow:hidden;margin-top:.35rem}');
+  h.push('.bar>i{display:block;height:100%;border-radius:.25rem}');
+  h.push('.crow{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;font-size:.88rem}');
+  h.push('.crow .n{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.82rem;white-space:nowrap}');
+  h.push('.tag{display:inline-block;font-size:.68rem;font-weight:700;padding:.08rem .38rem;border-radius:.28rem;border:1px solid currentColor;margin-inline-start:.3rem;white-space:nowrap}');
+  h.push('table{width:100%;border-collapse:collapse;font-size:.84rem}');
+  h.push('th,td{padding:.4rem .35rem;text-align:right;border-bottom:1px solid var(--rule)}');
+  // התאריך ISO נשבר לשתי שורות ומנפח כל שורה בטבלה — נעילה לשורה אחת.
+  h.push('td:first-child,th:first-child{white-space:nowrap}');
+  h.push('th{color:var(--muted);font-weight:600;font-size:.72rem}');
+  h.push('td.n,th.n{font-variant-numeric:tabular-nums;text-align:left;white-space:nowrap}');
+  h.push('.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}');
+  h.push('.hm td{text-align:center;font-variant-numeric:tabular-nums;font-size:.78rem;padding:.42rem .3rem;border:2px solid var(--card);border-radius:.25rem}');
+  h.push('.hm th{white-space:nowrap;font-size:.68rem}');
+  h.push('.hm td:first-child,.hm th:first-child{text-align:right;font-weight:600;font-size:.8rem;color:var(--ink)}');
+  h.push('.hm .tot{text-align:left;font-variant-numeric:tabular-nums;border-inline-start:1px solid var(--rule);padding-inline-start:.55rem}');
+  h.push('details{background:var(--card);border:1px solid var(--rule);border-radius:.8rem;padding:.7rem 1rem;margin-bottom:.55rem}');
+  h.push('summary{cursor:pointer;font-weight:700;font-size:.92rem;display:flex;justify-content:space-between;gap:.6rem;align-items:baseline}');
+  h.push('summary::-webkit-details-marker{display:none}');
+  h.push('summary .n{font-variant-numeric:tabular-nums;color:var(--muted);font-weight:600;font-size:.82rem}');
+  h.push('footer{margin-top:2.4rem;padding-top:1rem;border-top:1px solid var(--rule);color:var(--muted);font-size:.76rem}');
+  h.push('.legend{display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:var(--muted);margin-top:.5rem}');
+  h.push('.legend i{display:block;width:1.1rem;height:.6rem;border-radius:.15rem}');
+  h.push('@media print{body{background:#fff}.card,.hero,details{break-inside:avoid;border-color:#ccc}details{open:open}h2{page-break-after:avoid}}');
+  h.push('</style></head><body><div class="wrap">');
+
+  var first = _expDateParts(items[0]).iso, last = _expDateParts(items[items.length-1]).iso;
+  h.push('<h1>דוח הוצאות — פראג 2026</h1>');
+  h.push('<p class="sub">' + _h(first) + (last && last !== first ? ' — ' + _h(last) : '') +
+         ' · ' + items.length + ' הוצאות · שער 1 ₪ = ' + rate + ' CZK</p>');
+
+  // ── מספרי כותרת ──
+  h.push('<div class="heroRow">');
+  h.push('<div class="hero"><div class="k">סה״כ בפועל</div><div class="v">₪' + _nf(totI) + '</div>' +
+         '<div class="k" style="margin-top:.2rem;font-weight:400">' + _nf(totC) + ' CZK</div></div>');
+  var remain = budTotal - totI, over = remain < 0;
+  h.push('<div class="hero"><div class="k">' + (over ? 'חריגה' : 'נותר מהתקציב') + '</div><div class="v" style="color:' +
+         (over ? 'var(--crit)' : 'var(--good)') + '">₪' + _nf(Math.abs(remain)) + '</div>' +
+         '<div class="k" style="margin-top:.2rem;font-weight:400">מתוך ₪' + _nf(budTotal) + '</div></div>');
+  h.push('</div>');
+
+  // ── תקציב מול בפועל, לפי הקטגוריות של המשתמש ──
+  // ⚠️ צבע הסטטוס אף פעם לא לבד — לצידו תווית מילולית, כי שני מהגוונים
+  // יושבים מתחת ל-3:1 על רקע בהיר.
+  h.push('<h2>תקציב מול בפועל</h2><div class="card">');
+  budget.forEach(function(b, bi) {
+    var act = (byCat[b.cat] || {}).ils || 0, plan = Number(b.ils) || 0;
+    var r = plan > 0 ? act / plan : (act ? 1 : 0);
+    var col = r >= 1 ? 'var(--crit)' : r >= 0.85 ? 'var(--warn)' : 'var(--good)';
+    var lbl = r >= 1 ? '⚠️ חריגה' : r >= 0.85 ? '● קרוב לתקרה' : '✓ בתקציב';
+    h.push('<div style="margin-bottom:' + (bi === budget.length - 1 ? '0' : '.75rem') + '">' +
+      '<div class="crow"><div>' + _h(b.cat) +
+        '<span class="tag" style="color:' + col + '">' + lbl + '</span></div>' +
+      '<div class="n">₪' + _nf(act) + ' / ₪' + _nf(plan) + '</div></div>' +
+      '<div class="bar"><i style="width:' + Math.min(Math.round(r * 100), 100) + '%;background:' + col + '"></i></div>' +
+    '</div>');
+  });
+  h.push('</div>');
+
+  // ── מפת חום: קטגוריה × יום ──
+  h.push('<h2>לפי קטגוריה ויום (CZK)</h2><div class="card"><div class="scroll"><table class="hm">');
+  h.push('<tr><th>קטגוריה</th><th class="tot">סה״כ</th>' + dayOrder.map(function(k) {
+    return '<th>' + _h(dayLabel(k)) + '<br><span style="font-weight:400;opacity:.7">' + _h(k.slice(5)) + '</span></th>';
+  }).join('') + '</tr>');
+  catOrder.forEach(function(c) {
+    h.push('<tr><td>' + _h(c) + '</td><td class="tot"><b>' + _nf((byCat[c] || {}).czk || 0) + '</b></td>' +
+      dayOrder.map(function(k) {
+        var v = (byCatDay[c] || {})[k] || 0;
+        return '<td style="background:' + cellBg(v) + ';color:' + cellInk(v) + '" title="' + _h(c + ' · ' + dayLabel(k)) +
+               '">' + (v ? _nf(v) : '—') + '</td>';
+      }).join('') + '</tr>');
+  });
+  h.push('<tr><td><b>סה״כ יומי</b></td><td class="tot"><b>' + _nf(totC) + '</b></td>' + dayOrder.map(function(k) {
+    return '<td><b>' + _nf(byDay[k].czk) + '</b></td>';
+  }).join('') + '</tr>');
+  h.push('</table></div>');
+  h.push('<div class="legend"><span>נמוך</span><i style="background:' + RAMP[1] + '"></i><i style="background:' +
+         RAMP[5] + '"></i><i style="background:' + RAMP[9] + '"></i><i style="background:' + RAMP[11] +
+         '"></i><span>גבוה · המספרים בכל תא</span></div></div>');
+
+  // ── הוצאה יומית ──
+  h.push('<h2>הוצאה יומית</h2><div class="card">');
+  dayOrder.forEach(function(k, i) {
+    var v = byDay[k].czk;
+    h.push('<div style="margin-bottom:' + (i === dayOrder.length - 1 ? '0' : '.6rem') + '">' +
+      '<div class="crow"><div>' + _h(dayLabel(k)) + ' <span style="color:var(--muted);font-size:.78rem">' + _h(k.slice(5)) + '</span></div>' +
+      '<div class="n">' + _nf(v) + ' CZK · ₪' + _nf(byDay[k].ils) + '</div></div>' +
+      '<div class="bar"><i style="width:' + pct(v, maxDay) + '%;background:var(--accent)"></i></div>' +
+    '</div>');
+  });
+  h.push('</div>');
+
+  // ── פירוט, מקופל לפי קטגוריה ──
+  h.push('<h2>פירוט מלא</h2>');
+  catOrder.forEach(function(c) {
+    var g = byCat[c];
+    if (!g) return;
+    h.push('<details><summary><span>' + _h(c) + '</span><span class="n">' + _nf(g.czk) + ' CZK · ₪' + _nf(g.ils) +
+           ' · ' + (g.rows.length === 1 ? 'הוצאה אחת' : g.rows.length + ' הוצאות') + '</span></summary>');
+    h.push('<div class="scroll"><table><tr><th>תאריך</th><th>שעה</th><th>יום</th><th>שם</th><th class="n">CZK</th><th class="n">₪</th></tr>');
+    g.rows.forEach(function(r) {
+      h.push('<tr><td>' + _h(r.dp.iso) + '</td><td>' + _h(r.dp.time) + '</td><td>' + _h(r.dp.day) + '</td><td>' +
+             _h(r.e.name) + (expIsUnclassified(r.e.name) ? ' <span class="tag" style="color:var(--muted)">ללא סיווג</span>' : '') +
+             (r.e.note ? '<div style="color:var(--muted);font-size:.76rem">' + _h(r.e.note) + '</div>' : '') +
+             '</td><td class="n">' + _nf(r.c) + '</td><td class="n">' + _nf(r.i) + '</td></tr>');
+    });
+    h.push('</table></div></details>');
+  });
+
+  h.push('<footer>הופק מהאפליקציה ב-' + _h(new Date().toLocaleString('he-IL')) + ' · גרסה ' + _h(BUILD_ID) +
+         (unclassified ? ' · ' + unclassified + ' הוצאות ללא אימוג׳י מזוהה שויכו לקטגוריה האחרונה בתקציב' : '') +
+         '<br>הסכומים בשקלים מחושבים בשער ' + rate + ' ולכן משתנים אם השער מתעדכן.</footer>');
+  h.push('</div></body></html>');
+
+  var stamp = new Date(), p2 = function(n) { return (n < 10 ? '0' : '') + n; };
+  var blob = new Blob([h.join('')], { type: 'text/html;charset=utf-8' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'Prague_Report_' + stamp.getFullYear() + '-' + p2(stamp.getMonth()+1) + '-' + p2(stamp.getDate()) + '.html';
+  a.click();
+  toast('📄 דוח נשמר');
+}
+
+// ═══════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', function() {
@@ -7957,6 +8183,7 @@ document.addEventListener('DOMContentLoaded', function() {
     'btnAddExpense':      function() { openExpense(); },
     'btnRefreshExp':      function() { loadExpenses(); },
     'btnExportCsv':       function() { exportCsv(); },
+    'btnExportHtml':      function() { exportHtmlReport(); },
     'btnEditBudget':      function() { openBudgetModal(); },
     'btnSaveBudget':      function() { saveBudgetFromModalAndInvalidate(); },
     'btnAddBudgetCat':    function() { var b=loadBudget(); b.push({cat:'קטגוריה חדשה',ils:0}); saveBudget(b); openBudgetModal(); },
