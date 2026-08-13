@@ -981,7 +981,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-13-j';
+var BUILD_ID = '2026-08-13-k';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
@@ -2466,6 +2466,13 @@ function moveStopUpDown(dayIdx, stopIdx, direction) {
       <input id="expIls" type="number" inputmode="decimal" placeholder="₪" style="background:rgba(244,99,74,0.09);border:1px solid rgba(244,99,74,0.3);border-radius:13px;padding:13px 12px;font-size:15px;color:#F4634A;font-family:\'Rubik\',Arial,sans-serif;direction:ltr;font-weight:700;box-sizing:border-box;width:100%;">
     </div>
     <input id="expNote" type="text" placeholder="הערה (אופציונלי)" style="width:100%;background:#ffffff;border:1px solid rgba(0,0,0,0.09);border-radius:13px;padding:13px 14px;font-size:14px;color:#1E293B;font-family:\'Rubik\',Arial,sans-serif;direction:rtl;box-sizing:border-box;margin-bottom:14px;">
+    <!-- מיקום: **איפה** קניתי, בנפרד מ**מה** קניתי. הקטגוריה לא מושפעת מזה. -->
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;">
+      <button type="button" id="btnExpPlace" onclick="expFillPlace()" style="background:#ffffff;border:1px solid rgba(0,0,0,0.10);border-radius:12px;padding:10px 13px;font-size:13px;font-weight:700;color:#1E293B;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;white-space:nowrap;">📍 המיקום שלי</button>
+      <div id="expPlaceLbl" style="flex:1;min-width:0;font-size:12px;color:rgba(30,41,59,0.5);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">לא נבחר מיקום</div>
+      <button type="button" id="btnExpPlaceClear" onclick="expClearPlace()" style="display:none;background:rgba(239,68,68,0.12);border:0;border-radius:10px;padding:8px 11px;font-size:13px;color:#991B1B;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;">✕</button>
+    </div>
+    <input type="hidden" id="expPlace" value="">
     <button id="btnSaveExpense" style="width:100%;background:linear-gradient(135deg,#F4634A,#e8522e);color:white;border:0;border-radius:15px;padding:16px;font-size:15px;font-weight:900;cursor:pointer;font-family:\'Rubik\',Arial,sans-serif;box-shadow:0 8px 22px rgba(244,99,74,0.38);">שמור הוצאה 💸</button>
   </div>
 </div>
@@ -7438,7 +7445,8 @@ function renderExpenses() {
   list.innerHTML = EXPENSES.map(function(e) {
     return '<div style="background:rgba(0,0,0,0.07);border:1px solid rgba(0,0,0,0.10);border-radius:16px;padding:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;">' +
       '<div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:13px;color:#1E293B;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(e.name) + '</div>' +
-      '<div style="font-size:11px;color:rgba(30,41,59,0.4);">' + (e.note ? esc(e.note) + ' · ' : '') + (e.date || '') + '</div></div>' +
+      '<div style="font-size:11px;color:rgba(30,41,59,0.4);">' + (e.note ? esc(e.note) + ' · ' : '') + (e.date || '') + '</div>' +
+      (e.place ? '<div style="font-size:11px;color:#166534;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">📍 ' + esc(e.place) + '</div>' : '') + '</div>' +
       '<div style="text-align:left;direction:ltr;flex-shrink:0;">' +
       '<div style="font-weight:800;font-size:13px;color:#F59E0B;">' + Number(e.czk || 0).toLocaleString() + ' CZK</div>' +
       '<div style="font-size:12px;color:#F4634A;margin-bottom:6px;">₪' + Number(e.ils || 0).toLocaleString() + '</div>' +
@@ -7541,10 +7549,56 @@ function pickExpName(btn) {
   setTimeout(function(){ var c=qs('expCzk'); if(c) c.focus(); }, 80);
 }
 
+// ── מיקום ההוצאה (13/08) ──
+// המשתמש: "אני רוצה שזה יישמר תחת המיקום שאני נמצא בו". **מיקום אינו קטגוריה** —
+// גלידה בגן החיות היא אוכל שנקנה בגן החיות. שני שדות נפרדים, ואחד לא נוגע בשני.
+// ⚠️ מרחק מוחזר מ-haversine ב**קילומטרים** — להכפיל ב-1000 למטרים.
+function _nearestPlace(lat, lng) {
+  var best = null, bestD = Infinity;
+  try {
+    _mappablePlaces().forEach(function(pl) {
+      var c = PLACE_COORDS[pl.name] || (pl.coords || null);
+      if (!c || c.length < 2) return;
+      var d = haversine(lat, lng, c[0], c[1]) * 1000;
+      if (d < bestD) { bestD = d; best = pl; }
+    });
+  } catch (e) { return null; }
+  return best ? { name: _canonicalName ? _canonicalName(best.name) : best.name, dist: Math.round(bestD) } : null;
+}
+function _setExpPlace(name, dist) {
+  var inp = qs('expPlace'), lbl = qs('expPlaceLbl'), clr = qs('btnExpPlaceClear');
+  if (inp) inp.value = name || '';
+  if (lbl) lbl.textContent = name ? ('📍 ' + name + (dist != null ? ' · ' + (dist < 1000 ? dist + ' מ׳' : (dist/1000).toFixed(1) + ' ק״מ') : '')) : 'לא נבחר מיקום';
+  if (lbl) lbl.style.color = name ? '#166534' : 'rgba(30,41,59,0.5)';
+  if (clr) clr.style.display = name ? 'block' : 'none';
+}
+function expClearPlace() { _setExpPlace('', null); }
+function expFillPlace() {
+  var btn = qs('btnExpPlace');
+  var apply = function(lat, lng) {
+    var n = _nearestPlace(lat, lng);
+    // ⚠️ מעל 800 מ׳ זה כבר לא "המקום שאני בו" — עדיף בלי מיקום מאשר מיקום שגוי.
+    if (n && n.dist <= 800) _setExpPlace(n.name, n.dist);
+    else { _setExpPlace('', null); toast('📍 לא נמצא מקום מוכר בקרבת מקום'); }
+  };
+  if (_userLat !== null && _userLng !== null) { apply(_userLat, _userLng); return; }
+  if (!navigator.geolocation) { toast('📍 אין גישה למיקום'); return; }
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ מאתר...'; }
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    _userLat = pos.coords.latitude; _userLng = pos.coords.longitude;
+    if (btn) { btn.disabled = false; btn.textContent = '📍 המיקום שלי'; }
+    apply(_userLat, _userLng);
+  }, function() {
+    if (btn) { btn.disabled = false; btn.textContent = '📍 המיקום שלי'; }
+    toast('📍 לא הצלחתי לאתר — אפשר לשמור בלי מיקום');
+  }, { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 });
+}
+
 function openExpense() {
   EDIT_ID = null;
   var t = qs('expenseTitle'); if (t) t.textContent = '➕ הוסף הוצאה';
   ['expName','expCzk','expIls','expNote','expCat'].forEach(function(id) { var el = qs(id); if (el) el.value = ''; });
+  _setExpPlace('', null);
   buildCatChips('');
   buildExpNameList();
   var m = qs('expenseModal'); if (m) m.style.display = 'flex';
@@ -7589,10 +7643,11 @@ function saveExpense() {
     if (EDIT_ID) { google.script.run.withSuccessHandler(ok).withFailureHandler(fail).updateExpense(EDIT_ID, name, czk, ils, note); }
     else { google.script.run.withSuccessHandler(ok).withFailureHandler(fail).addExpense(name, czk, ils, note); }
   } else {
+    var place = (qs('expPlace') && qs('expPlace').value) || '';
     if (EDIT_ID) {
-      EXPENSES = EXPENSES.map(function(e) { return Number(e.id) === Number(EDIT_ID) ? {id:e.id,date:e.date,name:name,czk:czk,ils:ils,note:note} : e; });
+      EXPENSES = EXPENSES.map(function(e) { return Number(e.id) === Number(EDIT_ID) ? {id:e.id,date:e.date,name:name,czk:czk,ils:ils,note:note,place:place} : e; });
     } else {
-      EXPENSES.unshift({id:Date.now(), date:new Date().toLocaleString('he-IL'), name:name, czk:czk, ils:ils, note:note});
+      EXPENSES.unshift({id:Date.now(), date:new Date().toLocaleString('he-IL'), name:name, czk:czk, ils:ils, note:note, place:place});
     }
     saveLocal();
     ensureFirebaseAuth().then(function() {
@@ -7610,6 +7665,7 @@ function editExpense(id) {
   if (qs('expCzk')) qs('expCzk').value = e.czk || '';
   if (qs('expIls')) qs('expIls').value = e.ils || '';
   if (qs('expNote')) qs('expNote').value = e.note || '';
+  _setExpPlace(e.place || '', null);
   var gcat = guessExpCat(e.name||'');
   if (qs('expCat')) qs('expCat').value = gcat||'';
   buildCatChips(gcat||'');
@@ -7917,7 +7973,7 @@ function exportCsv() {
   catOrder.sort(function(a, b) { return byCat[b].czk - byCat[a].czk; });
   // ⚠️ רוחב הקובץ נקבע רק כאן — אחרי שידוע כמה ימים יש בפועל. `line` קורא את
   // COLS בזמן הקריאה, וכל השורות נבנות אחרי השורה הזו, ולכן ההרחבה תקפה לכולן.
-  COLS = Math.max(8, dayOrder.length + 2);
+  COLS = Math.max(9, dayOrder.length + 2);   // 9 = עמודות הפירוט כולל מיקום
 
   var first = items.length ? _expDateParts(items[0]).iso : '';
   var last  = items.length ? _expDateParts(items[items.length - 1]).iso : '';
@@ -7987,9 +8043,9 @@ function exportCsv() {
     var c = byCat[k];
     rows.push(blank);
     rows.push(line([k, '', '', '', '', c.czk, c.ils, pct(c.czk, totC)]));
-    rows.push(line(['', 'תאריך', 'שעה', 'יום בטיול', 'שם', 'CZK', 'ILS', 'הערה']));
+    rows.push(line(['', 'תאריך', 'שעה', 'יום בטיול', 'שם', 'CZK', 'ILS', 'הערה', 'מיקום']));
     c.rows.forEach(function(r) {
-      rows.push(line(['', r.dp.iso, r.dp.time, r.dp.day, r.e.name, r.c, r.i, r.e.note || '']));
+      rows.push(line(['', r.dp.iso, r.dp.time, r.dp.day, r.e.name, r.c, r.i, r.e.note || '', r.e.place || '']));
     });
     rows.push(line(['', '', '', '', 'סה״כ ' + k + ' (' + cnt(c.rows.length) + ')', c.czk, c.ils, pct(c.czk, totC)]));
   });
@@ -8181,12 +8237,13 @@ function exportHtmlReport() {
     if (!g) return;
     h.push('<details><summary><span>' + _h(c) + '</span><span class="n">' + _nf(g.czk) + ' CZK · ₪' + _nf(g.ils) +
            ' · ' + (g.rows.length === 1 ? 'הוצאה אחת' : g.rows.length + ' הוצאות') + '</span></summary>');
-    h.push('<div class="scroll"><table><tr><th>תאריך</th><th>שעה</th><th>יום</th><th>שם</th><th class="n">CZK</th><th class="n">₪</th></tr>');
+    h.push('<div class="scroll"><table><tr><th>תאריך</th><th>שעה</th><th>יום</th><th>שם</th><th>מיקום</th><th class="n">CZK</th><th class="n">₪</th></tr>');
     g.rows.forEach(function(r) {
       h.push('<tr><td>' + _h(r.dp.iso) + '</td><td>' + _h(r.dp.time) + '</td><td>' + _h(r.dp.day) + '</td><td>' +
              _h(r.e.name) + (expIsUnclassified(r.e.name) ? ' <span class="tag" style="color:var(--muted)">ללא סיווג</span>' : '') +
              (r.e.note ? '<div style="color:var(--muted);font-size:.76rem">' + _h(r.e.note) + '</div>' : '') +
-             '</td><td class="n">' + _nf(r.c) + '</td><td class="n">' + _nf(r.i) + '</td></tr>');
+             '</td><td style="color:var(--muted);font-size:.8rem">' + (r.e.place ? '📍 ' + _h(r.e.place) : '—') + '</td>' +
+             '<td class="n">' + _nf(r.c) + '</td><td class="n">' + _nf(r.i) + '</td></tr>');
     });
     h.push('</table></div></details>');
   });
