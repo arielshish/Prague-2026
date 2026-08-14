@@ -634,19 +634,28 @@ function _tripSummaryData() {
     var rec = _stopFallback(n);
     var mapRec = null;
     try { mapRec = _mappablePlaces().find(function(x) { return x.name === n; }); } catch (e) {}
-    var day = null;
-    try { day = findItemInDays(n); } catch (e) {}
+    // ⚠️ **היום נלקח מהסימון ולא מהלוז** (תוקן 14/08). קודם הוא הגיע רק
+    // מ-`findItemInDays`, ולכן כל מקום שהיינו בו ו**לא היה בלוז** — K12,
+    // Taiyaki, אקשן — קיבל `day:null` ונפל לסוף הלוח בערימה לא ממוינת.
+    // נמדד: מתוך 14 סימונים, 8 שורות בלי יום, למרות שה-timestamp ידע את כולן.
+    // כך גם מקום ששמו קנוני שונה משם התחנה (`מצודת פראג` מול `טירת פראג
+    // וקתדרלת ויטוס`) — `findItemInDays` לא מצא אותו ולכן הוא איבד את היום.
+    var planDay = null, visitDay = null;
+    try { var f = findItemInDays(n); planDay = f ? f.dayNum : null; } catch (e) {}
+    try { visitDay = visitedDayOf(n); } catch (e) {}
     return {
       name: n,
       icon: (mapRec && mapRec.icon) || rec.emoji || '📍',
       desc: _sclip(rec.desc || rec.details || '', 62),
       type: (mapRec && mapRec.type) || 'community',
-      coords: PLACE_COORDS[n] || null,
-      day: day ? day.dayNum : null,
+      coords: PLACE_COORDS[n] || (mapRec && mapRec.coords) || null,
+      day: visitDay || planDay,
+      dayFrom: visitDay ? 'visit' : (planDay ? 'plan' : null),
       ts: st[n]
     };
   });
-  // מיון לפי יום בלוז, ואז לפי מתי סומן — כך הלוח נקרא כרונולוגית
+  // מיון כרונולוגי: לפי היום שבו היינו, ואז לפי שעת הסימון בתוך היום.
+  // מקום שסומן מחוץ לטווח הטיול ואינו בלוז נשאר בסוף, ממוין לפי הזמן.
   items.sort(function(a, b) {
     if (a.day && b.day && a.day !== b.day) return a.day - b.day;
     if (a.day && !b.day) return -1;
@@ -848,8 +857,14 @@ function buildTripSummarySVG(items, L) {
       s += '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="15" fill="' + clr + '" stroke="#fff" stroke-width="3.5"/>';
       s += '<text x="' + x.toFixed(1) + '" y="' + (y + 6).toFixed(1) + '" text-anchor="middle" font-size="16" font-weight="800" fill="#fff">' + e.n + '</text>';
     });
-    s += '<rect x="' + (m.x + 14) + '" y="' + (m.y + m.h - 44) + '" width="290" height="30" rx="8" fill="rgba(255,255,255,0.85)"/>';
-    s += '<text x="' + (m.x + 24) + '" y="' + (m.y + m.h - 23) + '" text-anchor="end" font-size="17" fill="rgba(30,41,59,0.6)">© OpenStreetMap · ' + L.pts.length + ' נקודות</text>';
+    // ⚠️ **מקום בלי קואורדינטה מאומתת לא מצויר** (FAT CAT, IKEA) — הוא כן
+    // ברשימה. בלי לומר את זה, ההפרש בין מספר השורות למספר הנעצים נראה
+    // כאילו סימונים נעלמו.
+    var _noCoord = items.length - L.pts.length;
+    var _attr = '© OpenStreetMap · ' + L.pts.length + ' נקודות' +
+                (_noCoord > 0 ? ' · ' + _noCoord + ' ברשימה בלי מיקום מדויק' : '');
+    s += '<rect x="' + (m.x + 14) + '" y="' + (m.y + m.h - 44) + '" width="' + (_noCoord > 0 ? 470 : 290) + '" height="30" rx="8" fill="rgba(255,255,255,0.85)"/>';
+    s += '<text x="' + (m.x + 24) + '" y="' + (m.y + m.h - 23) + '" text-anchor="end" font-size="17" fill="rgba(30,41,59,0.6)">' + _sxesc(_attr) + '</text>';
   }
 
   // ── list ──
@@ -981,7 +996,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-14-f';
+var BUILD_ID = '2026-08-14-g';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
@@ -7325,9 +7340,22 @@ function guessExpCat(name) {
 // ממפה הוצאה ל**קטגוריית התקציב של המשתמש** — מקור אמת אחד לפסים ולדוח כאחד.
 // הוצאה בלי אימוג׳י מוכר נופלת לקטגוריה האחרונה בתקציב (התנהגות הפסים מאז ומתמיד,
 // אצל המשתמש `כללי ושונות 💡`). היא מסומנת בדוח כ"ללא סיווג" ולא נבלעת בשקט.
-function expBudgetCat(name, budget) {
+// ── הקטגוריה נשמרת על ההוצאה עצמה (14/08) ──
+// עד כאן הסיווג היה **תמיד ניחוש מהשם**, ולכן כל שם חופשי בלי אימוג׳י מוכר
+// (`מונית לשדה`, `חולצות`, `מים ונשנושים`, `טיפ למלצר`) חזר `null` ונפל
+// לקטגוריה **האחרונה** בתקציב — אצל המשתמש `כללי ושונות 💡`. זו הסיבה
+// ש"כללי" גדל מעצמו: לא הועברו לשם הוצאות, פשוט כל מה שלא זוהה נחת שם.
+// עכשיו הצ׳יפ שנבחר במודל נשמר בשדה `cat` וגובר על כל ניחוש. רשומות ישנות
+// בלי `cat` ממשיכות להיגזר מהשם בדיוק כמו קודם — אין מיגרציה ואין דריסה.
+function _expCatKeyOf(e) {
+  return (e && typeof e === 'object' && e.cat) ? String(e.cat) : null;
+}
+function _expNameOf(e) {
+  return (e && typeof e === 'object') ? String(e.name || '') : String(e == null ? '' : e);
+}
+function expBudgetCat(e, budget) {
   budget = budget || loadBudget();
-  var k = guessExpCat(name);
+  var k = _expCatKeyOf(e) || guessExpCat(_expNameOf(e));
   if (k) {
     for (var i = 0; i < budget.length; i++) {
       if (String(budget[i].cat).indexOf(k) !== -1) return budget[i].cat;
@@ -7335,14 +7363,18 @@ function expBudgetCat(name, budget) {
   }
   return budget.length ? budget[budget.length - 1].cat : '❓ אחר';
 }
-function expIsUnclassified(name) { return guessExpCat(name) === null; }
+// "ללא סיווג" = לא נבחרה קטגוריה **וגם** לא זוהתה מהשם. בחירה מפורשת
+// ב-`כללי` היא סיווג לכל דבר ולא נופלת לכאן.
+function expIsUnclassified(e) {
+  return !_expCatKeyOf(e) && guessExpCat(_expNameOf(e)) === null;
+}
 
 function catActualMap(budget) {
   // עובר דרך expBudgetCat — אותה פונקציה בדיוק שהדוח משתמש בה, כדי ששני
   // המסכים לא יוכלו להראות מספרים שונים לאותה הוצאה.
   var map = {};
   EXPENSES.forEach(function(e) {
-    var c = expBudgetCat(e.name || '', budget);
+    var c = expBudgetCat(e, budget);
     map[c] = (map[c] || 0) + (Number(e.ils) || 0);
   });
   return map;
@@ -7374,6 +7406,17 @@ function renderBudget() {
       '</div>' +
     '</div>';
   }).join('');
+
+  // ⚠️ הוצאה בלי קטגוריה נספרת בקטגוריה **האחרונה** בתקציב. זו התנהגות ותיקה
+  // ולגיטימית, אבל בלי לומר אותה "כללי" גדל בלי הסבר. עכשיו כתוב כמה וכמה.
+  var _unc = EXPENSES.filter(function(e) { return expIsUnclassified(e); });
+  if (_unc.length) {
+    var _uncIls = _unc.reduce(function(s, e) { return s + (Number(e.ils) || 0); }, 0);
+    var _lastCat = budget.length ? budget[budget.length - 1].cat : '';
+    rows.innerHTML += '<div style="margin-top:4px;padding:8px 10px;background:rgba(245,158,11,0.10);border:1px solid rgba(245,158,11,0.25);border-radius:10px;font-size:11px;color:rgba(30,41,59,0.75);line-height:1.6;">' +
+      '❓ <b>' + (_unc.length === 1 ? 'הוצאה אחת ללא קטגוריה' : _unc.length + ' הוצאות ללא קטגוריה') + '</b> · <bdi style="unicode-bidi:isolate;direction:ltr;">₪' + _uncIls.toLocaleString('he-IL') + '</bdi> — ' + (_unc.length === 1 ? 'נספרת' : 'נספרות') + ' תחת <b>' + esc(_lastCat) + '</b>.<br>' +
+      'לפתוח את ההוצאה בטאב ההוצאות ולבחור צ׳יפ קטגוריה — הבחירה נשמרת על ההוצאה.</div>';
+  }
 
   var remain = totalBudget - totalActual;
   var over = remain < 0;
@@ -7792,10 +7835,12 @@ function saveExpense() {
     else { google.script.run.withSuccessHandler(ok).withFailureHandler(fail).addExpense(name, czk, ils, note); }
   } else {
     var place = (qs('expPlace') && qs('expPlace').value) || '';
+    // הקטגוריה שנבחרה נשמרת על הרשומה — הצהרה מפורשת שלא צריך לנחש שוב.
+    var cat = catKey || '';
     if (EDIT_ID) {
-      EXPENSES = EXPENSES.map(function(e) { return Number(e.id) === Number(EDIT_ID) ? {id:e.id,date:e.date,name:name,czk:czk,ils:ils,note:note,place:place} : e; });
+      EXPENSES = EXPENSES.map(function(e) { return Number(e.id) === Number(EDIT_ID) ? {id:e.id,date:e.date,name:name,czk:czk,ils:ils,note:note,place:place,cat:cat} : e; });
     } else {
-      EXPENSES.unshift({id:Date.now(), date:new Date().toLocaleString('he-IL'), name:name, czk:czk, ils:ils, note:note, place:place});
+      EXPENSES.unshift({id:Date.now(), date:new Date().toLocaleString('he-IL'), name:name, czk:czk, ils:ils, note:note, place:place, cat:cat});
     }
     saveLocal();
     ensureFirebaseAuth().then(function() {
@@ -7814,7 +7859,8 @@ function editExpense(id) {
   if (qs('expIls')) qs('expIls').value = e.ils || '';
   if (qs('expNote')) qs('expNote').value = e.note || '';
   _setExpPlace(e.place || '', null);
-  var gcat = guessExpCat(e.name||'');
+  // הקטגוריה השמורה גוברת על הניחוש — אחרת עריכה הייתה מאפסת בחירה מפורשת.
+  var gcat = e.cat || guessExpCat(e.name||'');
   if (qs('expCat')) qs('expCat').value = gcat||'';
   buildCatChips(gcat||'');
   buildExpNameList();
@@ -8087,7 +8133,7 @@ function _expDateParts(e) {
 // רשומה בלי אימוג׳י מוכר נופלת ל"אחר" במפורש ולא משויכת בכוח.
 // הדוח משתמש עכשיו ב**קטגוריות התקציב של המשתמש** ולא בחמש שהמציא לעצמו,
 // כך ש"תקציב מול בפועל" בדוח הוא השוואה אמיתית ולא בין שתי טקסונומיות.
-function _expCat(name) { return expBudgetCat(name); }
+function _expCat(e) { return expBudgetCat(e); }
 function exportCsv() {
   var COLS = 8;
   var q = function(v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; };
@@ -8107,7 +8153,7 @@ function exportCsv() {
   var byCat = {}, catOrder = [], byDay = {}, dayOrder = [], byCatDay = {};
   items.forEach(function(e) {
     var c = Number(e.czk) || 0, i = Number(e.ils) || 0;
-    var cat = _expCat(e.name), dp = _expDateParts(e), dk = dp.iso || 'ללא תאריך';
+    var cat = _expCat(e), dp = _expDateParts(e), dk = dp.iso || 'ללא תאריך';
     totC += c; totI += i;
     if (!byCat[cat]) { byCat[cat] = { czk: 0, ils: 0, rows: [] }; catOrder.push(cat); }
     byCat[cat].czk += c; byCat[cat].ils += i; byCat[cat].rows.push({ e: e, c: c, i: i, dp: dp });
@@ -8231,9 +8277,9 @@ function exportHtmlReport() {
   var byCat = {}, byDay = {}, dayOrder = [], byCatDay = {}, unclassified = 0;
   items.forEach(function(e) {
     var c = Number(e.czk) || 0, i = Number(e.ils) || 0;
-    var cat = expBudgetCat(e.name, budget), dp = _expDateParts(e), dk = dp.iso || 'ללא תאריך';
+    var cat = expBudgetCat(e, budget), dp = _expDateParts(e), dk = dp.iso || 'ללא תאריך';
     totC += c; totI += i;
-    if (expIsUnclassified(e.name)) unclassified++;
+    if (expIsUnclassified(e)) unclassified++;
     if (!byCat[cat]) byCat[cat] = { czk: 0, ils: 0, rows: [] };
     byCat[cat].czk += c; byCat[cat].ils += i; byCat[cat].rows.push({ e: e, c: c, i: i, dp: dp });
     if (!byDay[dk]) { byDay[dk] = { czk: 0, ils: 0, n: 0, day: dp.day }; dayOrder.push(dk); }
@@ -8426,7 +8472,7 @@ function exportHtmlReport() {
     h.push('<div class="scroll"><table><tr><th>תאריך</th><th>שעה</th><th>יום</th><th>שם</th><th>מיקום</th><th class="n">CZK</th><th class="n">₪</th></tr>');
     g.rows.forEach(function(r) {
       h.push('<tr><td>' + _h(r.dp.iso) + '</td><td>' + _h(r.dp.time) + '</td><td>' + _h(r.dp.day) + '</td><td>' +
-             _h(r.e.name) + (expIsUnclassified(r.e.name) ? ' <span class="tag" style="color:var(--muted)">ללא סיווג</span>' : '') +
+             _h(r.e.name) + (expIsUnclassified(r.e) ? ' <span class="tag" style="color:var(--muted)">ללא סיווג</span>' : '') +
              (r.e.note ? '<div style="color:var(--muted);font-size:.76rem">' + _h(r.e.note) + '</div>' : '') +
              '</td><td style="color:var(--muted);font-size:.8rem">' + (r.e.place ? '📍 ' + _h(r.e.place) : '—') + '</td>' +
              '<td class="n">' + _nf(r.c) + '</td><td class="n">' + _nf(r.i) + '</td></tr>');
