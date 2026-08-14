@@ -981,7 +981,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-14-a';
+var BUILD_ID = '2026-08-14-b';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
@@ -3539,6 +3539,7 @@ var ALL_PLACES = [
 // ── SHOPS (type:'shop') ──────────────────────────────────────────────────────
   {type:'shop',icon:'🛍️',name:'Primark — כיכר וצסלב',stars:'★★★★★',hours:'09:00–21:00',metro:'מטרו A/C — Můstek',duration:'~20 דק׳',brands:'ביגוד, ילדים, בית, מזוודות',tip:'להגיע בבוקר — עמוס מאוד בצהריים.',mapUrl:'https://www.google.com/maps/search/Primark+Wenceslas+Square+Prague'},
   {type:'shop',icon:'🏬',name:'Palladium',stars:'★★★★★',hours:'09:00–21:00',metro:'מטרו B — Náměstí Republiky',duration:'~25 דק׳',brands:'~180 חנויות, Albert, Sephora',tip:'מעולה לשילוב עם העיר העתיקה.',mapUrl:'https://www.google.com/maps/place/Palladium+shopping+centre,+Prague'},
+  {type:'shop',icon:'🛋️',name:'IKEA Praha — Zličín',stars:'איקאה',hours:'10:00–20:00 כל יום',metro:'מטרו B — Zličín + אוטובוס מעבורת חינם מהתחנה',duration:'~60–90 דק׳',brands:'ריהוט, מטבח, טקסטיל, מזון שוודי · Skandinávská 15a, בתוך Avion Shopping Park',tip:'צמוד ל-Metropole Zličín — מתחנת המטרו Zličín יוצאים אוטובוסי מעבורת חינם להיפרמרקטים (איקאה, גלובוס, טסקו). באותו אזור גם Homepark Zličín עם Tesco Extra שפתוח 06:00–24:00. ⚠️ אין קואורדינטה מאומתת — לנווט דרך כפתור המפה.',mapUrl:'https://www.google.com/maps/search/IKEA+Praha+Zlicin'},
   {type:'shop',icon:'🏬',name:'Metropole Zličín',stars:'~200 חנויות',hours:'09:00–21:00 כל יום · אלברט 07:00–22:00',metro:'מטרו B — Zličín (תחנה סופית, גישה רגלית ישירה)',duration:'~90–120 דק׳',brands:'Primark (נפתח 11/2024), H&M, Albert היפרמרקט, C&A, Reserved, New Yorker, Lindex, Marks & Spencer, Sportisimo, Decathlon, Datart, Cinema City',tip:'הסניף השני של Primark בפראג — החלופה היחידה לזה שבכיכר וצסלב. ⚠️ סוף קו B, בקצה המערבי של העיר: מהמלון זה מטרו A → Můstek → B, כ-50–60 דק׳ לכיוון. הדירוג בגוגל לא אומת.',mapUrl:'https://www.google.com/maps/place/Metropole+Zličín,+Prague'},
   {type:'shop',icon:'🏢',name:'Westfield Chodov',stars:'★★★★☆',hours:'09:00–21:00',metro:'מטרו C — Chodov',duration:'~35–45 דק׳',brands:'~300 חנויות: Zara, Mango, Reserved',tip:'הקניון הגדול ביותר — ליום גשם.',mapUrl:'https://www.google.com/maps/search/Westfield+Chodov+Prague'},
   {type:'shop',icon:'🏷️',name:'Fashion Arena Outlet',stars:'★★★★☆',hours:'10:00–20:00',metro:'מטרו A → Depo Hostivař + Bus',duration:'~45–60 דק׳',brands:'Nike, Adidas, Tommy Hilfiger, Calvin Klein',tip:'מציאות מותגים — שווה חצי יום.',mapUrl:'https://www.google.com/maps/search/Fashion+Arena+Prague+Outlet'},
@@ -3666,6 +3667,11 @@ var ALL_PLACES = [
    google:'4.6',mapUrl:'https://www.google.com/maps/search/George+Prime+Steak+Prague'},
 
 // ── DESSERTS (type:'dessert') — level: 1=💰 עד 100 CZK | 2=💰💰 100–250 | 3=💰💰💰 250–500 ──
+  {type:'dessert',level:2,icon:'🐟',name:'Taiyaki Bar',sub:'טאיאקי יפני + שוקו חם — הרובע היהודי',
+   desc:'בר יפני שאופה טאיאקי — כיסון בצק בצורת דג — במקום, וממלא אותו בגלידה, קצפת ותוספות. מפורסם במיוחד בשוקו החם: רפאלו, אוראו וסמורס. ⭐4.9 מ-1,990 ביקורות. Maiselova 14/1, ליד כיכר העיר העתיקה ובית הכנסת מייזל.',
+   price:'~150–250 CZK',rating:'⭐⭐⭐⭐⭐',tag:'ויראלי 🔥',tagClr:'#FCD34D',
+   where:'Maiselova 14/1, Josefov · פתוח כל יום 11:00–21:00 · ⚠️ אין קואורדינטה מאומתת — לנווט דרך כפתור המפה',
+   mapUrl:'https://www.google.com/maps/search/Taiyaki+Bar+Maiselova+Prague'},
   {type:'dessert',level:1,icon:'🍦',name:'Angelato',sub:'גלידה איטלקית אמנותית — מקומיים בלבד',
    desc:'גלידה טרייה יומית ללא תוספים מלאכותיים. טעמים מטורפים: פיסטוק, גבינת פרמזן, סרפדים, רוברב. פתוחה מ-2007. שני סניפים — ממש ליד המרכז.',
    price:'50–90 CZK לכדור',rating:'⭐⭐⭐⭐⭐',tag:'מקומי ✨',tagClr:'#6EE7B7',
