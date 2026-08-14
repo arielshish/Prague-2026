@@ -981,7 +981,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-14-d';
+var BUILD_ID = '2026-08-14-e';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
@@ -5182,6 +5182,22 @@ function getVisitedState() {
 }
 function isVisited(name) { return !!getVisitedState()[_canonicalName(name)]; }
 function visitedCount() { return Object.keys(getVisitedState()).length; }
+// יום הביקור נגזר מה-**timestamp של הסימון עצמו**, ש-`VISITED_STATE` שומר מאז
+// ומתמיד (`{שם: timestamp}`). קודם תג היום הוצג רק למקום שנמצא ב-`DAYS`, ולכן
+// מקום שסומן "היינו" אך מעולם לא היה בלוז — K12 BBQ, Taiyaki, אקשן — נשאר בלי
+// יום, וברשימה זה נראה כאילו חלק מהכרטיסים חסרים משהו.
+// ⚠️ זה **יום הסימון** ולא בהכרח יום הביקור. בפועל מסמנים במקום או מיד אחריו,
+// אבל התווית אומרת "סומן" ולא "היינו ביום", כדי לא להצהיר יותר ממה שידוע.
+// ⚠️ סימון מחוץ לטווח הטיול (לפני שהתחיל, או אחרי שהסתיים) לא מקבל יום.
+function visitedDayOf(name) {
+  try {
+    var ts = getVisitedState()[_canonicalName(name)];
+    if (!ts) return null;
+    var d = tripDayNumber(new Date(Number(ts)));
+    var total = (getDaysState() || []).length || 8;
+    return (d >= 1 && d <= total) ? d : null;
+  } catch (e) { return null; }
+}
 
 function saveVisitedState() {
   var json = JSON.stringify(getVisitedState());
@@ -6547,8 +6563,9 @@ function renderNearbyList() {
           '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:' + catClr + '18;color:' + catClr + ';">' + catLbl + '</span>' +
           (distStr ? '<span style="font-size:10px;font-weight:700;color:rgba(30,41,59,0.5);">🚶 '+distStr+(walkMin?(' · '+walkMin+'ד\''):'')+'</span>' : '') +
           dirHtml +
-          (isVisited(p.name) ? '<span style="font-size:10px;font-weight:800;color:#065F46;background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.3);padding:2px 8px;border-radius:20px;">✅ היינו</span>' : '') +
-          (it.inDays ? '<span style="font-size:10px;font-weight:700;color:#16a34a;background:rgba(22,163,74,0.10);padding:2px 8px;border-radius:20px;margin-right:auto;">✅ יום '+it.inDays.dayNum+(it.inDays.time?' · '+it.inDays.time:'')+'</span>' : '') +
+          (isVisited(p.name) ? (function(){ var _vd = visitedDayOf(p.name);
+            return '<span style="font-size:10px;font-weight:800;color:#065F46;background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.3);padding:2px 8px;border-radius:20px;">✅ היינו' + (_vd ? ' · יום ' + _vd : '') + '</span>'; })() : '') +
+          (it.inDays ? '<span style="font-size:10px;font-weight:700;color:#16a34a;background:rgba(22,163,74,0.10);padding:2px 8px;border-radius:20px;margin-right:auto;">🗓 יום '+it.inDays.dayNum+(it.inDays.time?' · '+it.inDays.time:'')+'</span>' : '') +
         '</div>' +
       '</div>' +
       // arrow indicator
