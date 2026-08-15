@@ -1,0 +1,46 @@
+name: Apply Expense Stops PR130
+
+on:
+  push:
+    branches:
+      - feature/add-expense-stops
+    paths:
+      - tools/apply-expense-stops-pr130.py
+      - .github/workflows/apply-expense-stops-pr130.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, 'Apply expense-derived day stops') }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fetch main baseline
+        run: git fetch origin main
+
+      - name: Apply PR130 patch
+        run: python3 tools/apply-expense-stops-pr130.py
+
+      - name: Check inline JavaScript
+        run: node --check /tmp/app-inline.js
+
+      - name: Remove temporary workflow and script
+        run: |
+          rm -f tools/apply-expense-stops-pr130.py
+          rm -f .github/workflows/apply-expense-stops-pr130.yml
+          rmdir tools 2>/dev/null || true
+
+      - name: Commit result
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app.html docs/EXPENSE_STOPS_PR130.md docs/CLAUDE_EXPENSE_STOPS_PR130.md
+          git add -u
+          git commit -m "Apply expense-derived day stops"
+          git push origin feature/add-expense-stops
