@@ -16,15 +16,11 @@ jobs:
         run: python3 tools/apply-burger-king-expense-draft.py
       - name: Check inline JavaScript
         run: node --check /tmp/app-inline.js
-      - name: Remove temporary workflow and script
-        run: |
-          rm -f tools/apply-burger-king-expense-draft.py
-          rm -f .github/workflows/apply-burger-king-expense-draft.yml
-      - name: Commit result
+      - name: Commit app and docs only
         run: |
           git config user.name "arielshish"
           git config user.email "159256813+arielshish@users.noreply.github.com"
-          git add -A
+          git add app.html docs/BURGER_KING_EXPENSE_DRAFT_PR132.md docs/CLAUDE_BURGER_KING_EXPENSE_DRAFT_PR132.md
           git status --short
           git diff --cached --quiet && exit 0
           git commit -m "Add Burger King expense draft"
