@@ -18,39 +18,7 @@ additions = {
     'Primark — Metropole Zličín': [50.05340, 14.28946],
 }
 
-m = re.search(r'(var|const|let)\s+PLACE_COORDS\s*=\s*\{', app)
-if not m:
-    raise SystemExit('PLACE_COORDS not found')
-start = app.find('{', m.start())
-depth = 0
-quote = None
-esc = False
-end = None
-for i in range(start, len(app)):
-    ch = app[i]
-    if quote:
-        if esc:
-            esc = False
-        elif ch == '\\':
-            esc = True
-        elif ch == quote:
-            quote = None
-        continue
-    if ch in ('"', "'", '`'):
-        quote = ch
-        continue
-    if ch == '{':
-        depth += 1
-    elif ch == '}':
-        depth -= 1
-        if depth == 0:
-            end = i
-            break
-if end is None:
-    raise SystemExit('PLACE_COORDS close not found')
-
-obj = app[start:end+1]
-existing = set(re.findall(r"['\"]([^'\"]+)['\"]\s*:\s*\[", obj))
+existing = set(re.findall(r"['\"]([^'\"]+)['\"]\s*:\s*\[\s*-?\d", app))
 lines = []
 for name, coord in additions.items():
     if name not in existing:
@@ -58,8 +26,12 @@ for name, coord in additions.items():
         lines.append("  '%s': [%.7f, %.7f]," % (safe, coord[0], coord[1]))
 
 if lines:
-    insert = "\n  // PR #127: aliases for trip-summary selection bank / manual summary fixes\n" + "\n".join(lines) + "\n"
-    app = app[:end] + insert + app[end:]
+    insert = "  // PR #127: aliases for trip-summary selection bank / manual summary fixes\n" + "\n".join(lines) + "\n"
+    # Insert after a known real coordinate row inside PLACE_COORDS.
+    anchor = re.search(r"(^\s*['\"]K12 BBQ & Sushi['\"]\s*:\s*\[[^\n]+\],\s*$)", app, flags=re.M)
+    if not anchor:
+        raise SystemExit('safe coordinate anchor not found: K12 BBQ & Sushi')
+    app = app[:anchor.end()] + "\n" + insert + app[anchor.end():]
 
 if "var BUILD_ID = '2026-08-15-c';" not in app:
     raise SystemExit('expected BUILD_ID c not found')
