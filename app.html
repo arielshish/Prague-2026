@@ -1485,7 +1485,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-15-g';
+var BUILD_ID = '2026-08-15-h';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
@@ -4767,6 +4767,75 @@ function getDaysState() {
   return DAYS_STATE;
 }
 
+// PR #130: expense-derived stops shown above the rest of the day stops.
+// These are UI/day-plan stops only. They do not mark places as visited and do not touch expenses.
+var EXPENSE_DAY_STOPS_PR130 = [
+  {
+    emoji: '🍦',
+    name: 'Pure גלידה — Náplavka / שוק האיכרים על הנהר',
+    time: '12:44',
+    desc: 'נוסף לפי הוצאה: 200 CZK · ליד שוק האיכרים על הנהר. מיקום קנוני: Náplavka / Rašínovo nábřeží.',
+    mapUrl: 'https://www.google.com/maps/search/Naplavka+farmers+market+Prague'
+  },
+  {
+    emoji: '🏰🛍️',
+    name: 'Pražská tržnice — השוק הגדול (הולשוביצה)',
+    time: '12:43',
+    desc: 'נוסף לפי הוצאה: 117 CZK · השוק הגדול בהולשוביצה.',
+    mapUrl: 'https://www.google.com/maps/search/Prazska+trznice+Prague'
+  }
+];
+
+function _isPr130TargetExpenseDay(day, idx) {
+  var s = [day && day.date, day && day.title, day && day.subtitle, day && day.label, day && day.day].filter(Boolean).join(' ');
+  if (/15[./-]0?8/.test(s) || /0?8[./-]15/.test(s)) return true;
+  if (day && Number(day.dayNum) === 8) return true;
+  if (/יום\s*8/.test(s)) return true;
+  // Fallback: 15.08.2026 is trip day 8 in this itinerary.
+  return idx === 7;
+}
+
+function _ensureExpenseStopsPr130(days) {
+  try {
+    if (!Array.isArray(days) || !days.length) return days;
+    var targetIdx = -1;
+    for (var i = 0; i < days.length; i++) {
+      if (_isPr130TargetExpenseDay(days[i], i)) { targetIdx = i; break; }
+    }
+    if (targetIdx < 0) return days;
+    var day = days[targetIdx];
+    if (!day) return days;
+    if (!Array.isArray(day.stops)) day.stops = [];
+    var aliases = {
+      'Pure גלידה': true,
+      'Pure גלידה — Náplavka / שוק האיכרים על הנהר': true,
+      'Pražská tržnice': true,
+      'Pražská tržnice — השוק הגדול (הולשוביצה)': true,
+      'השוק הגדול — הולשוביצה': true
+    };
+    var existing = {};
+    day.stops.forEach(function(s) {
+      if (s && s.name) existing[s.name] = true;
+    });
+    var toAdd = [];
+    EXPENSE_DAY_STOPS_PR130.forEach(function(stop) {
+      var exists = !!existing[stop.name];
+      Object.keys(aliases).forEach(function(a) {
+        if (!exists && existing[a] && (a === stop.name || stop.name.indexOf(a) >= 0 || a.indexOf(stop.name) >= 0)) exists = true;
+      });
+      if (!exists) toAdd.push(Object.assign({}, stop));
+    });
+    if (toAdd.length) day.stops = toAdd.concat(day.stops);
+  } catch (e) {}
+  return days;
+}
+
+var _getDaysStateBeforePr130ExpenseStops = getDaysState;
+getDaysState = function() {
+  return _ensureExpenseStopsPr130(_getDaysStateBeforePr130ExpenseStops());
+};
+
+
 function timeOfDay(timeStr) {
   if (!timeStr) return null;
   var m = timeStr.match(/^(\d{1,2})[:\.](\d{2})/);
@@ -6295,6 +6364,13 @@ var PLACE_COORDS = {
   'Primark — Metropole Zličín': [50.0534000, 14.2894600],
   // PR #127: reviewed aliases from full coordinate audit
   // PR #128: selection bank coordinate sweep — safe real-place aliases
+  // PR #130: expense-derived day stops — real locations only
+  'Pure גלידה — Náplavka / שוק האיכרים על הנהר': [50.0692000, 14.4142000],
+  'Náplavka / שוק האיכרים על הנהר': [50.0692000, 14.4142000],
+  'שוק האיכרים על הנהר — Náplavka': [50.0692000, 14.4142000],
+  'Pražská tržnice — השוק הגדול (הולשוביצה)': [50.0996700, 14.4459800],
+  'Pražská tržnice': [50.0996700, 14.4459800],
+  'השוק הגדול — הולשוביצה': [50.0996700, 14.4459800],
   'Manifesto': [50.0703000, 14.4008000],
   'Manifesto Market — Anděl (שוק ערב)': [50.0703000, 14.4008000],
   'Prague Zoo': [50.1173000, 14.4075000],
