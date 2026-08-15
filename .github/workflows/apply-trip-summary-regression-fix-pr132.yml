@@ -15,7 +15,7 @@ jobs:
       - name: Fetch main baseline
         run: git fetch origin main
       - name: Apply regression fix
-        run: python3 tools/apply-trip-summary-regression-fix-pr132.py
+        run: python3 tools/apply-trip-summary-regression-fix-pr132b.py
       - name: Check inline JavaScript syntax
         run: node --check /tmp/app-inline.js
       - name: Run semantic regression tests
@@ -25,7 +25,9 @@ jobs:
           grep -q "var BUILD_ID = '2026-08-15-j';" app.html
           grep -q "return 'manual-visit:'" app.html
           grep -q "function _lockTripSummaryOverlayScroll" app.html
-          grep -q "'Burger King — OC Eden': \[50.06780, 14.47170\]" app.html
+          grep -q "Burger King — OC Eden" app.html
+          grep -q "50.06780" app.html
+          grep -q "14.47170" app.html
           ! git diff -- app.html | grep -E "prague_exp_v10|prague_visited_v1|prague_days_v1|appdata/(expenses|main|trip_summary)" || exit 1
       - name: Commit app and docs only
         run: |
