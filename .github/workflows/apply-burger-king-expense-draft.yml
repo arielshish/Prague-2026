@@ -24,8 +24,8 @@ jobs:
         run: |
           git config user.name "arielshish"
           git config user.email "159256813+arielshish@users.noreply.github.com"
-          git add app.html docs/BURGER_KING_EXPENSE_DRAFT_PR132.md docs/CLAUDE_BURGER_KING_EXPENSE_DRAFT_PR132.md
-          git add -u tools .github/workflows || true
+          git add -A
           git status --short
+          git diff --cached --quiet && exit 0
           git commit -m "Add Burger King expense draft"
           git push
