@@ -1,0 +1,29 @@
+name: Full Trip Coords Audit
+
+on:
+  push:
+    branches:
+      - feature/missing-trip-summary-coords
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      - name: Build full coordinate audit
+        run: |
+          python3 tools/audit-trip-coords-full.py
+          git config user.name "arielshish"
+          git config user.email "159256813+arielshish@users.noreply.github.com"
+          git add docs/FULL_TRIP_COORDS_AUDIT.md
+          git commit -m "Document full trip coordinates audit" || echo "No audit changes"
+          rm -f tools/audit-trip-coords-full.py .github/workflows/full-trip-coords-audit.yml
+          git add tools/audit-trip-coords-full.py .github/workflows/full-trip-coords-audit.yml
+          git commit -m "Clean full coordinate audit temporary files" || echo "No cleanup changes"
+          git push
