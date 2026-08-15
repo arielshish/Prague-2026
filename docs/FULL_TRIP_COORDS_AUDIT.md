@@ -1,0 +1,224 @@
+# Full Trip Coordinate Audit
+
+Generated on branch `feature/missing-trip-summary-coords` from `app.html`.
+
+- PLACE_COORDS entries: 144
+- Filtered place-like candidates: 206
+- With GPS: 126
+- Missing GPS / needs review: 80
+
+## Missing GPS / needs review
+
+- `, // גן ולנשטיין` — sources: context
+- `Albert בקומה -1 — לקנות שוקולדים ומזכרות` — sources: context
+- `Bolt מהמלון לשדה: 500–900 CZK | 30–50 דק׳` — sources: context
+- `Café Savoy בקרבת מקום — ארוחת צהריים מצוינת` — sources: context
+- `Café Savoy — מעולה לארוחה אחרונה עם אווירה` — sources: context
+- `Café Savoy — שניצל עגל וינאי` — sources: context
+- `Clementinum – הספרייה הבארוקית` — sources: name
+- `Gran Fierro / George Prime Steak — לסיים ביג!` — sources: context
+- `Gran Fierro אם יש אנרגיה, קל ליד המלון אם עייפים` — sources: context
+- `Gran Fierro — אם רוצים לסיים בגדול` — sources: context
+- `Gran Fierro — בשרים, או ארוחה קלה` — sources: context
+- `Gran Fierro — להזמין מראש!` — sources: context
+- `Gran Fierro: restaurants.granfierro.cz | Café Savoy: cafesavoy.ambi.cz` — sources: context
+- `Hamleys יש עגלות ניסיון ברחבי החנות` — sources: context
+- `IKEA Praha — Zličín` — sources: name
+- `Josefov, בית הכנסת ירושלים, Café Savoy` — sources: context
+- `Kantýna או Lokál — בקר/עוף בלבד` — sources: context
+- `LEGO Store — לאפשר בחירה חופשית` — sources: context
+- `Manifesto` — sources: context
+- `Manifesto Market — Anděl (שוק ערב)` — sources: context
+- `Municipal House – Obecní dům` — sources: name
+- `Pizza & Pasta Factory — 👨‍👩‍👧 מה שאכלנו בפועל` — sources: context
+- `Prague` — sources: context
+- `Primark → Na Příkopě → Palladium → Hamleys/LEGO` — sources: context
+- `Vyšehrad – המבצר הנסתר` — sources: name
+- `Výtopna — חוויה יותר ממסעדת גורמה` — sources: context
+- `Výtopna — להזמין מראש!` — sources: context
+- `אוכל בגן החיות` — sources: context
+- `אוכל בפארק (יקר — לשקול מחוץ)` — sources: context
+- `אי קמפה (Kampa Island) — אי שקט בתוך העיר, מופרד מהיבשה ע` — sources: context
+- `אישור הזמנת המלון` — sources: title
+- `אם עייפות — לוותר על מוזיאון האשליות` — sources: context
+- `אם עייפים מהנסיעה — אפשר לאכול בבית קפה ליד המלון` — sources: context
+- `אפשר לשלב עם קמפה וגשר קארל אחרי הארוחה` — sources: context
+- `ארוחת צהריים בגן — יש כמה מסעדות בפנים` — sources: context
+- `בין השעון האסטרונומי לגשר קארל` — sources: title
+- `בינוניות — פחות מגשר קארל` — sources: context
+- `בית הריקוד – Dancing House` — sources: name
+- `גלידה: Angelato — מומלצת מאוד` — sources: context
+- `גן החיות של פראג + שייט ערב` — sources: title
+- `גשר קארל – Charles Bridge` — sources: name
+- `הרובע היהודי ובית הכנסת הגדול בפראג` — sources: context, title
+- `הרובע היהודי – Josefov` — sources: name
+- `חדר כושר 24/7, חדר משחקים ומועדון ילדים — אין בריכה במלון` — sources: context
+- `טירת פראג – Pražský hrad` — sources: name
+- `יום מים — Aquapalace Prague` — sources: title
+- `יום קניות — Primark, Palladium וצעצועים` — sources: context, title
+- `כיכר העיר העתיקה – Old Town Square` — sources: name
+- `כרטיסים ל-Aquapalace` — sources: title
+- `כרטיסים לגן חיות פראג` — sources: title
+- `כרטיסים לטירת פראג` — sources: title
+- `כרטיסים לממלכת הרכבות` — sources: title
+- `כריך / פיצה / קפה ליד המלון` — sources: context
+- `לאכול בכיכר עצמה — יקר. לצאת לסמטאות` — sources: context
+- `להגיע ל-Primark בבוקר — פחות תורים` — sources: context
+- `להזמין Gran Fierro בזמן המנוחה` — sources: context
+- `להכין כתובת מלון Offline לפני הנחיתה` — sources: context
+- `להתחיל בממלכת הרכבות בבוקר` — sources: context
+- `לצד מאלה סטרנה — מסעדות עם נוף לגשר` — sources: context
+- `לשמור Gran Fierro לסוף הטיול אם אין כוח` — sources: context
+- `לשמור גשר קארל לשעת ערב` — sources: context
+- `מגדל פטרין – Petřín Tower` — sources: name
+- `מהרובע לבית הכנסת 1.1 ק״מ — 14 דק׳ הליכה` — sources: context
+- `מוזיאון קמפה — ~200 CZK, מומלץ לאוהבי אמנות` — sources: context
+- `ממלכת המלכים — ואז הביתה` — sources: title
+- `מתחם האוכל ב-Palladium או קפה ליד Na Příkopě` — sources: context
+- `נחיתה, מלון, נשימה ראשונה של פראג` — sources: context
+- `עדי יסמין מנהלת את הרכבות של פראג` — sources: title
+- `פארק חינם. מוזיאון: muzeumkampa.cz` — sources: context
+- `פארק רגוע, ברווזים, קפה` — sources: context
+- `צד שקט ויפה מגשר קארל` — sources: context
+- `ק-אאוט) → קואורדינטות המלון; //` — sources: context
+- `קל ליד המלון` — sources: context
+- `קפה טוב: Café Louvre או Café Imperial` — sources: context
+- `רכבל פנימי בגן — שווה!` — sources: context
+- `שעון האסטרונומי – Orloj` — sources: name
+- `שפת הנהר Vltava – בלילה` — sources: name
+- `→ Gran Fierro (לפי ה-mapUrl של התחנה עצמה).` — sources: context
+- `→ כיכר העיר העתיקה; //` — sources: context
+- `⚠️ 6.7 ק״מ מהמלון ובכיוון ההפוך — לשקול אם היום בפארק המים הוציא את כל האנרגיה` — sources: context
+
+## With GPS
+
+- `Albert Supermarket — Chodov` — sources: name
+- `Angelato` — sources: context, name
+- `Aquapalace Prague` — sources: name
+- `Aromi` — sources: context, name
+- `Black Light Theatre — Ta Fantastika` — sources: name
+- `Café Imperial` — sources: name
+- `Café Louvre` — sources: name
+- `Café Savoy` — sources: name
+- `Comfort Hotel Prague City East` — sources: name
+- `Cukrárna Myšák` — sources: name
+- `Dinitz — כשר ישראלי` — sources: name
+- `DinoPark Harfa` — sources: name
+- `Erhartova Cukrárna` — sources: name
+- `Escape Room — TheRoom Prague` — sources: name
+- `eXchange s.r.o. — Štefánikova (סמיחוב)` — sources: context, name
+- `Fashion Arena Outlet` — sources: name
+- `FAT CAT Downtown — כיכר וצסלב` — sources: name
+- `Fortuna Arena — סיור אצטדיון Slavia` — sources: name
+- `George Prime Steak` — sources: context, name
+- `Gran Fierro` — sources: name
+- `Gran Fierro — ארוחת ערב` — sources: name
+- `Hamleys + LEGO Store` — sources: name
+- `Hamleys Prague` — sources: name
+- `Havelské tržiště — השוק העתיק בפראג` — sources: name
+- `K12 BBQ & Sushi` — sources: name
+- `Kantýna` — sources: name
+- `Karel Zeman Museum` — sources: name
+- `King Solomon — כשר` — sources: name
+- `Koh-i-noor Hardtmuth — Bílá Labuť` — sources: context, name
+- `Kus Koláče` — sources: context, name
+- `Las Adelitas` — sources: name
+- `Level — משחקייה` — sources: name
+- `Little Chimney — קריוטוש דובאי` — sources: name
+- `Lokál Dlouhááá` — sources: name
+- `Lokál Korunní` — sources: name
+- `Majaland Prague` — sources: name
+- `Mala Strana — שכונת הברוק` — sources: context, name
+- `Mango — מסעדה אסייתית` — sources: name
+- `Manifesto Market — Anděl` — sources: context, name
+- `Metropole Zličín` — sources: name
+- `MI RYMAS EXCHANGE — כיכר ואצלב` — sources: context, name
+- `Mistral Café` — sources: name
+- `Mlýnec` — sources: name
+- `Nerudova Street` — sources: name
+- `Nový Smíchov` — sources: name
+- `OC Skalka — Action · Pepco · Tesco` — sources: name
+- `Ovocný Světozor` — sources: context, name
+- `Palladium` — sources: name
+- `Parizska Street — רחוב פריז` — sources: name
+- `Pasta Fresca` — sources: name
+- `Pekárna Praktika` — sources: context, name
+- `Pizza & Pasta Factory` — sources: name
+- `Praha Exchange — Jindřišská` — sources: name
+- `Pražská tržnice — השוק הגדול (הולשוביצה)` — sources: name
+- `Primark — כיכר וצסלב` — sources: name
+- `Puro Gelato` — sources: context, name
+- `Rabit` — sources: name
+- `Steiner & Kovarik` — sources: name
+- `Taiyaki Bar` — sources: name
+- `Trdelník (טרדלניק)` — sources: name
+- `U Fleků — פאב מ-1499` — sources: name
+- `Vapiano` — sources: name
+- `Výtopna` — sources: name
+- `Výtopna — מסעדת הרכבות` — sources: name
+- `Westfield Chodov` — sources: name
+- `Yammi Sushi House` — sources: name
+- `Černá Madona` — sources: name
+- `Čertovka — ונציה של פראג` — sources: name
+- `Čestr` — sources: name
+- `אי קמפה` — sources: context, name
+- `אי קמפה – Kampa Island` — sources: name
+- `ארוחת בוקר אחרונה במלון` — sources: name
+- `ארוחת ערב — Gran Fierro` — sources: context, name
+- `בית הכנסת הגדול — Staronová synagoga` — sources: name
+- `בית הכנסת הספרדי — Španělská` — sources: name
+- `בית הכנסת ירושלים — Jeruzalémská` — sources: name
+- `בית הכנסת מייזל — Maiselova` — sources: name
+- `בית הכנסת פינקס — אנדרטת השואה` — sources: context, name
+- `בית העירייה היהודי — השעון שהולך אחורה` — sources: name
+- `בית העלמין היהודי העתיק — Josefov` — sources: name
+- `בריכת Šutka` — sources: name
+- `גלרית Lumia — מוזיאון האורות` — sources: name
+- `גן החיות של פראג` — sources: name
+- `גן ולנשטיין` — sources: name
+- `גשר קארל` — sources: name
+- `הליכה דרך Na Příkopě` — sources: name
+- `המוזיאון הטכני הלאומי` — sources: name
+- `המזללה` — sources: name
+- `הרובע היהודי — Josefov` — sources: name
+- `ויישהראד — שביל המצוק` — sources: context, name
+- `חומת לנון` — sources: name
+- `חזרה ומנוחה במלון` — sources: name
+- `חזרה למלון ומנוחה` — sources: name
+- `טירת פראג וקתדרלת ויטוס` — sources: name
+- `יפו פראג — Jaffa Prague` — sources: name
+- `יציאה ל-Aquapalace בבוקר` — sources: name
+- `כיכר העיר העתיקה והשעון האסטרונומי` — sources: name
+- `כריך פסטו — שוק האיכרים` — sources: name
+- `לונה פארק — Lunapark Holešovice` — sources: name
+- `מאפה פרג` — sources: name
+- `מבוך המראות — Petřín` — sources: name
+- `מגדל פטז׳ין` — sources: name
+- `מוזיאון האשליות` — sources: name
+- `מוזיאון החושים` — sources: name
+- `מוזיאון הלגו — LEGO Museum Prague` — sources: name
+- `מזרקת Křižík` — sources: name
+- `ממלכת הרכבות — Království železnic` — sources: name
+- `מנזר סטרהוב — ספרייה` — sources: name
+- `מצודת פראג` — sources: name
+- `סיבוב קצר באזור המלון` — sources: name
+- `סמטאות העיר העתיקה` — sources: context, name
+- `פארק לטנה (Letná)` — sources: name
+- `פסל פרנץ קפקא — Vězeňská` — sources: name
+- `פסל קפקא המסתובב` — sources: name
+- `ק-אאוט ויציאה לשדה` — sources: context
+- `קפה אחרון וארוחת סיום` — sources: name
+- `קריוטוש כשר` — sources: name
+- `רחוב נובי סבט` — sources: name
+- `רחובות מלה סטרנה` — sources: name
+- `שדרת Na Příkopě` — sources: name
+- `שוק האיכרים Jiřák — רביעי–שבת` — sources: name
+- `שוק האיכרים Náplavka — שבת בלבד` — sources: name
+- `שייט בוולטאווה` — sources: name
+- `שייט ערב בוולטאווה` — sources: name
+- `שמורת Adršpach` — sources: name
+- `שעון אסטרונומי — מגדל` — sources: context, name
+
+## Runtime manual entries
+
+Manual entries saved by the user in localStorage/Firestore cannot be enumerated from repository code. The code resolves manual entry GPS by exact `PLACE_COORDS[name]`; if a manually typed name is not listed in PLACE_COORDS, it will have `coords = null`.
