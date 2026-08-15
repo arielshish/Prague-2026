@@ -1,0 +1,31 @@
+name: Audit Trip Summary Duplicates PR131
+on:
+  push:
+    branches: [feature/trip-summary-dedupe-clean]
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: feature/trip-summary-dedupe-clean
+      - name: Run duplicate audit
+        run: python3 tools/audit-trip-summary-duplicates-pr131.py
+      - name: Remove temporary audit files
+        run: |
+          rm -f tools/audit-trip-summary-duplicates-pr131.py
+          rm -f .github/workflows/audit-trip-summary-duplicates-pr131.yml
+      - name: Commit cleanup
+        run: |
+          git config user.name "arielshish"
+          git config user.email "159256813+arielshish@users.noreply.github.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "Remove temporary duplicate audit files"
+            git push origin feature/trip-summary-dedupe-clean
+          fi
