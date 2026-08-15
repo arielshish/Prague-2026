@@ -1,0 +1,66 @@
+name: Apply Trip Summary Cloud Sync
+
+on:
+  push:
+    branches:
+      - feature/trip-summary-cloud-sync
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor == 'arielshish'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      - name: Apply focused patch
+        run: |
+          git apply tools/pr126-trip-summary-cloud-sync.patch
+      - name: Validate safety boundaries
+        run: |
+          git fetch origin main
+          python3 - <<'PY'
+          from pathlib import Path
+          import re, subprocess, sys
+          old = subprocess.check_output(['git','show','origin/main:app.html'], text=True)
+          new = Path('app.html').read_text(encoding='utf-8')
+          doc = Path('docs/CLAUDE_TRIP_SUMMARY_CHANGELOG.md').read_text(encoding='utf-8')
+          def count(s, needle): return s.count(needle)
+          checks = []
+          checks.append(('BUILD_ID', "var BUILD_ID = '2026-08-15-c';" in new))
+          checks.append(('cloud doc path', "collection('appdata').doc('trip_summary')" in new and 'appdata/trip_summary' in doc))
+          checks.append(('override keys still present', 'prague_trip_summary_overrides_v1' in new and 'prague_trip_summary_overrides_ts' in new))
+          checks.append(('no appdata main added', count(new, 'appdata/main') == count(old, 'appdata/main')))
+          checks.append(('no appdata expenses added', count(new, 'appdata/expenses') == count(old, 'appdata/expenses')))
+          checks.append(('only one appdata collection addition', count(new, "collection('appdata')") == count(old, "collection('appdata')") + 2))
+          checks.append(('no protected local key writes added', all(count(new, k) == count(old, k) for k in ['prague_days_v1','prague_visited_v1','prague_exp_v10','prague_exp_ts'])))
+          checks.append(('no remove/clear added', count(new, 'localStorage.removeItem') == count(old, 'localStorage.removeItem') and count(new, 'localStorage.clear') == count(old, 'localStorage.clear')))
+          checks.append(('merge true cloud save', '{ merge: true }' in new))
+          checks.append(('claude md documented', 'PR #126 — Trip summary overrides cloud sync' in doc and 'backup/pre-trip-summary-cloud-sync-2026-08-15' in doc))
+          bad = [name for name, ok in checks if not ok]
+          if bad:
+              print('FAILED:', bad)
+              sys.exit(1)
+          scripts = re.findall(r'<script(?![^>]*src=)[^>]*>(.*?)</script>', new, flags=re.S|re.I)
+          Path('/tmp/app-inline.js').write_text('\n;\n'.join(scripts), encoding='utf-8')
+          PY
+          node --check /tmp/app-inline.js
+      - name: Ensure final diff scope before cleanup
+        run: |
+          git diff --name-only origin/main > /tmp/files.txt
+          grep -qx 'app.html' /tmp/files.txt
+          grep -qx 'docs/CLAUDE_TRIP_SUMMARY_CHANGELOG.md' /tmp/files.txt
+          test "$(wc -l < /tmp/files.txt)" -eq 4
+      - name: Clean temporary files and commit final result
+        run: |
+          rm tools/pr126-trip-summary-cloud-sync.patch
+          rm .github/workflows/apply-trip-summary-cloud-sync.yml
+          git config user.name "arielshish"
+          git config user.email "159256813+arielshish@users.noreply.github.com"
+          git add app.html docs/CLAUDE_TRIP_SUMMARY_CHANGELOG.md tools/pr126-trip-summary-cloud-sync.patch .github/workflows/apply-trip-summary-cloud-sync.yml
+          git commit -m "Sync trip summary overrides to Firestore"
+          git push
