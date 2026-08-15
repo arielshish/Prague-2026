@@ -43,7 +43,9 @@ jobs:
           grep -qx 'app.html' /tmp/changed.txt
           grep -qx 'docs/CLAUDE_TRIP_SUMMARY_SELECTION_BANK_PR129.md' /tmp/changed.txt
           grep -qx 'docs/TRIP_SUMMARY_SELECTION_BANK_PR129.md' /tmp/changed.txt
-          test $(wc -l < /tmp/changed.txt) -eq 3
+          grep -qx '.github/workflows/apply-trip-summary-selection-bank.yml' /tmp/changed.txt
+          grep -qx 'tools/apply-trip-summary-selection-bank.py' /tmp/changed.txt
+          test $(wc -l < /tmp/changed.txt) -eq 5
 
       - name: Commit result
         run: |
