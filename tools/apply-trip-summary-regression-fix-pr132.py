@@ -16,6 +16,7 @@ def log(msg):
 
 def require(cond, msg):
     if not cond:
+        print('::error file=tools/apply-trip-summary-regression-fix-pr132.py::[PR132 fail] ' + msg, flush=True)
         raise SystemExit('[PR132 fail] ' + msg)
 
 def replace_once(src, old, new, label):
