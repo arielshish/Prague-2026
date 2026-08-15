@@ -1,0 +1,46 @@
+name: Apply Trip Summary Dedupe Fix PR131
+
+on:
+  push:
+    branches:
+      - feature/trip-summary-dedupe-fix
+    paths:
+      - tools/apply-trip-summary-dedupe-fix.py
+      - .github/workflows/apply-trip-summary-dedupe-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, 'Apply trip summary dedupe fix') }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fetch main baseline
+        run: git fetch origin main
+
+      - name: Apply dedupe fix
+        run: python3 tools/apply-trip-summary-dedupe-fix.py
+
+      - name: Check inline JavaScript
+        run: node --check /tmp/app-inline.js
+
+      - name: Remove temporary workflow and script
+        run: |
+          rm -f tools/apply-trip-summary-dedupe-fix.py
+          rm -f .github/workflows/apply-trip-summary-dedupe-fix.yml
+          rmdir tools 2>/dev/null || true
+
+      - name: Commit result
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app.html docs/TRIP_SUMMARY_DEDUPE_FIX_PR131.md docs/CLAUDE_TRIP_SUMMARY_DEDUPE_FIX_PR131.md
+          git add -u
+          git commit -m "Apply trip summary dedupe fix"
+          git push origin feature/trip-summary-dedupe-fix
