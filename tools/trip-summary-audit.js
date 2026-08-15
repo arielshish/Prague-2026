@@ -16,7 +16,7 @@
 (function () {
   'use strict';
 
-  var AUDIT_VERSION = '2026-08-15-audit-readonly-v1';
+  var AUDIT_VERSION = '2026-08-15-audit-readonly-v2';
   var TRIP_START = new Date('2026-08-08T00:00:00');
   var TRIP_END = new Date('2026-08-15T23:59:59');
 
@@ -49,9 +49,7 @@
       var v = safeCall('localStorage:' + k, function () { return localStorage.getItem(k); }, null);
       out[k] = {
         exists: v !== null,
-        length: v == null ? 0 : String(v).length,
-        // length-only hash substitute: avoids exposing private data in quick summaries.
-        preview: v == null ? '' : String(v).slice(0, 80)
+        length: v == null ? 0 : String(v).length
       };
     });
     return out;
