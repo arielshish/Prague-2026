@@ -8,22 +8,19 @@ old_app = subprocess.check_output(['git', 'show', 'origin/main:app.html'], text=
 if "Burger King OC Eden" in app or "Burger King — OC Eden" in app:
     print('Burger King OC Eden already present; leaving app unchanged')
 else:
-    # Keep version i: PR #131 already advanced from h to i for the summary fix.
     if "var BUILD_ID = '2026-08-15-i';" not in app:
         raise SystemExit('expected BUILD_ID 2026-08-15-i not found')
 
-    # Add GPS aliases near PLACE_COORDS. Coordinates are for OC Eden / Slavia area, not a random BK.
-    # U Slavie 1527, Praha 10.
     coord_anchor = "'Pražská tržnice':"
     if coord_anchor not in app:
-        # fallback: add near PR #130 aliases if exact anchor differs
+        coord_anchor = "'Pražská tržnice — השוק הגדול (הולשוביצה)':"
+    if coord_anchor not in app:
         coord_anchor = "'השוק הגדול — הולשוביצה':"
     if coord_anchor not in app:
         raise SystemExit('coordinate anchor for PR130 aliases not found')
 
     insert_at = app.find(coord_anchor)
     line_start = app.rfind('\n', 0, insert_at) + 1
-    # Put BK block before/near recent expense-derived aliases for readability.
     bk_coords = """  // PR #131: expense-derived Burger King stop, receipt: BK Praha OC Eden, U Slavie 1527, Praha 10
   'Burger King — OC Eden': [50.06780, 14.47170],
   'Burger King OC Eden': [50.06780, 14.47170],
@@ -32,8 +29,6 @@ else:
 """
     app = app[:line_start] + bk_coords + app[line_start:]
 
-    # Add guaranteed day stop by extending the existing PR #130 guaranteed stop helper if present.
-    # Prefer to insert BK before Pure/Prazska so it appears above the existing expense-derived stops.
     marker = "Pure גלידה — Náplavka / שוק האיכרים על הנהר"
     idx = app.find(marker)
     if idx < 0:
@@ -51,17 +46,16 @@ else:
 """
     app = app[:obj_start] + bk_stop + app[obj_start:]
 
-    # Expand summary dedupe with Burger King aliases.
-    dedupe_anchor = "if(n.indexOf('pražská tržnice') >= 0"
+    # Expand summary dedupe with Burger King aliases. PR #131 helper uses `lower` + `name`.
+    dedupe_anchor = "if(lower.indexOf('pražská tržnice') >= 0"
     if dedupe_anchor not in app:
         raise SystemExit('summary dedupe anchor not found')
-    bk_dedupe = """  if(n.indexOf('burger king') >= 0 || n.indexOf('bk praha oc eden') >= 0 || n.indexOf('oc eden') >= 0 || s.indexOf('בורגר קינג') >= 0){
-    return 'burger-king-oc-eden';
+    bk_dedupe = """  if(lower.indexOf('burger king') >= 0 || lower.indexOf('bk praha oc eden') >= 0 || lower.indexOf('oc eden') >= 0 || name.indexOf('בורגר קינג') >= 0){
+    return 'poi:burger-king-oc-eden';
   }
 """
     app = app.replace(dedupe_anchor, bk_dedupe + dedupe_anchor, 1)
 
-# Docs update / create note.
 DOC = Path('docs/TRIP_SUMMARY_DEDUPE_FIX_PR131.md')
 if DOC.exists():
     txt = DOC.read_text(encoding='utf-8')
@@ -98,7 +92,7 @@ Added:
 - `Burger King — OC Eden`
 - aliases: `Burger King OC Eden`, `BK Praha OC Eden`, `Burger King — U Slavie`
 - day stop above the other 15.08 expense-derived stops
-- summary dedupe key `burger-king-oc-eden`
+- summary dedupe key `poi:burger-king-oc-eden`
 
 Do not mark as visited automatically; the user can mark it in the app.
 """
@@ -106,7 +100,6 @@ Do not mark as visited automatically; the user can mark it in the app.
 else:
     raise SystemExit('expected PR131 Claude doc missing')
 
-# Safety checks: no storage/path/delete behavior changes.
 protected = [
     'prague_visited_v1','prague_exp_v10','prague_exp_ts','prague_days_v1',
     'prague_trip_summary_overrides_v1','prague_trip_summary_overrides_ts',
@@ -121,7 +114,7 @@ if app.count('localStorage.clear') != old_app.count('localStorage.clear'):
     raise SystemExit('localStorage.clear count changed')
 if "Burger King — OC Eden" not in app:
     raise SystemExit('Burger King stop not found in app')
-if "burger-king-oc-eden" not in app:
+if "poi:burger-king-oc-eden" not in app:
     raise SystemExit('Burger King dedupe key not found')
 
 APP.write_text(app, encoding='utf-8')
