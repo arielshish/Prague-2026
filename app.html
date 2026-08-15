@@ -1286,7 +1286,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-15-c';
+var BUILD_ID = '2026-08-15-d';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
@@ -6083,6 +6083,18 @@ var PLACE_COORDS = {
   // **לא לגזור מ-K12 שבמספר 58 ולא ממרכז הכיכר** — זו אקסטרפולציה ולא מקור.
   // כשתגיע נקודה מ-Google Maps במקום (כמו ב-Taiyaki Bar) — להוסיף כאן.
   'K12 BBQ & Sushi':             [50.0798, 14.4290],
+  // PR #127: aliases for trip-summary selection bank / manual summary fixes
+  'FAT CAT Downtown': [50.0811606, 14.4284073],
+  'Fat Cat Downtown': [50.0811606, 14.4284073],
+  'FAT CAT Downtown — כיכר וצסלב': [50.0811606, 14.4284073],
+  'אי קמפה – Kampa Island': [50.0845810, 14.4082230],
+  'אי קמפה (Kampa Island)': [50.0845810, 14.4082230],
+  'Kampa Island': [50.0845810, 14.4082230],
+  'Makakiko Running Sushi': [50.0890049, 14.4291743],
+  'Makakiko Running Sushi — Palladium': [50.0890049, 14.4291743],
+  'Primark Metropole Zličín': [50.0534000, 14.2894600],
+  'Primark — Metropole Zličín': [50.0534000, 14.2894600],
+
   'Taiyaki Bar':                 [50.0884, 14.4187],
   'Metropole Zličín':            [50.0541, 14.2879],
   'Westfield Chodov':            [50.0311, 14.4905],
