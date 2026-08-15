@@ -801,13 +801,22 @@ function _applyTripSummaryOverrides(items) {
     }
     out.push(c);
     if (ov && Array.isArray(ov.visits) && ov.visits.length) {
-      ov.visits.forEach(function(v, idx) {
-        var extra = _cloneTripSummaryItem(it);
+      // PR #133: old repeated taps may have saved identical manual visits.
+      // Keep the data untouched, but render each place+day+label manual visit only once.
+      var seenManualVisits = {};
+      var manualVisitN = 0;
+      ov.visits.forEach(function(v) {
         var d = parseInt(v.day, 10);
+        var label = _sclip(v && v.label ? v.label : 'ביקור נוסף', 62);
+        var key = String((d >= 1 && d <= 30) ? d : '') + '|' + label.replace(/\s+/g,' ').trim().toLowerCase();
+        if (seenManualVisits[key]) return;
+        seenManualVisits[key] = true;
+        manualVisitN++;
+        var extra = _cloneTripSummaryItem(it);
         if (d >= 1 && d <= 30) { extra.day = d; extra.dayFrom = 'manual'; }
-        if (v.label) extra.desc = _sclip(v.label, 62);
+        extra.desc = label;
         extra.manual = true;
-        extra.manualVisit = idx + 1;
+        extra.manualVisit = manualVisitN;
         out.push(extra);
       });
     }
@@ -1541,7 +1550,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-15-j';
+var BUILD_ID = '2026-08-15-k';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
