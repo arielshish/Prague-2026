@@ -831,7 +831,56 @@ function _applyTripSummaryOverrides(items) {
   return _sortTripSummaryItems(out);
 }
 
-function _tripSummaryData() { return _applyTripSummaryOverrides(_tripSummaryBaseData()); }
+
+function _tripSummaryDedupeKey(r){
+  var name = String((r && r.name) || '').trim();
+  var lower = name.toLowerCase();
+  if(!name) return '';
+
+  // PR #131: summary-only canonicalization to prevent duplicate rows when
+  // the same real stop arrives from itinerary/day guard, map aliases, bank,
+  // or manual summary rows.
+  if(lower.indexOf('pure') >= 0 || name.indexOf('שוק האיכרים') >= 0 || lower.indexOf('náplavka') >= 0 || lower.indexOf('naplavka') >= 0){
+    return 'poi:naplavka-farmers-market-pure-gelato';
+  }
+  if(lower.indexOf('pražská tržnice') >= 0 || lower.indexOf('prazska trznice') >= 0 || name.indexOf('השוק הגדול') >= 0 || name.indexOf('הולשוביצה') >= 0){
+    return 'poi:prazska-trznice-holesovice';
+  }
+
+  var coords = (r && r.coords) || PLACE_COORDS[name] || null;
+  if(coords && coords.length >= 2){
+    return 'gps:' + Number(coords[0]).toFixed(5) + ',' + Number(coords[1]).toFixed(5);
+  }
+  return 'name:' + name.replace(/\s+/g,' ').toLowerCase();
+}
+function _tripSummaryDedupeRows(rows){
+  var out = [];
+  var seen = {};
+  (rows || []).forEach(function(r){
+    var key = _tripSummaryDedupeKey(r);
+    if(!key) return;
+    if(seen[key]){
+      var existing = seen[key];
+      if(!existing.day && r.day) existing.day = r.day;
+      if(!existing.dayFrom && r.dayFrom) existing.dayFrom = r.dayFrom;
+      if(!existing.coords && r.coords) existing.coords = r.coords;
+      if(existing.visited !== true && r.visited === true) existing.visited = true;
+      if(!existing.sources) existing.sources = [];
+      (r.sources || []).forEach(function(s){
+        if(existing.sources.indexOf(s) < 0) existing.sources.push(s);
+      });
+      return;
+    }
+    seen[key] = r;
+    out.push(r);
+  });
+  return out;
+}
+function _tripSummaryData(){
+  return _tripSummaryDedupeRows(_tripSummaryDataRaw());
+}
+
+function _tripSummaryDataRaw() { return _applyTripSummaryOverrides(_tripSummaryBaseData()); }
 
 function _tripSummaryDayOptions(selected) {
   var h = '<option value="">ללא יום</option>';
@@ -1485,7 +1534,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-15-h';
+var BUILD_ID = '2026-08-15-i';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
