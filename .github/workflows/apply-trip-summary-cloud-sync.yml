@@ -23,6 +23,7 @@ jobs:
           node --check /tmp/app-inline.js
       - name: Validate diff scope and commit
         run: |
+          git add -N docs/CLAUDE_TRIP_SUMMARY_CLOUD_SYNC.md
           git diff --name-only origin/main > /tmp/files.txt
           cat /tmp/files.txt
           python3 - <<'PY'
