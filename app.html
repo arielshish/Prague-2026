@@ -1118,6 +1118,38 @@ function tripSummaryBankHide(btn) {
   toast('🙈 הוסתר מהסיכום');
 }
 
+
+
+// PR #134: edit/remove items that were added from the Trip Summary selection bank.
+function tripSummaryManualSetAdded(btn) {
+  var idx = parseInt(btn && btn.getAttribute('data-idx'), 10);
+  if (!isFinite(idx) || idx < 0) return;
+  var o = _loadTripSummaryOverrides();
+  if (!o.added || !o.added[idx]) return;
+  var dayEl = document.getElementById('tsAddedDay_' + idx);
+  var labelEl = document.getElementById('tsAddedLabel_' + idx);
+  var d = parseInt(dayEl && dayEl.value, 10);
+  o.added[idx].day = (d >= 1 && d <= 30) ? d : null;
+  var label = labelEl ? String(labelEl.value || '').replace(/\s+/g, ' ').trim() : '';
+  o.added[idx].label = label || 'נוסף מבנק הבחירה';
+  _saveTripSummaryOverrides(o);
+  _refreshTripSummaryPreview();
+  toast('✅ פריט בנק הבחירה עודכן');
+}
+function tripSummaryManualRemoveAdded(btn) {
+  var idx = parseInt(btn && btn.getAttribute('data-idx'), 10);
+  if (!isFinite(idx) || idx < 0) return;
+  var o = _loadTripSummaryOverrides();
+  if (!o.added || !o.added[idx]) return;
+  var name = o.added[idx].name || 'פריט';
+  o.added.splice(idx, 1);
+  _saveTripSummaryOverrides(o);
+  _refreshTripSummaryPreview();
+  _closeTripSummaryEditPanel();
+  openTripSummaryOverridesEditor();
+  toast('🗑️ הוסר מהסיכום: ' + name);
+}
+
 function openTripSummaryOverridesEditor() {
   try {
     var old = document.getElementById('tripSummaryEditPanel');
@@ -1148,6 +1180,25 @@ function openTripSummaryOverridesEditor() {
         '</div>' +
       '</div>';
     });
+    var addedRows = '';
+    (o.added || []).forEach(function(a, idx) {
+      if (!a || !a.name) return;
+      var day = a.day || '';
+      var label = a.label || 'נוסף מבנק הבחירה';
+      addedRows += '<div style="background:rgba(34,197,94,0.10);border:1px solid rgba(34,197,94,0.28);border-radius:14px;padding:10px;margin-bottom:8px;">' +
+        '<div style="font-weight:900;font-size:13px;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">📌 ' + _sxesc(a.name) + '</div>' +
+        '<div style="font-size:10px;color:#86efac;font-weight:900;margin-bottom:7px;">נוסף מבנק הבחירה — אפשר לערוך או להסיר מכאן</div>' +
+        '<div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;">' +
+          '<select id="tsAddedDay_' + idx + '" style="flex:1;border-radius:10px;border:none;padding:9px;font-weight:800;">' + _tripSummaryDayOptions(day) + '</select>' +
+          '<button type="button" data-idx="' + idx + '" onclick="tripSummaryManualSetAdded(this)" style="border:none;border-radius:10px;background:#22c55e;color:#fff;padding:9px 10px;font-weight:800;">שמור</button>' +
+        '</div>' +
+        '<input id="tsAddedLabel_' + idx + '" value="' + _sxesc(label) + '" placeholder="תווית בסיכום" style="width:100%;box-sizing:border-box;border:none;border-radius:10px;padding:9px;font-weight:800;margin-bottom:6px;direction:rtl;">' +
+        '<button type="button" data-idx="' + idx + '" onclick="tripSummaryManualRemoveAdded(this)" style="width:100%;border:none;border-radius:10px;background:#ef4444;color:#fff;padding:9px;font-weight:900;">הסר מהסיכום</button>' +
+      '</div>';
+    });
+    if (addedRows) {
+      rows += '<div style="margin:14px 0 8px;font-size:12px;font-weight:900;color:#86efac;border-top:1px solid rgba(255,255,255,0.16);padding-top:12px;">📌 פריטים שנוספו מבנק הבחירה</div>' + addedRows;
+    }
     panel.innerHTML =
       '<div style="display:flex;gap:8px;padding:14px;border-bottom:1px solid rgba(255,255,255,0.14);align-items:center;">' +
         '<button type="button" onclick="_closeTripSummaryEditPanel()" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:12px;padding:10px 14px;font-weight:800;">✕</button>' +
@@ -1550,7 +1601,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-15-k';
+var BUILD_ID = '2026-08-15-l';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
