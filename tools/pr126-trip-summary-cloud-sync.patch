@@ -96,13 +96,7 @@ index 068abe9..0000000 100644
    localStorage.setItem(TRIP_SUMMARY_OVERRIDES_TS_KEY, String(Date.now()));
 +  _saveTripSummaryOverridesToCloud(o, _tripSummaryOverridesLocalTs());
  }
-@@ -1245,6 +1332,7 @@ function _showApp() {
-   if (ls) ls.style.display = 'none';
-   if (app) app.style.display = 'block';
-   try { _renderBuildStamp(); } catch (e) {}
-+  try { if (typeof initTripSummaryOverridesCloudSync === 'function') initTripSummaryOverridesCloudSync(); } catch (e) { console.warn('trip summary cloud init from showApp failed', e); }
- }
-@@ -1209,7 +1297,7 @@
+@@ -1209,7 +1296,7 @@
  // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
  // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
  // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
@@ -111,6 +105,12 @@ index 068abe9..0000000 100644
  
  function forceUpdate() {
    // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
+@@ -1245,6 +1332,7 @@ function _showApp() {
+   if (ls) ls.style.display = 'none';
+   if (app) app.style.display = 'block';
+   try { _renderBuildStamp(); } catch (e) {}
++  try { if (typeof initTripSummaryOverridesCloudSync === 'function') initTripSummaryOverridesCloudSync(); } catch (e) { console.warn('trip summary cloud init from showApp failed', e); }
+ }
 diff --git a/docs/CLAUDE_TRIP_SUMMARY_CHANGELOG.md b/docs/CLAUDE_TRIP_SUMMARY_CHANGELOG.md
 index 6c3ed15..0000000 100644
 --- a/docs/CLAUDE_TRIP_SUMMARY_CHANGELOG.md
