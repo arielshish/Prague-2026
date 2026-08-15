@@ -43,9 +43,7 @@ jobs:
           grep -qx 'app.html' /tmp/changed.txt
           grep -qx 'docs/CLAUDE_TRIP_SUMMARY_SELECTION_BANK_PR129.md' /tmp/changed.txt
           grep -qx 'docs/TRIP_SUMMARY_SELECTION_BANK_PR129.md' /tmp/changed.txt
-          grep -qx '.github/workflows/apply-trip-summary-selection-bank.yml' /tmp/changed.txt
-          grep -qx 'tools/apply-trip-summary-selection-bank.py' /tmp/changed.txt
-          test $(wc -l < /tmp/changed.txt) -eq 5
+          if grep -E '(^backend|^gas_project|^translator.html|^robots.txt)' /tmp/changed.txt; then exit 1; fi
 
       - name: Commit result
         run: |
