@@ -14,6 +14,7 @@ Bank rule for the next UI PR:
 - selectable item must have GPS
 - no GPS = not selectable
 - non-place strings are documented, not forced onto the map
+- compound strings that contain several real places must be split and de-duplicated into canonical places
 
 ## Added safe aliases
 
@@ -38,13 +39,12 @@ Total safe aliases in this sweep: 16
 
 ## Excluded from coordinate insertion
 
-These are not single POIs and must not be forced into `PLACE_COORDS`:
+These are not single POIs and must not be forced into `PLACE_COORDS` as one coordinate:
 
 - `שפת הנהר Vltava – בלילה`
 - `גן החיות של פראג + שייט ערב`
 - `בין השעון האסטרונומי לגשר קארל`
 - `Primark → Na Příkopě → Palladium → Hamleys/LEGO`
-- `Josefov, בית הכנסת ירושלים, Café Savoy`
 - `Kantýna או Lokál — בקר/עוף בלבד`
 - `Gran Fierro / George Prime Steak — לסיים ביג!`
 - `קפה טוב: Café Louvre או Café Imperial`
@@ -59,6 +59,20 @@ These are not single POIs and must not be forced into `PLACE_COORDS`:
 - `להזמין Gran Fierro בזמן המנוחה`
 - `להכין כתובת מלון Offline לפני הנחיתה`
 - `לשמור גשר קארל לשעת ערב`
+
+## Compound visited-place strings to de-duplicate
+
+The following string contains real places that the user confirmed were visited and already have coordinates, but it should not become one GPS point:
+
+- `Josefov, בית הכנסת ירושלים, Café Savoy`
+
+Future selection-bank logic should split/normalize it into canonical entries and avoid duplicates:
+
+- `הרובע היהודי – Josefov` / `Josefov`
+- `בית הכנסת ירושלים` / `Jerusalem Synagogue` / `Jubilee Synagogue`
+- `Café Savoy`
+
+This means the bank should show the real places once each, with their own coordinates, instead of also showing the combined comma-separated string.
 
 ## Safety boundaries
 
