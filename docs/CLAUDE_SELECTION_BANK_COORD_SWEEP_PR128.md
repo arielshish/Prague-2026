@@ -42,7 +42,7 @@ coords: PLACE_COORDS[a.name] || null
 
 Therefore aliases are useful and safe when they represent the same exact physical place.
 
-## Non-place policy
+## Non-place and compound-label policy
 
 Do not add GPS for strings that are:
 
@@ -58,9 +58,22 @@ Examples that should not be single GPS entries:
 - `שפת הנהר Vltava – בלילה`
 - `גן החיות של פראג + שייט ערב`
 - `בין השעון האסטרונומי לגשר קארל`
+
+## Compound visited-place de-duplication
+
+The user clarified that this string represents real visited places that already have coordinates:
+
 - `Josefov, בית הכנסת ירושלים, Café Savoy`
 
-These should be handled by the future bank as non-selectable or split into real POIs.
+Do not add that combined string as one GPS point.
+
+Future selection-bank logic should split and normalize it into canonical entries:
+
+- `הרובע היהודי – Josefov` / `Josefov`
+- `בית הכנסת ירושלים` / `Jerusalem Synagogue` / `Jubilee Synagogue`
+- `Café Savoy`
+
+The bank should then show each real place once, with its own coordinates, and avoid also showing the combined comma-separated label.
 
 ## Next PR after this
 
@@ -70,5 +83,6 @@ Required validation for PR #129:
 
 - every selectable bank item has GPS
 - missing-GPS items appear only in a separate review/non-selectable area
+- compound place strings are split/deduplicated into canonical real places
 - no mutation of `prague_visited_v1` from bank actions
 - use existing trip-summary override storage for show/hide/include choices
