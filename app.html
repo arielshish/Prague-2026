@@ -627,7 +627,7 @@ function _sclip(s, maxChars) {
 }
 
 // אוסף את המקומות המסומנים ומעשיר אותם מאותה רשומה שכל שאר האפליקציה משתמשת בה
-function _tripSummaryData() {
+function _tripSummaryBaseData() {
   var st = getVisitedState();
   var names = Object.keys(st);
   var items = names.map(function(n) {
@@ -663,6 +663,218 @@ function _tripSummaryData() {
     return (a.ts || 0) - (b.ts || 0);
   });
   return items;
+}
+
+var TRIP_SUMMARY_OVERRIDES_KEY = 'prague_trip_summary_overrides_v1';
+var TRIP_SUMMARY_OVERRIDES_TS_KEY = 'prague_trip_summary_overrides_ts';
+
+function _emptyTripSummaryOverrides() { return { version: 1, places: {}, hidden: {}, added: [] }; }
+
+function _loadTripSummaryOverrides() {
+  try {
+    var raw = localStorage.getItem(TRIP_SUMMARY_OVERRIDES_KEY);
+    var o = raw ? JSON.parse(raw) : null;
+    if (!o || typeof o !== 'object') o = _emptyTripSummaryOverrides();
+    o.version = 1;
+    o.places = (o.places && typeof o.places === 'object') ? o.places : {};
+    o.hidden = (o.hidden && typeof o.hidden === 'object') ? o.hidden : {};
+    o.added = Array.isArray(o.added) ? o.added : [];
+    return o;
+  } catch (e) { return _emptyTripSummaryOverrides(); }
+}
+
+function _saveTripSummaryOverrides(o) {
+  o = o || _emptyTripSummaryOverrides();
+  o.version = 1;
+  o.places = o.places || {};
+  o.hidden = o.hidden || {};
+  o.added = Array.isArray(o.added) ? o.added : [];
+  localStorage.setItem(TRIP_SUMMARY_OVERRIDES_KEY, JSON.stringify(o));
+  localStorage.setItem(TRIP_SUMMARY_OVERRIDES_TS_KEY, String(Date.now()));
+}
+
+function _sortTripSummaryItems(items) {
+  items.sort(function(a, b) {
+    if (a.day && b.day && a.day !== b.day) return a.day - b.day;
+    if (a.day && !b.day) return -1;
+    if (!a.day && b.day) return 1;
+    return (a.ts || 0) - (b.ts || 0);
+  });
+  return items;
+}
+
+function _cloneTripSummaryItem(it) {
+  var c = {};
+  Object.keys(it || {}).forEach(function(k) { c[k] = it[k]; });
+  return c;
+}
+
+function _applyTripSummaryOverrides(items) {
+  var o = _loadTripSummaryOverrides();
+  var out = [];
+  items.forEach(function(it) {
+    if (!it || !it.name) return;
+    if (o.hidden[it.name]) return;
+    var ov = o.places[it.name] || null;
+    if (ov && Array.isArray(ov.visits) && ov.visits.length) {
+      ov.visits.forEach(function(v, idx) {
+        var c = _cloneTripSummaryItem(it);
+        var d = parseInt(v.day, 10);
+        if (d >= 1 && d <= 30) { c.day = d; c.dayFrom = 'manual'; }
+        if (v.label) c.desc = _sclip(v.label, 62);
+        c.manual = true;
+        c.manualVisit = idx + 1;
+        out.push(c);
+      });
+      return;
+    }
+    var c = _cloneTripSummaryItem(it);
+    if (ov) {
+      var od = parseInt(ov.day, 10);
+      if (od >= 1 && od <= 30) { c.day = od; c.dayFrom = 'manual'; c.manual = true; }
+      if (ov.label) c.desc = _sclip(ov.label, 62);
+    }
+    out.push(c);
+  });
+  (o.added || []).forEach(function(a, idx) {
+    if (!a || !a.name || o.hidden[a.name]) return;
+    var d = parseInt(a.day, 10);
+    out.push({
+      name: a.name,
+      icon: a.icon || '📍',
+      desc: _sclip(a.label || 'נוסף ידנית לסיכום', 62),
+      type: a.type || 'community',
+      coords: PLACE_COORDS[a.name] || null,
+      day: (d >= 1 && d <= 30) ? d : null,
+      dayFrom: 'manual',
+      ts: Date.now() + idx,
+      manual: true
+    });
+  });
+  return _sortTripSummaryItems(out);
+}
+
+function _tripSummaryData() { return _applyTripSummaryOverrides(_tripSummaryBaseData()); }
+
+function _tripSummaryDayOptions(selected) {
+  var h = '<option value="">ללא יום</option>';
+  for (var i = 1; i <= 8; i++) h += '<option value="' + i + '"' + (String(selected || '') === String(i) ? ' selected' : '') + '>יום ' + i + '</option>';
+  return h;
+}
+
+function _tripSummaryEncodedName(btn) {
+  try { return decodeURIComponent(btn.getAttribute('data-name') || ''); } catch (e) { return ''; }
+}
+
+function _refreshTripSummaryPreview() {
+  window._tripCanvas = null;
+  var host = document.getElementById('tripSummaryHost');
+  if (host) { host.style.padding = '18px'; host.textContent = '⌛ מעדכן את הלוח…'; }
+  renderTripSummaryCanvas().then(function(cv) {
+    var h = document.getElementById('tripSummaryHost');
+    if (!h) return;
+    h.style.padding = '0'; h.innerHTML = '';
+    cv.style.width = '100%'; cv.style.height = 'auto'; cv.style.display = 'block';
+    h.appendChild(cv); window._tripCanvas = cv;
+  }).catch(function(e) { if (host) host.textContent = '⚠️ שגיאה בעדכון: ' + (e && e.message); });
+}
+
+function openTripSummaryOverridesEditor() {
+  try {
+    var old = document.getElementById('tripSummaryEditPanel');
+    if (old) { old.remove(); return; }
+    var o = _loadTripSummaryOverrides();
+    var items = _tripSummaryBaseData();
+    var panel = document.createElement('div');
+    panel.id = 'tripSummaryEditPanel';
+    panel.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.96);z-index:10070;display:flex;flex-direction:column;color:#fff;font-family:Rubik,Arial,sans-serif;direction:rtl;';
+    var rows = '';
+    items.forEach(function(it) {
+      var name = it.name;
+      var enc = encodeURIComponent(name);
+      var ov = o.places[name] || {};
+      var day = ov.day || it.day || '';
+      var hidden = !!o.hidden[name];
+      rows += '<div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:10px;margin-bottom:8px;">' +
+        '<div style="font-weight:800;font-size:13px;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + _sxesc(it.icon + ' ' + name) + (hidden ? ' — מוסתר' : '') + '</div>' +
+        '<div style="display:flex;gap:6px;align-items:center;">' +
+          '<select id="tsDay_' + enc + '" style="flex:1;border-radius:10px;border:none;padding:9px;font-weight:800;">' + _tripSummaryDayOptions(day) + '</select>' +
+          '<button type="button" data-name="' + enc + '" onclick="tripSummaryManualSetDay(this)" style="border:none;border-radius:10px;background:#22c55e;color:#fff;padding:9px 10px;font-weight:800;">שמור</button>' +
+          '<button type="button" data-name="' + enc + '" onclick="tripSummaryManualAddVisit(this)" style="border:none;border-radius:10px;background:#3b82f6;color:#fff;padding:9px 10px;font-weight:800;">+ ביקור</button>' +
+        '</div>' +
+        '<div style="display:flex;gap:6px;margin-top:6px;">' +
+          '<button type="button" data-name="' + enc + '" onclick="tripSummaryManualHide(this)" style="flex:1;border:none;border-radius:10px;background:#ef4444;color:#fff;padding:8px;font-weight:800;">הסתר</button>' +
+          '<button type="button" data-name="' + enc + '" onclick="tripSummaryManualReset(this)" style="flex:1;border:1px solid rgba(255,255,255,0.25);border-radius:10px;background:transparent;color:#fff;padding:8px;font-weight:800;">איפוס</button>' +
+        '</div>' +
+      '</div>';
+    });
+    panel.innerHTML =
+      '<div style="display:flex;gap:8px;padding:14px;border-bottom:1px solid rgba(255,255,255,0.14);align-items:center;">' +
+        '<button type="button" onclick="document.getElementById(\'tripSummaryEditPanel\').remove()" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:12px;padding:10px 14px;font-weight:800;">✕</button>' +
+        '<div style="flex:1;font-size:16px;font-weight:900;">✏️ תיקון ידני לסיכום</div>' +
+      '</div>' +
+      '<div style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.12);">' +
+        '<div style="font-size:12px;color:rgba(255,255,255,0.72);margin-bottom:8px;">השינויים נשמרים רק לסיכום הטיול, ב-localStorage מבודד. הם לא משנים מסלול, הוצאות או היינו.</div>' +
+        '<div style="display:flex;gap:6px;">' +
+          '<input id="tsAddName" placeholder="שם מקום להוספה ידנית" style="flex:1;border-radius:10px;border:none;padding:10px;font-weight:700;">' +
+          '<select id="tsAddDay" style="width:95px;border-radius:10px;border:none;padding:10px;font-weight:800;">' + _tripSummaryDayOptions('') + '</select>' +
+          '<button type="button" onclick="tripSummaryManualAddPlace()" style="border:none;border-radius:10px;background:#F4634A;color:#fff;padding:10px 12px;font-weight:900;">הוסף</button>' +
+        '</div>' +
+      '</div>' +
+      '<div style="flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:12px;">' + rows + '</div>' +
+      '<div style="padding:12px;border-top:1px solid rgba(255,255,255,0.12);display:flex;gap:8px;">' +
+        '<button type="button" onclick="tripSummaryManualClearAll()" style="flex:1;border:none;border-radius:12px;background:#991b1b;color:#fff;padding:11px;font-weight:900;">איפוס כל התיקונים</button>' +
+        '<button type="button" onclick="document.getElementById(\'tripSummaryEditPanel\').remove()" style="flex:1;border:none;border-radius:12px;background:#fff;color:#0f172a;padding:11px;font-weight:900;">סיום</button>' +
+      '</div>';
+    document.body.appendChild(panel);
+  } catch (e) { toast('⚠️ שגיאה בעורך: ' + (e && e.message)); }
+}
+
+function tripSummaryManualSetDay(btn) {
+  var name = _tripSummaryEncodedName(btn); if (!name) return;
+  var enc = encodeURIComponent(name), sel = document.getElementById('tsDay_' + enc);
+  var o = _loadTripSummaryOverrides(); o.places[name] = o.places[name] || {};
+  var d = sel ? parseInt(sel.value, 10) : 0;
+  if (d) o.places[name].day = d; else delete o.places[name].day;
+  delete o.hidden[name]; delete o.places[name].visits;
+  _saveTripSummaryOverrides(o); _refreshTripSummaryPreview(); toast('✅ נשמר לסיכום');
+}
+
+function tripSummaryManualAddVisit(btn) {
+  var name = _tripSummaryEncodedName(btn); if (!name) return;
+  var enc = encodeURIComponent(name), sel = document.getElementById('tsDay_' + enc);
+  var d = sel && sel.value ? parseInt(sel.value, 10) : parseInt(prompt('לאיזה יום להוסיף ביקור?', ''), 10);
+  if (!d) return;
+  var o = _loadTripSummaryOverrides(); o.places[name] = o.places[name] || {};
+  var visits = o.places[name].visits = Array.isArray(o.places[name].visits) ? o.places[name].visits : [];
+  visits.push({ day: d, label: 'ביקור נוסף' });
+  delete o.hidden[name]; _saveTripSummaryOverrides(o); _refreshTripSummaryPreview(); toast('✅ נוסף ביקור לסיכום');
+}
+
+function tripSummaryManualHide(btn) {
+  var name = _tripSummaryEncodedName(btn); if (!name) return;
+  var o = _loadTripSummaryOverrides(); o.hidden[name] = true;
+  _saveTripSummaryOverrides(o); _refreshTripSummaryPreview(); openTripSummaryOverridesEditor(); openTripSummaryOverridesEditor();
+}
+
+function tripSummaryManualReset(btn) {
+  var name = _tripSummaryEncodedName(btn); if (!name) return;
+  var o = _loadTripSummaryOverrides(); delete o.hidden[name]; delete o.places[name];
+  _saveTripSummaryOverrides(o); _refreshTripSummaryPreview(); openTripSummaryOverridesEditor(); openTripSummaryOverridesEditor();
+}
+
+function tripSummaryManualAddPlace() {
+  var n = (document.getElementById('tsAddName') || {}).value || '';
+  n = n.replace(/\s+/g, ' ').trim(); if (!n) return;
+  var d = parseInt((document.getElementById('tsAddDay') || {}).value, 10) || null;
+  var o = _loadTripSummaryOverrides(); o.added.push({ name: n, day: d, icon: '📍', label: 'נוסף ידנית לסיכום' });
+  _saveTripSummaryOverrides(o); _refreshTripSummaryPreview(); openTripSummaryOverridesEditor(); openTripSummaryOverridesEditor();
+}
+
+function tripSummaryManualClearAll() {
+  if (!confirm('לאפס את כל התיקונים הידניים של סיכום הטיול?')) return;
+  _saveTripSummaryOverrides(_emptyTripSummaryOverrides());
+  _refreshTripSummaryPreview(); openTripSummaryOverridesEditor(); openTripSummaryOverridesEditor(); toast('✅ אופס');
 }
 
 var _SUM_TYPE = {
@@ -932,6 +1144,7 @@ function openTripSummary() {
     ov.innerHTML =
       '<div style="flex-shrink:0;display:flex;gap:8px;padding:14px 14px 10px;">' +
         '<button type="button" onclick="document.getElementById(\'tripSummaryOverlay\').remove()" style="flex:0 0 auto;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:13px;padding:11px 15px;font-size:14px;font-weight:800;cursor:pointer;font-family:Rubik,Arial,sans-serif;">✕</button>' +
+        '<button type="button" onclick="openTripSummaryOverridesEditor()" style="flex:1;background:#2563EB;border:none;color:#fff;border-radius:13px;padding:11px;font-size:14px;font-weight:800;cursor:pointer;font-family:Rubik,Arial,sans-serif;">✏️ תיקון ידני</button>' +
         '<button type="button" id="tripShareBtn" onclick="exportTripSummary()" style="flex:1;background:#F4634A;border:none;color:#fff;border-radius:13px;padding:11px;font-size:14px;font-weight:800;cursor:pointer;font-family:Rubik,Arial,sans-serif;">📤 שמור / שתף כתמונה</button>' +
       '</div>' +
       '<div style="flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:0 12px 20px;">' +
@@ -996,7 +1209,7 @@ function _downloadBlob(blob) {
 // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
 // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
 // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
-var BUILD_ID = '2026-08-15-a';
+var BUILD_ID = '2026-08-15-b';
 
 function forceUpdate() {
   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
