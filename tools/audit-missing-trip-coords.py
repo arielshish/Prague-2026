@@ -9,8 +9,21 @@ def extract_object(src, name):
         return ''
     start = src.find('{', m.start())
     depth = 0
+    quote = None
+    esc = False
     for i in range(start, len(src)):
         ch = src[i]
+        if quote:
+            if esc:
+                esc = False
+            elif ch == '\\':
+                esc = True
+            elif ch == quote:
+                quote = None
+            continue
+        if ch in ('"', "'", '`'):
+            quote = ch
+            continue
         if ch == '{':
             depth += 1
         elif ch == '}':
@@ -19,38 +32,54 @@ def extract_object(src, name):
                 return src[start:i+1]
     return ''
 
+def is_place_like(x):
+    x = re.sub(r'\s+', ' ', x).strip()
+    if len(x) < 2 or len(x) > 90:
+        return False
+    bad_chars = set('`{}[];=<>()')
+    if any(ch in bad_chars for ch in x):
+        return False
+    if x.startswith('#') or x.startswith('.') or x.startswith('/'):
+        return False
+    if re.fullmatch(r'[A-Za-z0-9_\-]+', x):
+        return False
+    bad_words = [
+        'function','localStorage','Firestore','firebase','console','innerHTML','onclick','style','class',
+        'BUILD_ID','rgba','px','http','data:image','blob','querySelector','document.','window.',
+        'גרסה','שמור','שתף','הוסף','ערוך','מחק','סגור','טעינה','שגיאה','בחר','אישור','ביטול'
+    ]
+    if any(b in x for b in bad_words):
+        return False
+    # Must contain a real Hebrew or Latin letter, not only symbols/numbers.
+    if not re.search(r'[A-Za-zא-ת]', x):
+        return False
+    return True
+
 coords_obj = extract_object(app, 'PLACE_COORDS')
 coord_names = set(re.findall(r"['\"]([^'\"]+)['\"]\s*:\s*\[\s*-?\d", coords_obj))
 
-# Candidate place names from structured place-like objects and display lists.
-patterns = [
+candidates = set()
+for pat in [
     r"\bname\s*:\s*['\"]([^'\"]{2,120})['\"]",
     r"\bplace\s*:\s*['\"]([^'\"]{2,120})['\"]",
     r"\btitle\s*:\s*['\"]([^'\"]{2,120})['\"]",
-]
-candidates = set()
-for pat in patterns:
+]:
     for x in re.findall(pat, app):
         x = re.sub(r'\s+', ' ', x).strip()
-        if not x:
-            continue
-        # filter obvious UI labels, not places
-        if any(bad in x for bad in ['function', 'localStorage', 'Firestore', 'BUILD_ID', 'גרסה', 'שמור', 'שתף', 'הוסף', 'ערוך']):
-            continue
-        if len(x) < 2 or len(x) > 100:
-            continue
-        candidates.add(x)
-
-# Also find explicit stop-like strings in known arrays/objects by nearby emoji/type/coords context.
-for m in re.finditer(r"['\"]([^'\"]{2,120})['\"]", app):
-    x = re.sub(r'\s+', ' ', m.group(1)).strip()
-    if not x or x in coord_names or x in candidates:
-        continue
-    window = app[max(0, m.start()-180):m.end()+180]
-    if any(marker in window for marker in ['emoji', 'icon', 'coords', 'PLACE_COORDS', 'lat', 'lng', 'stop', 'stops', 'type']):
-        if not any(bad in x for bad in ['http', 'rgba', 'px', 'function', 'localStorage', 'console.', 'Firestore', 'firebase', 'innerHTML', 'onclick']):
+        if is_place_like(x):
             candidates.add(x)
 
+# Prefer names that appear in proximity to schedule/place metadata.
+nearby_candidates = set()
+for m in re.finditer(r"['\"]([^'\"]{2,120})['\"]", app):
+    x = re.sub(r'\s+', ' ', m.group(1)).strip()
+    if not is_place_like(x):
+        continue
+    window = app[max(0, m.start()-240):m.end()+240]
+    if any(marker in window for marker in ['emoji', 'icon', 'coords', 'PLACE_COORDS', 'gps', 'mapUrl', 'stops', 'type', 'desc']):
+        nearby_candidates.add(x)
+
+candidates |= nearby_candidates
 missing = sorted([x for x in candidates if x not in coord_names])
 
 lines = []
@@ -59,8 +88,8 @@ lines.append('')
 lines.append('Generated from `app.html`.')
 lines.append('')
 lines.append(f'- PLACE_COORDS entries: {len(coord_names)}')
-lines.append(f'- Candidate place-like names: {len(candidates)}')
-lines.append(f'- Missing candidate coordinates: {len(missing)}')
+lines.append(f'- Candidate place-like names after filtering: {len(candidates)}')
+lines.append(f'- Missing candidate coordinates after filtering: {len(missing)}')
 lines.append('')
 lines.append('## Missing candidates')
 lines.append('')
@@ -69,8 +98,7 @@ for x in missing:
 lines.append('')
 lines.append('## Notes')
 lines.append('')
-lines.append('- This is a static audit only.')
-lines.append('- It may include UI labels if they appear in place-like structures.')
-lines.append('- Do not add coordinates before manual review/verification.')
+lines.append('- Static audit only; manually verify each candidate before adding coordinates.')
+lines.append('- False positives are still possible, but CSS/UI/code strings are filtered out.')
 Path('docs/MISSING_TRIP_COORDS_AUDIT.md').write_text('\n'.join(lines) + '\n', encoding='utf-8')
 print('\n'.join(lines))
