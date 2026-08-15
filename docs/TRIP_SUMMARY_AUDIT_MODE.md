@@ -54,6 +54,17 @@ The tool must not call:
 
 The tool only reads app globals and localStorage.
 
+## Privacy guard
+
+The audit snapshot does **not** include localStorage values or previews.
+
+For protected localStorage keys, it records only:
+
+- whether the key exists
+- the value length
+
+This is enough to detect whether a key changed during the audit without exposing the saved trip data.
+
 ## How to run manually
 
 1. Open the live Prague app in a browser.
