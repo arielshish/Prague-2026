@@ -1,0 +1,37 @@
+name: Apply Burger King OC Eden PR131
+on:
+  push:
+    branches:
+      - feature/trip-summary-dedupe-clean
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/trip-summary-dedupe-clean
+          fetch-depth: 0
+      - name: Fetch main baseline
+        run: git fetch origin main
+      - name: Apply Burger King OC Eden
+        run: python3 tools/apply-burger-king-oc-eden-pr131.py
+      - name: Check inline JavaScript
+        run: node --check /tmp/app-inline.js
+      - name: Remove temporary workflow and script
+        run: |
+          rm -f tools/apply-burger-king-oc-eden-pr131.py
+          rm -f .github/workflows/apply-burger-king-oc-eden-pr131.yml
+      - name: Commit result
+        run: |
+          git config user.name "arielshish"
+          git config user.email "159256813+arielshish@users.noreply.github.com"
+          git add app.html docs/CLAUDE_TRIP_SUMMARY_DEDUPE_FIX_PR131.md docs/TRIP_SUMMARY_DEDUPE_FIX_PR131.md tools .github/workflows || true
+          git status --short
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "Add Burger King OC Eden stop"
+          git push origin feature/trip-summary-dedupe-clean
