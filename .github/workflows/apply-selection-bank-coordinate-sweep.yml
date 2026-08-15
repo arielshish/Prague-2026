@@ -1,0 +1,41 @@
+name: Apply Selection Bank Coordinate Sweep
+
+on:
+  push:
+    branches:
+      - feature/selection-bank-coordinate-sweep
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prepare base ref
+        run: git fetch origin main
+      - name: Apply coordinate sweep
+        run: python tools/apply-selection-bank-coordinate-sweep.py
+      - name: Validate inline JavaScript
+        run: node --check /tmp/app-inline.js
+      - name: Final safety diff check
+        run: |
+          git diff -- app.html docs/SELECTION_BANK_COORD_SWEEP_PR128.md docs/CLAUDE_SELECTION_BANK_COORD_SWEEP_PR128.md
+          ! git diff --name-only origin/main...HEAD | grep -E '^(backend|gas_project|sync_gas|translator\.html)' || exit 1
+      - name: Commit app/docs and cleanup temp workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f tools/apply-selection-bank-coordinate-sweep.py
+          rm -f .github/workflows/apply-selection-bank-coordinate-sweep.yml
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Add selection bank coordinate aliases and docs"
+            git push
+          fi
