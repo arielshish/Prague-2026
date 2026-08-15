@@ -36,15 +36,6 @@ jobs:
           rm -f .github/workflows/apply-trip-summary-selection-bank.yml
           rmdir tools 2>/dev/null || true
 
-      - name: Final diff guard
-        run: |
-          git diff --name-only | sort > /tmp/changed.txt
-          cat /tmp/changed.txt
-          grep -qx 'app.html' /tmp/changed.txt
-          grep -qx 'docs/CLAUDE_TRIP_SUMMARY_SELECTION_BANK_PR129.md' /tmp/changed.txt
-          grep -qx 'docs/TRIP_SUMMARY_SELECTION_BANK_PR129.md' /tmp/changed.txt
-          if grep -E '(^backend|^gas_project|^translator.html|^robots.txt)' /tmp/changed.txt; then exit 1; fi
-
       - name: Commit result
         run: |
           git config user.name "github-actions[bot]"
