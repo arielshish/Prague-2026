@@ -9,8 +9,6 @@ if "var BUILD_ID = '2026-08-15-h';" not in app:
     raise SystemExit('expected BUILD_ID 2026-08-15-h not found')
 app = app.replace("var BUILD_ID = '2026-08-15-h';", "var BUILD_ID = '2026-08-15-i';", 1)
 
-# Add a narrow summary-only canonicalizer for known aliases that can appear from expense stops,
-# itinerary guard, map records, and manual/bank rows.
 anchor = "function _tripSummaryData()"
 idx = app.find(anchor)
 if idx < 0:
@@ -64,13 +62,13 @@ function _tripSummaryDedupeRows(rows){
 }
 """
 
+# Insert helper before _tripSummaryData.
 if '_tripSummaryDedupeKey' not in app:
     app = app[:idx] + helper + '\n' + app[idx:]
 else:
     raise SystemExit('dedupe helper already exists')
 
-# Wrap the return from _tripSummaryData. Prefer the common pattern: return rows.sort(...);
-# If not present, wrap the last return rows; inside the function.
+# Find _tripSummaryData function end after helper insertion, then wrap externally.
 start = app.find(anchor)
 brace = app.find('{', start)
 depth = 0
@@ -80,14 +78,18 @@ esc = False
 for i in range(brace, len(app)):
     ch = app[i]
     if quote:
-        if esc: esc = False
-        elif ch == '\\': esc = True
-        elif ch == quote: quote = None
+        if esc:
+            esc = False
+        elif ch == '\\':
+            esc = True
+        elif ch == quote:
+            quote = None
         continue
     if ch in ('"', "'", '`'):
         quote = ch
         continue
-    if ch == '{': depth += 1
+    if ch == '{':
+        depth += 1
     elif ch == '}':
         depth -= 1
         if depth == 0:
@@ -95,27 +97,20 @@ for i in range(brace, len(app)):
             break
 if end is None:
     raise SystemExit('could not find _tripSummaryData end')
-func = app[start:end+1]
-newfunc = func
 
-patterns = [
-    ("return rows.sort(function(a,b){", "return _tripSummaryDedupeRows(rows).sort(function(a,b){"),
-    ("return rows;", "return _tripSummaryDedupeRows(rows);"),
-]
-for old, new in patterns:
-    if old in newfunc:
-        newfunc = newfunc.replace(old, new, 1)
-        break
-if newfunc == func:
-    # safer fallback: inject just before final closing brace a rows = _tripSummaryDedupeRows(rows)
-    last_return = newfunc.rfind('return ')
-    if last_return < 0:
-        raise SystemExit('no return in _tripSummaryData')
-    raise SystemExit('no recognized _tripSummaryData return pattern')
+wrapper = r"""
+// PR #131: summary-only wrapper. Keep the original data builder intact and
+// de-duplicate only its returned rows.
+var _tripSummaryDataRaw_PR131 = _tripSummaryData;
+function _tripSummaryData(){
+  return _tripSummaryDedupeRows(_tripSummaryDataRaw_PR131());
+}
+"""
 
-app = app[:start] + newfunc + app[end+1:]
+if '_tripSummaryDataRaw_PR131' in app:
+    raise SystemExit('wrapper already exists')
+app = app[:end+1] + '\n' + wrapper + app[end+1:]
 
-# Docs.
 Path('docs/TRIP_SUMMARY_DEDUPE_FIX_PR131.md').write_text("""# Trip Summary Dedupe Fix — PR #131
 
 Date: 2026-08-15
@@ -135,7 +130,9 @@ The user noticed the duplication specifically in the summary.
 
 ## Fix
 
-Add summary-only de-duplication before rendering Trip Summary rows.
+Add summary-only de-duplication around `_tripSummaryData()`.
+
+The original data builder remains intact. The wrapper only de-duplicates the returned rows before rendering.
 
 The dedupe key prefers:
 
@@ -181,7 +178,7 @@ The user then reported duplicate rows in the Trip Summary.
 
 ## Fix Applied
 
-Trip Summary now runs rows through `_tripSummaryDedupeRows(rows)` before sorting/rendering.
+Trip Summary now wraps `_tripSummaryData()` and runs returned rows through `_tripSummaryDedupeRows(rows)` before rendering.
 
 `_tripSummaryDedupeKey(r)` canonicalizes the new stop families and then falls back to GPS rounding / normalized name.
 
@@ -192,7 +189,6 @@ This is summary-only. It does not mutate days, expenses, visited state, or Fires
 Future additions should prefer adding canonical mappings to `_tripSummaryDedupeKey` instead of adding broader destructive normalization.
 """, encoding='utf-8')
 
-# Validate safety counts.
 new_app = app
 protected = [
     'prague_visited_v1','prague_exp_v10','prague_exp_ts','prague_days_v1',
@@ -208,8 +204,8 @@ if new_app.count('localStorage.clear') != old_app.count('localStorage.clear'):
     raise SystemExit('localStorage.clear count changed')
 if "var BUILD_ID = '2026-08-15-i';" not in new_app:
     raise SystemExit('BUILD_ID i not found')
-if '_tripSummaryDedupeRows(rows)' not in new_app:
-    raise SystemExit('dedupe rows call not found')
+if '_tripSummaryDedupeRows(_tripSummaryDataRaw_PR131())' not in new_app:
+    raise SystemExit('dedupe wrapper call not found')
 
 APP.write_text(new_app, encoding='utf-8')
 scripts = re.findall(r'<script(?![^>]*src=)[^>]*>(.*?)</script>', new_app, flags=re.S|re.I)
