@@ -9,8 +9,6 @@ if "var BUILD_ID = '2026-08-15-h';" not in app:
     raise SystemExit('expected BUILD_ID 2026-08-15-h not found')
 app = app.replace("var BUILD_ID = '2026-08-15-h';", "var BUILD_ID = '2026-08-15-i';", 1)
 
-# Add a narrow summary-only canonicalizer for known aliases that can appear from expense stops,
-# itinerary guard, map records, and manual/bank rows.
 anchor = "function _tripSummaryData()"
 idx = app.find(anchor)
 if idx < 0:
@@ -22,8 +20,8 @@ function _tripSummaryDedupeKey(r){
   var lower = name.toLowerCase();
   if(!name) return '';
 
-  // PR #131: summary-only canonicalization to prevent duplicates when the same
-  // real stop arrives through expenses/day guard/map/manual names.
+  // PR #131: summary-only canonicalization to prevent duplicate rows when the
+  // same real stop arrives through expenses/day guard/map/manual names.
   if(lower.indexOf('pure') >= 0 || name.indexOf('שוק האיכרים') >= 0 || lower.indexOf('náplavka') >= 0 || lower.indexOf('naplavka') >= 0){
     return 'poi:naplavka-farmers-market-pure-gelato';
   }
@@ -69,53 +67,16 @@ if '_tripSummaryDedupeKey' not in app:
 else:
     raise SystemExit('dedupe helper already exists')
 
-# Wrap the return from _tripSummaryData. Prefer the common pattern: return rows.sort(...);
-# If not present, wrap the last return rows; inside the function.
-start = app.find(anchor)
-brace = app.find('{', start)
-depth = 0
-end = None
-quote = None
-esc = False
-for i in range(brace, len(app)):
-    ch = app[i]
-    if quote:
-        if esc: esc = False
-        elif ch == '\\': esc = True
-        elif ch == quote: quote = None
-        continue
-    if ch in ('"', "'", '`'):
-        quote = ch
-        continue
-    if ch == '{': depth += 1
-    elif ch == '}':
-        depth -= 1
-        if depth == 0:
-            end = i
-            break
-if end is None:
-    raise SystemExit('could not find _tripSummaryData end')
-func = app[start:end+1]
-newfunc = func
+# Rather than depending on the exact return shape inside _tripSummaryData, wrap
+# consumers of _tripSummaryData(). This is safer across small implementation changes.
+app, n = re.subn(r'(?<!function\s)_tripSummaryData\(\)', r'_tripSummaryDedupeRows(_tripSummaryData())', app)
+# The substitution above also changes the function declaration in some engines if the
+# negative lookbehind cannot account for whitespace variants, so correct that explicitly.
+app = app.replace('function _tripSummaryDedupeRows(_tripSummaryData())', 'function _tripSummaryData()')
+# At minimum the rendered summary/bank should have at least one wrapped consumer.
+if n < 1 or '_tripSummaryDedupeRows(_tripSummaryData())' not in app:
+    raise SystemExit('no _tripSummaryData consumer was wrapped')
 
-patterns = [
-    ("return rows.sort(function(a,b){", "return _tripSummaryDedupeRows(rows).sort(function(a,b){"),
-    ("return rows;", "return _tripSummaryDedupeRows(rows);"),
-]
-for old, new in patterns:
-    if old in newfunc:
-        newfunc = newfunc.replace(old, new, 1)
-        break
-if newfunc == func:
-    # safer fallback: inject just before final closing brace a rows = _tripSummaryDedupeRows(rows)
-    last_return = newfunc.rfind('return ')
-    if last_return < 0:
-        raise SystemExit('no return in _tripSummaryData')
-    raise SystemExit('no recognized _tripSummaryData return pattern')
-
-app = app[:start] + newfunc + app[end+1:]
-
-# Docs.
 Path('docs/TRIP_SUMMARY_DEDUPE_FIX_PR131.md').write_text("""# Trip Summary Dedupe Fix — PR #131
 
 Date: 2026-08-15
@@ -135,7 +96,7 @@ The user noticed the duplication specifically in the summary.
 
 ## Fix
 
-Add summary-only de-duplication before rendering Trip Summary rows.
+Add summary-only de-duplication for Trip Summary consumers of `_tripSummaryData()`.
 
 The dedupe key prefers:
 
@@ -181,18 +142,17 @@ The user then reported duplicate rows in the Trip Summary.
 
 ## Fix Applied
 
-Trip Summary now runs rows through `_tripSummaryDedupeRows(rows)` before sorting/rendering.
+Consumers of `_tripSummaryData()` now use `_tripSummaryDedupeRows(_tripSummaryData())`.
 
 `_tripSummaryDedupeKey(r)` canonicalizes the new stop families and then falls back to GPS rounding / normalized name.
 
 ## Important
 
-This is summary-only. It does not mutate days, expenses, visited state, or Firestore.
+This is summary-only display de-duplication. It does not mutate days, expenses, visited state, or Firestore.
 
 Future additions should prefer adding canonical mappings to `_tripSummaryDedupeKey` instead of adding broader destructive normalization.
 """, encoding='utf-8')
 
-# Validate safety counts.
 new_app = app
 protected = [
     'prague_visited_v1','prague_exp_v10','prague_exp_ts','prague_days_v1',
@@ -208,7 +168,7 @@ if new_app.count('localStorage.clear') != old_app.count('localStorage.clear'):
     raise SystemExit('localStorage.clear count changed')
 if "var BUILD_ID = '2026-08-15-i';" not in new_app:
     raise SystemExit('BUILD_ID i not found')
-if '_tripSummaryDedupeRows(rows)' not in new_app:
+if '_tripSummaryDedupeRows(_tripSummaryData())' not in new_app:
     raise SystemExit('dedupe rows call not found')
 
 APP.write_text(new_app, encoding='utf-8')
