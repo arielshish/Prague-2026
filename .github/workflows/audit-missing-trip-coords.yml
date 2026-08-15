@@ -1,0 +1,26 @@
+name: Audit Missing Trip Coords
+
+on:
+  push:
+    branches:
+      - feature/missing-trip-summary-coords
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      - name: Build missing coordinates report
+        run: |
+          python3 tools/audit-missing-trip-coords.py
+          git config user.name "arielshish"
+          git config user.email "159256813+arielshish@users.noreply.github.com"
+          git add docs/MISSING_TRIP_COORDS_AUDIT.md
+          git commit -m "Document missing trip summary coordinates audit" || echo "No audit changes"
+          git push
