@@ -843,7 +843,10 @@ function _tripSummaryDedupeKey(r){
   if(lower.indexOf('pure') >= 0 || name.indexOf('שוק האיכרים') >= 0 || lower.indexOf('náplavka') >= 0 || lower.indexOf('naplavka') >= 0){
     return 'poi:naplavka-farmers-market-pure-gelato';
   }
-  if(lower.indexOf('pražská tržnice') >= 0 || lower.indexOf('prazska trznice') >= 0 || name.indexOf('השוק הגדול') >= 0 || name.indexOf('הולשוביצה') >= 0){
+    if(lower.indexOf('burger king') >= 0 || lower.indexOf('bk praha oc eden') >= 0 || lower.indexOf('oc eden') >= 0 || name.indexOf('בורגר קינג') >= 0){
+    return 'poi:burger-king-oc-eden';
+  }
+if(lower.indexOf('pražská tržnice') >= 0 || lower.indexOf('prazska trznice') >= 0 || name.indexOf('השוק הגדול') >= 0 || name.indexOf('הולשוביצה') >= 0){
     return 'poi:prazska-trznice-holesovice';
   }
 
@@ -4819,7 +4822,14 @@ function getDaysState() {
 // PR #130: expense-derived stops shown above the rest of the day stops.
 // These are UI/day-plan stops only. They do not mark places as visited and do not touch expenses.
 var EXPENSE_DAY_STOPS_PR130 = [
-  {
+      {
+      emoji: '🍔',
+      name: 'Burger King — OC Eden',
+      time: '13:56',
+      area: 'OC Eden / U Slavie 1527, Praha 10',
+      note: 'מהקבלה — 918 CZK, Burger King BK Praha OC Eden'
+    },
+{
     emoji: '🍦',
     name: 'Pure גלידה — Náplavka / שוק האיכרים על הנהר',
     time: '12:44',
@@ -4858,6 +4868,11 @@ function _ensureExpenseStopsPr130(days) {
     var aliases = {
       'Pure גלידה': true,
       'Pure גלידה — Náplavka / שוק האיכרים על הנהר': true,
+  // PR #131: expense-derived Burger King stop, receipt: BK Praha OC Eden, U Slavie 1527, Praha 10
+  'Burger King — OC Eden': [50.06780, 14.47170],
+  'Burger King OC Eden': [50.06780, 14.47170],
+  'BK Praha OC Eden': [50.06780, 14.47170],
+  'Burger King — U Slavie': [50.06780, 14.47170],
       'Pražská tržnice': true,
       'Pražská tržnice — השוק הגדול (הולשוביצה)': true,
       'השוק הגדול — הולשוביצה': true

@@ -31,3 +31,16 @@ This means all existing summary behavior remains, with only final row de-duplica
 ## Boundaries
 
 Summary display only. Do not mutate days, expenses, visited state, Firestore, backend, or GAS.
+
+
+## Later addition in same PR
+
+User uploaded a Burger King receipt and asked to add it.
+Added:
+
+- `Burger King — OC Eden`
+- aliases: `Burger King OC Eden`, `BK Praha OC Eden`, `Burger King — U Slavie`
+- day stop above the other 15.08 expense-derived stops
+- summary dedupe key `poi:burger-king-oc-eden`
+
+Do not mark as visited automatically; the user can mark it in the app.

@@ -49,3 +49,16 @@ No data deletion. No new localStorage keys.
 ## Version
 
 `BUILD_ID` advanced to `2026-08-15-i`.
+
+
+## Added from receipt — Burger King OC Eden
+
+Added another expense-derived stop from the receipt uploaded by the user:
+
+- `Burger King — OC Eden`
+- Receipt text: `BK Praha OC Eden`, `U Slavie 1527, Praha 10`
+- Date/time: `15.08.2026 13:56`
+- Amount: `918 CZK`
+
+The stop is added above the existing expense-derived stops for day 8 / 15.08.2026.
+It is not marked as visited automatically.
