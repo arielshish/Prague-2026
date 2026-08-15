@@ -1,4 +1,4 @@
-# Trip Summary Missing Coordinate Aliases — PR #127
+# Trip Summary Coordinate Aliases — PR #127
 
 Date: 2026-08-15
 Repository: `arielshish/Prague-2026`
@@ -9,7 +9,7 @@ Backup branch: `backup/pre-missing-coords-2026-08-15`
 
 Add missing/alternative `PLACE_COORDS` aliases needed before the trip-summary selection bank.
 
-## Added aliases
+## First alias batch
 
 - `FAT CAT Downtown`
 - `Fat Cat Downtown`
@@ -22,12 +22,25 @@ Add missing/alternative `PLACE_COORDS` aliases needed before the trip-summary se
 - `Primark Metropole Zličín`
 - `Primark — Metropole Zličín`
 
-## Coordinates used
+## Reviewed audit alias batch
 
-- FAT CAT Downtown / Wenceslas Square: `[50.0811606, 14.4284073]`
-- Kampa Island: `[50.084581, 14.408223]`
-- Makakiko Running Sushi Palladium: `[50.0890049, 14.4291743]`
-- Primark Metropole Zličín: `[50.05340, 14.28946]`
+Added after reviewing `docs/FULL_TRIP_COORDS_AUDIT.md` and filtering out UI text, tickets, route labels, and explanatory sentences.
+
+- `Clementinum – הספרייה הבארוקית`
+- `IKEA Praha — Zličín`
+- `Municipal House – Obecní dům`
+- `Vyšehrad – המבצר הנסתר`
+- `בית הריקוד – Dancing House`
+- `גשר קארל – Charles Bridge`
+- `הרובע היהודי – Josefov`
+- `טירת פראג – Pražský hrad`
+- `כיכר העיר העתיקה – Old Town Square`
+- `מגדל פטרין – Petřín Tower`
+- `שעון האסטרונומי – Orloj`
+
+## Intentionally not added
+
+- `שפת הנהר Vltava – בלילה` — broad route/area label, not one exact point.
 
 ## Safety boundaries
 
@@ -44,10 +57,10 @@ Do not touch:
 
 ## Validation
 
-The apply workflow checks:
+Workflow checks:
 
-- all aliases exist in `PLACE_COORDS`
-- `BUILD_ID` is `2026-08-15-d`
+- all reviewed aliases exist in `PLACE_COORDS`
+- `BUILD_ID` is `2026-08-15-e`
 - no protected localStorage keys changed
 - no `appdata/*` paths changed
 - no new `localStorage.removeItem` or `localStorage.clear`
