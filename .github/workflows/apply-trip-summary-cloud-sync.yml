@@ -17,7 +17,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
-      - name: Apply focused changes
+      - name: Apply focused app changes
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -27,101 +27,88 @@ jobs:
               if old not in src:
                   raise SystemExit(f'missing marker: {label}')
               return src.replace(old, new, 1)
-
           app = repl(app,
           "  try { if (_hasLocalData('prague_budget_v1') && typeof saveBudget === 'function' && typeof loadBudget === 'function') saveBudget(loadBudget()); } catch (e) { console.warn('resync budget categories failed', e); }\n}",
           "  try { if (_hasLocalData('prague_budget_v1') && typeof saveBudget === 'function' && typeof loadBudget === 'function') saveBudget(loadBudget()); } catch (e) { console.warn('resync budget categories failed', e); }\n  try { if (_hasLocalData('prague_trip_summary_overrides_v1') && typeof _saveTripSummaryOverridesToCloud === 'function') _saveTripSummaryOverridesToCloud(_loadTripSummaryOverrides(), _tripSummaryOverridesLocalTs() || Date.now()); } catch (e) { console.warn('resync trip summary overrides failed', e); }\n}",
           'resync trip summary overrides')
-
           app = repl(app,
           "var TRIP_SUMMARY_OVERRIDES_KEY = 'prague_trip_summary_overrides_v1';\nvar TRIP_SUMMARY_OVERRIDES_TS_KEY = 'prague_trip_summary_overrides_ts';\n\nfunction _emptyTripSummaryOverrides() { return { version: 1, places: {}, hidden: {}, added: [] }; }",
           "var TRIP_SUMMARY_OVERRIDES_KEY = 'prague_trip_summary_overrides_v1';\nvar TRIP_SUMMARY_OVERRIDES_TS_KEY = 'prague_trip_summary_overrides_ts';\nvar _tripSummaryCloudUnsub = null;\nvar _tripSummaryCloudApplying = false;\n\nfunction _emptyTripSummaryOverrides() { return { version: 1, places: {}, hidden: {}, added: [] }; }\n\nfunction _tripSummaryOverridesLocalTs() {\n  try { return Number(localStorage.getItem(TRIP_SUMMARY_OVERRIDES_TS_KEY) || '0') || 0; } catch (e) { return 0; }\n}\n\nfunction _tripSummaryOverridesMeaningful(o) {\n  if (!o || typeof o !== 'object') return false;\n  var places = o.places && typeof o.places === 'object' ? o.places : {};\n  var hidden = o.hidden && typeof o.hidden === 'object' ? o.hidden : {};\n  var added = Array.isArray(o.added) ? o.added : [];\n  return Object.keys(places).length > 0 || Object.keys(hidden).length > 0 || added.length > 0;\n}\n\nfunction _saveTripSummaryOverridesToCloud(o, ts) {\n  if (_tripSummaryCloudApplying) return;\n  o = o || _emptyTripSummaryOverrides();\n  ts = Number(ts || Date.now()) || Date.now();\n  try {\n    ensureFirebaseAuth().then(function(ok) {\n      if (!ok) return;\n      var db = getFirestoreDb();\n      db.collection('appdata').doc('trip_summary').set({\n        version: 1,\n        overrides_json: JSON.stringify(o),\n        ts: ts,\n        updatedAt: firebase.firestore.FieldValue.serverTimestamp()\n      }, { merge: true }).catch(function(e) { console.warn('trip summary cloud save failed', e); });\n    }).catch(function(e) { console.warn('trip summary auth check failed', e); });\n  } catch (e) { console.warn('trip summary cloud save init failed', e); }\n}\n\nfunction _applyTripSummaryOverridesFromCloud(d) {\n  if (!d) return;\n  var remote = null;\n  try {\n    if (d.overrides_json) remote = JSON.parse(d.overrides_json);\n    else if (d.overrides && typeof d.overrides === 'object') remote = d.overrides;\n  } catch (e) { console.warn('trip summary cloud parse failed', e); return; }\n  if (!remote || typeof remote !== 'object') return;\n  var remoteTs = Number(d.ts || 0) || 0;\n  var localTs = _tripSummaryOverridesLocalTs();\n  var remoteMeaningful = _tripSummaryOverridesMeaningful(remote);\n  var localMeaningful = _hasLocalData(TRIP_SUMMARY_OVERRIDES_KEY);\n  if (!remoteMeaningful && localMeaningful) return;\n  if (localMeaningful && localTs && remoteTs && remoteTs < localTs) {\n    _saveTripSummaryOverridesToCloud(_loadTripSummaryOverrides(), localTs);\n    return;\n  }\n  _tripSummaryCloudApplying = true;\n  try {\n    localStorage.setItem(TRIP_SUMMARY_OVERRIDES_KEY, JSON.stringify(remote));\n    if (remoteTs) localStorage.setItem(TRIP_SUMMARY_OVERRIDES_TS_KEY, String(remoteTs));\n  } catch (e) { console.warn('trip summary cloud apply failed', e); }\n  _tripSummaryCloudApplying = false;\n  try { if (document.getElementById('tripSummaryOverlay')) _refreshTripSummaryPreview(); } catch (e) {}\n}\n\nfunction initTripSummaryOverridesCloudSync() {\n  if (_tripSummaryCloudUnsub) return;\n  try {\n    ensureFirebaseAuth().then(function(ok) {\n      if (!ok || _tripSummaryCloudUnsub) return;\n      var db = getFirestoreDb();\n      _tripSummaryCloudUnsub = db.collection('appdata').doc('trip_summary').onSnapshot(function(snap) {\n        if (!snap.exists) {\n          if (_hasLocalData(TRIP_SUMMARY_OVERRIDES_KEY)) _saveTripSummaryOverridesToCloud(_loadTripSummaryOverrides(), _tripSummaryOverridesLocalTs() || Date.now());\n          return;\n        }\n        _applyTripSummaryOverridesFromCloud(snap.data() || {});\n      }, function(e) { console.warn('trip summary cloud listener failed', e); });\n    }).catch(function(e) { console.warn('trip summary cloud auth failed', e); });\n  } catch (e) { console.warn('trip summary cloud init failed', e); }\n}",
           'trip summary cloud functions')
-
           app = repl(app,
           "  localStorage.setItem(TRIP_SUMMARY_OVERRIDES_KEY, JSON.stringify(o));\n  localStorage.setItem(TRIP_SUMMARY_OVERRIDES_TS_KEY, String(Date.now()));\n}",
           "  localStorage.setItem(TRIP_SUMMARY_OVERRIDES_KEY, JSON.stringify(o));\n  localStorage.setItem(TRIP_SUMMARY_OVERRIDES_TS_KEY, String(Date.now()));\n  _saveTripSummaryOverridesToCloud(o, _tripSummaryOverridesLocalTs());\n}",
           'save cloud call')
-
-          app = repl(app,
-          "var BUILD_ID = '2026-08-15-b';",
-          "var BUILD_ID = '2026-08-15-c';",
-          'build id')
-
+          app = repl(app, "var BUILD_ID = '2026-08-15-b';", "var BUILD_ID = '2026-08-15-c';", 'build id')
           app = repl(app,
           "  try { _renderBuildStamp(); } catch (e) {}\n}",
           "  try { _renderBuildStamp(); } catch (e) {}\n  try { if (typeof initTripSummaryOverridesCloudSync === 'function') initTripSummaryOverridesCloudSync(); } catch (e) { console.warn('trip summary cloud init from showApp failed', e); }\n}",
           'show app cloud init')
-
           app_path.write_text(app, encoding='utf-8')
-
-          doc_path = Path('docs/CLAUDE_TRIP_SUMMARY_CHANGELOG.md')
-          doc = doc_path.read_text(encoding='utf-8')
-          if 'PR #126 — Trip summary overrides cloud sync' not in doc:
-              doc += """
-
----
-
-## PR #126 — Trip summary overrides cloud sync
-
-Date: 2026-08-15
-Branch: `feature/trip-summary-cloud-sync`
-Backup branch: `backup/pre-trip-summary-cloud-sync-2026-08-15`
-
-### Purpose
-
-Persist the manual trip-summary corrections added in PR #125 to Firestore, while keeping them isolated from all existing app data.
-
-### Files changed
-
-- `app.html`
-- `docs/CLAUDE_TRIP_SUMMARY_CHANGELOG.md`
-
-### App changes in `app.html`
-
-The cloud sync is intentionally scoped to one new Firestore document:
-
-- Firestore collection/doc: `appdata/trip_summary`
-
-The existing local override keys remain the local source/cache:
-
-- `prague_trip_summary_overrides_v1`
-- `prague_trip_summary_overrides_ts`
-
-Added functions:
-
-- `_tripSummaryOverridesLocalTs()`
-- `_tripSummaryOverridesMeaningful(o)`
-- `_saveTripSummaryOverridesToCloud(o, ts)`
-- `_applyTripSummaryOverridesFromCloud(d)`
-- `initTripSummaryOverridesCloudSync()`
-
-Integration points:
-
-- `_saveTripSummaryOverrides(o)` now writes local first and then attempts isolated Firestore save.
-- `_resyncLocalDataToCloud()` now uploads local trip-summary overrides after login only if local override data exists.
-- `_showApp()` starts the isolated trip-summary listener when the authenticated app is displayed.
-- `BUILD_ID` is updated to `2026-08-15-c`.
-
-### Safety boundaries
-
-This PR must not touch or reuse:
-
-- `appdata/main`
-- `appdata/expenses`
-- `prague_days_v1`
-- `prague_visited_v1`
-- `prague_exp_v10`
-- GAS / backend login code
-
-Conflict protection:
-
-- Empty remote trip-summary state does not overwrite meaningful local override data.
-- Older remote timestamp does not overwrite newer local override data; local newer data is pushed back to `appdata/trip_summary`.
-- Firestore save uses `{ merge: true }` on the isolated document.
-"""
-          doc_path.write_text(doc, encoding='utf-8')
           PY
+      - name: Write Claude-facing documentation
+        run: |
+          cat > docs/CLAUDE_TRIP_SUMMARY_CLOUD_SYNC.md <<'CLOUDMD'
+          # Claude Trip Summary Cloud Sync — PR #126
+
+          Date: 2026-08-15
+          Repository: `arielshish/Prague-2026`
+          Branch: `feature/trip-summary-cloud-sync`
+          Backup branch: `backup/pre-trip-summary-cloud-sync-2026-08-15`
+
+          ## Purpose
+
+          Persist manual trip-summary corrections from PR #125 to Firestore without touching existing app data.
+
+          ## Files changed
+
+          - `app.html`
+          - `docs/CLAUDE_TRIP_SUMMARY_CLOUD_SYNC.md`
+
+          ## Runtime change in `app.html`
+
+          New isolated Firestore document:
+
+          - `appdata/trip_summary`
+
+          Existing local keys remain the local cache/source:
+
+          - `prague_trip_summary_overrides_v1`
+          - `prague_trip_summary_overrides_ts`
+
+          Added functions:
+
+          - `_tripSummaryOverridesLocalTs()`
+          - `_tripSummaryOverridesMeaningful(o)`
+          - `_saveTripSummaryOverridesToCloud(o, ts)`
+          - `_applyTripSummaryOverridesFromCloud(d)`
+          - `initTripSummaryOverridesCloudSync()`
+
+          Integration points:
+
+          - `_saveTripSummaryOverrides(o)` writes local first, then attempts Firestore save.
+          - `_resyncLocalDataToCloud()` uploads local trip-summary overrides after login only if local override data exists.
+          - `_showApp()` starts the isolated listener after the authenticated app is displayed.
+          - `BUILD_ID` becomes `2026-08-15-c`.
+
+          ## Safety boundaries
+
+          Do not touch or reuse:
+
+          - `appdata/main`
+          - `appdata/expenses`
+          - `prague_days_v1`
+          - `prague_visited_v1`
+          - `prague_exp_v10`
+          - GAS / backend login code
+
+          Conflict protection:
+
+          - Empty remote state does not overwrite meaningful local override data.
+          - Older remote timestamp does not overwrite newer local override data.
+          - Newer local data is pushed back to `appdata/trip_summary`.
+          - Firestore save uses `{ merge: true }`.
+          CLOUDMD
       - name: Validate safety boundaries
         run: |
           git fetch origin main
@@ -130,7 +117,7 @@ Conflict protection:
           import re, subprocess, sys
           old = subprocess.check_output(['git','show','origin/main:app.html'], text=True)
           new = Path('app.html').read_text(encoding='utf-8')
-          doc = Path('docs/CLAUDE_TRIP_SUMMARY_CHANGELOG.md').read_text(encoding='utf-8')
+          doc = Path('docs/CLAUDE_TRIP_SUMMARY_CLOUD_SYNC.md').read_text(encoding='utf-8')
           def count(s, needle): return s.count(needle)
           checks = []
           checks.append(('BUILD_ID', "var BUILD_ID = '2026-08-15-c';" in new))
@@ -142,7 +129,7 @@ Conflict protection:
           checks.append(('no protected local key writes added', all(count(new, k) == count(old, k) for k in ['prague_days_v1','prague_visited_v1','prague_exp_v10','prague_exp_ts'])))
           checks.append(('no remove/clear added', count(new, 'localStorage.removeItem') == count(old, 'localStorage.removeItem') and count(new, 'localStorage.clear') == count(old, 'localStorage.clear')))
           checks.append(('merge true cloud save', '{ merge: true }' in new))
-          checks.append(('claude md documented', 'PR #126 — Trip summary overrides cloud sync' in doc and 'backup/pre-trip-summary-cloud-sync-2026-08-15' in doc))
+          checks.append(('claude md documented', 'Claude Trip Summary Cloud Sync' in doc and 'backup/pre-trip-summary-cloud-sync-2026-08-15' in doc))
           bad = [name for name, ok in checks if not ok]
           if bad:
               print('FAILED:', bad)
@@ -155,7 +142,7 @@ Conflict protection:
         run: |
           git diff --name-only origin/main > /tmp/files.txt
           grep -qx 'app.html' /tmp/files.txt
-          grep -qx 'docs/CLAUDE_TRIP_SUMMARY_CHANGELOG.md' /tmp/files.txt
+          grep -qx 'docs/CLAUDE_TRIP_SUMMARY_CLOUD_SYNC.md' /tmp/files.txt
           grep -qx 'tools/pr126-trip-summary-cloud-sync.patch' /tmp/files.txt
           grep -qx '.github/workflows/apply-trip-summary-cloud-sync.yml' /tmp/files.txt
           test "$(wc -l < /tmp/files.txt)" -eq 4
@@ -165,6 +152,6 @@ Conflict protection:
           rm .github/workflows/apply-trip-summary-cloud-sync.yml
           git config user.name "arielshish"
           git config user.email "159256813+arielshish@users.noreply.github.com"
-          git add app.html docs/CLAUDE_TRIP_SUMMARY_CHANGELOG.md tools/pr126-trip-summary-cloud-sync.patch .github/workflows/apply-trip-summary-cloud-sync.yml
+          git add app.html docs/CLAUDE_TRIP_SUMMARY_CLOUD_SYNC.md tools/pr126-trip-summary-cloud-sync.patch .github/workflows/apply-trip-summary-cloud-sync.yml
           git commit -m "Sync trip summary overrides to Firestore"
           git push
