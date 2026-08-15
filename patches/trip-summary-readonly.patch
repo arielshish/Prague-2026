@@ -1,0 +1,26 @@
+--- app.html
++++ app.html
+@@ -648,10 +648,10 @@
+       icon: (mapRec && mapRec.icon) || rec.emoji || '📍',
+       desc: _sclip(rec.desc || rec.details || '', 62),
+       type: (mapRec && mapRec.type) || 'community',
+       coords: PLACE_COORDS[n] || (mapRec && mapRec.coords) || null,
+-      day: visitDay || planDay,
+-      dayFrom: visitDay ? 'visit' : (planDay ? 'plan' : null),
++      day: planDay || visitDay,
++      dayFrom: planDay ? 'plan' : (visitDay ? 'visit' : null),
+       ts: st[n]
+     };
+   });
+   // מיון כרונולוגי: לפי היום שבו היינו, ואז לפי שעת הסימון בתוך היום.
+@@ -995,9 +995,9 @@
+ // הייתה `s.replace("...-a","...-b")` בלי אימות, ואחרי מיזוג main המחרוזת
+ // שחיפשה כבר לא הייתה בקובץ — ההחלפה נכשלה **בשקט** והגרסה נשארה ישנה,
+ // בזמן שכל שאר התוכן כן נכנס. חותמת שקרית גרועה מאין חותמת: היא שולחת
+ // לחפש באג שכבר תוקן. כשמעדכנים בסקריפט — לוודא שהמחרוזת הישנה נמצאה.
+-var BUILD_ID = '2026-08-14-g';
++var BUILD_ID = '2026-08-15-a';
+ 
+ function forceUpdate() {
+   // query param ייחודי = URL אחר = Safari חייב להביא מהרשת ולא מהמטמון.
+   // reload(true) הוסר מהתקן ומתעלמים ממנו ברוב הדפדפנים, ולכן לא מספיק.
