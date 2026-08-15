@@ -15,7 +15,7 @@ jobs:
       - name: Fetch main baseline
         run: git fetch origin main
       - name: Apply regression fix
-        run: python3 tools/apply-trip-summary-regression-fix-pr132c.py
+        run: python3 tools/apply-trip-summary-regression-fix-pr132d.py
       - name: Check inline JavaScript syntax
         run: node --check /tmp/app-inline.js
       - name: Run semantic regression tests
