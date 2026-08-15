@@ -16,15 +16,17 @@ jobs:
       - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
       - name: Apply focused patch
         run: |
           git apply tools/pr125-trip-summary-manual-overrides.patch
       - name: Validate safety boundaries
         run: |
+          git fetch origin main --depth=1
           python3 - <<'PY'
           from pathlib import Path
           import re, subprocess, sys
-          old = subprocess.check_output(['git','show','HEAD~2:app.html'], text=True)
+          old = subprocess.check_output(['git','show','origin/main:app.html'], text=True)
           new = Path('app.html').read_text(encoding='utf-8')
           def count(s, needle): return s.count(needle)
           checks = []
@@ -46,8 +48,8 @@ jobs:
           node --check /tmp/app-inline.js
       - name: Ensure final diff scope before cleanup
         run: |
-          git diff --name-only HEAD~2..HEAD > /tmp/before.txt
-          git diff --name-only HEAD~2 -- app.html | grep -qx app.html
+          changed=$(git diff --name-only origin/main -- app.html)
+          test "$changed" = "app.html"
       - name: Clean temporary files and commit final result
         run: |
           rm tools/pr125-trip-summary-manual-overrides.patch
