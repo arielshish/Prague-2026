@@ -1,0 +1,1363 @@
+# Missing Trip Summary Coordinates Audit
+
+Generated from `app.html`.
+
+- PLACE_COORDS entries: 134
+- Candidate place-like names: 1469
+- Missing candidate coordinates: 1347
+
+## Missing candidates
+
+- `#0891B2`
+- `#0e7490`
+- `#155e75`
+- `#166534`
+- `#16a34a`
+- `#1e293b`
+- `#2563EB`
+- `#334155`
+- `#64748B`
+- `#7c2d12`
+- `#9333ea`
+- `#991B1B`
+- `#9a3412`
+- `#F4634A`
+- `#FCD34D`
+- `#e879f9`
+- `#f59e0b`
+- `&quot;`
+- `) +`
+- `) + (PLACE_COORDS[d.name] ?`
+- `) + (PLACE_COORDS[p.name] ?`
+- `) + (PLACE_COORDS[s.name] ?`
+- `) + (_duration ?`
+- `) + (p.gps && p.gps.lat ?`
+- `) + (p.note ?`
+- `) + bookingBadge + existingBadge +`
+- `) + n; }; var blob = new Blob([`
+- `) + n; }; var blob = new Blob([h.join(`
+- `) + visitedBtnHtml(p.name,`
+- `) + visitedBtnHtml(r.name,`
+- `) + visitedBtnHtml(s.name,`
+- `) :`
+- `) : (p.tips ||`
+- `) : String(e == null ?`
+- `) === v; return`
+- `) ? sched.time :`
+- `) merged[k2] = rich[k2]; } // ⚠️ ה-type נקבע לפי ה**ספציפי** ולא לפי ה`
+- `) renderCommunity(); if (item.id ===`
+- `) return false; var places = o.places && typeof o.places ===`
+- `) { if (p.how) infoHtml +=`
+- `) { if (p.sub) infoHtml +=`
+- `) { return`
+- `) { var LEVEL_LABELS = [`
+- `) { var chips4 =`
+- `) || gps.lat.toFixed(5) +`
+- `) || {}).value ||`
+- `) || {}).value, 10) || null; var o = _loadTripSummaryOverrides(); o.added.push({ name: n, day: d, icon:`
+- `) }; var how = attr[howKey||`
+- `) לתחנה Čestlice, Aquapark — 15–20 דק׳. גם 328 עוצר שם. ⚠️ קווים 363 ו-357 עוצרים ב-V Oblouku ולא בפארק`
+- `) — level: 1=💰 עד 100 CZK | 2=💰💰 100–250 | 3=💰💰💰 250–500 ── {type:`
+- `) — sorted cheap→expensive ────────────────────────────────── {type:`
+- `) ────────────────────────────────────────────────────── // ── 🍽️ מסעדות ── {type:`
+- `) ────────────────────────────────────────────────────── {type:`
+- `)) +`
+- `))); btnsDiv.appendChild(addBtn); overlay.appendChild(panel); var addBtn = panel.querySelector(`
+- `)); card.addEventListener(`
+- `)); } catch(e) { toast(`
+- `)+`
+- `), text: (p.place ||`
+- `), this.getAttribute(`
+- `).indexOf(`
+- `).remove()`
+- `).remove();`
+- `).remove();openEditStopTime(`
+- `).remove();openStopMapDialog(this.dataset.pn)`
+- `).replace(/\n/g,`
+- `).reverse().join(`
+- `).slice(1).join(`
+- `).style.display = tab ===`
+- `).substring(0, 120).replace(/\n/g,`
+- `).substring(0,120),booking:mp.booking||\`
+- `).substring(0,120).replace(/\n/g,`
+- `).substring(0,40) +`
+- `).trim() === nameTrim) { return { dayNum: i + 1, dayTitle: state[i].title || (`
+- `).trim() ||`
+- `).trim(), desc: (qs(`
+- `).trim(), mapUrl:`
+- `).trim(); if (!n) return; var d = parseInt((document.getElementById(`
+- `).trim(); if (!name) { toast(`
+- `).value ||`
+- `).value; var timeInput = document.getElementById(`
+- `); a.href = URL.createObjectURL(blob); a.download =`
+- `); btn.style.cssText =`
+- `); card.type =`
+- `); dayGrid.style.cssText =`
+- `); h.push(`
+- `); header.style.cssText =`
+- `); if (!badge) return; badge.textContent = emoji +`
+- `); if (!el) return; var cats = [ { label:`
+- `); if (addBtn) { addBtn.addEventListener(`
+- `); if (e) e.value = (attr[iconKey]||`
+- `); if (inp) { inp.style.direction = src ===`
+- `); if (ls) ls.style.display =`
+- `); if (m) m.style.display =`
+- `); if (n) n.value = name; var t = document.getElementById(`
+- `); if (rateStatus) { rateStatus.textContent =`
+- `); if (t) t.value =`
+- `); logoDiv.style.cssText =`
+- `); overlay.id =`
+- `); return; } setVoiceStatus(`
+- `); return; } toast(`
+- `); return; } var finalTime = (timeInput.value || selectedTime ||`
+- `); return; } var pending = _pendingAttrStop; var ov = document.getElementById(`
+- `); return; } var st = getDaysState(); if (!st[selectedDay]) { toast(`
+- `); return; } var stop = { emoji: (qs(`
+- `); var app = document.getElementById(`
+- `); var btn = qs(`
+- `); var card = document.createElement(`
+- `); var d = state[i - 1]; var card = qs(`
+- `); var dayIdx = targetDayEl ? parseInt(targetDayEl.value) : 0; var stop = { emoji: data.emoji ||`
+- `); var desc = String(p.desc || _tipStr ||`
+- `); var gpsTag = p.gps && p.gps.lat ?`
+- `); var inTrip = dt >= tripStart && dt <= tripEnd; var emoji = WMO_EMOJI[d.weathercode[i]] ||`
+- `); var m = qs(`
+- `); var mapLink =`
+- `); var n = document.getElementById(`
+- `); var n = qs(`
+- `); var overlay = document.createElement(`
+- `); var rateStatus = qs(`
+- `); var time = timeInput.value.trim() || timeInput.dataset.partVal ||`
+- `); var today = new Date(); var days = Math.ceil((tripDate - today) / 86400000); var el = document.getElementById(`
+- `); var url =`
+- `); } else if (tab ===`
+- `); } var overlay = document.getElementById(`
+- `); }; if (_userLat !== null && _userLng !== null) { show(); return; } if (!navigator.geolocation) { toast(`
+- `);if(d)d.remove();var mp=window._mapNavPlace||{};openAddCustomStop(\`
+- `)[0] +`
+- `)], { type:`
+- `)], {type:`
+- `+`
+- `+ (!done ?`
+- `+ (L.rowH - 8) +`
+- `+ (W - PAD * 2) +`
+- `+ (W - PAD - 68) +`
+- `+ (_inDaysBankRem ?`
+- `+ (_stopImg ?`
+- `+ (_unc.length === 1 ?`
+- `+ (a[iconKey]||`
+- `+ (active ?`
+- `+ (b.ils||0) +`
+- `+ (d.emoji||`
+- `+ (d.getMonth()+1) +`
+- `+ (d.stops||[]).length +`
+- `+ (data.emoji||`
+- `+ (dayIdx + 1) +`
+- `+ (existing ?`
+- `+ (i + 1) +`
+- `+ (i+1) +`
+- `+ (i+1)), time: stops[j].time ||`
+- `+ (i>=total?`
+- `+ (idx+1) +`
+- `+ (imgUrl ?`
+- `+ (infoHtml ?`
+- `+ (isCurrent ?`
+- `+ (item.done ?`
+- `+ (lines.join(`
+- `+ (m.y + 42) +`
+- `+ (name||`
+- `+ (on ?`
+- `+ (p.note ?`
+- `+ (r.emoji||`
+- `+ (r.icon||`
+- `+ (r.title||`
+- `+ (r.url ||`
+- `+ (rec.icon||`
+- `+ (s.emoji||`
+- `+ (s.mapUrl ?`
+- `+ (s.time||`
+- `+ (sched.day ||`
+- `+ (sched.time && !sched.time.includes(`
+- `+ (schedInfo ?`
+- `+ (sel ?`
+- `+ (short > 0 ?`
+- `+ (si+1) +`
+- `+ (up ?`
+- `+ (y + 17) +`
+- `+ (y + 2).toFixed(1) +`
+- `+ (y + 46) +`
+- `+ (y - 12) +`
+- `+ // thumbnail`
+- `+ Math.abs(m.delta).toLocaleString(`
+- `+ Math.ceil(d/0.08) +`
+- `+ PAD +`
+- `+ String(d.getMinutes()).padStart(2,`
+- `+ [`
+- `+ _c[0] +`
+- `+ _c[1] +`
+- `+ _dStr +`
+- `+ _sclip(it.name, 34)) +`
+- `+ _sxesc(it.icon +`
+- `+ _tripSummaryDayOptions(`
+- `+ _tripSummaryDayOptions(day) +`
+- `+ _uncIls.toLocaleString(`
+- `+ _w +`
+- `+ apIdx +`
+- `+ c0 +`
+- `+ c1 +`
+- `+ c[1] +`
+- `+ c[1]]) byCoord[c[0] +`
+- `+ cc +`
+- `+ chips2 +`
+- `+ chips3 +`
+- `+ ci +`
+- `+ cnt(items.length) +`
+- `+ common +`
+- `+ coords[1] +`
+- `+ d.date +`
+- `+ d.emoji +`
+- `+ d.getHours() +`
+- `+ d.icon +`
+- `+ d.id +`
+- `+ d.replace(/`
+- `+ d.stops.length +`
+- `+ d.where, mapUrl: d.mapUrl ||`
+- `+ dStr +`
+- `+ dateShort +`
+- `+ dateStr +`
+- `+ dayBtns +`
+- `+ dayDate +`
+- `+ dayIdx +`
+- `+ dayName +`
+- `+ desc +`
+- `+ emoji +`
+- `+ enc +`
+- `+ esc((r.desc||`
+- `+ esc(_google) +`
+- `+ esc(_lastCat) +`
+- `+ esc(addedStopName) +`
+- `+ esc(d.name) +`
+- `+ esc(d.title||`
+- `+ esc(data.name) +`
+- `+ esc(m.cat) +`
+- `+ esc(name) +`
+- `+ esc(p.desc) +`
+- `+ esc(p.name) +`
+- `+ esc(p.note) +`
+- `+ esc(p.sub) +`
+- `+ esc(p.tips); } infoHtml +=`
+- `+ esc(p.where) +`
+- `+ esc(r.name) +`
+- `+ esc(rec.name) +`
+- `+ esc(s.desc) +`
+- `+ esc(s.name) +`
+- `+ esc(t) +`
+- `+ googleUrl +`
+- `+ gps.lat +`
+- `+ gps.lat.toFixed(5) +`
+- `+ gps.lng +`
+- `+ gps.lng.toFixed(5) + mapLink; } // reverse geocode — Nominatim fetch(`
+- `+ gps.lng.toFixed(5)) + mapLink; el.style.color =`
+- `+ i +`
+- `+ ii +`
+- `+ infoHtml +`
+- `+ item.icon +`
+- `+ item.label +`
+- `+ key.replace(/`
+- `+ label +`
+- `+ lbl +`
+- `+ name +`
+- `+ name) + (hidden ?`
+- `+ p.dataUrl +`
+- `+ p.gps.lng +`
+- `+ p.icon +`
+- `+ p.name +`
+- `+ p.note :`
+- `+ p.stars +`
+- `+ p2(stamp.getMonth()+1) +`
+- `+ p[1]; var sel = sched.time === val; return`
+- `+ partBtns +`
+- `+ pending.name +`
+- `+ r.covered.toLocaleString(`
+- `+ r.day +`
+- `+ r.deadline.split(`
+- `+ r.desc +`
+- `+ r.emoji +`
+- `+ r.icon +`
+- `+ r.id +`
+- `+ r.price +`
+- `+ r.title +`
+- `+ r.url) :`
+- `+ rec.how; return { emoji: rec.icon ||`
+- `+ rows +`
+- `+ rows.join(`
+- `+ rows; window._balanceMoves = r.moves; var m = qs(`
+- `+ s.best +`
+- `+ s.crowds, tips: [s.tip], booking:`
+- `+ s.emoji +`
+- `+ s.fee_txt, mapUrl: s.mapUrl ||`
+- `+ s.icon +`
+- `+ s.mapUrl +`
+- `+ s.name +`
+- `+ schedInfo +`
+- `+ short.toLocaleString(`
+- `+ si +`
+- `+ stamp.getFullYear() +`
+- `+ stopIdx +`
+- `+ stopImgHtml +`
+- `+ stopRows +`
+- `+ stopsHtml +`
+- `+ tod.emoji +`
+- `+ tod.emoji + tod.label :`
+- `+ tod.label +`
+- `+ type +`
+- `+ v.replace(/`
+- `+ v.split(`
+- `+ val +`
+- `+ visitedBtnHtml(d.name,`
+- `+ visitedBtnHtml(p.name,`
+- `+ visitedBtnHtml(s.name,`
+- `+ voiceSrcLang +`
+- `+ voiceTgtLang +`
+- `+ x.toFixed(1) +`
+- `+(active?`
+- `+(active?c.clr.replace(`
+- `+_stopGrad[1]+`
+- `+_stopImg+`
+- `+c.key+`
+- `+c.name; }) ) }, { label:`
+- `+c.name; }) }, { label:`
+- `+c.replace(/`
+- `+cat.label+`
+- `+color+`
+- `+esc(p.name)+`
+- `+grad[0]+`
+- `+grad[1]+`
+- `+imgUrl+`
+- `+name.replace(/`
+- `+r.name; }) }, // ⚠️ **תחנות הלוז הוסרו מכאן (13/08).** רשימת ההוצאות היא`
+- `+r.name; }) }, { label:`
+- `,`
+- `, (attr[descKey]||`
+- `, // גן ולנשטיין`
+- `, // ותחנת לוז היא`
+- `, // חומת לנון`
+- `, // מלה סטרנה`
+- `, 62), type: (mapRec && mapRec.type) ||`
+- `, 62), type: a.type ||`
+- `, attr[nameKey]||`
+- `, best:`
+- `, coords: PLACE_COORDS[a.name] || null, day: (d >= 1 && d <= 30) ? d : null, dayFrom:`
+- `, day:`
+- `, deadline:`
+- `, desc:`
+- `, desc: _sclip(a.label ||`
+- `, desc: _sclip(rec.desc || rec.details ||`
+- `, desc: data.desc ||`
+- `, desc: full.desc || s.desc ||`
+- `, desc: pending.desc, mapUrl:`
+- `, desc: rec.desc ||`
+- `, desc: rec.desc || rec.sub || rec.tip ||`
+- `, details:`
+- `, details: d.sub ||`
+- `, details: data.details ||`
+- `, details: details, tips: tips, booking: rec.booking ||`
+- `, details: full.details ||`
+- `, details: r.details ||`
+- `, details: r.sub ||`
+- `, details: rec.how ?`
+- `, duration:`
+- `, duration: rec.duration ||`
+- `, duration: st.duration ||`
+- `, e); toast(`
+- `, emoji:`
+- `, fb:`
+- `, google:`
+- `, google: full.google ||`
+- `, google: rec.google ||`
+- `, google: rec.google || rec.rating || rec.stars ||`
+- `, google: st.google ||`
+- `, history:`
+- `, how:`
+- `, icon:`
+- `, items:[`
+- `, label:`
+- `, lng = null, lngRef =`
+- `, mapUrl:`
+- `, mapUrl: data.mapUrl ||`
+- `, mapUrl: r.mapUrl ||`
+- `, mapUrl: rec.mapUrl ||`
+- `, mapUrl: st.mapUrl ||`
+- `, name, e); toast(`
+- `, name:`
+- `, name: d.name, desc: d.desc ||`
+- `, name: data.name, time: val ||`
+- `, name: name ||`
+- `, name: name, time: (qs(`
+- `, name: r.title, desc: r.desc ||`
+- `, name: rec.name, time: val ||`
+- `, name: s.name, desc: s.desc ||`
+- `, name: st.name, desc: st.desc ||`
+- `, null); toast(`
+- `, peak:`
+- `, photo:`
+- `, price:`
+- `, priority:`
+- `, stops:[ {emoji:`
+- `, story:`
+- `, tag:`
+- `, time: finalTime, desc: (_base.desc || desc ||`
+- `, tip:`
+- `, tips: [d.tag, d.rating], booking:`
+- `, tips: [r.badge], booking:`
+- `, tips: data.tips || [], booking: data.booking ||`
+- `, tips: full.tips || [], booking: full.booking ||`
+- `, tips: r.tips ? [r.tips] : [], booking: r.url ? (`
+- `, tips: tipsArr, booking: rec.booking ||`
+- `, tips:[`
+- `, title:`
+- `, totC, totI,`
+- `, type:`
+- `, url:`
+- `, where:`
+- `, who:`
+- `, who: rec.who ||`
+- `, who: st.who ||`
+- `, year:`
+- `, { emoji: d.icon ||`
+- `, { emoji: s.icon ||`
+- `, { headers: {`
+- `, ולכן חייב סגירה וחזרה לכרטיס בשביל כל פעולה.`
+- `,\`
+- `,badge:`
+- `,badgeClr:`
+- `,badgeTxt:`
+- `,brands:`
+- `,cat:`
+- `,crowds:`
+- `,date:`
+- `,desc:`
+- `,desc:(mp.desc||mp.sub||\`
+- `,duration:`
+- `,duration:mp.duration||\`
+- `,fee:0,icon:`
+- `,fee_txt:`
+- `,google:mp.google||\`
+- `,hours:`
+- `,how:`
+- `,how:c.how||`
+- `,how:s.metro||`
+- `,icon:`
+- `,level:1,icon:`
+- `,level:2,icon:`
+- `,level:3,icon:`
+- `,level:4,icon:`
+- `,mapUrl:`
+- `,mapUrl:mp.mapUrl||\`
+- `,metro:`
+- `,name:`
+- `,name:mp.name||\`
+- `,rating:`
+- `,stars:`
+- `,sub:`
+- `,tag:`
+- `,tagClr:`
+- `,time:`
+- `,tip:`
+- `,title:`
+- `,who:`
+- `,who:mp.who||\`
+- `,{emoji:mp.icon||\`
+- `.jpg`
+- `.png`
+- `.visitedBtn`
+- `/`
+- `/>`
+- `/> </svg> <div style=`
+- `/> <ellipse cx=`
+- `/></linearGradient>`
+- `/></linearGradient> <linearGradient id=`
+- `/></linearGradient> <radialGradient id=`
+- `/></radialGradient> </defs> <path fill=`
+- `/><stop offset=`
+- `0 שגיאות JS`
+- `0% עמלה`
+- `0.01`
+- `0.2`
+- `0.35`
+- `0.4`
+- `0.5`
+- `0.9`
+- `09:30–11:30`
+- `11 באוגוסט`
+- `14 באוגוסט`
+- `2 דקות אחרי שהאפוסטולים מסיימים — הקהל מתפזר, אז מצלמים את השעון נקי.`
+- `2026-08-15`
+- `250 CZK + 150 CZK מעלית`
+- `2–3 שעות`
+- `30–45 דק׳`
+- `4+ שעות — נעליים נוחות`
+- `4.5`
+- `4.7`
+- `400–700 CZK`
+- `45–60 דק׳`
+- `6 בתי כנסת, בית עלמין עתיק, מוזיאון יהודי`
+- `6.4`
+- `60–90 דק׳`
+- `8 באוגוסט`
+- `:`
+- `: _unc.length +`
+- `: it.dist.toFixed(1)+`
+- `: p.type; var catClr = typeColor[effType] ||`
+- `; //`
+- `; // תמונת תחנה var _allP = (typeof ALL_PLACES !==`
+- `; // ── מרחק + כיוון מהמיקום הנוכחי (רק אם GPS פעיל) ── var infoHtml =`
+- `; _pendingAttrStop = { emoji: emoji, name: name, desc: desc.substring(0,100).replace(/\n/g,`
+- `; addBtn.addEventListener(`
+- `; addBtn.textContent =`
+- `; badge.style.background =`
+- `; badge.style.borderColor =`
+- `; badge.style.color =`
+- `; btn.addEventListener(`
+- `; btn.style.borderColor =`
+- `; btn.style.color =`
+- `; card.addEventListener(`
+- `; card.style.cssText =`
+- `; dayLabel.textContent =`
+- `; document.getElementById(`
+- `; el.style.color =`
+- `; for (var i = 0; i < d.time.length; i++) { var dt = new Date(d.time[i] +`
+- `; header.textContent = (emoji||`
+- `; if (_rec.google) chips +=`
+- `; if (app) app.style.display =`
+- `; if (chips3) infoHtml +=`
+- `; if (clr) clr.style.display = name ?`
+- `; if (el) { el.style.display =`
+- `; if (it.desc) s +=`
+- `; if (p.desc) infoHtml +=`
+- `; if (p.hours) chips4 +=`
+- `; if (p.hours) chipsX +=`
+- `; if (p.stars) chips4 +=`
+- `; if (p.stars) chipsX +=`
+- `; if (rec.how) details = (details ? details +`
+- `; if (res) res.style.display =`
+- `; inp.placeholder = src ===`
+- `; overlay.style.cssText =`
+- `; rateStatus.style.color =`
+- `; return`
+- `; s +=`
+- `; setVoiceStatus(`
+- `; text = text.trim(); if (!text) { setVoiceStatus(`
+- `; timeInput.placeholder =`
+- `; timeInput.style.cssText =`
+- `; try { _renderBuildStamp(); } catch (e) {} try { if (typeof initTripSummaryOverridesCloudSync ===`
+- `; var _desc = (a[descKey] ||`
+- `; var _duration = a.duration || _commMatch.duration ||`
+- `; var _duration = s.duration ||`
+- `; var _who = a.who || _commMatch.who ||`
+- `; var booking = attr.booking||`
+- `; var catLbl = typeLabel[effType] || p.type; var _tipStr = Array.isArray(p.tips) ? p.tips.join(`
+- `; var chips =`
+- `; var d = document.getElementById(`
+- `; var dayGrid = document.createElement(`
+- `; var desc = WMO_DESC[d.weathercode[i]] ||`
+- `; var desc = attr[descKey]||`
+- `; var distStr = it.dist !== null ? (it.dist < 1 ? Math.round(it.dist*1000)+`
+- `; var duration = attr.duration||`
+- `; var emails =`
+- `; var emoji = attr[iconKey]||`
+- `; var existing = findItemInDays(name); var _commMatch = (typeof COMMUNITY !==`
+- `; var hasDetails = !!(s.details || (s.tips && s.tips.length)); var dayIdx = i - 1; var stopNumLabel =`
+- `; var header = document.createElement(`
+- `; var mapUrl = attr.mapUrl||`
+- `; var navItems = [ { id:`
+- `; var stopImgHtml =`
+- `; var targetDayEl = document.getElementById(`
+- `; voiceLastTranslation =`
+- `; } else if (coords) { // אין עדיין מיקום — להציג כפתור במקום להעלים את הפיצ`
+- `; } else if (p.type ===`
+- `; } fetch(`
+- `; } if (variant ===`
+- `; } return`
+- `; } var effType = it.inDays ?`
+- `; } } else if (p.type ===`
+- `; })() +`
+- `; })() + (_google ?`
+- `; })() + (s.google ?`
+- `; }).join(`
+- `; }); } body +=`
+- `; }); } else { infoHtml +=`
+- `; }); } if (important.length) { body +=`
+- `; }); } if (logistics.length) { body +=`
+- `; }; var h = []; h.push(`
+- `; }; })(tp[2], btn)); timePartBtns.push(btn); timeGrid.appendChild(btn); }); timeInput.type =`
+- `;color:`
+- `;cursor:pointer;font-weight:800;font-family:Rubik,Arial,sans-serif;`
+- `</bdi> · מתוך <bdi style=`
+- `</bdi></div>`
+- `</defs>`
+- `</div>`
+- `</span> </div> <div style=`
+- `<br>`
+- `<button type=`
+- `<circle cx=`
+- `<div id=`
+- `<div style=`
+- `<linearGradient id=`
+- `<select onchange=`
+- `<span style=`
+- `= בר/פרא +`
+- `= מים. סמטנה כתב עליו את הסימפוניה`
+- `> <!-- מיקום: **איפה** קניתי, בנפרד מ**מה** קניתי. הקטגוריה לא מושפעת מזה. --> <div style=`
+- `> <!-- קטגוריה לתקציב --> <div id=`
+- `> <!-- רשימה נגללת --> <div id=`
+- `> <!-- ═══ HEADER ═══ --> <header style=`
+- `> </div> <input id=`
+- `> <button id=`
+- `> <button type=`
+- `> <defs> <linearGradient id=`
+- `> <div class=`
+- `> <div id=`
+- `> <div style=`
+- `> <div> <div style=`
+- `> <div><div style=`
+- `> <div><h2 style=`
+- `> <h2 id=`
+- `> <h2 style=`
+- `> <input id=`
+- `>+ ביקור</button>`
+- `>+1</sup></div><div style=`
+- `>8–15 באוגוסט 2026 · פראג, צ׳כיה</text>`
+- `></div>`
+- `></div> </div> <!-- ═══ NAV ═══ --> <nav style=`
+- `></div> </div> </div> <!-- ═══ SHOPPING ═══ --> <section id=`
+- `></div> </div> <div id=`
+- `></div> </section> <!-- מודל תיוג תמונה --> <div id=`
+- `></div> </section> <!-- ═══ PACK ═══ --> <section id=`
+- `></div> <div id=`
+- `></div> <div style=`
+- `></div> <input id=`
+- `></div> <input type=`
+- `></textarea> <div style=`
+- `><span class=`
+- `><stop offset=`
+- `>=</div> <div> <div style=`
+- `>?</span> ימים</p> </div> <!-- Send email buttons --> <div style=`
+- `>Kč קרונות</div> <input id=`
+- `>Smart Wings QS1287/QS1286 · Comfort Hotel Prague City East · 8 ימים</p> </div> <div style=`
+- `>\u2713</div>`
+- `>אין מקומות בקטגוריה זו</div>`
+- `>אין תוצאות — הטקסט שהקלדת ישמר כמו שהוא</div>`
+- `>ביטול</button>`
+- `>ביטול</button> </div> <!-- שם --> <input id=`
+- `>בפועל <bdi style=`
+- `>ברוכים הבאים לפראג ✈️</h2> <p style=`
+- `>דיבור ישיר למיקרופון · תרגום אוטומטי · השמעה בקול<br>עובד ב-Safari/Chrome מחוץ לאפליקציה</div> <a href=`
+- `>הוצאות</span></button> <button id=`
+- `>הסתר</button>`
+- `>הקלידו — תרגום אוטומטי תוך שנייה</div> <div style=`
+- `>הרשימה המלאה</text>`
+- `>טוען מזג אוויר...</div>`
+- `>טיסות</span></button> <button id=`
+- `>ימים</span></button> <button id=`
+- `>לא נבחר מיקום</div> <button type=`
+- `>לחצו לפתוח מצלמה</div> </div> </div> <input id=`
+- `>מיקום</span></button> <button id=`
+- `>משפחת שיש</div> <div id=`
+- `>נתב`
+- `>סה״כ הוצאות</div> </div> </div> <div style=`
+- `>עדיין אין תמונות — לחצו על הכפתור למעלה להתחיל!</div> <div id=`
+- `>פראג 8–15 אוגוסט · עוד <span id=`
+- `>קניות</span></button> <button id=`
+- `>ראשי</span></button> <button id=`
+- `>שמור הוצאה 💸</button> </div> </div> <!-- TOAST --> <div id=`
+- `>שמור</button>`
+- `>תאריך</div><div style=`
+- `>תזכורות</span></button> </nav> </div> <!-- ═══ EXPENSE MODAL ═══ --> <div id=`
+- `>תרגום</div> <div id=`
+- `>‹</button>`
+- `>₪`
+- `>₪ שקלים</div> <input id=`
+- `>↔</button>`
+- `>↔️ העבר לאיזה יום?</h2> <div id=`
+- `>⌨️ תרגום טקסט</div> <div style=`
+- `>⏰ מתי ביום?</div> <div style=`
+- `>⏰ שעה</button>`
+- `>⏰</button>`
+- `>⏳`
+- `>▲</button>`
+- `>☀️<br>צהריים</button> <button type=`
+- `>✅ בוצע</button>`
+- `>✅ בוצע</button> </div> <!-- Reminders list --> <div id=`
+- `>✅ יום`
+- `>✅ נשלח קוד בן 6 ספרות למייל שלך.<br>הזן אותו כאן כדי להיכנס.</div> <input id=`
+- `>✈️</span><span class=`
+- `>✏️ או הקלד ידנית</div> <input id=`
+- `>✏️ ערוך</button> </div> <!-- כרטיס סיכום גדול --> <div style=`
+- `>✏️ תיקון ידני</button>`
+- `>✕</button>`
+- `>✕</button> </div> <input type=`
+- `>➕ הוסף פריט</h2> <input id=`
+- `>➕ הוסף תחנה</button>`
+- `>⭐`
+- `>🌅<br>בוקר</button> <button type=`
+- `>🌇<br>אחה״צ</button> <button type=`
+- `>🌙<br>ערב</button> </div> <input id=`
+- `>🌤️ מזג אוויר — אוגוסט בפראג</div> <div style=`
+- `>🎟️`
+- `>🏠</span><span class=`
+- `>🏰</div> <h2 style=`
+- `>💡`
+- `>💰 תקציב כולל לטיול (₪)</div> <input id=`
+- `>💰</span><span class=`
+- `>💱 מקומות מומלצים (מאומתים) מסומנים על המפה בטאב מיקום — קטגוריית`
+- `>💾 שמור ידני</button> <button id=`
+- `>💾 שמור</button>`
+- `>📅</span><span class=`
+- `>📍`
+- `>📍 המיקום שלי</button> <div id=`
+- `>📍 כמה רחוק ממני?</button>`
+- `>📍 ממני</button>`
+- `>📍 מקום</div> <div id=`
+- `>📍</span><span class=`
+- `>📍<br>ממני</button>`
+- `>📷</div> <div style=`
+- `>📸 לצלם</button> </div> <div id=`
+- `>🔁 המרה מהירה</div> <div style=`
+- `>🔔</span><span class=`
+- `>🗑️ נקה</button> </div> <div id=`
+- `>🗣️ ביטויים מהירים — לחץ להשמעה</div> <div style=`
+- `>🗺️ נווט למפה</a>`
+- `>🗺️ נווט</a>`
+- `>🗺️ ניווט</a>`
+- `>🗺️</a>`
+- `>🗺️<br>נווט</a>`
+- `>🚋</div> </header> <!-- ═══ HOME ═══ --> <section id=`
+- `>🛍️</span><span class=`
+- `>🛰`
+- `>🛰 GPS</a>`
+- `>🧳</span><span class=`
+- `?`
+- `? -1 : 1); var lngDec = dmsToDecimal(lng) * (lngRef ===`
+- `? o.places : {}; var hidden = o.hidden && typeof o.hidden ===`
+- `Aspects of Alice`
+- `Bolt מהמלון לשדה: 500–900 CZK | 30–50 דק׳`
+- `Bolt מהשדה: 400–700 CZK`
+- `Bolt עדיף עם מגבות ותיקים`
+- `Café Savoy בקרבת מקום — ארוחת צהריים מצוינת`
+- `Clementinum – הספרייה הבארוקית`
+- `DOMContentLoaded`
+- `Děkuji`
+- `Enter`
+- `FAT CAT Downtown — כיכר וצסלב`
+- `Google</span>`
+- `Gran Fierro אם יש אנרגיה, קל ליד המלון אם עייפים`
+- `Hamleys יש עגלות ניסיון ברחבי החנות`
+- `Holešovická tržnice`
+- `IKEA Praha — Zličín`
+- `Josefov, בית הכנסת ירושלים, Café Savoy`
+- `Manifesto`
+- `Municipal House – Obecní dům`
+- `None (Anonymous)`
+- `Prague`
+- `Primark → Na Příkopě → Palladium → Hamleys/LEGO`
+- `QS1286 — המראה 15 אוגוסט 23:45. צ\`
+- `Rubik\`
+- `Segoe UI\`
+- `Tax Free בשירות המחויבים בכניסה הראשית`
+- `Tax Free מעל 2,000 CZK — לשמור קבלות`
+- `Tax Free — לשמור קבלות ודרכונים`
+- `Vyšehrad – המבצר הנסתר`
+- `Výtopna — להזמין מראש!`
+- `[location] _openNearbyDialog error`
+- `[location] _openNearbyDialog: invalid apIdx`
+- `\\`
+- `\\\`
+- `\n`
+- `])[1]; if (i % 2 === 0) s +=`
+- `])[1]; s +=`
+- `], booking:`
+- `]||`
+- `_editStopSelectDay(this,`
+- `_locateForDialog(this)`
+- `_saveScheduleEdit(\`
+- `_schedSelectDay(this,\`
+- `_schedSelectPart(this,\`
+- `accept=`
+- `active`
+- `addCommunityStopOverlay`
+- `addStopModal`
+- `addStopName`
+- `all`
+- `appdata`
+- `attr`
+- `attrDetailClose`
+- `back-btn`
+- `bdi{unicode-bidi:isolate;direction:ltr;font-variant-numeric:tabular-nums}`
+- `block`
+- `btnBackPhotoDiary`
+- `btnCloseRebalance`
+- `btnDoneRebalance`
+- `btnGetGps`
+- `btnLocate`
+- `btnNewPhoto`
+- `btnSaveAddStop`
+- `budgetInputs`
+- `budgetModal`
+- `button`
+- `calcCzk`
+- `calcIls`
+- `capture=`
+- `center`
+- `change`
+- `checkbox`
+- `chip`
+- `class=`
+- `click`
+- `color:#1D4ED8;`
+- `color:#991B1B;`
+- `commCatFilter`
+- `community`
+- `cs`
+- `cx=`
+- `cy=`
+- `d=`
+- `data-ci`
+- `data-day`
+- `data-field=`
+- `data-ii`
+- `data-ii=`
+- `data-name=`
+- `data-pn=`
+- `data-rest-desc=`
+- `data-rest-name=`
+- `data-val=`
+- `data-vn`
+- `data-vn=`
+- `day-details-col`
+- `day-timeline-col`
+- `dayPrevBtn`
+- `dayTimePickerOverlay`
+- `days`
+- `desc`
+- `dessert`
+- `direction=`
+- `display:none;position:fixed;inset:0;z-index:80;align-items:flex-end;justify-content:center;`
+- `div`
+- `doc1`
+- `doc2`
+- `document.getElementById(\`
+- `ds-badge ds-badge-amber`
+- `ds-section-hdr`
+- `editStopDayBtns`
+- `editStopTargetDay`
+- `editTimeInput`
+- `editTimeOverlay`
+- `editTimeParts`
+- `event.stopPropagation()`
+- `event.stopPropagation();moveStopUpDown(`
+- `event.stopPropagation();openEditStopTime(`
+- `event.stopPropagation();openStopMapDialog(this.dataset.pn)`
+- `exchange`
+- `expCzk`
+- `expName\`
+- `fill=`
+- `flex`
+- `flex:1;`
+- `flex:1;min-width:0;`
+- `font-family=`
+- `font-size=`
+- `font-weight:600;color:#1E293B;`
+- `font-weight:800;color:#9333ea;`
+- `font-weight=`
+- `he`
+- `he-IL`
+- `height=`
+- `hg`
+- `hidden`
+- `how`
+- `icon`
+- `id=`
+- `image/png`
+- `input`
+- `input[type=checkbox][data-ci]`
+- `inputmode=`
+- `loading`
+- `loading=`
+- `location`
+- `locationStatusText`
+- `loginScreen`
+- `makový závin`
+- `mapNavDialog`
+- `mapNavDialog\`
+- `markReminderDone(\`
+- `maxlength=`
+- `min-width:0;`
+- `move`
+- `moveDayPicker`
+- `name`
+- `none`
+- `null`
+- `number`
+- `object`
+- `onerror=`
+- `oninput=`
+- `onkeydown=`
+- `openAddStop(`
+- `overflow-y:auto;flex:1;`
+- `packItemOverlay`
+- `pattern=`
+- `photo`
+- `photoGpsDisplay`
+- `pickExpCat(\`
+- `pickExpName(this)`
+- `placeholder=`
+- `plan`
+- `prague-2026-summary.png`
+- `prague_budget_v1`
+- `prague_days_v1`
+- `prague_exp_v10`
+- `prague_pack_v2`
+- `prague_remindersDone`
+- `prague_remindersSchedule`
+- `prague_total_budget`
+- `prague_trip_summary_overrides_v1`
+- `preserveAspectRatio=`
+- `r1`
+- `r=`
+- `rate`
+- `re-init realtime sync failed`
+- `readonly tabindex=`
+- `rel=`
+- `reminder`
+- `reminderDetailOverlay`
+- `reminders`
+- `rest`
+- `restaurant`
+- `restaurants`
+- `resync budget categories failed`
+- `resync days failed`
+- `resync expenses failed`
+- `resync pack failed`
+- `resync remindersDone failed`
+- `resync remindersSchedule failed`
+- `resync total budget failed`
+- `resync visited failed`
+- `rtl`
+- `rx=`
+- `ry=`
+- `schedDayVal`
+- `schedPartBtns`
+- `schedTimeInput`
+- `schedule`
+- `scheduleEditOverlay`
+- `setEditTimePart(this,\`
+- `shop`
+- `shopping`
+- `showDistanceTo(this.dataset.pn)`
+- `showReminderDetail(\`
+- `showStopDetail(`
+- `showStopDetail(...)`
+- `stop`
+- `stop-color=`
+- `stopDetailOverlay`
+- `stopDetailOverlay\`
+- `stopDragLeave(this)`
+- `stopDragOver(event, this)`
+- `stopDragStart(event,`
+- `stopDrop(event,`
+- `string`
+- `style=`
+- `stylesheet`
+- `target=`
+- `text`
+- `text-anchor=`
+- `text/plain`
+- `transparent`
+- `trip summary cloud parse failed`
+- `tripSummaryManualAddPlace()`
+- `tripSummaryManualClearAll()`
+- `true`
+- `tsAddDay`
+- `tsDay_`
+- `type=`
+- `undefined`
+- `undefined undefined`
+- `unicode-bidi:isolate;direction:ltr;`
+- `unicode-bidi:isolate;direction:ltr;font-weight:800;color:`
+- `utf-8`
+- `value=`
+- `viewBox=`
+- `viewport`
+- `visibilitychange`
+- `visit`
+- `visited`
+- `visitedBtn`
+- `voiceInputText`
+- `voiceLangHe`
+- `voiceTranslateResult`
+- `voiceTranslateText`
+- `weatherRow`
+- `width=`
+- `width=device-width,initial-scale=1`
+- `x1=`
+- `x2=`
+- `xmlns=`
+- `y1=`
+- `y2=`
+- `y=`
+- `|`
+- `|| (Array.isArray(cur) && !cur.length)); var valEmpty = (val === undefined || val === null || val ===`
+- `|| c.cat ===`
+- `} : { type:`
+- `}); _userMarker = L.marker([_userLat,_userLng],{icon:youIcon,zIndexOffset:1000}) .bindPopup(`
+- `}); sortDayStops(dayIdx); saveDaysState(); closeAddStopModal(); renderDays(); toast(`
+- `}); var a = document.createElement(`
+- `}); } // נעץ`
+- `}, // ── COMMUNITY (type:`
+- `}, // ── DESSERTS (type:`
+- `}, // ── PHOTO_SPOTS (type:`
+- `}, // ── RESTAURANTS (type:`
+- `}, // ── SHOPS (type:`
+- `}, // ── הרובע היהודי (Josefov) — אתרים נוספים, כולם בכרטיס המשותף של Jewish Museum ── {type:`
+- `}, // ── שווקים ───────────────────────────────────────────────────────────────── {type:`
+- `}, // ── 🎟️ אטרקציות חדשות ── {type:`
+- `}, // ── 🎟️ אטרקציות ── {type:`
+- `}, // ── 💰 זול ────────────────────────────────────────── {type:`
+- `}, // ── 💰💰 בינוני ────────────────────────────────────── {type:`
+- `}, // ── 💰💰💰 יקר ────────────────────────────────────── {type:`
+- `}, // ── 💰💰💰💰 יוקרה ──────────────────────────────────── {type:`
+- `}, // ── 🛍️ קניות ── {type:`
+- `}, ]; var logoDiv = document.createElement(`
+- `}, ]; var remindersFilter =`
+- `}, { emoji:`
+- `}, { id:`
+- `}, {emoji:`
+- `}, {id:8,emoji:`
+- `}, {type:`
+- `}; _openScheduleModal(`
+- `}; checkDayFullAndAdd(dayIdx, stop); overlay.remove(); }; overlay.addEventListener(`
+- `}; if (h >= 12 && h < 17) return { label:`
+- `}; if (h >= 17 && h < 21) return { label:`
+- `}; return { label:`
+- `}; }); buildBankCards(shopItems,`
+- `~300 CZK מגדל (50% הנחה בשעה הראשונה)`
+- `·`
+- `český strakatý skot`
+- `אוכל`
+- `אוכל צ\`
+- `אחה״צ`
+- `אטרקציה`
+- `אטרקציות`
+- `אי קמפה (Kampa Island) — אי שקט בתוך העיר, מופרד מהיבשה ע`
+- `אי קמפה – Kampa Island`
+- `אין הרשאה`
+- `אישור הזמנת המלון`
+- `אם יש זמן — סיבוב קצר שעה אחרונה בעיר`
+- `אם עייפות — לוותר על מוזיאון האשליות`
+- `אראה עיר גדולה`
+- `ארוחת ערב — Gran // Fierro`
+- `ארוחת צהריים בגן — יש כמה מסעדות בפנים`
+- `בדיקת תחזית מזג אוויר לפראג`
+- `בוקר`
+- `ביגוד ילדים — מהזולים בעולם, קנו הרבה`
+- `ביטוח נסיעות`
+- `ביטוח נסיעות (פרינט + אפליקציה)`
+- `בין השעון האסטרונומי לגשר קארל`
+- `בית העלמין העתיק — 12 שכבות קברים, והשקט שבתוך העיר.`
+- `בית הריקוד – Dancing House`
+- `בלוז`
+- `בערב — יש תאורה יפה על המים`
+- `ברווזים ניתן להאכיל ליד המים`
+- `גבוהות בצהריים — נמוכות בפתיחה`
+- `גלידה: Angelato — מומלצת מאוד`
+- `גן החיות של פראג + שייט ערב`
+- `גשר קארל – Charles Bridge`
+- `דרכונים — Ariel, Mariana, Adi (x3)`
+- `הגעה מוקדמת. 5 קומות. מטרו A → Můstek.`
+- `הועבר ליום`
+- `הוצאה`
+- `הורדת אפליקציות: Bolt, Mapy.cz, PID Lítačka, XE Currency, Google Translate`
+- `הזמנה חובה — vytopna.cz`
+- `הזמנה: prague-boats.cz | ~400–600 CZK לאדם`
+- `הזמנת מקום ב-Oblaka`
+- `הזמנת שולחן ב-U Fleků`
+- `הזמנת שייט בנהר Vltava`
+- `היה מדהים`
+- `היום הראשון לא נועד לכבוש את פראג. הוא נועד להיכנס אליה לאט — להגיע למלון, להוריד תיקים ולהרגיש את הקצב של העיר.`
+- `היינו`
+- `היפסטרית`
+- `הישנה-חדשה`
+- `הליכה רגועה בלי יעד קשיח`
+- `המרת כסף`
+- `המרת מטבע — CZK`
+- `הנהר הבר`
+- `הפנים מרשים יותר מהחזית — שווה להיכנס`
+- `הצמוד בית הקברות הגותי/Art Nouveau — ציורי מאוד לצילום.`
+- `הצעדים הראשונים בעיר האגדות`
+- `הרובע היהודי ובית הכנסת הגדול בפראג`
+- `הרובע היהודי – Josefov`
+- `השלמת צ\`
+- `השעון האסטרונומי מ-1410 — פסל האפוסטולים כל שעה בדיוק. עלייה למגדל: פנורמה על גגות העיר העתיקה, כנסיית טין, כיכר.`
+- `וואו`
+- `וס ואווירה שילדים אוהבים. אחד הסניפים המרכזיים ברחוב Petrská. ללא חזיר ברוב המנות. אווירה כיפית ועליזה.`
+- `וס. אווירה שילדים מתים עליה! Petrská 23. מומלץ להזמין בשעות ערב.`
+- `חדר כושר 24/7, חדר משחקים ומועדון ילדים — אין בריכה במלון`
+- `חינם`
+- `חנות H&M — גדולה ומגוונת`
+- `חנות Reserved — בגדים איכותיים במחיר טוב`
+- `חניכי פלאש בקתדרלה — אסורים`
+- `טיסת בוקר 8 אוגוסט המראה 06:00 — צ\`
+- `טירת פראג – Pražský hrad`
+- `י בלוק community). if (p.type !==`
+- `י מרדכי מייזל, ראש הקהילה היהודית בסוף המאה ה-16 — תור הזהב של יהדות פראג. היום תערוכה על תולדות היהודים בארצות הצ\`
+- `י פרנק גרי (ארכיטקט Guggenheim ביאלבו) ו-Vlado Milunić. נקרא`
+- `י תעלת Čertovka (`
+- `יום מים — Aquapalace Prague`
+- `יום קניות מסודר במרכז פראג: מתחילים בפריימארק כשהוא פחות עמוס, ממשיכים לפלעדיום, ואז עצירת צעצועים לעדי.`
+- `יום קניות — Primark, Palladium וצעצועים`
+- `יום של היסטוריה יהודית — מהגטו העתיק של Josefov, דרך בית הכנסת הגדול והצבעוני בפראג, ועד ארוחה בבית קפה וינאי קלאסי.`
+- `ימים`
+- `ירידה דרך סמטאות יפות`
+- `יש פינת תצפית גבוהה — לא לפספס`
+- `כ ~30 CZK בלבד.`
+- `כי — Dlouhá 33`
+- `כי.`
+- `כיה. המוזיאון מציג את הסרטים שלו עם תפאורות שאפשר להיכנס אליהן ולצלם — ילדים (ומבוגרים) שוכחים מה זמן. יחודי לפראג.`
+- `כיכר העיר העתיקה – Old Town Square`
+- `כללי`
+- `כניסה חינם, ללא הזמנה.`
+- `כניסה חינם.`
+- `כרטיסים ל-Aquapalace`
+- `כרטיסים ל-Clementinum`
+- `כרטיסים לגן חיות פראג`
+- `כרטיסים לטירת פראג`
+- `כרטיסים לממלכת הרכבות`
+- `כרטיסים לרובע היהודי`
+- `כרטיסים מראש — זול יותר ב-10–15%`
+- `כרטיסים מראש: aquapalace.cz | מומלץ מאוד`
+- `כרטיסים מראש: hrad.cz | מומלץ מאוד`
+- `כרטיסים: kralovstvi-zeleznic.cz | ~350 CZK מבוגר, 250 CZK ילד`
+- `כרטיסים: muzeumiluziprag.cz | ~350 CZK מבוגר`
+- `כרטיסים: zoopraha.cz | ~350 CZK מבוגר, 250 ילד`
+- `לא יודע`
+- `לא להגיע לשעון בדיוק בדקה העגולה`
+- `לא לחפוז — זה יום של עדי`
+- `לא לנסות לראות הכל — אזור טרופיקה + קרקס`
+- `לא נדרשת הזמנה מראש לכניסה — מספיק אישור ההזמנה הקיים.`
+- `לאכול בכיכר עצמה — יקר. לצאת לסמטאות`
+- `לארוז מזוודות בלילה!`
+- `לבדוק אם יש מהדורות מוגבלות בלעדיות`
+- `להגיע למלון ולסגור היום בארוחה רגועה בלי לחץ.`
+- `להזמין Gran Fierro בזמן המנוחה`
+- `להזמין משקה ברכבת — כיף גדול לילדים`
+- `להיזהר מכייסים באזור הצפוף`
+- `להכין כתובת מלון Offline לפני הנחיתה`
+- `לחבק, לצחוק ולהגיד — היה שווה כל רגע.`
+- `לחפש את בית Rott — בניין ציורי מהמאה ה-15`
+- `לחץ להצגת פרטי סנכרון`
+- `ללא צורך — אזור ציבורי.`
+- `ללא צורך, כניסה חינם.`
+- `ללא צורך.`
+- `ללא צורך. הכלבו פתוח א׳–ו׳ 09:00–20:00, שבת 09:00–18:00, ראשון 10:00–18:00.`
+- `למחוק תחנה זו?`
+- `לפי טיסה`
+- `לצאת מהשביל הראשי לסמטאות הצדדיות`
+- `לצד מאלה סטרנה — מסעדות עם נוף לגשר`
+- `לצלם את הבוקר האחרון`
+- `לקנות כרטיסים אונליין מראש`
+- `לשמור גשר קארל לשעת ערב`
+- `מ חובה לאולמות הפנימיים. הטרס בחינם — לא כולם יודעים.`
+- `מ שמוסדר ברמזור. צילום אייקוני.`
+- `מ, עובר דרך 17 ערים. שמו מקורו בסלטי:`
+- `מ: גשר קארל + המטרונום הענק + 4 גשרים בפריים אחד. המקומיים באים לכאן, תיירים הולכים לפטז׳ין.`
+- `מגדל פטרין – Petřín Tower`
+- `מגלשת הטורנדו — הכי מרגשת, תורים ארוכים`
+- `מה עוד לא עשינו?`
+- `מהרובע לבית הכנסת 1.1 ק״מ — 14 דק׳ הליכה`
+- `מוזיקאים רחוב נפלאים — להישאר ולהאזין`
+- `מחירים דומים לישראל — לא בהכרח זול`
+- `מטרו A → Staroměstská + 5 דק׳ | Vězeňská 1`
+- `מטרו A → Staroměstská + 8 דק׳ הליכה לכיוון מלה סטרנה`
+- `מטרו B → náměstí Republiky + 7 דק׳ הליכה`
+- `מטרו C → Holešovice + הליכה 10 דק׳ לשטח Výstaviště`
+- `מים בסופר — 20–30 CZK, יקרים יותר בתיירות`
+- `ממלכת המלכים — ואז הביתה`
+- `ממני`
+- `מסמכים 📄`
+- `מסעדה`
+- `מסעדות`
+- `מקומות שהיינו בהם`
+- `מתי היינו`
+- `מ׳`
+- `נווט`
+- `נחיתה, מלון, נשימה ראשונה של פראג`
+- `נעלי הליכה — הרבה אבן ועליות`
+- `נעלמו`
+- `נקודות צילום`
+- `סגור בשבת ובחגי ישראל`
+- `עברו על הצ\`
+- `עדי יסמין מנהלת את הרכבות של פראג`
+- `עיר סלעים`
+- `על שם האסטייר ורוג׳רס — הבניין`
+- `עליה למגדל — כרטיס בקופה, ללא הזמנה.`
+- `עפרונות קוהינור מקוריים — המזכרת הצ׳כית הקלאסית`
+- `ערב`
+- `ערב זה — לנוח ולא לתכנן אטרקציות`
+- `פארק חינם. מוזיאון: muzeumkampa.cz`
+- `פארק רגוע, ברווזים, קפה`
+- `פורו`
+- `פנורמה + שעון אייקוני`
+- `פראג 2026 —`
+- `פראג 2026 — משפחת שיש 🏰`
+- `פראג 2026 — סיכום הטיול`
+- `פרטים ›`
+- `צ\`
+- `צד שקט ויפה מגשר קארל`
+- `צהריים`
+- `צילום`
+- `ק אין, מקלחות, טעינת טלפונים`
+- `ק-אאוט ב-12:00, משאירים מזוודות בלובי, ועולים לטירה — ואז יורדים דרך Mala Strana לקמפה ולתעלת Čertovka.`
+- `ק-אאוט עד 12:00 — אפשר להשאיר מזוודות בלובי ולצאת לטיול קצר של שעה-שעתיים.`
+- `ק-אין לטיסת הלוך (8 אוגוסט 06:00)`
+- `ק-אין לטיסת חזור QS1286`
+- `קהילה`
+- `קוהינור`
+- `קינוח`
+- `קינוחים`
+- `קליסט ציוד (80%+)`
+- `קניות`
+- `קפה Cukrkávalimonáda — קרוב ומומלץ`
+- `קפה טוב: Café Louvre או Café Imperial`
+- `קרם הגנה + בגד ים יבש חלופי`
+- `ק״מ`
+- `ר! נבנתה ב-870 ע`
+- `רזה`
+- `רחוב הטריפיק ליט`
+- `רכבל פנימי בגן — שווה!`
+- `שביל לאורך חומת המבצר מצד הנהר — נוף פתוח לכיוון הטירה ועיר העתיקה. כמעט אף תייר. מקומיים עם כלבים ורצים.`
+- `שגיאת GPS`
+- `שייט עם ארוחת ערב — אפשרות נהדרת`
+- `שלבו עם מנזר סטרהוב (5 דקות הליכה) — כפל שווה.`
+- `שלום משפחת שיש! 🏰\n\nהנה סיכום מה שצריך לסדר לפני פראג (8–15 אוגוסט):\n\n`
+- `שני כרטיסים נפרדים: הרובע 600 CZK, ירושלים 150 CZK`
+- `שעה מדויקת (לדוג׳ 10:00)`
+- `שעון האסטרונומי – Orloj`
+- `שפת הנהר Vltava – בלילה`
+- `שקיות, קפה, תמונה אחרונה בכיכר ואצלב — לסיים מתוק.`
+- `תזכורות שעבר מועדן! לחץ על 🔔`
+- `תחנות`
+- `תיאור של מאבק`
+- `תם הזמן`
+- `תפריט אנגלי זמין`
+- `תצפית נסתרת על הוולטבה`
+- `— עדיף בלי מיקום מאשר מיקום שגוי. if (n && n.dist <= 800) _setExpPlace(n.name, n.dist); else { _setExpPlace(`
+- `— על שם אישה זקופה-לשון שגרה ליד) שנחפרה במאה ה-13 להנעת ריחיים. ב-1978 הוכרז פארק. פסלי David Černý:`
+- `•`
+- `• Auth user:`
+- `• Firebase SDK loaded:`
+- `• isGas:`
+- `↔️ הועבר ליום`
+- `⌛ מאתר מיקום…`
+- `⌛ מאתר…`
+- `⏰ מתי ביום? (אופציונלי)`
+- `⏱ שעה מדויקת (לדוג׳ 10:00)`
+- `⏱️ 10 דקות`
+- `⏱️ 15 דקות`
+- `⏱️ 2–3 שעות`
+- `⏱️ 30 דקות`
+- `⏱️ 30–45 דקות`
+- `⏱️ 5 דקות (Online)`
+- `⏱️ 60–90 דקות`
+- `⏳ מאתר...`
+- `☀️`
+- `☀️ צהריים`
+- `☕ אוכל ושתייה`
+- `☕ קפה`
+- `⚖️ התקציב אוזן`
+- `⚠️ אין הרשאת מיקום`
+- `⚠️ אין תמיכה באיתור מיקום`
+- `⚠️ דפדפן זה לא תומך באיתור מיקום`
+- `⚠️ הדפדפן לא תומך בהשמעה`
+- `⚠️ הייצוא נכשל`
+- `⚠️ יום לא קיים:`
+- `⚠️ יש`
+- `⚠️ לא הצלחתי לתרגם`
+- `⚠️ לא ניתן לאתר מיקום`
+- `⚠️ לא ניתן לאתר:`
+- `⚠️ שגיאת חיבור — נסה שוב`
+- `⚠️ שיתוף בוטל`
+- `⚠️ תמונה לא נמצאה`
+- `✅`
+- `✅ מיקום עודכן ·`
+- `✅ נוסף בהצלחה ליום`
+- `✅ סדר התחנות עודכן!`
+- `✅ תחנה נוספה!`
+- `✅ תרגום מוכן — לחץ 🔊 להשמעה`
+- `✈️`
+- `✈️ טיסות`
+- `✏️`
+- `✡️`
+- `⭐ 4.5`
+- `⭐⭐⭐⭐½`
+- `⭐⭐⭐⭐⭐`
+- `🌅 בוקר`
+- `🌇 אחה״צ`
+- `🌙 ערב`
+- `🌮 ילדים אוהבים`
+- `🍕 ארוחת צהריים`
+- `🍦 קינוחים`
+- `🍺 בר`
+- `🍽️`
+- `🍽️ מסעדות`
+- `🎁 מזכרות`
+- `🎟️`
+- `🎟️ אטרקציות`
+- `🎟️ בכניסה בלבד — 150 CZK מבוגר / 100 ילד`
+- `🎟️ כרטיס משולב — jewishmuseum.cz | 600 CZK מבוגר / 200 ילד 6–15`
+- `🏔️`
+- `🏘️`
+- `🏝️`
+- `🏨 מלון`
+- `👥 מתאים ל:`
+- `👦👧 ילדים כל הגילאים | 👨‍👩‍👧‍👦 חוויה קצרה ומשמחת | 🌇 יפה בשעות הערב עם האורות`
+- `👧🧒 ילדים מגיל 6+ | 🎨 אוהבי קולנוע ואנימציה`
+- `👨‍👩‍👧‍👦 כל המשפחה | 🎁 מזכרות וקנייה לבית`
+- `👨‍👩‍👧‍👦 כל המשפחה | 🕍 היסטוריה יהודית`
+- `👨‍👩‍👧‍👦 מרשים ויזואלית גם לילדים | 📸 הכי מצולם ברובע`
+- `💊 בריאות`
+- `💡 הקלידו בשדה למעלה — תרגום אוטומטי תוך שנייה`
+- `💡 להגדיר כרטיס אשראי ב-Bolt לפני הטיסה! להוריד מפת פראג Offline ב-Google Maps או Mapy.cz.`
+- `💡 להגיע לשדה לפחות שעתיים לפני — כלומר ב-04:00! מומלץ להזמין מונית/Gett לילה לפני.`
+- `💡 לצלם את הדרכונים ולשמור בענן. לבדוק תוקף תרופות. ללבוש נעלי הליכה לטיסה — חוסך מקום.`
+- `💡 נסיעה לשדה סביב 21:00. שדה Václav Havel — 30 דק׳ מהמרכז בטקסי.`
+- `💰 זול`
+- `💰💰 בינוני`
+- `💰💰💰 יקר`
+- `💰💰💰💰 יוקרה`
+- `📍 אין גישה למיקום`
+- `📍 אין קואורדינטות למקום הזה`
+- `📍 אין קואורדינטות לתחנה הזו`
+- `📍 אתרו אותי`
+- `📍 המיקום שלי`
+- `🔀 שונות`
+- `🔔 פרטי סנכרון ענן (Firebase):\n\n`
+- `🔴 דחוף — הזמינו עכשיו:\n`
+- `🕯️`
+- `🕰️`
+- `🗑️ נמחק`
+- `🗑️ תחנה נמחקה`
+- `🚇 מטרו`
+- `🚋 טראם`
+- `🚌 אוטובוס`
+- `🛍️`
+- `🛍️ קניות`
+- `🛑 עצור מעקב`
+- `🛰️ מעקב חי ·`
+- `🥐 ארוחת בוקר`
+
+## Notes
+
+- This is a static audit only.
+- It may include UI labels if they appear in place-like structures.
+- Do not add coordinates before manual review/verification.
