@@ -1,5 +1,5 @@
 from pathlib import Path
-import re, subprocess, textwrap, json
+import re, subprocess
 
 APP = Path('app.html')
 app = APP.read_text(encoding='utf-8')
@@ -11,16 +11,28 @@ protected = [
     'appdata/main','appdata/expenses','appdata/trip_summary'
 ]
 
+def log(msg):
+    print('[PR132]', msg, flush=True)
+
 def require(cond, msg):
     if not cond:
-        raise SystemExit(msg)
+        raise SystemExit('[PR132 fail] ' + msg)
 
 def replace_once(src, old, new, label):
     require(old in src, 'missing anchor: ' + label)
+    log('replace ' + label)
     return src.replace(old, new, 1)
 
+def sub_once(src, pattern, repl, label, flags=0):
+    new, n = re.subn(pattern, repl, src, count=1, flags=flags)
+    require(n == 1, 'regex did not match: ' + label)
+    log('regex replace ' + label)
+    return new
+
+log('start')
+
 # 1) Build ID
-app = replace_once(app, "var BUILD_ID = '2026-08-15-i';", "var BUILD_ID = '2026-08-15-j';", 'BUILD_ID i')
+app = replace_once(app, "var BUILD_ID = '2026-08-15-i';", "var BUILD_ID = '2026-08-15-j';", 'BUILD_ID i -> j')
 
 # 2) Burger King GPS aliases belong in PLACE_COORDS, not in the day-stop alias map.
 coords_block = """  // PR #132: Burger King OC Eden aliases moved to PLACE_COORDS (were accidentally placed in day-stop aliases in PR #131)
@@ -29,44 +41,36 @@ coords_block = """  // PR #132: Burger King OC Eden aliases moved to PLACE_COORD
   'BK Praha OC Eden': [50.06780, 14.47170],
   'Burger King — U Slavie': [50.06780, 14.47170],
 """
-if "'Burger King — OC Eden': [50.06780, 14.47170]," not in app.split("// PR #130: expense-derived day stops — real locations only", 1)[0]:
-    marker = "  // PR #130: expense-derived day stops — real locations only\n"
-    app = replace_once(app, marker, marker + coords_block, 'PLACE_COORDS PR130 marker')
+place_marker = "  // PR #130: expense-derived day stops — real locations only\n"
+require(place_marker in app, 'PLACE_COORDS PR130 marker missing')
+place_prefix = app.split(place_marker, 1)[0]
+if "'Burger King — OC Eden': [50.06780, 14.47170]," not in place_prefix:
+    app = replace_once(app, place_marker, place_marker + coords_block, 'insert Burger King PLACE_COORDS')
+else:
+    log('Burger King PLACE_COORDS already present')
 
-bad_alias_block = """  // PR #131: expense-derived Burger King stop, receipt: BK Praha OC Eden, U Slavie 1527, Praha 10
-  'Burger King — OC Eden': [50.06780, 14.47170],
-  'Burger King OC Eden': [50.06780, 14.47170],
-  'BK Praha OC Eden': [50.06780, 14.47170],
-  'Burger King — U Slavie': [50.06780, 14.47170],
-"""
-good_alias_block = """      // PR #132: aliases here are only existence aliases; GPS lives in PLACE_COORDS.
+bk_array_alias_pattern = r"\s*// PR #131: expense-derived Burger King stop, receipt: BK Praha OC Eden, U Slavie 1527, Praha 10\n\s*'Burger King — OC Eden': \[50\.06780, 14\.47170\],\n\s*'Burger King OC Eden': \[50\.06780, 14\.47170\],\n\s*'BK Praha OC Eden': \[50\.06780, 14\.47170\],\n\s*'Burger King — U Slavie': \[50\.06780, 14\.47170\],\n"
+good_alias_block = """
+      // PR #132: aliases here are only existence aliases; GPS lives in PLACE_COORDS.
       'Burger King — OC Eden': true,
       'Burger King OC Eden': true,
       'BK Praha OC Eden': true,
       'Burger King — U Slavie': true,
 """
-app = replace_once(app, bad_alias_block, good_alias_block, 'Burger King aliases in day-stop guard')
+app = sub_once(app, bk_array_alias_pattern, good_alias_block, 'Burger King aliases arrays -> true')
 
 # 3) Normalize Burger King day stop object fields.
-old_bk_stop = """      {
-      emoji: '🍔',
-      name: 'Burger King — OC Eden',
-      time: '13:56',
-      area: 'OC Eden / U Slavie 1527, Praha 10',
-      note: 'מהקבלה — 918 CZK, Burger King BK Praha OC Eden'
-    },
-"""
-new_bk_stop = """  {
+bk_stop_pattern = r"\{\s*emoji:\s*'🍔',\s*name:\s*'Burger King — OC Eden',\s*time:\s*'13:56',\s*area:\s*'OC Eden / U Slavie 1527, Praha 10',\s*note:\s*'מהקבלה — 918 CZK, Burger King BK Praha OC Eden'\s*\},"
+new_bk_stop = """{
     emoji: '🍔',
     name: 'Burger King — OC Eden',
     time: '13:56',
     desc: 'נוסף לפי הוצאה: 918 CZK · BK Praha OC Eden · U Slavie 1527, Praha 10.',
     mapUrl: 'https://www.google.com/maps/search/Burger+King+OC+Eden+U+Slavie+1527+Praha'
-  },
-"""
-app = replace_once(app, old_bk_stop, new_bk_stop, 'Burger King stop object')
+  },"""
+app = sub_once(app, bk_stop_pattern, new_bk_stop, 'normalize Burger King day stop', flags=re.S)
 
-# 4) Overlay scroll lock helpers after toast().
+# 4) Overlay scroll lock helpers after toast/isGas utilities.
 if 'function _lockTripSummaryOverlayScroll()' not in app:
     toast_end = """function isGas() {
   return typeof google !== 'undefined' && google.script && google.script.run;
@@ -124,7 +128,9 @@ function _closeTripSummarySelectionBank() {
   _unlockTripSummaryOverlayScroll();
 }
 """
-    app = replace_once(app, toast_end, scroll_helpers + "\n" + toast_end, 'insert scroll lock helpers')
+    app = replace_once(app, toast_end, scroll_helpers + "\n" + toast_end, 'insert overlay scroll lock helpers')
+else:
+    log('scroll lock helpers already present')
 
 # 5) Manual visits must survive de-dupe as separate rows.
 manual_visit_guard = """  if(r && r.manualVisit){
@@ -132,30 +138,14 @@ manual_visit_guard = """  if(r && r.manualVisit){
   }
 """
 if "return 'manual-visit:'" not in app:
-    app = replace_once(app, "  if(!name) return '';\n\n  // PR #131:", "  if(!name) return '';\n" + manual_visit_guard + "\n  // PR #131:", 'manualVisit dedupe guard')
+    app = sub_once(app, r"(function _tripSummaryDedupeKey\(r\)\{[\s\S]*?if\(!name\) return '';\n)", r"\1" + manual_visit_guard, 'manualVisit dedupe guard')
+else:
+    log('manualVisit guard already present')
 
 # 6) Preserve base visit when additional manual visits exist.
-old_visit_branch = """    if (ov && Array.isArray(ov.visits) && ov.visits.length) {
-      ov.visits.forEach(function(v, idx) {
-        var c = _cloneTripSummaryItem(it);
-        var d = parseInt(v.day, 10);
-        if (d >= 1 && d <= 30) { c.day = d; c.dayFrom = 'manual'; }
-        if (v.label) c.desc = _sclip(v.label, 62);
-        c.manual = true;
-        c.manualVisit = idx + 1;
-        out.push(c);
-      });
-      return;
-    }
+visit_branch_pattern = r"\s*if \(ov && Array\.isArray\(ov\.visits\) && ov\.visits\.length\) \{\s*ov\.visits\.forEach\(function\(v, idx\) \{\s*var c = _cloneTripSummaryItem\(it\);\s*var d = parseInt\(v\.day, 10\);\s*if \(d >= 1 && d <= 30\) \{ c\.day = d; c\.dayFrom = 'manual'; \}\s*if \(v\.label\) c\.desc = _sclip\(v\.label, 62\);\s*c\.manual = true;\s*c\.manualVisit = idx \+ 1;\s*out\.push\(c\);\s*\}\);\s*return;\s*\}\s*var c = _cloneTripSummaryItem\(it\);\s*if \(ov\) \{\s*var od = parseInt\(ov\.day, 10\);\s*if \(od >= 1 && od <= 30\) \{ c\.day = od; c\.dayFrom = 'manual'; c\.manual = true; \}\s*if \(ov\.label\) c\.desc = _sclip\(ov\.label, 62\);\s*\}\s*out\.push\(c\);"
+new_visit_branch = """
     var c = _cloneTripSummaryItem(it);
-    if (ov) {
-      var od = parseInt(ov.day, 10);
-      if (od >= 1 && od <= 30) { c.day = od; c.dayFrom = 'manual'; c.manual = true; }
-      if (ov.label) c.desc = _sclip(ov.label, 62);
-    }
-    out.push(c);
-"""
-new_visit_branch = """    var c = _cloneTripSummaryItem(it);
     if (ov) {
       var od = parseInt(ov.day, 10);
       if (od >= 1 && od <= 30) { c.day = od; c.dayFrom = 'manual'; c.manual = true; }
@@ -172,19 +162,17 @@ new_visit_branch = """    var c = _cloneTripSummaryItem(it);
         extra.manualVisit = idx + 1;
         out.push(extra);
       });
-    }
-"""
-app = replace_once(app, old_visit_branch, new_visit_branch, 'preserve base plus manual visits')
+    }"""
+app = sub_once(app, visit_branch_pattern, new_visit_branch, 'preserve base row plus manual visits', flags=re.S)
 
 # 7) Use close helpers and lock helpers in overlays.
-app = app.replace("if (old) { old.remove(); return; }\n    window._tripSummarySelectionBankItems", "if (old) { _closeTripSummarySelectionBank(); return; }\n    _lockTripSummaryOverlayScroll();\n    window._tripSummarySelectionBankItems")
-app = app.replace("onclick=\"document.getElementById(\\'tripSummarySelectionBankPanel\\').remove()\"", "onclick=\"_closeTripSummarySelectionBank()\"")
-app = app.replace("if (old) { old.remove(); return; }\n    var o = _loadTripSummaryOverrides();", "if (old) { _closeTripSummaryEditPanel(); return; }\n    _lockTripSummaryOverlayScroll();\n    var o = _loadTripSummaryOverrides();")
+app = replace_once(app, "if (old) { old.remove(); return; }\n    window._tripSummarySelectionBankItems", "if (old) { _closeTripSummarySelectionBank(); return; }\n    _lockTripSummaryOverlayScroll();\n    window._tripSummarySelectionBankItems", 'selection bank open lock')
+app = replace_once(app, "onclick=\"document.getElementById(\\'tripSummarySelectionBankPanel\\').remove()\"", "onclick=\"_closeTripSummarySelectionBank()\"", 'selection bank close button')
+app = replace_once(app, "if (old) { old.remove(); return; }\n    var o = _loadTripSummaryOverrides();", "if (old) { _closeTripSummaryEditPanel(); return; }\n    _lockTripSummaryOverlayScroll();\n    var o = _loadTripSummaryOverrides();", 'editor open lock')
 app = app.replace("onclick=\"document.getElementById(\\'tripSummaryEditPanel\\').remove()\"", "onclick=\"_closeTripSummaryEditPanel()\"")
 
 # 8) Docs
-DOC = Path('docs/TRIP_SUMMARY_REGRESSION_FIX_PR132.md')
-DOC.write_text("""# Trip Summary Regression Fix — PR #132
+Path('docs/TRIP_SUMMARY_REGRESSION_FIX_PR132.md').write_text("""# Trip Summary Regression Fix — PR #132
 
 Date: 2026-08-15
 Branch: `feature/trip-summary-regression-fix`
@@ -241,8 +229,7 @@ No intentional changes to:
 `BUILD_ID` advanced to `2026-08-15-j`.
 """, encoding='utf-8')
 
-CDOC = Path('docs/CLAUDE_TRIP_SUMMARY_REGRESSION_FIX_PR132.md')
-CDOC.write_text("""# Claude Handoff — Trip Summary Regression Fix PR #132
+Path('docs/CLAUDE_TRIP_SUMMARY_REGRESSION_FIX_PR132.md').write_text("""# Claude Handoff — Trip Summary Regression Fix PR #132
 
 Date: 2026-08-15
 
@@ -287,7 +274,6 @@ require("'Burger King — OC Eden': true" in app, 'Burger King day alias true mi
 require("return 'manual-visit:'" in app, 'manualVisit dedupe guard missing')
 require('function _lockTripSummaryOverlayScroll()' in app and 'function _unlockTripSummaryOverlayScroll()' in app, 'scroll lock helpers missing')
 require('_closeTripSummaryEditPanel()' in app and '_closeTripSummarySelectionBank()' in app, 'overlay close helpers missing')
-require('Burger King — OC Eden\': [50.06780, 14.47170]' in app, 'BK coords string missing')
 
 APP.write_text(app, encoding='utf-8')
 
@@ -329,23 +315,17 @@ function _loadTripSummaryOverrides(){ return __ov; }
     extract_func(app, '_tripSummaryDedupeKey'),
     extract_func(app, '_tripSummaryDedupeRows'),
 ]) + """
-
-// Existing canonical duplicate still collapses.
 var pureRows = _tripSummaryDedupeRows([
   {name:'Pure גלידה', coords:[50.0692,14.4142], day:8},
   {name:'Náplavka / שוק האיכרים על הנהר', coords:[50.0692,14.4142], day:8}
 ]);
 assert(pureRows.length === 1, 'Pure/Naplavka duplicate did not collapse');
-
-// Manual additional visit must survive dedupe even same name/GPS.
 var pizzaRows = _tripSummaryDedupeRows([
   {name:'Pizza & Pasta Factory', coords:[50.083515,14.422403], day:3},
   {name:'Pizza & Pasta Factory', coords:[50.083515,14.422403], day:7, manual:true, manualVisit:1}
 ]);
 assert(pizzaRows.length === 2, 'Pizza manual visit was swallowed by dedupe');
 assert(pizzaRows[1].manualVisit === 1 && pizzaRows[1].day === 7, 'Pizza manual visit metadata lost');
-
-// Overrides must preserve base + append manual visit.
 __ov = { version:1, places:{'Pizza & Pasta Factory':{visits:[{day:7,label:'ביקור נוסף'}]}}, hidden:{}, added:[] };
 var applied = _applyTripSummaryOverrides([{name:'Pizza & Pasta Factory', day:3, coords:[50.083515,14.422403], icon:'🍕', desc:'base', ts:1}]);
 assert(applied.length === 2, 'apply overrides did not return base + extra');
@@ -354,4 +334,4 @@ assert(applied[1].day === 7 && applied[1].manualVisit === 1, 'extra Pizza visit 
 console.log('semantic trip summary regression tests passed');
 """
 Path('/tmp/trip-summary-regression-tests.js').write_text(semantic, encoding='utf-8')
-print('Prepared PR132 fix and semantic tests')
+log('prepared fix and semantic tests')
